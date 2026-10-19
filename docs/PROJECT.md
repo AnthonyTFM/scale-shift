@@ -78,6 +78,32 @@ The single source of truth for what we're building and why. Both owners and both
 - Analytics (GA4 ID in Vercel) and form delivery (webhook vs Resend)
 - Slack with @Claude for both owners (after both have shipped from their laptops)
 
+## Status and setup log
+_Last updated: October 19, 2026_
+
+**Live:** https://scale-shift.vercel.app
+
+**Hosting:** Vercel Hobby plan, project `scale-shift` under the BellAI team. Every merge to `main` deploys to production automatically; every pull request gets its own preview link.
+
+**Environment variables (Vercel)**
+| Variable | Status |
+|---|---|
+| `NEXT_PUBLIC_SITE_URL` | Set to `https://scale-shift.vercel.app` (all environments). A typo (`ttps://`) was fixed on Oct 18; the live sitemap was checked on Oct 19 and all 69 links are correct. |
+| `NEXT_PUBLIC_GA4_ID` | Not set yet (no analytics) |
+| `SUBMISSIONS_WEBHOOK_URL` or the `RESEND_*` settings | Not set yet, so the live site's forms don't save anything |
+
+**GitHub**
+- `main` is protected: changes go through a pull request, approvals are not required, and the CI status check `build` must pass (lint, typecheck, build, data check).
+- Issues are on. Leftover branches from merged PRs are deleted.
+- Working from a Claude Code cloud session: GitHub's GraphQL API is blocked there, so `gh pr list`, `gh pr checks` and `gh pr merge` fail. Use the REST equivalents (`gh api repos/AnthonyTFM/scale-shift/...`) or finish the step from a laptop.
+
+**Open setup items**
+1. Invite Evan as a collaborator (waiting for his GitHub username).
+2. Confirm Evan's test PR (adding `CONTRIBUTORS.md`) deploys. If Vercel marks his deployment "Blocked", the Hobby plan is refusing a second author: either move the project to Vercel Pro or host somewhere that allows free collaborators.
+3. Connect form delivery: set `SUBMISSIONS_WEBHOOK_URL` or the Resend settings in Vercel. Until then the live site's forms don't save.
+4. Pick the final name and domain.
+5. Later: Slack with @Claude for both owners.
+
 ## Working with Claude (examples that work well)
 - "Pull the latest main, then add a comparison page for the Aztec Empire vs Mexico and ship it."
 - "Open an issue for adding AD 117, assign it to me, then research where we can get licensed boundary data for that year."
