@@ -32,7 +32,7 @@ function Bar() {
       {isSignedIn ? (
         <>
           <span>{name ? <>Signed in as <strong className="text-ink">{name}</strong>.</> : name === null ? "Signed in. Play today's challenge to join the board." : "Signed in."}</span>
-          <SignOutButton>
+          <SignOutButton redirectUrl="/leaderboard">
             <button type="button" className="font-semibold text-link hover:underline">
               Sign out
             </button>
@@ -41,7 +41,7 @@ function Bar() {
       ) : (
         <>
           <span>Same nickname on every device:</span>
-          <SignInButton mode="modal" withSignUp>
+          <SignInButton mode="modal" withSignUp forceRedirectUrl="/leaderboard" signUpForceRedirectUrl="/leaderboard">
             <button type="button" className="font-semibold text-link hover:underline">
               Sign in →
             </button>
