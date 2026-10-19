@@ -55,6 +55,7 @@ export const POLITICAL = ["#F6C28B", "#F29E8E", "#F5D671", "#B6D98A", "#8DD0B8",
 
 const COLORS = {
   ocean: "#9FCBE0",
+  offMap: "#FBF6EE", // the bars beside the world when zoomed all the way out
   land: "#EFE3C8", // land the source leaves unclaimed or unmapped
   border: "rgba(88, 60, 46, 0.6)",
   borderSoft: "rgba(88, 60, 46, 0.25)",
@@ -348,8 +349,16 @@ export class MapEngine {
   private drawBase(proj: ReturnType<typeof projectionFor>) {
     const ctx = this.bctx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    ctx.fillStyle = COLORS.ocean;
+    const world = this.worldRect();
+    ctx.fillStyle = COLORS.offMap;
     ctx.fillRect(0, 0, this.w, this.h);
+    ctx.fillStyle = COLORS.ocean;
+    ctx.fillRect(world.x, world.y, world.w, world.h);
+    // nothing spills into the bars (Antarctica's edge, claim wedges)
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(world.x, world.y, world.w, world.h);
+    ctx.clip();
     const path = geoPath(proj, ctx);
     const vb = this.visibleBox();
 
@@ -460,7 +469,7 @@ export class MapEngine {
     if (eq && eq[1] > 12 && eq[1] < this.h - 4) {
       ctx.font = "600 10px system-ui, sans-serif";
       ctx.fillStyle = COLORS.equator;
-      ctx.fillText("EQUATOR", 8, eq[1] - 5);
+      ctx.fillText("EQUATOR", Math.max(8, world.x + 8), eq[1] - 5);
     }
 
     if (this.labels) {
@@ -481,6 +490,7 @@ export class MapEngine {
         ctx.fill();
       }
     }
+    ctx.restore();
   }
 
   private drawLabels(
@@ -608,6 +618,11 @@ export class MapEngine {
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.w, this.h);
     this.paths.clear();
+    const world = this.worldRect();
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(world.x, world.y, world.w, world.h);
+    ctx.clip();
     for (const o of this.overlays) {
       const p2d = new Path2D();
       geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(this.placed(o) as GeoPermissibleObjects);
@@ -627,6 +642,7 @@ export class MapEngine {
       ctx.strokeStyle = color;
       ctx.stroke(p2d);
     }
+    ctx.restore();
     if (!this.labels) return;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -670,7 +686,16 @@ export class MapEngine {
     return null;
   }
 
+  /** Where the whole world sits on screen (the map is a square, 2π·k on each side). Wider than the screen unless zoomed far out. */
+  private worldRect() {
+    const size = 2 * Math.PI * this.view.k;
+    const top = this.h / 2 + this.view.k * this.view.y - size / 2;
+    return { x: (this.w - size) / 2, y: top, w: size, h: size };
+  }
+
   lonLatAt(x: number, y: number): LonLat | null {
+    const world = this.worldRect();
+    if (x < world.x || x > world.x + world.w || y < world.y || y > world.y + world.h) return null;
     const proj = projectionFor(this.view, this.w, this.h);
     const ll = proj.invert?.([x, y]);
     if (!ll || !Number.isFinite(ll[0])) return null;

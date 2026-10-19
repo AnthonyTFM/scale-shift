@@ -74,9 +74,13 @@ export function minScale(w: number, h: number) {
   return Math.max(w, h) / (2 * Math.PI);
 }
 
+/** Smallest scale: the whole world fits on screen, with bars on the sides (or top and bottom) where it doesn't fill it. */
+export function fitScale(w: number, h: number) {
+  return Math.min(w, h) / (2 * Math.PI);
+}
+
 export function clampView(v: View, w: number, h: number): View {
-  const kMin = minScale(w, h);
-  const k = Math.max(kMin, Math.min(kMin * 60, v.k));
+  const k = Math.max(fitScale(w, h), Math.min(minScale(w, h) * 60, v.k));
   const half = h / (2 * k);
   const y = half >= MAX_MERC_Y ? 0 : Math.max(-MAX_MERC_Y + half, Math.min(MAX_MERC_Y - half, v.y));
   return { lon: normLon(v.lon), y, k };
