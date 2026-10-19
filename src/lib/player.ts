@@ -3,7 +3,8 @@
 
 export type Player = { id: string; name: string; email?: string; reminders?: boolean };
 
-const KEY = "atlas-player-v1";
+// v2: reset on Oct 19 with the fresh leaderboard (players now sign in)
+const KEY = "atlas-player-v2";
 
 export function loadPlayer(): Player | null {
   try {

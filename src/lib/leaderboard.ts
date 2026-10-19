@@ -7,6 +7,9 @@
 //           On Vercel without Redis this falls back to /tmp, which is wiped regularly, so scores won't last.
 //
 // Scores are never trusted from the browser: the server rebuilds the day's questions and marks the answers itself.
+//
+// Redis keys start with "lb2:". The leaderboard was reset on Oct 19 when verified sign-in launched (everything under the
+// old "lb:" keys is left unused). To reset again, bump the prefix everywhere in this file.
 import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -123,82 +126,82 @@ function redisStore(url: string, token: string): Store {
   };
   return {
     async submit(date, id, score, at) {
-      const [added] = await run([["HSETNX", `lb:day:${date}`, id, JSON.stringify({ s: score, t: at })]]);
+      const [added] = await run([["HSETNX", `lb2:day:${date}`, id, JSON.stringify({ s: score, t: at })]]);
       if (Number(added) !== 1) return false;
       await run([
-        ["ZINCRBY", "lb:points", score, id],
-        ["HINCRBY", "lb:days", id, 1],
+        ["ZINCRBY", "lb2:points", score, id],
+        ["HINCRBY", "lb2:days", id, 1],
       ]);
       return true;
     },
     async setName(id, name) {
-      await run([["HSET", "lb:names", id, name]]);
+      await run([["HSET", "lb2:names", id, name]]);
     },
     async has(date, id) {
-      const [r] = await run([["HEXISTS", `lb:day:${date}`, id]]);
+      const [r] = await run([["HEXISTS", `lb2:day:${date}`, id]]);
       return Number(r) === 1;
     },
     async claimName(nameKey, id) {
       const [, owner] = await run([
-        ["HSETNX", "lb:owners", nameKey, id],
-        ["HGET", "lb:owners", nameKey],
+        ["HSETNX", "lb2:owners", nameKey, id],
+        ["HGET", "lb2:owners", nameKey],
       ]);
       return owner === id;
     },
     async emailOf(id) {
-      const [email] = await run([["HGET", "lb:emails", id]]);
+      const [email] = await run([["HGET", "lb2:emails", id]]);
       return (email as string | null) ?? null;
     },
     async claimEmail(emailKey, id, email) {
       const [, owner] = await run([
-        ["HSETNX", "lb:email-owners", emailKey, id],
-        ["HGET", "lb:email-owners", emailKey],
+        ["HSETNX", "lb2:email-owners", emailKey, id],
+        ["HGET", "lb2:email-owners", emailKey],
       ]);
       if (owner !== id) return false;
-      await run([["HSET", "lb:emails", id, email]]);
+      await run([["HSET", "lb2:emails", id, email]]);
       return true;
     },
     async setReminders(id, on, at) {
-      await run([on ? ["HSET", "lb:reminders", id, at] : ["HDEL", "lb:reminders", id]]);
+      await run([on ? ["HSET", "lb2:reminders", id, at] : ["HDEL", "lb2:reminders", id]]);
     },
     async playerOfEmail(emailKey) {
-      const [id] = await run([["HGET", "lb:email-owners", emailKey]]);
+      const [id] = await run([["HGET", "lb2:email-owners", emailKey]]);
       return typeof id === "string" ? id : null;
     },
     async nameOf(id) {
-      const [n] = await run([["HGET", "lb:names", id]]);
+      const [n] = await run([["HGET", "lb2:names", id]]);
       return typeof n === "string" ? n : null;
     },
     async remindersOn(id) {
-      const [r] = await run([["HEXISTS", "lb:reminders", id]]);
+      const [r] = await run([["HEXISTS", "lb2:reminders", id]]);
       return Number(r) === 1;
     },
     async playerOfAccount(accountId) {
-      const [id] = await run([["HGET", "lb:accounts", accountId]]);
+      const [id] = await run([["HGET", "lb2:accounts", accountId]]);
       return typeof id === "string" ? id : null;
     },
     async linkAccount(accountId, id) {
       const [, owner] = await run([
-        ["HSETNX", "lb:accounts", accountId, id],
-        ["HGET", "lb:accounts", accountId],
+        ["HSETNX", "lb2:accounts", accountId, id],
+        ["HGET", "lb2:accounts", accountId],
       ]);
       return owner as string;
     },
     async reminderRecipients() {
-      const [raw] = await run([["HGETALL", "lb:reminders"]]);
+      const [raw] = await run([["HGETALL", "lb2:reminders"]]);
       const since = pairs(raw);
       const ids = Object.keys(since);
       if (!ids.length) return [];
       const [emails, names] = await run([
-        ["HMGET", "lb:emails", ...ids],
-        ["HMGET", "lb:names", ...ids],
+        ["HMGET", "lb2:emails", ...ids],
+        ["HMGET", "lb2:names", ...ids],
       ]);
       return ids
         .map((id, i) => ({ id, email: (emails as (string | null)[])[i] ?? "", name: (names as (string | null)[])[i] ?? "Player", since: Number(since[id]) }))
         .filter((r) => r.email);
     },
     async bumpNetwork(date, netKey) {
-      const key = `lb:net:${date}:${netKey}`;
+      const key = `lb2:net:${date}:${netKey}`;
       const [n] = await run([
         ["INCR", key],
         ["EXPIRE", key, 3 * 86400],
@@ -206,14 +209,14 @@ function redisStore(url: string, token: string): Store {
       return Number(n);
     },
     async day(date) {
-      const [raw] = await run([["HGETALL", `lb:day:${date}`]]);
+      const [raw] = await run([["HGETALL", `lb2:day:${date}`]]);
       const entries = Object.entries(pairs(raw)).map(([id, v]) => ({ id, ...(JSON.parse(v) as DayEntry) }));
       if (!entries.length) return [];
-      const [names] = await run([["HMGET", "lb:names", ...entries.map((e) => e.id)]]);
+      const [names] = await run([["HMGET", "lb2:names", ...entries.map((e) => e.id)]]);
       return entries.map((e, i) => ({ ...e, name: (names as (string | null)[])[i] ?? "Player" }));
     },
     async allTime(limit, me) {
-      const [top, total] = await run([["ZREVRANGE", "lb:points", 0, limit - 1, "WITHSCORES"], ["ZCARD", "lb:points"]]);
+      const [top, total] = await run([["ZREVRANGE", "lb2:points", 0, limit - 1, "WITHSCORES"], ["ZCARD", "lb2:points"]]);
       const list = (top as string[]) ?? [];
       const ids: string[] = [];
       const pts: number[] = [];
@@ -223,8 +226,8 @@ function redisStore(url: string, token: string): Store {
       }
       const want = me && !ids.includes(me) ? [...ids, me] : ids;
       const cmds: (string | number)[][] = [];
-      if (want.length) cmds.push(["HMGET", "lb:names", ...want], ["HMGET", "lb:days", ...want]);
-      if (me) cmds.push(["ZSCORE", "lb:points", me]);
+      if (want.length) cmds.push(["HMGET", "lb2:names", ...want], ["HMGET", "lb2:days", ...want]);
+      if (me) cmds.push(["ZSCORE", "lb2:points", me]);
       const res = cmds.length ? await run(cmds) : [];
       const n = (want.length ? res[0] : []) as (string | null)[];
       const d = (want.length ? res[1] : []) as (string | null)[];
@@ -232,7 +235,7 @@ function redisStore(url: string, token: string): Store {
       let meRow = null;
       if (me && mine !== null && mine !== undefined) {
         const points = Number(mine);
-        const [above] = await run([["ZCOUNT", "lb:points", `(${points}`, "+inf"]]);
+        const [above] = await run([["ZCOUNT", "lb2:points", `(${points}`, "+inf"]]);
         const j = want.indexOf(me);
         meRow = { name: n[j] ?? "You", points, days: Number(d[j] ?? 0), above: Number(above) };
       }

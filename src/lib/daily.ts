@@ -174,7 +174,8 @@ export function explain(q: Question) {
 export type DayRecord = { c: number[]; s?: number };
 export type DailySave = { v: 1; days: Record<string, DayRecord> };
 
-const KEY = "atlas-daily-v1";
+// v2: progress was reset on Oct 19 with the fresh leaderboard
+const KEY = "atlas-daily-v2";
 
 export function loadSave(): DailySave {
   try {
