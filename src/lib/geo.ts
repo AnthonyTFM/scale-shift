@@ -74,9 +74,10 @@ export function minScale(w: number, h: number) {
   return Math.max(w, h) / (2 * Math.PI);
 }
 
-/** Smallest scale: the whole world fits on screen, with bars on the sides (or top and bottom) where it doesn't fill it. */
-export function fitScale(w: number, h: number) {
-  return Math.min(w, h) / (2 * Math.PI);
+/** Furthest zoom-out: the world's full height fills at least 90% of the screen, so the bars above and below stay thin.
+ * Sideways there are no bars: the world repeats, like a web map. */
+export function fitScale(_w: number, h: number) {
+  return (0.9 * h) / (2 * Math.PI);
 }
 
 export function clampView(v: View, w: number, h: number): View {
@@ -86,11 +87,12 @@ export function clampView(v: View, w: number, h: number): View {
   return { lon: normLon(v.lon), y, k };
 }
 
-export function projectionFor(v: View, w: number, h: number): GeoProjection {
+/** `shift` moves the world sideways in pixels: used to draw the repeated copies either side when zoomed far out. */
+export function projectionFor(v: View, w: number, h: number, shift = 0): GeoProjection {
   return geoMercator()
     .rotate([-v.lon, 0])
     .scale(v.k)
-    .translate([w / 2, h / 2 + v.k * v.y])
+    .translate([w / 2 + shift, h / 2 + v.k * v.y])
     .clipExtent([
       [-2, -2],
       [w + 2, h + 2],

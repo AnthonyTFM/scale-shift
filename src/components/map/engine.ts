@@ -55,7 +55,7 @@ export const POLITICAL = ["#F6C28B", "#F29E8E", "#F5D671", "#B6D98A", "#8DD0B8",
 
 const COLORS = {
   ocean: "#9FCBE0",
-  offMap: "#FBF6EE", // the bars beside the world when zoomed all the way out
+  offMap: "#FBF6EE", // the thin bars above and below the world when zoomed all the way out
   land: "#EFE3C8", // land the source leaves unclaimed or unmapped
   border: "rgba(88, 60, 46, 0.6)",
   borderSoft: "rgba(88, 60, 46, 0.25)",
@@ -322,15 +322,24 @@ export class MapEngine {
   }
 
   private drawNow() {
-    const proj = projectionFor(this.view, this.w, this.h);
+    const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
     if (this.baseDirty) {
-      this.drawBase(proj);
+      this.drawBase(projs);
       this.baseDirty = false;
     }
     if (this.topDirty) {
-      this.drawTop(proj);
+      this.drawTop(projs);
       this.topDirty = false;
     }
+  }
+
+  /** Sideways pixel offsets of every copy of the world on screen, the main copy first. Only one copy unless zoomed far out. */
+  private copyShifts() {
+    const size = 2 * Math.PI * this.view.k;
+    const n = Math.max(0, Math.ceil((this.w + size) / 2 / size) - 1);
+    const shifts = [0];
+    for (let i = 1; i <= n; i++) shifts.push(-i * size, i * size);
+    return shifts;
   }
 
   /** Visible lon/lat window, used to skip off-screen shapes. */
@@ -352,7 +361,7 @@ export class MapEngine {
     return d <= vb.halfLon + width / 2 + 1;
   }
 
-  private drawBase(proj: ReturnType<typeof projectionFor>) {
+  private drawBase(projs: ReturnType<typeof projectionFor>[]) {
     const ctx = this.bctx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     const world = this.worldRect();
@@ -365,6 +374,13 @@ export class MapEngine {
     ctx.beginPath();
     ctx.rect(world.x, world.y, world.w, world.h);
     ctx.clip();
+    projs.forEach((proj, i) => this.drawBaseCopy(proj, i === 0));
+    ctx.restore();
+  }
+
+  /** One copy of the world: land, borders, labels and the pin. */
+  private drawBaseCopy(proj: ReturnType<typeof projectionFor>, main: boolean) {
+    const ctx = this.bctx;
     const path = geoPath(proj, ctx);
     const vb = this.visibleBox();
 
@@ -472,10 +488,10 @@ export class MapEngine {
     ctx.stroke();
     ctx.setLineDash([]);
     const eq = proj([this.view.lon, 0]);
-    if (eq && eq[1] > 12 && eq[1] < this.h - 4) {
+    if (main && eq && eq[1] > 12 && eq[1] < this.h - 4) {
       ctx.font = "600 10px system-ui, sans-serif";
       ctx.fillStyle = COLORS.equator;
-      ctx.fillText("EQUATOR", Math.max(8, world.x + 8), eq[1] - 5);
+      ctx.fillText("EQUATOR", 8, eq[1] - 5);
     }
 
     if (this.labels) {
@@ -496,7 +512,6 @@ export class MapEngine {
         ctx.fill();
       }
     }
-    ctx.restore();
   }
 
   private drawLabels(
@@ -619,7 +634,7 @@ export class MapEngine {
     return g;
   }
 
-  private drawTop(proj: ReturnType<typeof projectionFor>) {
+  private drawTop(projs: ReturnType<typeof projectionFor>[]) {
     const ctx = this.tctx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, this.w, this.h);
@@ -631,7 +646,7 @@ export class MapEngine {
     ctx.clip();
     for (const o of this.overlays) {
       const p2d = new Path2D();
-      geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(this.placed(o) as GeoPermissibleObjects);
+      for (const proj of projs) geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(this.placed(o) as GeoPermissibleObjects);
       this.paths.set(o.id, p2d);
       const color = PALETTE[o.color % PALETTE.length];
       const sel = o.id === this.selected;
@@ -654,21 +669,23 @@ export class MapEngine {
     ctx.textBaseline = "middle";
     ctx.lineJoin = "round";
     const taken: [number, number, number][] = []; // x, y, half-width of labels already drawn
-    for (const o of this.overlays) {
-      const p = proj([o.lon, o.lat]);
-      if (!p) continue;
-      ctx.font = "700 13px system-ui, sans-serif";
-      const text = o.name.length > 30 ? o.name.slice(0, 28) + "…" : o.name;
-      const half = ctx.measureText(text).width / 2;
-      let y = p[1];
-      // nudge down until it no longer overlaps another shape's label
-      for (let guard = 0; guard < 6 && taken.some(([tx, ty, th]) => Math.abs(tx - p[0]) < th + half && Math.abs(ty - y) < 16); guard++) y += 17;
-      taken.push([p[0], y, half]);
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = "rgba(255, 250, 240, 0.95)";
-      ctx.strokeText(text, p[0], y);
-      ctx.fillStyle = "#24160F";
-      ctx.fillText(text, p[0], y);
+    for (const proj of projs) {
+      for (const o of this.overlays) {
+        const p = proj([o.lon, o.lat]);
+        if (!p) continue;
+        ctx.font = "700 13px system-ui, sans-serif";
+        const text = o.name.length > 30 ? o.name.slice(0, 28) + "…" : o.name;
+        const half = ctx.measureText(text).width / 2;
+        let y = p[1];
+        // nudge down until it no longer overlaps another shape's label
+        for (let guard = 0; guard < 6 && taken.some(([tx, ty, th]) => Math.abs(tx - p[0]) < th + half && Math.abs(ty - y) < 16); guard++) y += 17;
+        taken.push([p[0], y, half]);
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = "rgba(255, 250, 240, 0.95)";
+        ctx.strokeText(text, p[0], y);
+        ctx.fillStyle = "#24160F";
+        ctx.fillText(text, p[0], y);
+      }
     }
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
@@ -692,16 +709,14 @@ export class MapEngine {
     return null;
   }
 
-  /** Where the whole world sits on screen (the map is a square, 2π·k on each side). Wider than the screen unless zoomed far out. */
+  /** The band the map covers on screen: full width (the world repeats sideways), 2π·k tall. Taller than the screen unless zoomed far out. */
   private worldRect() {
     const size = 2 * Math.PI * this.view.k;
     const top = this.h / 2 + this.view.k * this.view.y - size / 2;
-    return { x: (this.w - size) / 2, y: top, w: size, h: size };
+    return { x: 0, y: top, w: this.w, h: size };
   }
 
   lonLatAt(x: number, y: number): LonLat | null {
-    const world = this.worldRect();
-    if (x < world.x || x > world.x + world.w || y < world.y || y > world.y + world.h) return null;
     const proj = projectionFor(this.view, this.w, this.h);
     const ll = proj.invert?.([x, y]);
     if (!ll || !Number.isFinite(ll[0])) return null;
@@ -869,7 +884,9 @@ export class MapEngine {
       this.top.style.cursor = "grab";
     } else if (g?.kind === "pan" && !g.moved && e.type === "pointerup") {
       const { x, y } = this.local(e);
-      const ll = this.lonLatAt(x, y);
+      const world = this.worldRect();
+      // a click on the bars above or below the world does nothing
+      const ll = y >= world.y && y <= world.y + world.h ? this.lonLatAt(x, y) : null;
       if (ll) {
         this.selected = null;
         this.cb.onSelect(null);
