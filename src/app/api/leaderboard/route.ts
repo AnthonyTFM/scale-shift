@@ -1,6 +1,7 @@
 import { connection } from "next/server";
 import {
   allTimeBoard,
+  checkEmail,
   checkName,
   dayBoard,
   getStore,
@@ -40,9 +41,9 @@ export async function GET(request: Request) {
   }
 }
 
-/** POST { player, name, date, choices: [0|1 ×5], website } → your score and rank for the day. */
+/** POST { player, name, email, date, choices: [0|1 ×5], website } → your score and rank for the day. The email is needed once per player. */
 export async function POST(request: Request) {
-  const fail = (error: string, status: number, field?: "name") => Response.json({ ok: false, error, ...(field ? { field } : {}) } satisfies SubmitResult, { status });
+  const fail = (error: string, status: number, field?: "name" | "email") => Response.json({ ok: false, error, ...(field ? { field } : {}) } satisfies SubmitResult, { status });
   if (rateLimited(`lb-post:${ipOf(request)}`, 30)) return fail("Too many tries. Please wait a few minutes.", 429);
 
   let body: Record<string, unknown>;
@@ -61,6 +62,14 @@ export async function POST(request: Request) {
 
   try {
     const store = getStore();
+    // joining needs an email (kept private): one player per inbox
+    if (!(await store.emailOf(body.player))) {
+      const mail = checkEmail(body.email);
+      if (mail.error) return fail(mail.error, 422, "email");
+      if (!(await store.claimEmail(mail.key, body.player, mail.email))) {
+        return fail("That email is already signed up on another device or browser.", 422, "email");
+      }
+    }
     // a nickname belongs to the first player who used it, so a second browser can't post under the same name
     if (!(await store.claimName(nameKey(name), body.player))) return fail("That nickname is taken. Please pick another.", 422, "name");
     // a brand-new score for today: cap how many different players one network can add per day
