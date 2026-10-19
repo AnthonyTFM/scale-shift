@@ -56,14 +56,19 @@ export async function DailyFact() {
   return (
     <Link
       href={href}
-      className="flex flex-col rounded-card bg-white p-5 text-ink shadow-float ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-amber-300"
+      className="grid items-center gap-x-8 gap-y-1 rounded-card bg-white p-5 text-ink shadow-sm ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-amber-300 md:grid-cols-[1fr_1.3fr] md:px-7"
     >
-      <span className="text-xs font-bold uppercase tracking-wide text-link">{home.fact.eyebrow}</span>
-      <span className="mt-1 font-display text-2xl leading-tight">{preset.title}</span>
-      <span className="mt-1 text-sm leading-relaxed text-ink-soft">{preset.hook}</span>
-      <Bars label={home.fact.mapLabel} rows={rows} field="m" />
-      <Bars label={home.fact.realLabel} rows={rows} field="a" />
-      <span className="mt-auto pt-4 font-bold text-link">{home.fact.cta}</span>
+      <span className="block">
+        <span className="block text-xs font-bold uppercase tracking-wide text-link">{home.fact.eyebrow}</span>
+        <span className="mt-1 block font-display text-2xl leading-tight">{preset.title}</span>
+        <span className="mt-1 block text-sm leading-relaxed text-ink-soft">{preset.hook}</span>
+        <span className="mt-3 hidden font-bold text-link md:block">{home.fact.cta}</span>
+      </span>
+      <span className="block md:-mt-3">
+        <Bars label={home.fact.mapLabel} rows={rows} field="m" />
+        <Bars label={home.fact.realLabel} rows={rows} field="a" />
+        <span className="mt-4 block font-bold text-link md:hidden">{home.fact.cta}</span>
+      </span>
     </Link>
   );
 }
