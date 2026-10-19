@@ -593,7 +593,8 @@ export default function AtlasApp() {
 
       {/* Right-hand controls */}
       <div className="absolute right-3 top-3 z-20 flex flex-col items-end gap-2">
-        <div className="flex gap-2">
+        {/* phones: Home sits under the menu so it stays clear of the search panel */}
+        <div className="flex flex-col-reverse items-end gap-2 sm:flex-row">
           <Link
             href="/"
             aria-label="Home"

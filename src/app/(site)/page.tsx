@@ -28,7 +28,7 @@ const directory = [
     href: "/leaderboard",
     icon: "🏆",
     title: "Leaderboard",
-    body: "See who scored best today and who has the most points of all time. Pick a nickname and join in.",
+    body: "See who scored best today and who has the most points of all time. Sign up with your email and a nickname to join in.",
     cta: "See the rankings",
   },
   {
@@ -73,7 +73,7 @@ export default function HomePage() {
       <section className="bg-panel text-panel-text">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-[1.2fr_1fr] md:py-16">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-accent">Free · No sign-up · Built for curious minds</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-accent">Free · No sign-up to play · Built for curious minds</p>
             <h1 className="mt-3 font-display text-4xl leading-[1.05] md:text-6xl">Maps lie about size. Find out the truth.</h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-panel-muted">
               Most world maps stretch land near the poles, so Greenland looks as big as Africa. {site.name} lets you drag any country or empire

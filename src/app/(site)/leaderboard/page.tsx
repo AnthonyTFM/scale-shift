@@ -14,15 +14,15 @@ export default function LeaderboardPage() {
       <p className="text-xs font-bold uppercase tracking-wide text-link">Daily challenge</p>
       <h1 className="mt-1 font-display text-4xl text-ink md:text-5xl">Leaderboard</h1>
       <p className="mt-2 leading-relaxed text-ink-soft">
-        Finish the <Link href="/daily" className="font-semibold text-link hover:underline">daily challenge</Link>, pick a nickname, and your
-        score lands here. Each day has its own board, and every correct answer adds a point to the all-time ranking.
+        Finish the <Link href="/daily" className="font-semibold text-link hover:underline">daily challenge</Link>, sign up with your email and a
+        nickname, and your score lands here. Each day has its own board, and every correct answer adds a point to the all-time ranking.
       </p>
       <div className="mt-6">
         <LeaderboardView />
       </div>
       <p className="mt-6 text-xs leading-relaxed text-muted">
-        Scores are checked on our server, and only your first try each day counts. Each nickname belongs to the first player who uses it.
-        Nicknames are public; offensive ones are blocked. Want yours
+        Scores are checked on our server, and only your first try each day counts. Each email gets one player, and each nickname belongs to the
+        first player who uses it. Emails stay private. Nicknames are public; slurs and offensive names are blocked, however they&apos;re spelled. Want yours
         removed? <Link href="/contact?topic=other" className="underline">Contact us</Link>.
       </p>
     </div>
