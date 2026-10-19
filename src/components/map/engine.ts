@@ -110,7 +110,7 @@ export class MapEngine {
   private baseDirty = true;
   // While a finger (or the mouse) is moving the map, the base layer is a shifted copy of the last full drawing;
   // the full redraw waits until the gesture pauses or ends. Redrawing ~250 shapes per move made phones stutter.
-  private snap: { canvas: HTMLCanvasElement; view: View } | null = null;
+  private snap: { canvas: HTMLCanvasElement; view: View; at: number } | null = null;
   private settleTimer = 0;
   private topDirty = true;
   private raf = 0;
@@ -315,20 +315,37 @@ export class MapEngine {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, c.width, c.height);
     ctx.drawImage(this.base, 0, 0);
-    this.snap = { canvas: c, view: { ...this.view } };
+    this.snap = { canvas: c, view: { ...this.view }, at: performance.now() };
   }
 
   /**
    * Draws the snapshot moved and scaled to the current view: Mercator panning is a pure shift and zooming a pure scale,
    * so this matches the full drawing except at the newly exposed edges, which fill in when the gesture pauses.
    */
-  private drawBaseFast() {
-    const { canvas, view: v0 } = this.snap!;
+  /** Where the snapshot sits on screen for the current view: x' = s·x + tx, y' = s·y + ty. */
+  private snapTransform() {
+    const v0 = this.snap!.view;
     const v = this.view;
     const s = v.k / v0.k;
     const dLon = ((((v0.lon - v.lon + 180) % 360) + 360) % 360) - 180;
-    const tx = (this.w / 2) * (1 - s) + v.k * dLon * (Math.PI / 180);
-    const ty = (this.h / 2) * (1 - s) + v.k * (v.y - v0.y);
+    return { s, tx: (this.w / 2) * (1 - s) + v.k * dLon * (Math.PI / 180), ty: (this.h / 2) * (1 - s) + v.k * (v.y - v0.y) };
+  }
+
+  /**
+   * The shifted copy is only good while it still covers the screen. Past ~12% uncovered (a long pan, or the map
+   * edge-scrolling under a dragged shape) or after 0.4 s, draw the real thing; otherwise the world goes blank.
+   */
+  private snapUsable() {
+    if (!this.snap || !this.moving() || performance.now() - this.snap.at > 400) return false;
+    const { s, tx, ty } = this.snapTransform();
+    if (s < 0.8 || s > 1.25) return false;
+    const gap = Math.max(tx, ty, this.w - (tx + this.w * s), this.h - (ty + this.h * s), 0);
+    return gap < 0.12 * Math.min(this.w, this.h);
+  }
+
+  private drawBaseFast() {
+    const { canvas } = this.snap!;
+    const { s, tx, ty } = this.snapTransform();
     const ctx = this.bctx;
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     const world = this.worldRect();
@@ -371,8 +388,7 @@ export class MapEngine {
   private drawNow() {
     const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
     if (this.baseDirty) {
-      const scale = this.snap ? this.view.k / this.snap.view.k : 0;
-      if (this.moving() && this.snap && scale > 0.5 && scale < 2) {
+      if (this.snapUsable()) {
         this.drawBaseFast();
         // full quality once the finger rests for a moment
         clearTimeout(this.settleTimer);
