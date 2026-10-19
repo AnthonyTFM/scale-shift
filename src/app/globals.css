@@ -127,20 +127,3 @@ body {
 .intro-seen [data-intro] {
   display: none;
 }
-
-/* printing (teacher handouts): drop site chrome and keep each activity on its own page where possible */
-@media print {
-  header,
-  footer,
-  .no-print,
-  [href="#main"] {
-    display: none !important;
-  }
-  body {
-    background: #fff;
-  }
-  .print-card {
-    break-inside: avoid;
-    box-shadow: none !important;
-  }
-}

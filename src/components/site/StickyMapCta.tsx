@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 export function StickyMapCta() {
   if (usePathname() === "/daily") return null;
   return (
-    <div className="no-print fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 p-3 backdrop-blur md:hidden">
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 p-3 backdrop-blur md:hidden">
       <Link href="/map" className="flex h-12 items-center justify-center rounded-lg bg-accent font-bold text-panel">
         Open the interactive map
       </Link>

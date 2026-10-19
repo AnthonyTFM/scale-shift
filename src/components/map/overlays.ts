@@ -69,6 +69,7 @@ export async function buildOverlay(
     hiddenParts: hidden,
     km2: hidden ? areaKm2(geom) : f.props.a,
     props: f.props,
+    ...(f.sliced ? { sliced: true } : {}),
   };
 }
 

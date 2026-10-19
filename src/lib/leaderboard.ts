@@ -201,6 +201,13 @@ function fileStore(file: string): Store {
 }
 
 let store: Store | null = null;
+
+/** Which storage is in use: "redis" when the Redis settings are present, otherwise "file". */
+export const storeKind = () =>
+  (process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL) && (process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN)
+    ? "redis"
+    : "file";
+
 export function getStore(): Store {
   if (store) return store;
   const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;

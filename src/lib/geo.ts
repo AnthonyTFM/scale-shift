@@ -1,4 +1,4 @@
-import { geoArea, geoCentroid, geoDistance, geoMercator, geoRotation, type GeoProjection } from "d3-geo";
+import { geoArea, geoCentroid, geoContains, geoDistance, geoMercator, geoRotation, type GeoPermissibleObjects, type GeoProjection } from "d3-geo";
 import type { MultiPolygon, Polygon, Position } from "geojson";
 
 export const EARTH_RADIUS_KM = 6371.0088;
@@ -93,6 +93,70 @@ export function projectionFor(v: View, w: number, h: number): GeoProjection {
     ])
     // borders are already dense, so skip d3's adaptive resampling until zoomed well in (big CPU saving)
     .precision(v.k > minScale(w, h) * 4 ? 0.5 : 0);
+}
+
+/** True if a shape surrounds the North or South Pole. */
+export function wrapsPole(g: GeoPermissibleObjects, bbox: [number, number, number, number]) {
+  return (bbox[1] < -75 && geoContains(g, [0, -89.9])) || (bbox[3] > 75 && geoContains(g, [0, 89.9]));
+}
+
+/** The map stops at ±85° (like every web map), so nothing is lost by cutting shapes there. */
+const POLE_CUT = 85;
+
+/** Clip one ring (planar lon/lat) to a box, keeping the inside (Sutherland–Hodgman; the box is convex). */
+function clipRingToBox(ring: Position[], [x0, y0, x1, y1]: [number, number, number, number]) {
+  type Edge = { inside: (p: Position) => boolean; cut: (a: Position, b: Position) => Position };
+  const at = (a: Position, b: Position, t: number): Position => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  const edges: Edge[] = [
+    { inside: (p) => p[0] >= x0, cut: (a, b) => at(a, b, (x0 - a[0]) / (b[0] - a[0])) },
+    { inside: (p) => p[0] <= x1, cut: (a, b) => at(a, b, (x1 - a[0]) / (b[0] - a[0])) },
+    { inside: (p) => p[1] >= y0, cut: (a, b) => at(a, b, (y0 - a[1]) / (b[1] - a[1])) },
+    { inside: (p) => p[1] <= y1, cut: (a, b) => at(a, b, (y1 - a[1]) / (b[1] - a[1])) },
+  ];
+  let out = ring.slice(0, -1);
+  for (const e of edges) {
+    const input = out;
+    out = [];
+    for (let i = 0; i < input.length; i++) {
+      const cur = input[i];
+      const prev = input[(i + input.length - 1) % input.length];
+      if (e.inside(cur)) {
+        if (!e.inside(prev)) out.push(e.cut(prev, cur));
+        out.push(cur);
+      } else if (e.inside(prev)) out.push(e.cut(prev, cur));
+    }
+    if (!out.length) return null;
+  }
+  // a straight lon/lat segment along the cut latitude must follow the parallel, not a great circle: add a point every degree
+  const dense: Position[] = [];
+  for (let i = 0; i < out.length; i++) {
+    const a = out[i];
+    const b = out[(i + 1) % out.length];
+    dense.push(a);
+    if (a[1] === b[1] && Math.abs(a[1]) === POLE_CUT) {
+      const steps = Math.floor(Math.abs(b[0] - a[0]));
+      for (let k = 1; k < steps; k++) dense.push([a[0] + ((b[0] - a[0]) * k) / steps, a[1]]);
+    }
+  }
+  dense.push(dense[0]);
+  return dense.length >= 4 ? dense : null;
+}
+
+/**
+ * d3 can't reliably draw a shape that wraps around a pole on a zoomed-in Mercator map (it floods the screen).
+ * Cut such a shape into four 90° slices that stop at ±85°: no slice contains a pole, and the map looks the same.
+ */
+export function splitPolar(g: MultiPolygon): MultiPolygon {
+  const parts: Position[][][] = [];
+  for (let lon = -180; lon < 180; lon += 90) {
+    for (const poly of g.coordinates) {
+      const rings = poly.map((r) => clipRingToBox(r, [lon, -POLE_CUT, lon + 90, POLE_CUT])).filter((r): r is Position[] => !!r);
+      if (!rings.length || !clipRingToBox(poly[0], [lon, -POLE_CUT, lon + 90, POLE_CUT])) continue;
+      // d3 wants the small side inside each ring; flip any ring that came out covering the rest of the globe
+      parts.push(rings.map((r, i) => (geoArea({ type: "Polygon", coordinates: [r] }) > 2 * Math.PI === (i === 0) ? [...r].reverse() : r)));
+    }
+  }
+  return { type: "MultiPolygon", coordinates: parts };
 }
 
 /** Zoom by `factor`, keeping the point under (px, py) fixed. */
