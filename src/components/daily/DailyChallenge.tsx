@@ -23,6 +23,7 @@ import { formatBoth } from "@/lib/format";
 import { mapUrl } from "@/lib/share";
 import { challengeHash, readChallenge, type Challenge } from "@/lib/challenge";
 import { loadPlayer } from "@/lib/player";
+import { play, setSound, soundOn } from "@/lib/sound";
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -137,6 +138,8 @@ export function DailyChallenge() {
     const next = [...choices, choice];
     const q = round.questions[step];
     track("daily_answer", { n: step + 1, correct: q.answer === choice, practice: !round.date });
+    const last = next.length >= round.questions.length;
+    play(q.answer !== choice ? "wrong" : last && scoreOf(round, next) === round.questions.length ? "perfect" : "right");
     let updated = save;
     if (round.date) {
       const fresh = loadSave(); // keep anything other tabs saved
@@ -204,19 +207,53 @@ function Skeleton() {
 
 function Progress({ round, choices, step }: { round: Round; choices: number[]; step: number }) {
   return (
-    <ol className="mb-4 flex items-center gap-2" aria-label="Progress">
+    <ol className="mb-4 flex items-center gap-1.5" aria-label="Progress">
       {round.questions.map((q, i) => {
         const done = i < choices.length;
         const right = done && choices[i] === q.answer;
+        const current = !done && i === step;
         return (
           <li
             key={i}
-            aria-label={`Question ${i + 1}: ${done ? (right ? "correct" : "wrong") : i === step ? "current" : "not answered"}`}
-            className={`h-2.5 flex-1 rounded-full ${done ? (right ? "bg-formal" : "bg-danger") : i === step ? "bg-accent" : "bg-line"}`}
-          />
+            aria-label={`Question ${i + 1}: ${done ? (right ? "correct" : "wrong") : current ? "current" : "not answered"}`}
+            className="flex flex-1 items-center gap-1.5"
+          >
+            <span
+              aria-hidden="true"
+              className={`grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold ${
+                done
+                  ? `pop-in text-white ${right ? "bg-formal" : "bg-danger"}`
+                  : current
+                    ? "bg-accent text-panel ring-4 ring-accent/30"
+                    : "bg-white text-muted ring-1 ring-line"
+              }`}
+            >
+              {done ? (right ? "✓" : "✗") : i + 1}
+            </span>
+            {i < round.questions.length - 1 ? <span aria-hidden="true" className={`h-1 flex-1 rounded-full ${done ? "bg-ink-soft/30" : "bg-line"}`} /> : null}
+          </li>
         );
       })}
     </ol>
+  );
+}
+
+/** Sound effects on or off (off by default). */
+function SoundToggle() {
+  const [on, setOn] = useState(false);
+  useEffect(() => queueMicrotask(() => setOn(soundOn())), []);
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={() => {
+        setSound(!on);
+        setOn(!on);
+      }}
+      className="inline-flex h-8 items-center gap-1 rounded-full px-2.5 text-xs font-semibold text-muted ring-1 ring-line hover:text-ink"
+    >
+      <span aria-hidden="true">{on ? "🔊" : "🔇"}</span> Sound {on ? "on" : "off"}
+    </button>
   );
 }
 
@@ -242,37 +279,40 @@ function QuestionCard({
   const answered = picked !== undefined;
   const correct = picked === q.answer;
   const nextRef = useRef<HTMLButtonElement>(null);
-  const view = answered ? "ea" : "merc";
-  const outlines = q.options.map((o) => shapes[o.id][view]);
-  // one shared scale for both tiles, so the two drawings compare fairly
-  const span = Math.max(...outlines.map((o) => Math.max(o.b[2] - o.b[0], o.b[3] - o.b[1]))) * 1.12;
+  // one shared scale per view for both tiles, so the two drawings compare fairly
+  const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
+  const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
 
   useEffect(() => {
     if (answered) nextRef.current?.focus();
   }, [answered]);
 
   return (
-    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white p-4 shadow-sm sm:p-6">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">
-        {practice ? "Practice · " : ""}Question {n + 1} of {total}
-      </p>
-      <h2 id="daily-q" className="mt-1 font-display text-2xl text-ink sm:text-3xl">
+    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white p-4 shadow-float sm:p-6">
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-bold uppercase tracking-wide text-muted">
+          {practice ? "Practice · " : ""}Question {n + 1} of {total}
+        </p>
+        <SoundToggle />
+      </div>
+      <h2 id="daily-q" className="mt-1 text-center font-display text-2xl text-ink sm:text-3xl">
         {q.prompt}
       </h2>
-      <p className="mt-1 text-sm text-muted">
-        {answered ? "Now drawn at their true size, side by side." : "Shown the way a normal web map draws them. Tap the one you think is bigger."}
+      <p className="mt-1 text-center text-sm text-muted">
+        {answered ? "Watch them change to their true size." : "Drawn the way a normal web map shows them. Tap the bigger one."}
       </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-3">
+      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-4">
         {q.options.map((o, i) => {
           const isAnswer = i === q.answer;
-          const ring = !answered
-            ? "ring-1 ring-line hover:ring-2 hover:ring-accent"
+          const look = !answered
+            ? "border-line hover:border-accent [--press-shadow:#e3d6c3] hover:[--press-shadow:#f29e1f]"
             : isAnswer
-              ? "ring-2 ring-formal"
+              ? "border-formal [--press-shadow:#0f7a55]"
               : picked === i
-                ? "ring-2 ring-danger"
-                : "ring-1 ring-line opacity-80";
+                ? "border-danger [--press-shadow:#b4235a]"
+                : "border-line opacity-70 [--press-shadow:#e3d6c3]";
+          const inflate = o.m / o.a;
           return (
             <button
               key={o.id}
@@ -280,28 +320,41 @@ function QuestionCard({
               disabled={answered}
               onClick={() => onPick(i)}
               aria-label={answered ? undefined : `${o.n}, ${o.sub}`}
-              className={`flex min-w-0 flex-col rounded-xl bg-paper p-2 text-left transition disabled:cursor-default sm:p-3 ${ring}`}
+              className={`press relative flex min-w-0 flex-col rounded-2xl border-2 bg-white p-2 text-left disabled:cursor-default sm:p-3 ${look}`}
             >
-              <Tile outline={outlines[i]} span={span} color={COLORS[i]} />
-              <span className="mt-2 block truncate text-sm font-bold text-ink sm:text-base">{o.n}</span>
+              {answered && (isAnswer || picked === i) ? (
+                <span
+                  className={`pop-in absolute -top-3 right-2 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow ${isAnswer ? "bg-formal" : "bg-danger"}`}
+                >
+                  {isAnswer ? "✓ Bigger" : "✗ Your pick"}
+                </span>
+              ) : null}
+              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
+              <span className="mt-2 block truncate text-base font-bold text-ink sm:text-lg">{o.n}</span>
               <span className="block truncate text-xs text-muted">{o.sub}</span>
               {answered ? (
                 <span className="mt-1 block text-xs font-semibold text-ink-soft">
                   {formatBoth(o.a)}
-                  {isAnswer ? <span className="ml-1 rounded bg-formal px-1.5 py-0.5 text-[10px] uppercase text-white">Bigger</span> : null}
+                  {inflate >= 1.3 ? <span className="block font-normal text-muted">Maps show it {inflate >= 10 ? Math.round(inflate) : inflate.toFixed(1)}× too big</span> : null}
                 </span>
               ) : null}
             </button>
           );
         })}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-panel text-xs font-black text-white ring-4 ring-white"
+        >
+          VS
+        </span>
       </div>
 
       <WhoIsWho options={q.options} />
 
       <div aria-live="polite">
         {answered ? (
-          <div className={`mt-4 rounded-xl p-4 ${correct ? "bg-emerald-50 text-emerald-950" : "bg-rose-50 text-rose-950"}`}>
-            <p className="font-bold">{correct ? "Correct!" : "Not quite."}</p>
+          <div className={`pop-in mt-4 rounded-xl p-4 ${correct ? "bg-emerald-50 text-emerald-950" : "bg-rose-50 text-rose-950"}`}>
+            <p className="text-lg font-bold">{correct ? "✓ Correct!" : "✗ Not quite."}</p>
             {explain(q).map((line) => (
               <p key={line} className="mt-1 text-sm leading-relaxed">
                 {line}
@@ -315,7 +368,7 @@ function QuestionCard({
           ref={nextRef}
           type="button"
           onClick={onNext}
-          className="mt-4 h-12 w-full rounded-lg bg-panel font-bold text-panel-text hover:bg-panel-2"
+          className="press mt-4 h-12 w-full rounded-xl bg-panel font-bold text-panel-text [--press-shadow:#071a2e] hover:bg-panel-2"
         >
           {n + 1 < total ? "Next question" : "See my results"}
         </button>
@@ -343,15 +396,58 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
   );
 }
 
-function Tile({ outline, span, color }: { outline: Outline; span: number; color: string }) {
+const size = (o: Outline) => Math.max(o.b[2] - o.b[0], o.b[3] - o.b[1]);
+
+/** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
+function Shape({ outline, span, color }: { outline: Outline; span: number; color: string }) {
   const [x0, y0, x1, y1] = outline.b;
-  const cx = (x0 + x1) / 2;
-  const cy = (y0 + y1) / 2;
-  const tiny = Math.max(x1 - x0, y1 - y0) < span * 0.06;
+  const k = 100 / span;
+  const tiny = size(outline) < span * 0.06;
   return (
-    <svg viewBox={`${cx - span / 2} ${cy - span / 2} ${span} ${span}`} className="aspect-square w-full rounded-lg bg-[#cfe6f1]" aria-hidden="true">
-      <path d={outline.d} fill={color} fillOpacity={0.85} stroke={color} strokeWidth={span / 260} fillRule="evenodd" strokeLinejoin="round" />
-      {tiny ? <circle cx={cx} cy={cy} r={span * 0.08} fill="none" stroke={color} strokeWidth={span / 120} /> : null}
+    <>
+      <path
+        d={outline.d}
+        transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
+        fill={color}
+        fillOpacity={0.88}
+        stroke={color}
+        strokeWidth={1}
+        vectorEffect="non-scaling-stroke"
+        fillRule="evenodd"
+        strokeLinejoin="round"
+      />
+      {tiny ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
+    </>
+  );
+}
+
+/**
+ * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
+ * it really is next to the other shape, then the true outline fades in.
+ */
+function RevealTile({
+  map,
+  real,
+  spans,
+  revealed,
+  color,
+}: {
+  map: Outline;
+  real: Outline;
+  spans: { merc: number; ea: number };
+  revealed: boolean;
+  color: string;
+}) {
+  const area = (o: Outline, span: number) => ((o.b[2] - o.b[0]) * (o.b[3] - o.b[1])) / (span * span);
+  const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
+  return (
+    <svg viewBox="0 0 100 100" className="aspect-square w-full rounded-xl bg-[radial-gradient(circle_at_35%_30%,#dff0f8,#bcdcec)]" aria-hidden="true">
+      <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
+        <Shape outline={map} span={spans.merc} color={color} />
+      </g>
+      <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
+        <Shape outline={real} span={spans.ea} color={color} />
+      </g>
     </svg>
   );
 }
@@ -425,12 +521,22 @@ function Results({
   };
 
   return (
-    <section aria-labelledby="daily-done" className="rounded-card border border-line bg-white p-4 shadow-sm sm:p-6">
+    <section aria-labelledby="daily-done" className="rounded-card border border-line bg-white p-4 shadow-float sm:p-6">
       <p className="text-xs font-bold uppercase tracking-wide text-muted">{round.date ? `Daily #${dayNumber(round.date)}` : "Practice round"}</p>
-      <h2 id="daily-done" className="mt-1 font-display text-3xl text-ink">
-        You got {score} out of {total}
-      </h2>
-      <p className="mt-1 text-ink-soft">{verdict}</p>
+      <div className="mt-2 flex items-center gap-4">
+        <p
+          className={`pop-in grid size-20 shrink-0 place-items-center rounded-full font-display text-3xl text-white ${score >= total - 1 ? "bg-formal" : score >= 3 ? "bg-panel" : "bg-danger"}`}
+          aria-hidden="true"
+        >
+          {score}/{total}
+        </p>
+        <div>
+          <h2 id="daily-done" className="font-display text-3xl leading-tight text-ink">
+            You got {score} out of {total}
+          </h2>
+          <p className="mt-1 text-ink-soft">{verdict}</p>
+        </div>
+      </div>
       {challenge ? (
         <p className="mt-2 rounded-lg bg-amber-100 px-3 py-2 text-sm font-bold text-amber-950">
           {score > challenge.score
@@ -460,13 +566,13 @@ function Results({
             ))}
           </dl>
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-            <button type="button" onClick={share} className="h-12 flex-1 rounded-lg bg-accent font-bold text-panel hover:bg-accent-strong">
+            <button type="button" onClick={share} className="press h-12 flex-1 rounded-xl bg-accent font-bold text-panel [--press-shadow:#c47a10] hover:bg-accent-strong">
               Share my score
             </button>
-            <button type="button" onClick={challengeFriend} className="h-12 flex-1 rounded-lg bg-panel font-bold text-panel-text hover:bg-panel-2">
+            <button type="button" onClick={challengeFriend} className="press h-12 flex-1 rounded-xl bg-panel font-bold text-panel-text [--press-shadow:#071a2e] hover:bg-panel-2">
               Challenge a friend
             </button>
-            <button type="button" onClick={onPractice} className="h-12 flex-1 rounded-lg border border-line font-bold text-ink hover:bg-paper">
+            <button type="button" onClick={onPractice} className="press h-12 flex-1 rounded-xl border-2 border-line bg-white font-bold text-ink hover:bg-paper">
               Play a practice round
             </button>
           </div>
