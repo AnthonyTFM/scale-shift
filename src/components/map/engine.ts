@@ -19,7 +19,6 @@ import {
   EARTH_RADIUS_KM,
 } from "@/lib/geo";
 
-export const PALETTE = ["#E8366B", "#2F6FDE", "#E89A00", "#12976F", "#8A4FFF", "#E2561F", "#0A97A8", "#8C5A2B"];
 
 export type Overlay = {
   id: string;
@@ -50,8 +49,8 @@ export type EngineCallbacks = {
   onViewChange: (view: View) => void;
 };
 
-import { POLITICAL } from "@/lib/palette";
-export { POLITICAL };
+import { PALETTE, POLITICAL } from "@/lib/palette";
+export { PALETTE, POLITICAL };
 
 const COLORS = {
   ocean: "#9FCBE0",

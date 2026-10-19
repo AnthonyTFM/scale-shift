@@ -1,5 +1,4 @@
-// Homepage copy. Facts here must stay true: Africa is 30.37M km², Greenland 2.17M km² (14× smaller),
-// DR Congo 2.34M km² (a little bigger than Greenland).
+// Homepage copy. Facts here must stay true: Africa is 30.37M km², Greenland 2.17M km² (14× smaller).
 
 export const home = {
   eyebrow: "Free to play · No sign-up needed",
@@ -20,15 +19,10 @@ export const home = {
 
   fact: {
     eyebrow: "See it to believe it",
-    title: "Greenland vs DR Congo",
-    body: "On a normal map Greenland looks several times bigger. Line them up at the equator and DR Congo wins.",
     cta: "Line them up →",
-    barsLabel: "Real size",
-    // km², official land areas
-    bars: [
-      { name: "Greenland", km2: 2_166_000 },
-      { name: "DR Congo", km2: 2_345_000 },
-    ],
+    // the comparison itself rotates daily (src/components/home/DailyFact.tsx); these are the labels
+    mapLabel: "On a normal map",
+    realLabel: "Real size",
   },
 
   stickyCta: "Explore the true-size map",
