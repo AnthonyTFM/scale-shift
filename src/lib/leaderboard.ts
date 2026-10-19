@@ -82,6 +82,14 @@ interface Store {
   emailOf(id: string): Promise<string | null>;
   /** tie an email to this player; false if another player already signed up with it */
   claimEmail(emailKey: string, id: string, email: string): Promise<boolean>;
+  /** the player who signed up with this email (by its emailKey), if any */
+  playerOfEmail(emailKey: string): Promise<string | null>;
+  nameOf(id: string): Promise<string | null>;
+  remindersOn(id: string): Promise<boolean>;
+  /** the player a signed-in account plays as */
+  playerOfAccount(accountId: string): Promise<string | null>;
+  /** tie a signed-in account to a player; returns the player it's tied to (the first one wins) */
+  linkAccount(accountId: string, id: string): Promise<string>;
   /** turn daily-challenge reminder emails on (recording when they agreed) or off */
   setReminders(id: string, on: boolean, at: number): Promise<void>;
   /** players who agreed to reminders, with their email and nickname */
@@ -153,6 +161,29 @@ function redisStore(url: string, token: string): Store {
     async setReminders(id, on, at) {
       await run([on ? ["HSET", "lb:reminders", id, at] : ["HDEL", "lb:reminders", id]]);
     },
+    async playerOfEmail(emailKey) {
+      const [id] = await run([["HGET", "lb:email-owners", emailKey]]);
+      return typeof id === "string" ? id : null;
+    },
+    async nameOf(id) {
+      const [n] = await run([["HGET", "lb:names", id]]);
+      return typeof n === "string" ? n : null;
+    },
+    async remindersOn(id) {
+      const [r] = await run([["HEXISTS", "lb:reminders", id]]);
+      return Number(r) === 1;
+    },
+    async playerOfAccount(accountId) {
+      const [id] = await run([["HGET", "lb:accounts", accountId]]);
+      return typeof id === "string" ? id : null;
+    },
+    async linkAccount(accountId, id) {
+      const [, owner] = await run([
+        ["HSETNX", "lb:accounts", accountId, id],
+        ["HGET", "lb:accounts", accountId],
+      ]);
+      return owner as string;
+    },
     async reminderRecipients() {
       const [raw] = await run([["HGETALL", "lb:reminders"]]);
       const since = pairs(raw);
@@ -223,6 +254,7 @@ type FileData = {
   emails?: Record<string, string>;
   emailOwners?: Record<string, string>;
   reminders?: Record<string, number>;
+  accounts?: Record<string, string>;
 };
 
 function fileStore(file: string): Store {
@@ -230,9 +262,9 @@ function fileStore(file: string): Store {
   const read = async (): Promise<FileData> => {
     try {
       const d = JSON.parse(await fs.readFile(file, "utf8"));
-      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {}, reminders: d.reminders ?? {} };
+      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {}, reminders: d.reminders ?? {}, accounts: d.accounts ?? {} };
     } catch {
-      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {}, reminders: {} };
+      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {}, reminders: {}, accounts: {} };
     }
   };
   // serialize writes so two players finishing at once can't overwrite each other
@@ -279,6 +311,24 @@ function fileStore(file: string): Store {
         if (owners[emailKey] !== id) return false;
         (d.emails ??= {})[id] = email;
         return true;
+      }),
+    async playerOfEmail(emailKey) {
+      return (await read()).emailOwners?.[emailKey] ?? null;
+    },
+    async playerOfAccount(accountId) {
+      return (await read()).accounts?.[accountId] ?? null;
+    },
+    async nameOf(id) {
+      return (await read()).names[id] ?? null;
+    },
+    async remindersOn(id) {
+      return !!(await read()).reminders?.[id];
+    },
+    linkAccount: (accountId, id) =>
+      write((d) => {
+        const accounts = (d.accounts ??= {});
+        accounts[accountId] ??= id;
+        return accounts[accountId];
       }),
     setReminders: (id, on, at) =>
       write((d) => {

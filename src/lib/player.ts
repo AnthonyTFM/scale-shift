@@ -27,5 +27,15 @@ export function savePlayer(name: string, email?: string, reminders?: boolean): P
   return p;
 }
 
+/** After signing in: this browser becomes the account's player (the email stays on the server). */
+export function rememberPlayer(p: { id: string; name: string }) {
+  try {
+    const old = loadPlayer();
+    localStorage.setItem(KEY, JSON.stringify({ id: p.id, name: p.name, reminders: old?.id === p.id ? old.reminders : undefined }));
+  } catch {
+    /* storage blocked */
+  }
+}
+
 /** Player ID for "highlight me" on the leaderboard, without creating one. */
 export const playerId = () => loadPlayer()?.id ?? null;
