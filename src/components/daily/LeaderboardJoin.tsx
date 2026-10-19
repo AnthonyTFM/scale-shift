@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, savePlayer, type Player } from "@/lib/player";
 import { track } from "@/lib/analytics";
+import { isOffensive } from "@/lib/name-filter";
 
 type Props = { date: string; choices: number[] };
 
@@ -77,6 +78,11 @@ export function LeaderboardJoin({ date, choices }: Props) {
             if (name.length < 3) {
               setStatus("error");
               setError("Use 3 to 16 characters.");
+              return;
+            }
+            if (isOffensive(name)) {
+              setStatus("error");
+              setError("Please pick a different nickname.");
               return;
             }
             const p = savePlayer(name);
