@@ -7,16 +7,65 @@ import { mapUrl } from "@/lib/share";
 import { PALETTE } from "@/lib/palette";
 
 const DAY = 86_400_000;
-type PoolRow = { n: string; era: string; a: number; m: number };
+type PoolRow = { n: string; src: string; era: string; kind: string; a: number; m: number };
+type Fact = { preset: Pick<Preset, "title" | "hook" | "baseEra" | "shapes" | "at">; rows: PoolRow[] };
 
 /** Two-shape "surprising" comparisons we have both areas for: real (a) and how big a normal map draws it (m). */
-const facts = presets
+const curated: Fact[] = presets
   .filter((p) => p.category === "surprising" && p.shapes.length === 2)
   .map((p) => {
     const rows = p.shapes.map((s) => (pool as PoolRow[]).find((r) => r.n === s.name && r.era === s.era));
     return rows.every(Boolean) ? { preset: p, rows: rows as PoolRow[] } : null;
   })
   .filter((f): f is { preset: Preset; rows: PoolRow[] } => f !== null);
+
+const times = (x: number) => (x >= 10 ? Math.round(x).toString() : x.toFixed(1).replace(/\.0$/, ""));
+
+/**
+ * More comparisons made from the puzzle shapes: pairs of well-known countries and US states where a normal map gets the
+ * order wrong (A drawn clearly bigger, B really bigger). The most surprising ones first.
+ */
+const generated: Fact[] = (() => {
+  const known = (pool as PoolRow[]).filter((r) => (r.kind === "country" && r.a >= 300_000) || (r.kind === "state" && r.a >= 150_000));
+  const pairs: { a: PoolRow; b: PoolRow; surprise: number }[] = [];
+  for (const a of known)
+    for (const b of known) {
+      const looks = a.m / b.m; // how much bigger A is drawn
+      const really = b.a / a.a; // how much bigger B really is
+      if (looks >= 1.3 && really >= 1.05 && really <= 6) pairs.push({ a, b, surprise: looks * really });
+    }
+  const seen = new Set<string>();
+  return pairs
+    .sort((x, y) => y.surprise - x.surprise || x.a.n.localeCompare(y.a.n))
+    .filter(({ a, b }) => {
+      // each shape at most three times, so the rotation stays varied
+      const k = [a.n, b.n];
+      const count = (n: string) => [...seen].filter((s) => s.split("|").includes(n)).length;
+      if (k.some((n) => count(n) >= 3)) return false;
+      seen.add(k.join("|"));
+      return true;
+    })
+    .slice(0, 150)
+    .map(({ a, b }) => ({
+      preset: {
+        title: `${a.n} vs ${b.n}`,
+        hook: `On a normal map ${a.n} looks ${times(a.m / b.m)}× bigger. In reality ${b.n} is ${b.a / a.a < 1.2 ? "slightly bigger" : `${times(b.a / a.a)}× the size`}.`,
+        baseEra: "present",
+        shapes: [
+          { era: a.era, name: a.src },
+          { era: b.era, name: b.src },
+        ],
+      },
+      rows: [a, b],
+    }));
+})();
+
+// a hand-picked comparison every fourth day, the generated ones in between
+const facts: Fact[] = [];
+for (let i = 0, c = 0; i < generated.length || c < curated.length; i++) {
+  if (i % 4 === 0 && c < curated.length) facts.push(curated[c++]);
+  if (i < generated.length) facts.push(generated[i]);
+}
 
 /** Days since 1970 (UTC). Cached for an hour so the fact flips soon after midnight UTC. */
 async function currentDay() {
