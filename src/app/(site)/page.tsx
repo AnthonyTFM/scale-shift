@@ -3,13 +3,12 @@ import Link from "next/link";
 import pool from "@/data/daily-pool.json";
 import { disputes } from "@/content/disputes";
 import { events } from "@/content/events";
-import { presets } from "@/content/presets";
 import { site } from "@/content/site";
 import { eras } from "@/lib/eras";
-import { mapUrl } from "@/lib/share";
 import { DailyTeaser } from "@/components/home/DailyTeaser";
 import { LegacyMapRedirect } from "@/components/home/LegacyMapRedirect";
 import { JsonLd } from "@/components/site/PageHero";
+import { WeeklyPicks } from "@/components/home/WeeklyPicks";
 
 export const metadata: Metadata = {
   title: { absolute: `${site.name}: the real size of countries and empires, 2000 BCE to today` },
@@ -55,9 +54,6 @@ const directory = [
   },
 ];
 
-const featured = presets.filter((p) =>
-  ["greenland-vs-congo", "russia-at-equator", "rome-over-usa", "crimea-vs-belgium", "mexico-before-1848", "watch-us-grow"].includes(p.id),
-);
 
 export default function HomePage() {
   return (
@@ -160,25 +156,7 @@ export default function HomePage() {
           <h2 id="try" className="font-display text-3xl text-ink">
             Jump straight in
           </h2>
-          <p className="mt-1 text-ink-soft">Each one opens the map with the comparison already set up.</p>
-          <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((p) => (
-              <li key={p.id}>
-                <Link
-                  href={mapUrl({ era: p.baseEra, shapes: p.shapes.map((s, i) => ({ ...s, color: i })), at: p.at })}
-                  className={`block h-full rounded-xl p-4 ring-1 transition hover:ring-2 ${
-                    p.category === "controversial" ? "bg-rose-50 ring-rose-200 hover:ring-rose-400" : "bg-amber-50 ring-amber-200 hover:ring-amber-400"
-                  }`}
-                >
-                  <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
-                    {p.category === "controversial" ? "Controversial" : "Surprising"}
-                  </span>
-                  <span className="mt-0.5 block font-bold text-ink">{p.title}</span>
-                  <span className="mt-1 block text-sm leading-relaxed text-ink-soft">{p.hook}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <WeeklyPicks />
         </div>
       </section>
 

@@ -28,7 +28,8 @@ export default function PrivacyPage() {
           <li>
             <strong>Leaderboard (optional):</strong> only if you choose to join. We store the nickname you pick, your daily scores and a random
             ID your browser creates so your scores stay together. Nicknames and scores are public. No email, no account and no real name
-            needed.
+            needed. To stop spam we keep a one-way scrambled code made from your network address for three days; the address itself is never
+            stored.
           </li>
           <li>
             <strong>Feedback form:</strong> if you send a report, we store what you type (and your email, if you give it) so we can fix the map

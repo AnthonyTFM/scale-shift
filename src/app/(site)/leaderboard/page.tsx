@@ -21,7 +21,8 @@ export default function LeaderboardPage() {
         <LeaderboardView />
       </div>
       <p className="mt-6 text-xs leading-relaxed text-muted">
-        Scores are checked on our server, and only your first try each day counts. Nicknames are public; offensive ones are blocked. Want yours
+        Scores are checked on our server, and only your first try each day counts. Each nickname belongs to the first player who uses it.
+        Nicknames are public; offensive ones are blocked. Want yours
         removed? <Link href="/contact?topic=other" className="underline">Contact us</Link>.
       </p>
     </div>

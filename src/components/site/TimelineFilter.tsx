@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { events, eventTypeLabels, statusLabels, type EventType, type TerritoryEvent } from "@/content/events";
 import { EventCard } from "@/components/EventCard";
+import { formatYear } from "@/lib/eras";
 
 const periods = [
   { id: "all", label: "All periods", test: () => true },
@@ -18,6 +19,7 @@ export function TimelineFilter() {
   const [status, setStatus] = useState<"all" | TerritoryEvent["status"]>("all");
   const [type, setType] = useState<"all" | EventType>("all");
   const [q, setQ] = useState("");
+  const [order, setOrder] = useState<"oldest" | "newest">("oldest");
 
   const list = useMemo(() => {
     const p = periods.find((x) => x.id === period)!;
@@ -27,8 +29,9 @@ export function TimelineFilter() {
       .filter((e) => status === "all" || e.status === status)
       .filter((e) => type === "all" || e.type === type)
       .filter((e) => !query || `${e.title} ${e.region} ${e.summary} ${e.polities.join(" ")}`.toLowerCase().includes(query))
-      .sort((a, b) => a.taken - b.taken);
-  }, [period, status, type, q]);
+      // always chronological (by the year control changed), ties broken by the year it was made official
+      .sort((a, b) => (a.taken - b.taken || (a.formalized ?? a.taken) - (b.formalized ?? b.taken)) * (order === "oldest" ? 1 : -1));
+  }, [period, status, type, q, order]);
 
   const types = [...new Set(events.map((e) => e.type))];
 
@@ -92,12 +95,37 @@ export function TimelineFilter() {
           </button>
         </div>
       </form>
-      <p className="mt-4 text-sm text-muted" aria-live="polite">
-        Showing {list.length} of {events.length} events
-      </p>
-      <ol className="mt-4 grid gap-4 md:grid-cols-2">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-muted" aria-live="polite">
+          Showing {list.length} of {events.length} events, {order === "oldest" ? "oldest first" : "newest first"}
+        </p>
+        <div role="group" aria-label="Order" className="flex rounded-full bg-white p-1 text-sm font-semibold ring-1 ring-line">
+          {(
+            [
+              ["oldest", "Oldest first"],
+              ["newest", "Newest first"],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={order === id}
+              onClick={() => setOrder(id)}
+              className="rounded-full px-3 py-1.5 aria-pressed:bg-panel aria-pressed:text-panel-text"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+      {/* one column, read top to bottom: a year marker on the line, then the event */}
+      <ol className="relative mt-6 space-y-5 border-l-2 border-line pl-6 sm:ml-24 sm:pl-8">
         {list.map((ev) => (
-          <li key={ev.id}>
+          <li key={ev.id} className="relative">
+            <span aria-hidden="true" className="absolute -left-[33px] top-6 size-3 rounded-full bg-accent ring-4 ring-paper sm:-left-[41px]" />
+            <p className="mb-1 font-display text-lg text-ink sm:absolute sm:-left-36 sm:top-4 sm:mb-0 sm:w-24 sm:text-right">
+              {formatYear(ev.taken, ev.approx)}
+            </p>
             <EventCard ev={ev} headingLevel={2} />
           </li>
         ))}
