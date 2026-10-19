@@ -12,6 +12,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import pool from "@/data/daily-pool.json";
 import { buildQuestions, shiftDate, type PoolEntry } from "./daily";
+import { isOffensive } from "./name-filter";
 import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow } from "./leaderboard-types";
 
 // ---------- validation ----------
@@ -27,21 +28,11 @@ export function isPlayableDate(date: string, now = new Date()) {
   return date === utc || date === shiftDate(utc, -1) || date === shiftDate(utc, 1);
 }
 
-// Blocked words. Substrings are checked inside the whole name; whole words only as separate words (so "Hancock" is fine).
-const BLOCK_SUBSTRINGS = ["fuck", "shit", "cunt", "nigg", "fagg", "bitch", "whore", "slut", "rape", "nazi", "hitler", "retard", "twat", "wank", "asshole", "porn", "pussy", "penis", "vagina", "kkk"];
-const BLOCK_WORDS = ["fag", "dick", "cock", "sex", "ass", "cum", "tits", "hoe", "kys"];
-const LEET: Record<string, string> = { "0": "o", "1": "i", "3": "e", "4": "a", "5": "s", "7": "t", "@": "a", $: "s", "!": "i" };
-
 export function checkName(raw: unknown): { name: string; error?: string } {
   const name = (typeof raw === "string" ? raw : "").normalize("NFKC").replace(/\s+/g, " ").trim();
   if (name.length < 3 || name.length > 16) return { name, error: "Use 3 to 16 characters." };
   if (!/^[\p{L}\p{N}][\p{L}\p{N} _.-]*$/u.test(name)) return { name, error: "Use letters, numbers, spaces, dots, dashes or underscores." };
-  const plain = name.toLowerCase().replace(/[013457@$!]/g, (c) => LEET[c] ?? c);
-  const squashed = plain.replace(/[^a-z]/g, "");
-  const words = plain.split(/[^a-z]+/);
-  if (BLOCK_SUBSTRINGS.some((b) => squashed.includes(b)) || words.some((w) => BLOCK_WORDS.includes(w))) {
-    return { name, error: "Please pick a different nickname." };
-  }
+  if (isOffensive(name)) return { name, error: "Please pick a different nickname." };
   return { name };
 }
 
@@ -290,7 +281,7 @@ export function networkKey(ip: string, date: string) {
 export const NEW_PLAYERS_PER_NETWORK = 5;
 
 export async function dayBoard(date: string, limit: number, me: string | null): Promise<DayBoard> {
-  const entries = (await getStore().day(date)).sort((a, b) => b.s - a.s || a.t - b.t);
+  const entries = (await getStore().day(date)).filter((e) => !isOffensive(e.name)).sort((a, b) => b.s - a.s || a.t - b.t);
   const ranked = rankBy(entries, (e) => e.s);
   const toRow = ({ r, rank }: (typeof ranked)[number]): DayRow => ({ rank, name: r.name, score: r.s, ...(r.id === me ? { me: true } : {}) });
   const mine = me ? ranked.find((x) => x.r.id === me) : undefined;
@@ -298,7 +289,10 @@ export async function dayBoard(date: string, limit: number, me: string | null): 
 }
 
 export async function allTimeBoard(limit: number, me: string | null): Promise<AllTimeBoard> {
-  const { total, top, me: mine } = await getStore().allTime(limit, me);
+  const { total: stored, top: all, me: mine } = await getStore().allTime(limit, me);
+  // names saved before the filter was tightened are hidden until someone removes them from the store
+  const top = all.filter((t) => !isOffensive(t.name));
+  const total = stored - (all.length - top.length);
   const rows: AllTimeRow[] = rankBy(top, (t) => t.points).map(({ r, rank }) => ({
     rank,
     name: r.name,
