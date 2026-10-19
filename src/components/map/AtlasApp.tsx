@@ -382,6 +382,8 @@ export default function AtlasApp() {
   };
 
   const selectedOverlay = overlays.find((o) => o.id === selected) ?? null;
+  // the phone "selected shape" bar shows when the panel is folded and nothing else covers the bottom
+  const phoneBar = selectedOverlay && !panelOpen && !info && !changesOpen && !keyOpen ? selectedOverlay : null;
   const steps = selectedOverlay && index ? timelineSteps(selectedOverlay.name, selectedOverlay.era, index) : null;
   useEffect(() => {
     if (selected && !index) needIndex();
@@ -705,8 +707,33 @@ export default function AtlasApp() {
         </div>
       ) : null}
 
+      {/* Phones: the panel is folded, so show what's selected with quick actions */}
+      {phoneBar ? (
+        <div
+          role="group"
+          aria-label={`${phoneBar.name} selected`}
+          className="absolute inset-x-3 bottom-[124px] z-30 flex items-center gap-2 rounded-2xl bg-panel p-2 pl-3 text-panel-text shadow-float sm:hidden"
+        >
+          <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: PALETTE[phoneBar.color % PALETTE.length] }} />
+          <span className="min-w-0 flex-1 truncate text-sm font-bold">{phoneBar.name}</span>
+          <button type="button" onClick={() => setPanelOpen(true)} className="h-10 rounded-lg bg-white/10 px-3 text-sm font-semibold">
+            Edit
+          </button>
+          <button type="button" onClick={() => removeShape(phoneBar.id)} className="h-10 rounded-lg bg-rose-500/20 px-3 text-sm font-semibold text-rose-100">
+            Remove
+          </button>
+          <button type="button" onClick={() => setSelected(null)} aria-label="Deselect" className="grid size-10 place-items-center rounded-lg hover:bg-white/10">
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+      ) : null}
+
       {/* Compass rose (rotation), like the reference */}
-      <div className={`absolute bottom-[124px] left-3 z-10 sm:bottom-4 ${info || changesOpen || keyOpen ? "hidden sm:block" : ""}`}>
+      <div
+        className={`absolute left-3 z-10 sm:bottom-4 ${phoneBar ? "bottom-[188px]" : "bottom-[124px]"} ${info || changesOpen || keyOpen ? "hidden sm:block" : ""}`}
+      >
         <Compass
           rotation={selectedOverlay ? Math.round(((selectedOverlay.rot % 360) + 540) % 360 - 180) : null}
           onRotate={(deg) => selectedOverlay && update(selectedOverlay.id, { rot: deg, moved: true })}
