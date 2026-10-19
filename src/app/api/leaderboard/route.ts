@@ -1,5 +1,18 @@
 import { connection } from "next/server";
-import { allTimeBoard, checkName, dayBoard, getStore, isDateKey, isPlayableDate, isPlayerId, scoreAnswers, storeKind } from "@/lib/leaderboard";
+import {
+  allTimeBoard,
+  checkName,
+  dayBoard,
+  getStore,
+  isDateKey,
+  isPlayableDate,
+  isPlayerId,
+  nameKey,
+  networkKey,
+  NEW_PLAYERS_PER_NETWORK,
+  scoreAnswers,
+  storeKind,
+} from "@/lib/leaderboard";
 import type { SubmitResult } from "@/lib/leaderboard-types";
 import { rateLimited } from "@/lib/submissions";
 
@@ -48,6 +61,13 @@ export async function POST(request: Request) {
 
   try {
     const store = getStore();
+    // a nickname belongs to the first player who used it, so a second browser can't post under the same name
+    if (!(await store.claimName(nameKey(name), body.player))) return fail("That nickname is taken. Please pick another.", 422, "name");
+    // a brand-new score for today: cap how many different players one network can add per day
+    if (!(await store.has(body.date, body.player))) {
+      const n = await store.bumpNetwork(body.date, networkKey(ipOf(request), body.date));
+      if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
+    }
     await store.setName(body.player, name);
     const fresh = await store.submit(body.date, body.player, score, Date.now());
     const board = await dayBoard(body.date, 0, body.player);

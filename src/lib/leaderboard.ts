@@ -7,6 +7,7 @@
 //           On Vercel without Redis this falls back to /tmp, which is wiped regularly, so scores won't last.
 //
 // Scores are never trusted from the browser: the server rebuilds the day's questions and marks the answers itself.
+import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import pool from "@/data/daily-pool.json";
@@ -59,6 +60,12 @@ interface Store {
   /** false if this player already has a score for this date (the first one counts) */
   submit(date: string, id: string, score: number, at: number): Promise<boolean>;
   setName(id: string, name: string): Promise<void>;
+  /** has this player already posted a score for this date? */
+  has(date: string, id: string): Promise<boolean>;
+  /** reserve a nickname (case-insensitive) for this player; false if someone else already owns it */
+  claimName(nameKey: string, id: string): Promise<boolean>;
+  /** count one more new player from this network today; returns the new count */
+  bumpNetwork(date: string, netKey: string): Promise<number>;
   day(date: string): Promise<{ id: string; name: string; s: number; t: number }[]>;
   allTime(limit: number, me: string | null): Promise<{ total: number; top: { id: string; name: string; points: number; days: number }[]; me: { name: string; points: number; days: number; above: number } | null }>;
 }
@@ -96,6 +103,25 @@ function redisStore(url: string, token: string): Store {
     },
     async setName(id, name) {
       await run([["HSET", "lb:names", id, name]]);
+    },
+    async has(date, id) {
+      const [r] = await run([["HEXISTS", `lb:day:${date}`, id]]);
+      return Number(r) === 1;
+    },
+    async claimName(nameKey, id) {
+      const [, owner] = await run([
+        ["HSETNX", "lb:owners", nameKey, id],
+        ["HGET", "lb:owners", nameKey],
+      ]);
+      return owner === id;
+    },
+    async bumpNetwork(date, netKey) {
+      const key = `lb:net:${date}:${netKey}`;
+      const [n] = await run([
+        ["INCR", key],
+        ["EXPIRE", key, 3 * 86400],
+      ]);
+      return Number(n);
     },
     async day(date) {
       const [raw] = await run([["HGETALL", `lb:day:${date}`]]);
@@ -138,16 +164,21 @@ function redisStore(url: string, token: string): Store {
 }
 
 // --- JSON file ---
-type FileData = { names: Record<string, string>; days: Record<string, Record<string, DayEntry>> };
+type FileData = {
+  names: Record<string, string>;
+  days: Record<string, Record<string, DayEntry>>;
+  owners?: Record<string, string>;
+  nets?: Record<string, number>;
+};
 
 function fileStore(file: string): Store {
   let queue: Promise<unknown> = Promise.resolve();
   const read = async (): Promise<FileData> => {
     try {
       const d = JSON.parse(await fs.readFile(file, "utf8"));
-      return { names: d.names ?? {}, days: d.days ?? {} };
+      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {} };
     } catch {
-      return { names: {}, days: {} };
+      return { names: {}, days: {}, owners: {}, nets: {} };
     }
   };
   // serialize writes so two players finishing at once can't overwrite each other
@@ -174,6 +205,22 @@ function fileStore(file: string): Store {
     setName: (id, name) =>
       write((d) => {
         d.names[id] = name;
+      }),
+    async has(date, id) {
+      return !!(await read()).days[date]?.[id];
+    },
+    claimName: (nameKey, id) =>
+      write((d) => {
+        const owners = (d.owners ??= {});
+        owners[nameKey] ??= id;
+        return owners[nameKey] === id;
+      }),
+    bumpNetwork: (date, netKey) =>
+      write((d) => {
+        const nets = (d.nets ??= {});
+        const k = `${date}:${netKey}`;
+        nets[k] = (nets[k] ?? 0) + 1;
+        return nets[k];
       }),
     async day(date) {
       const d = await read();
@@ -230,6 +277,17 @@ function rankBy<T>(rows: T[], key: (r: T) => number) {
     return { r, rank };
   });
 }
+
+/** Nicknames are unique ignoring case, spaces and punctuation ("Map Wizard" = "mapwizard"). */
+export const nameKey = (name: string) => name.toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
+
+/** One-way hash of the visitor's network address plus the date, so no IP address is ever stored. */
+export function networkKey(ip: string, date: string) {
+  return createHash("sha256").update(`${ip}|${date}|scale-shift`).digest("hex").slice(0, 16);
+}
+
+/** New players allowed per network per day (a household or friends on one Wi-Fi). */
+export const NEW_PLAYERS_PER_NETWORK = 5;
 
 export async function dayBoard(date: string, limit: number, me: string | null): Promise<DayBoard> {
   const entries = (await getStore().day(date)).sort((a, b) => b.s - a.s || a.t - b.t);

@@ -593,7 +593,20 @@ export default function AtlasApp() {
 
       {/* Right-hand controls */}
       <div className="absolute right-3 top-3 z-20 flex flex-col items-end gap-2">
-        <SiteMenu variant="map" />
+        <div className="flex gap-2">
+          <Link
+            href="/"
+            aria-label="Home"
+            title="Back to the homepage"
+            className="flex h-11 items-center gap-2 rounded-xl bg-panel px-3 text-sm font-bold text-panel-text shadow-float hover:bg-panel-2"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round">
+              <path d="M3 11 12 4l9 7M5 10v10h5v-6h4v6h5V10" />
+            </svg>
+            <span className="hidden sm:inline">Home</span>
+          </Link>
+          <SiteMenu variant="map" />
+        </div>
         <button
           type="button"
           onClick={openShare}
