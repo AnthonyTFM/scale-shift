@@ -90,7 +90,7 @@ _Last updated: October 19, 2026_
 | `NEXT_PUBLIC_GA4_ID` | Not set yet (no analytics) |
 | `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` (+ `NOTIFY_EMAIL_FROM`) | Not set yet, so the live site's forms don't save anything |
 | Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`, added by Vercel → Storage) | Set Oct 19. The live API reports `X-Leaderboard-Store: redis`. |
-| Clerk (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY`, added by Vercel → Marketplace → Clerk) | Not set yet. In Clerk: Email verification code on, Google on, Password off. Development keys until we own a domain. |
+| Clerk (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY`, added by Vercel → Marketplace → Clerk) | Set Oct 19 (Production + Preview), Clerk **development** keys (`pk_test_`): email verification code on, password off. Switch to production keys once we own a domain. |
 
 **GitHub**
 - `main` is protected: changes go through a pull request, approvals are not required, and the CI status check `build` must pass (lint, typecheck, build, data check).
