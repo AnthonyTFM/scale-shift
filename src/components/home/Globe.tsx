@@ -12,6 +12,19 @@ const TILT = -18; // degrees: show a little more of the north, where most people
 const SPEED = 6; // degrees per second
 const FRAME_MS = 50; // 20 frames a second is smooth enough for a slow spin and keeps phones responsive
 
+/**
+ * Drops slivers: island outlines squashed to fewer than 3 distinct points. One lying exactly on the globe's edge makes the
+ * clipping think it covers the whole sphere, and the ocean flashes that country's colour. scripts/build-globe.mjs already
+ * removes them; this also covers a copy of the old file still sitting in a browser's cache.
+ */
+function dropSlivers(c: Country): Country {
+  const g = c.geometry as { type: string; coordinates: number[][][][] | number[][][] };
+  const solid = (rings: number[][][]) => new Set(rings[0].map((p) => p.join())).size >= 3;
+  if (g.type === "Polygon") return solid(g.coordinates as number[][][]) ? c : { ...c, geometry: { type: "MultiPolygon", coordinates: [] } as GeoPermissibleObjects };
+  if (g.type !== "MultiPolygon") return c;
+  return { ...c, geometry: { type: "MultiPolygon", coordinates: (g.coordinates as number[][][][]).filter(solid) } as GeoPermissibleObjects };
+}
+
 /** A slowly turning globe drawn from our own borders. Drag to spin it. Decorative: the page works without it. */
 export function Globe({ label }: { label: string }) {
   const wrap = useRef<HTMLDivElement>(null);
@@ -123,7 +136,7 @@ export function Globe({ label }: { label: string }) {
       .then((r) => r.json())
       .then((topo: Topology<{ p: GeometryCollection<{ n: string; k: number }> }>) => {
         if (disposed) return;
-        countries = (feature(topo, topo.objects.p) as unknown as { features: Country[] }).features;
+        countries = (feature(topo, topo.objects.p) as unknown as { features: Country[] }).features.map(dropSlivers);
         draw();
         const go = () =>
           window.setTimeout(() => {
