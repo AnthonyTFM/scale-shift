@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate } from "@/lib/daily";
-import type { AllTimeBoard, DayBoard } from "@/lib/leaderboard-types";
+import type { AllTimeBoard, DayBoard, WeekBoard } from "@/lib/leaderboard-types";
 import { loadPlayer, playerId } from "@/lib/player";
 
-type Tab = "day" | "all";
-type Loaded = { key: string; data: DayBoard | AllTimeBoard | null; failed: boolean };
+type Tab = "day" | "week" | "all";
+type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | null; failed: boolean };
 
 const medal = (rank: number) => (rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null);
+const shortDate = (key: string) => new Date(`${key}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 const prettyDate = (key: string) =>
   new Date(`${key}T12:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
@@ -29,12 +30,17 @@ export function LeaderboardView() {
     });
   }, []);
 
-  const key = tab === "all" ? "all" : (date ?? "");
+  const key = tab === "all" ? "all" : tab === "week" ? (today ? `week:${today}` : "") : (date ?? "");
   useEffect(() => {
     if (!key) return;
     let alive = true;
     const id = playerId();
-    const url = tab === "all" ? `/api/leaderboard?scope=all&limit=100` : `/api/leaderboard?scope=day&date=${key}&limit=100`;
+    const url =
+      tab === "all"
+        ? `/api/leaderboard?scope=all&limit=100`
+        : tab === "week"
+          ? `/api/leaderboard?scope=week&date=${key.slice(5)}&limit=100`
+          : `/api/leaderboard?scope=day&date=${key}&limit=100`;
     fetch(`${url}${id ? `&player=${id}` : ""}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => alive && setLoaded({ key, data, failed: false }))
@@ -48,10 +54,11 @@ export function LeaderboardView() {
 
   return (
     <div>
-      <div role="tablist" aria-label="Leaderboard" className="inline-grid grid-cols-2 rounded-xl bg-white p-1 text-sm font-semibold ring-1 ring-line">
+      <div role="tablist" aria-label="Leaderboard" className="inline-grid grid-cols-3 rounded-xl bg-white p-1 text-sm font-semibold ring-1 ring-line">
         {(
           [
             ["day", "Daily"],
+            ["week", "This week"],
             ["all", "All time"],
           ] as const
         ).map(([id, label]) => (
@@ -61,7 +68,7 @@ export function LeaderboardView() {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className="rounded-lg px-5 py-2 aria-selected:bg-panel aria-selected:text-panel-text"
+            className="rounded-lg px-3 py-2 aria-selected:bg-panel aria-selected:text-panel-text sm:px-5"
           >
             {label}
           </button>
@@ -118,6 +125,13 @@ export function LeaderboardView() {
           </p>
         ) : tab === "day" ? (
           <DayTable board={current.data as DayBoard} />
+        ) : tab === "week" ? (
+          <AllTable
+            board={current.data as WeekBoard}
+            caption={`This week: ${shortDate((current.data as WeekBoard).start)} to ${shortDate((current.data as WeekBoard).end)}`}
+            note="Resets every Monday. Every day you play this week adds your points."
+            empty="No scores yet this week. Play today's challenge to take the lead."
+          />
         ) : (
           <AllTable board={current.data as AllTimeBoard} />
         )}
@@ -180,12 +194,22 @@ function DayTable({ board }: { board: DayBoard }) {
   );
 }
 
-function AllTable({ board }: { board: AllTimeBoard }) {
-  if (!board.rows.length) return <Empty text="No scores yet. Play today's challenge to be the first." />;
+function AllTable({
+  board,
+  caption = "All-time points",
+  note = "One point per correct answer, every day you play.",
+  empty = "No scores yet. Play today's challenge to be the first.",
+}: {
+  board: AllTimeBoard;
+  caption?: string;
+  note?: string;
+  empty?: string;
+}) {
+  if (!board.rows.length) return <Empty text={empty} />;
   const meOutside = board.me && !board.rows.some((r) => r.me);
   return (
     <table className="w-full text-left text-sm">
-      <caption className="sr-only">All-time points</caption>
+      <caption className="px-4 pt-3 text-left text-xs font-semibold text-muted">{caption}</caption>
       <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
         <tr>
           <th scope="col" className="w-16 px-4 py-2.5">
@@ -222,7 +246,7 @@ function AllTable({ board }: { board: AllTimeBoard }) {
       <tfoot>
         <tr>
           <td colSpan={5} className="border-t border-line px-4 py-2 text-xs text-muted">
-            {board.total} {board.total === 1 ? "player" : "players"}. One point per correct answer, every day you play.
+            {board.total} {board.total === 1 ? "player" : "players"}. {note}
           </td>
         </tr>
       </tfoot>

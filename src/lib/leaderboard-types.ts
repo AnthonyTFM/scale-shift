@@ -5,6 +5,8 @@ export type DayBoard = { date: string; total: number; rows: DayRow[]; me?: DayRo
 
 export type AllTimeRow = { rank: number; name: string; points: number; days: number; average: number; me?: boolean };
 export type AllTimeBoard = { total: number; rows: AllTimeRow[]; me?: AllTimeRow | null };
+/** Monday to Sunday (UTC dates). Rows use the all-time shape: points, days played and average. */
+export type WeekBoard = AllTimeBoard & { start: string; end: string };
 
 export type SubmitResult =
   | { ok: true; score: number; rank: number; total: number; duplicate: boolean }

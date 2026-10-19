@@ -21,6 +21,8 @@ import { dailyContext } from "@/content/daily-context";
 import { LeaderboardJoin } from "./LeaderboardJoin";
 import { formatBoth } from "@/lib/format";
 import { mapUrl } from "@/lib/share";
+import { challengeHash, readChallenge, type Challenge } from "@/lib/challenge";
+import { loadPlayer } from "@/lib/player";
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -73,8 +75,12 @@ async function prepare(practice: boolean): Promise<Game> {
 export function DailyChallenge() {
   const [game, setGame] = useState<Game | null>(null);
   const [failed, setFailed] = useState(false);
+  // someone sent a "can you beat me?" link
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
 
   useEffect(() => {
+    const c = readChallenge(location.hash);
+    if (c) queueMicrotask(() => setChallenge(c));
     prepare(false)
       .then(setGame)
       .catch(() => setFailed(true));
@@ -118,11 +124,28 @@ export function DailyChallenge() {
   };
 
   const finished = step >= round.questions.length;
+  const todayNo = round.date ? dayNumber(round.date) : null;
   return (
     <div>
+      {challenge && todayNo && !finished ? (
+        <p className="mb-3 rounded-xl bg-amber-100 p-3 text-sm font-semibold text-amber-950 ring-1 ring-amber-300">
+          🎯{" "}
+          {challenge.day === todayNo
+            ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
+            : `${challenge.name} sent you Daily #${challenge.day}. Here's today's: play it and send your score back.`}
+        </p>
+      ) : null}
       <Progress round={round} choices={choices} step={step} />
       {finished ? (
-        <Results round={round} choices={choices} save={save} today={today} onPractice={() => start(true)} onToday={() => start(false)} />
+        <Results
+          round={round}
+          choices={choices}
+          save={save}
+          today={today}
+          challenge={challenge && round.date && challenge.day === dayNumber(round.date) ? challenge : null}
+          onPractice={() => start(true)}
+          onToday={() => start(false)}
+        />
       ) : (
         <QuestionCard
           key={`${round.date ?? "practice"}-${step}`}
@@ -317,6 +340,7 @@ function Results({
   choices,
   save,
   today,
+  challenge,
   onPractice,
   onToday,
 }: {
@@ -324,6 +348,7 @@ function Results({
   choices: number[];
   save: DailySave;
   today: string;
+  challenge: Challenge | null;
   onPractice: () => void;
   onToday: () => void;
 }) {
@@ -340,6 +365,23 @@ function Results({
         : score >= 3
           ? "Not bad. The map tricked you twice."
           : "The map fooled you today. New questions tomorrow.";
+
+  const challengeFriend = async () => {
+    if (!round.date) return;
+    const url = `${location.origin}/daily${challengeHash(dayNumber(round.date), score, loadPlayer()?.name ?? null)}`;
+    const text = `I got ${score}/${total} on today's ${site.name} challenge. Think you can beat me?\n${url}`;
+    track("daily_challenge_friend", { score });
+    try {
+      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+        await navigator.share({ text });
+        return;
+      }
+      await navigator.clipboard.writeText(text);
+      setCopied("Challenge link copied! Send it to a friend.");
+    } catch {
+      setCopied(text);
+    }
+  };
 
   const share = async () => {
     const url = `${location.origin}/daily`;
@@ -364,6 +406,15 @@ function Results({
         You got {score} out of {total}
       </h2>
       <p className="mt-1 text-ink-soft">{verdict}</p>
+      {challenge ? (
+        <p className="mt-2 rounded-lg bg-amber-100 px-3 py-2 text-sm font-bold text-amber-950">
+          {score > challenge.score
+            ? `🏆 You beat ${challenge.name} (${challenge.score}/5)! Send them a rematch.`
+            : score === challenge.score
+              ? `🤝 Tied with ${challenge.name} at ${score}/5.`
+              : `${challenge.name} wins this one with ${challenge.score}/5. Get them back tomorrow.`}
+        </p>
+      ) : null}
       <p className="mt-3 text-2xl tracking-[0.2em]" aria-label={`${score} correct, ${total - score} wrong`}>
         {grid}
       </p>
@@ -386,6 +437,9 @@ function Results({
           <div className="mt-5 flex flex-col gap-2 sm:flex-row">
             <button type="button" onClick={share} className="h-12 flex-1 rounded-lg bg-accent font-bold text-panel hover:bg-accent-strong">
               Share my score
+            </button>
+            <button type="button" onClick={challengeFriend} className="h-12 flex-1 rounded-lg bg-panel font-bold text-panel-text hover:bg-panel-2">
+              Challenge a friend
             </button>
             <button type="button" onClick={onPractice} className="h-12 flex-1 rounded-lg border border-line font-bold text-ink hover:bg-paper">
               Play a practice round

@@ -13,6 +13,7 @@ import {
   NEW_PLAYERS_PER_NETWORK,
   scoreAnswers,
   storeKind,
+  weekBoard,
 } from "@/lib/leaderboard";
 import type { SubmitResult } from "@/lib/leaderboard-types";
 import { rateLimited } from "@/lib/submissions";
@@ -22,6 +23,7 @@ const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split
 /**
  * GET /api/leaderboard?scope=day&date=2026-10-20&limit=50&player=<id>
  * GET /api/leaderboard?scope=all&limit=50&player=<id>
+ * GET /api/leaderboard?scope=week&date=2026-10-20&limit=50&player=<id>   (the Monday–Sunday week containing date)
  */
 export async function GET(request: Request) {
   await connection();
@@ -34,6 +36,8 @@ export async function GET(request: Request) {
     if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
     const date = q.get("date");
     if (!isDateKey(date)) return Response.json({ error: "Use date=YYYY-MM-DD." }, { status: 400 });
+    if (q.get("scope") === "week")
+      return Response.json(await weekBoard(date, limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
     return Response.json(await dayBoard(date, limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
   } catch (e) {
     console.error("[leaderboard] read failed", e);
