@@ -10,11 +10,25 @@ export const home = {
   globeHint: "Drag to spin",
 
   teaser: {
+    badge: "Today's game",
     title: "Which is bigger?",
     lead: "5 matchups. One looks huge, the other really is. Your eyes will lie to you. Can you go 5 for 5?",
+    steps: ["5 quick matchups", "Same puzzle for everyone", "New every midnight"],
     done: (score: number) => `You scored ${score}/5 today. New matchups at midnight.`,
     cta: "Take today's 5 →",
     doneCta: "See today's answers",
+    topPlayers: "Today's top players",
+    noScores: "No scores yet today. Be the first on the board.",
+    fullBoard: "Full leaderboard →",
+  },
+
+  // the example picture in the daily challenge card: always this pair, the classic trick
+  example: {
+    caption: "Example matchup",
+    mapLabel: "On a normal map",
+    realLabel: "Real size",
+    looks: (bigger: string, times: number) => `${bigger} looks ${times}× bigger`,
+    answer: (winner: string) => `${winner} wins`,
   },
 
   fact: {

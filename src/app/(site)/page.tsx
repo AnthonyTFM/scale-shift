@@ -11,6 +11,7 @@ import { JsonLd } from "@/components/site/PageHero";
 import { WeeklyPicks } from "@/components/home/WeeklyPicks";
 import { GlobeLazy } from "@/components/home/GlobeLazy";
 import { DailyFact } from "@/components/home/DailyFact";
+import { ExampleMatchup } from "@/components/home/ExampleMatchup";
 import { home } from "@/content/home";
 
 export const metadata: Metadata = {
@@ -114,8 +115,8 @@ export default function HomePage() {
       </section>
 
       {/* Today's game and a fact that proves the point, overlapping the hero */}
-      <section aria-label="Play" className="relative z-10 mx-auto -mt-12 grid max-w-6xl gap-4 px-4 md:grid-cols-[1.25fr_1fr]">
-        <DailyTeaser />
+      <section aria-label="Play" className="relative z-10 mx-auto -mt-12 grid max-w-6xl gap-4 px-4">
+        <DailyTeaser example={<ExampleMatchup />} />
         <DailyFact />
       </section>
 
