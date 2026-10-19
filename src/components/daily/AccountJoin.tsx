@@ -118,7 +118,7 @@ export function AccountJoin({ date, choices }: Props) {
             Sign in to put your score on the public leaderboard. We&apos;ll send a code to your email (or use Google), so nobody else can post as
             you, and you keep the same nickname on every device.
           </p>
-          <SignInButton mode="modal">
+          <SignInButton mode="modal" withSignUp>
             <button type="button" className="mt-3 h-11 rounded-lg bg-panel px-4 font-bold text-panel-text hover:bg-panel-2">
               Sign in to post my score
             </button>

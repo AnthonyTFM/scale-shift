@@ -41,7 +41,7 @@ function Bar() {
       ) : (
         <>
           <span>Same nickname on every device:</span>
-          <SignInButton mode="modal">
+          <SignInButton mode="modal" withSignUp>
             <button type="button" className="font-semibold text-link hover:underline">
               Sign in →
             </button>
