@@ -63,7 +63,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
         <rect x="2" y="2" width="32" height="16" rx="3" fill="url(#key-ov)" opacity="0.6" stroke={PALETTE[0]} strokeWidth="2" />
       </Swatch>,
       "Your shapes",
-      "Drawn at their real size wherever you drag them. Drag to the screen edge and the map scrolls with you.",
+      "Drawn at their real size wherever you drag them.",
     ],
     [
       <Swatch key="e">
@@ -117,6 +117,11 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
           </li>
         ))}
       </ul>
+
+      <p className="mt-4 rounded-lg bg-white/5 p-2.5 text-xs leading-relaxed text-panel-muted">
+        <span className="font-semibold text-panel-text">Tip:</span> rest your mouse near any edge of the map and it scrolls that way. Drag a
+        shape to the edge and it travels with the map.
+      </p>
 
       <h3 className="mt-5 text-sm font-bold">Antarctic claims</h3>
       {claims.length ? (

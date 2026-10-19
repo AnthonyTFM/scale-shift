@@ -119,9 +119,13 @@ export class MapEngine {
     | null = null;
   private flight = 0;
   private lastMoveEmit = 0;
-  /** edge scrolling: while a shape is dragged near the screen edge, the map scrolls under it */
+  /**
+   * Edge scrolling: with the mouse resting near a screen edge (or dragging a shape there), the map scrolls that way.
+   * pointerAt is the drag position; hoverAt is the mouse position when nothing is pressed, with the time it reached the edge.
+   */
   private edgeRaf = 0;
   private pointerAt: { x: number; y: number } | null = null;
+  private hoverAt: { x: number; y: number; since: number } | null = null;
 
   constructor(container: HTMLElement, cb: EngineCallbacks) {
     this.container = container;
@@ -147,6 +151,7 @@ export class MapEngine {
     this.top.addEventListener("pointerdown", this.onPointerDown);
     this.top.addEventListener("pointermove", this.onPointerMove);
     this.top.addEventListener("pointerup", this.onPointerUp);
+    this.top.addEventListener("pointerleave", this.onPointerLeave);
     this.top.addEventListener("pointercancel", this.onPointerUp);
     this.top.addEventListener("wheel", this.onWheel, { passive: false });
     this.top.addEventListener("dblclick", this.onDblClick);
@@ -161,6 +166,7 @@ export class MapEngine {
     this.top.removeEventListener("pointerdown", this.onPointerDown);
     this.top.removeEventListener("pointermove", this.onPointerMove);
     this.top.removeEventListener("pointerup", this.onPointerUp);
+    this.top.removeEventListener("pointerleave", this.onPointerLeave);
     this.top.removeEventListener("pointercancel", this.onPointerUp);
     this.top.removeEventListener("wheel", this.onWheel);
     this.top.removeEventListener("dblclick", this.onDblClick);
@@ -685,6 +691,7 @@ export class MapEngine {
 
   private onPointerDown = (e: PointerEvent) => {
     if (e.button === 2) return;
+    this.hoverAt = null;
     this.top.setPointerCapture(e.pointerId);
     const { x, y } = this.local(e);
     this.pointers.set(e.pointerId, { x, y });
@@ -716,6 +723,10 @@ export class MapEngine {
     if (!this.pointers.has(e.pointerId)) {
       if (e.pointerType === "mouse") {
         this.top.style.cursor = this.hitOverlay(x, y) ? "grab" : "default";
+        // hover edge scrolling (mouse only: touch screens can't hover)
+        const atEdge = this.atEdge(x, y);
+        this.hoverAt = atEdge ? { x, y, since: this.hoverAt?.since || performance.now() } : null;
+        if (atEdge) this.edgeScroll();
       }
       return;
     }
@@ -774,26 +785,46 @@ export class MapEngine {
     return d >= band ? 0 : 3 + ((band - Math.max(0, d)) / band) ** 1.5 * 15;
   }
 
-  /** While a shape is dragged near the edge of the screen, keep scrolling the map so it can travel anywhere in one drag. */
+  private atEdge(x: number, y: number) {
+    return this.edgeSpeed(x) > 0 || this.edgeSpeed(this.w - x) > 0 || this.edgeSpeed(y) > 0 || this.edgeSpeed(this.h - y) > 0;
+  }
+
+  /**
+   * Scroll the map while the pointer sits near an edge: when dragging a shape (it travels with the map, so it can go
+   * anywhere in one drag), or when the mouse simply rests there (after a short pause, gentler, so passing through the
+   * edge on the way to a button doesn't move the map).
+   */
   private edgeScroll() {
     if (this.edgeRaf) return;
+    const HOVER_DELAY = 300;
     const tick = () => {
       this.edgeRaf = 0;
       const g = this.gesture;
-      const p = this.pointerAt;
-      if (g?.kind !== "drag" || !g.moved || !p) return;
-      const dx = this.edgeSpeed(p.x) - this.edgeSpeed(this.w - p.x);
-      const dy = this.edgeSpeed(p.y) - this.edgeSpeed(this.h - p.y);
-      if (!dx && !dy) return;
+      const dragging = g?.kind === "drag" && g.moved && this.pointerAt;
+      const p = dragging ? this.pointerAt : !g ? this.hoverAt : null;
+      if (!p || !this.atEdge(p.x, p.y)) return;
+      if (!dragging && performance.now() - (this.hoverAt?.since ?? 0) < HOVER_DELAY) {
+        this.edgeRaf = requestAnimationFrame(tick); // still waiting out the pause
+        return;
+      }
+      const k = dragging ? 1 : 0.6;
+      const dx = (this.edgeSpeed(p.x) - this.edgeSpeed(this.w - p.x)) * k;
+      const dy = (this.edgeSpeed(p.y) - this.edgeSpeed(this.h - p.y)) * k;
       const before = this.view;
       this.view = panBy(this.view, dx, dy, this.w, this.h);
-      if (this.view.lon === before.lon && this.view.y === before.y) return; // reached the top or bottom of the map
-      this.viewChanged();
-      this.dragTo(p.x, p.y);
-      this.edgeRaf = requestAnimationFrame(tick);
+      const stuck = this.view.lon === before.lon && this.view.y === before.y; // reached the top or bottom of the map
+      if (!stuck) {
+        this.viewChanged();
+        if (dragging) this.dragTo(p.x, p.y);
+      }
+      if (!stuck || dx) this.edgeRaf = requestAnimationFrame(tick);
     };
     this.edgeRaf = requestAnimationFrame(tick);
   }
+
+  private onPointerLeave = () => {
+    this.hoverAt = null;
+  };
 
   private finishDrag() {
     const g = this.gesture;
