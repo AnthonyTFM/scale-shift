@@ -97,7 +97,13 @@ export async function POST(request: Request) {
       if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
     }
     await store.setName(player, name);
-    const fresh = await store.submit(body.date, player, score, Date.now());
+    const choices = body.choices as number[];
+    const fresh = await store.submit(body.date, player, score, Date.now(), choices);
+    // posted before picks were kept: add them, if they give the score already on the board (the first try still counts)
+    if (!fresh) {
+      const [first] = await store.records(player, [body.date]);
+      if (first && !first.c && first.s === score) await store.addChoices(body.date, player, choices);
+    }
     const board = await dayBoard(body.date, 0, player);
     // a repeat submission keeps the first score; report that one
     const mine = board.me;

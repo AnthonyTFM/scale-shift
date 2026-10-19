@@ -195,6 +195,17 @@ export function writeSave(save: DailySave) {
   }
 }
 
+/**
+ * Results from the leaderboard for a signed-in player. Those are their official first tries, so they replace whatever
+ * this browser has for the same days (e.g. a replay on a second device).
+ */
+export function mergeDays(days: Record<string, DayRecord>) {
+  const save = loadSave();
+  const merged = { ...save, days: { ...save.days, ...days } };
+  writeSave(merged);
+  return merged;
+}
+
 export type Stats = { played: number; average: number; streak: number; best: number };
 
 export function stats(save: DailySave, today: string): Stats {
