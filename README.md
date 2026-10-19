@@ -71,6 +71,7 @@ Players sign up with an email (kept private, one player per inbox) and a nicknam
   2. Or create one at [upstash.com](https://upstash.com) and add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel → Settings → Environment Variables.
   3. Redeploy.
 - **Removing a nickname:** with Redis, open the database console and delete the player's ID from `lb:names`. With the JSON file, edit `data/leaderboard.json`.
+- **Reminder emails (opt-in):** players can tick "Email me when a new daily challenge is up". Consent and its date are stored in `lb:reminders`; `reminderRecipients()` in `src/lib/leaderboard.ts` lists who agreed. Every email must include the one-click link `/api/leaderboard/unsubscribe?p=<id>&t=<unsubscribeToken(id)>`. Set `UNSUBSCRIBE_SECRET` in Vercel (any long random string) to sign those links. Sending isn't built yet: it needs a real domain and Resend.
 - **Blocked words** for nicknames are in `src/lib/name-filter.ts`. It catches disguised spellings (n1gg3r, niqqer, f4g0t). The boards also hide any saved name that fails it, so adding a word there takes a bad name down on the next deploy.
 
 ## Map data

@@ -27,9 +27,14 @@ export default function PrivacyPage() {
           </li>
           <li>
             <strong>Leaderboard (optional):</strong> only if you choose to join. We store your email, the nickname you pick, your daily scores and a
-            random ID your browser creates so your scores stay together. Nicknames and scores are public. Your email is private: it is only used
-            to keep one player per person, is never shown on the site, and is never sold or shared. No real name needed. To stop spam we keep a one-way scrambled code made from your network address for three days; the address itself is never
+            random ID your browser creates so your scores stay together. Nicknames and scores are public. Your email is private: it is used to keep
+            one player per person, is never shown on the site, and is never sold or shared. No real name needed. To stop spam we keep a one-way scrambled code made from your network address for three days; the address itself is never
             stored.
+          </li>
+          <li>
+            <strong>Reminder emails (optional):</strong> only if you tick &ldquo;Email me when a new daily challenge is up&rdquo;. We record
+            when you agreed and send at most one email a day about the new challenge and your leaderboard spot. Every email has a one-click
+            unsubscribe link, and you can also turn reminders off on the results screen after a daily round.
           </li>
           <li>
             <strong>Feedback form:</strong> if you send a report, we store what you type (and your email, if you give it) so we can fix the map

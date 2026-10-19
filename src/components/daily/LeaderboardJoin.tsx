@@ -20,9 +20,35 @@ export function LeaderboardJoin({ date, choices }: Props) {
   const [top, setTop] = useState<DayBoard | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
+  const remindRef = useRef<HTMLInputElement>(null);
   const sent = useRef(false);
+  const [remindNote, setRemindNote] = useState("");
 
-  const submit = async (p: Player) => {
+  /** Turn reminder emails on or off on the server, then remember the choice in this browser. */
+  const saveReminders = async (p: Player, on: boolean) => {
+    setRemindNote("");
+    // flip the box straight away; put it back if the server says no
+    setPlayer({ ...p, reminders: on });
+    const undo = (note: string) => {
+      setPlayer(p);
+      setRemindNote(note);
+    };
+    try {
+      const res = await fetch("/api/leaderboard/reminders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ player: p.id, on }),
+      });
+      const data = (await res.json()) as { ok: boolean; error?: string };
+      if (!data.ok) return undo(data.error ?? "Couldn't save that. Please try again.");
+      setPlayer(savePlayer(p.name, p.email, on));
+      setRemindNote(on ? "Done. We'll email you when a new challenge is up." : "Done. No more reminder emails.");
+    } catch {
+      undo("Couldn't reach the server. Please try again.");
+    }
+  };
+
+  const submit = async (p: Player, reminders?: boolean) => {
     setStatus("sending");
     setError("");
     setErrorField(null);
@@ -44,6 +70,7 @@ export function LeaderboardJoin({ date, choices }: Props) {
       setStatus("done");
       setEditing(false);
       if (!data.duplicate) track("leaderboard_join", { rank: data.rank });
+      if (reminders !== undefined) await saveReminders(p, reminders);
       const board = await fetch(`/api/leaderboard?scope=day&date=${date}&limit=5&player=${p.id}`).then((r) => (r.ok ? r.json() : null));
       setTop(board);
     } catch {
@@ -89,9 +116,10 @@ export function LeaderboardJoin({ date, choices }: Props) {
             if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return invalid("email", "Enter your email to join the leaderboard.");
             if (name.length < 3) return invalid("name", "Use 3 to 16 characters.");
             if (isOffensive(name)) return invalid("name", "Please pick a different nickname.");
+            const reminders = remindRef.current?.checked ?? false;
             const p = savePlayer(name, email);
             setPlayer(p);
-            submit(p);
+            submit(p, reminders);
           }}
         >
           <p className="text-sm text-ink-soft">
@@ -135,9 +163,16 @@ export function LeaderboardJoin({ date, choices }: Props) {
               {status === "sending" ? "Saving…" : player ? "Save" : "Join"}
             </button>
           </div>
+          <label className="mt-3 flex items-start gap-2 text-sm text-ink">
+            <input ref={remindRef} type="checkbox" defaultChecked={player?.reminders ?? false} className="mt-0.5 size-4 shrink-0 accent-amber-500" />
+            <span>
+              Email me when a new daily challenge is up, so I can defend my spot on the leaderboard.{" "}
+              <span className="text-muted">Optional. Unsubscribe any time with one click.</span>
+            </span>
+          </label>
           <p id="lb-help" className="mt-1 text-xs text-muted">
-            One nickname per email. Your email is only used to keep the leaderboard fair; we never show or share it. Please don&apos;t use
-            your full real name as a nickname. Only your first try each day counts.
+            One nickname per email. We use your email to keep the leaderboard fair, and for reminders only if you tick the box. We never
+            show or share it. Please don&apos;t use your full real name as a nickname. Only your first try each day counts.
           </p>
         </form>
       ) : null}
@@ -158,6 +193,18 @@ export function LeaderboardJoin({ date, choices }: Props) {
             </button>
           </p>
         ) : null}
+        {result && !editing && player ? (
+          <label className="mt-2 flex items-start gap-2 text-sm text-ink-soft">
+            <input
+              type="checkbox"
+              checked={player.reminders ?? false}
+              onChange={(e) => saveReminders(player, e.target.checked)}
+              className="mt-0.5 size-4 shrink-0 accent-amber-500"
+            />
+            <span>Email me when a new daily challenge is up</span>
+          </label>
+        ) : null}
+        {remindNote ? <p className="mt-1 text-xs text-muted">{remindNote}</p> : null}
       </div>
 
       {top?.rows.length ? (

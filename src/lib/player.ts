@@ -1,6 +1,7 @@
-// This browser's leaderboard identity: a random ID (kept private), the public nickname and the private sign-up email.
+// This browser's leaderboard identity: a random ID (kept private), the public nickname, the private sign-up email
+// and whether they asked for reminder emails.
 
-export type Player = { id: string; name: string; email?: string };
+export type Player = { id: string; name: string; email?: string; reminders?: boolean };
 
 const KEY = "atlas-player-v1";
 
@@ -15,9 +16,9 @@ export function loadPlayer(): Player | null {
 }
 
 /** Keeps the same ID when the nickname changes, so past scores stay yours. */
-export function savePlayer(name: string, email?: string): Player {
+export function savePlayer(name: string, email?: string, reminders?: boolean): Player {
   const old = loadPlayer();
-  const p: Player = { id: old?.id ?? crypto.randomUUID(), name, email: email || old?.email };
+  const p: Player = { id: old?.id ?? crypto.randomUUID(), name, email: email || old?.email, reminders: reminders ?? old?.reminders };
   try {
     localStorage.setItem(KEY, JSON.stringify(p));
   } catch {
