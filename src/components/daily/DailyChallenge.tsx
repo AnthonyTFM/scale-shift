@@ -8,6 +8,7 @@ import { track } from "@/lib/analytics";
 import {
   buildQuestions,
   dayNumber,
+  mergeDays,
   explain,
   loadSave,
   localDateKey,
@@ -22,7 +23,9 @@ import { LeaderboardJoin } from "./LeaderboardJoin";
 import { formatBoth } from "@/lib/format";
 import { mapUrl } from "@/lib/share";
 import { challengeHash, readChallenge, type Challenge } from "@/lib/challenge";
-import { loadPlayer } from "@/lib/player";
+import { loadPlayer, rememberPlayer } from "@/lib/player";
+import { signInOn } from "@/lib/sign-in";
+import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
 
 type Outline = { d: string; b: [number, number, number, number] };
@@ -73,6 +76,13 @@ async function prepare(practice: boolean): Promise<Game> {
   return { round, today, save, choices, step: Math.min(choices.length, round.questions.length) };
 }
 
+/** Show the leaderboard's result for this round in place of whatever this browser had (they're the first try). */
+function official(g: Game, save: DailySave): Game {
+  const rec = g.round.date ? save.days[g.round.date] : undefined;
+  if (!rec || typeof rec.s !== "number") return { ...g, save };
+  return { ...g, save, choices: rec.c, step: g.round.questions.length };
+}
+
 /**
  * Today's progress lives in this browser's storage, shared by all its tabs. If another tab has answered more of today's
  * questions, take its answers (the first answer to each question counts, as on the leaderboard). Practice rounds are
@@ -100,6 +110,17 @@ export function DailyChallenge() {
       .catch(() => setFailed(true));
     // another tab answered: show its progress here too, so tabs never disagree (or let today be played twice)
     const sync = () => setGame((g) => (g ? catchUp(g) : g));
+    // signed in: bring in this player's results from the leaderboard, so every device shows the same (first) score
+    if (signInOn)
+      fetch(`/api/leaderboard/me?today=${localDateKey()}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d: { player?: { id: string; name: string | null } | null; days?: Record<string, { c: number[]; s: number }> } | null) => {
+          if (d?.player?.name) rememberPlayer({ id: d.player.id, name: d.player.name });
+          if (!d?.days || !Object.keys(d.days).length) return;
+          const save = mergeDays(d.days);
+          setGame((g) => (g ? official(g, save) : g));
+        })
+        .catch(() => {});
     window.addEventListener("storage", sync);
     window.addEventListener("focus", sync);
     return () => {
@@ -163,6 +184,7 @@ export function DailyChallenge() {
             : `${challenge.name} sent you Daily #${challenge.day}. Here's today's: play it and send your score back.`}
         </p>
       ) : null}
+      {signInOn && !finished && round.date ? <PlayedElsewhere /> : null}
       <Progress round={round} choices={choices} step={step} />
       {finished ? (
         <Results
@@ -284,7 +306,8 @@ function QuestionCard({
   const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
 
   useEffect(() => {
-    if (answered) nextRef.current?.focus();
+    // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
+    if (answered) nextRef.current?.focus({ preventScroll: true });
   }, [answered]);
 
   return (

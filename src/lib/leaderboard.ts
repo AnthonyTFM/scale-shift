@@ -71,11 +71,16 @@ export function scoreAnswers(date: string, choices: unknown): number | null {
 
 // ---------- storage ----------
 
-type DayEntry = { s: number; t: number };
+/** s = score, t = when it was posted, c = the picks (so a signed-in player sees the same results on every device). */
+type DayEntry = { s: number; t: number; c?: number[] };
 
 interface Store {
   /** false if this player already has a score for this date (the first one counts) */
-  submit(date: string, id: string, score: number, at: number): Promise<boolean>;
+  submit(date: string, id: string, score: number, at: number, choices: number[]): Promise<boolean>;
+  /** this player's saved result for each date (null where they didn't play) */
+  records(id: string, dates: string[]): Promise<(DayEntry | null)[]>;
+  /** add the picks to a result posted before picks were kept */
+  addChoices(date: string, id: string, choices: number[]): Promise<void>;
   setName(id: string, name: string): Promise<void>;
   /** has this player already posted a score for this date? */
   has(date: string, id: string): Promise<boolean>;
@@ -125,8 +130,8 @@ function redisStore(url: string, token: string): Store {
     return m;
   };
   return {
-    async submit(date, id, score, at) {
-      const [added] = await run([["HSETNX", `lb2:day:${date}`, id, JSON.stringify({ s: score, t: at })]]);
+    async submit(date, id, score, at, choices) {
+      const [added] = await run([["HSETNX", `lb2:day:${date}`, id, JSON.stringify({ s: score, t: at, c: choices })]]);
       if (Number(added) !== 1) return false;
       await run([
         ["ZINCRBY", "lb2:points", score, id],
@@ -136,6 +141,17 @@ function redisStore(url: string, token: string): Store {
     },
     async setName(id, name) {
       await run([["HSET", "lb2:names", id, name]]);
+    },
+    async records(id, dates) {
+      if (!dates.length) return [];
+      const raw = await run(dates.map((d) => ["HGET", `lb2:day:${d}`, id]));
+      return raw.map((r) => (typeof r === "string" ? (JSON.parse(r) as DayEntry) : null));
+    },
+    async addChoices(date, id, choices) {
+      const [raw] = await run([["HGET", `lb2:day:${date}`, id]]);
+      if (typeof raw !== "string") return;
+      const e = JSON.parse(raw) as DayEntry;
+      if (!e.c) await run([["HSET", `lb2:day:${date}`, id, JSON.stringify({ ...e, c: choices })]]);
     },
     async has(date, id) {
       const [r] = await run([["HEXISTS", `lb2:day:${date}`, id]]);
@@ -284,12 +300,21 @@ function fileStore(file: string): Store {
     return job;
   };
   return {
-    submit: (date, id, score, at) =>
+    submit: (date, id, score, at, choices) =>
       write((d) => {
         const day = (d.days[date] ??= {});
         if (day[id]) return false;
-        day[id] = { s: score, t: at };
+        day[id] = { s: score, t: at, c: choices };
         return true;
+      }),
+    async records(id, dates) {
+      const d = await read();
+      return dates.map((date) => d.days[date]?.[id] ?? null);
+    },
+    addChoices: (date, id, choices) =>
+      write((d) => {
+        const e = d.days[date]?.[id];
+        if (e && !e.c) e.c = choices;
       }),
     setName: (id, name) =>
       write((d) => {
@@ -414,6 +439,23 @@ export const nameKey = (name: string) => name.toLowerCase().replace(/[^\p{L}\p{N
 /** One-way hash of the visitor's network address plus the date, so no IP address is ever stored. */
 export function networkKey(ip: string, date: string) {
   return createHash("sha256").update(`${ip}|${date}|scale-shift`).digest("hex").slice(0, 16);
+}
+
+// ---------- a signed-in player's results on any device ----------
+
+/** How far back a signed-in device gets its results (for the streak and stats). */
+const HISTORY_DAYS = 60;
+
+/** The player's results with picks, newest first: { date: { c, s } }. Days posted without picks are left out. */
+export async function playerHistory(id: string, today: string) {
+  const dates = Array.from({ length: HISTORY_DAYS }, (_, i) => shiftDate(today, -i));
+  const saved = await getStore().records(id, dates);
+  const days: Record<string, { c: number[]; s: number }> = {};
+  dates.forEach((date, i) => {
+    const e = saved[i];
+    if (e?.c) days[date] = { c: e.c, s: e.s };
+  });
+  return days;
 }
 
 // ---------- reminder emails ----------
