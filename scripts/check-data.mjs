@@ -1,34 +1,44 @@
 #!/usr/bin/env node
 /**
- * Sanity check for public/data: every snapshot decodes and no shape renders inside-out on Mercator.
- * Run after `npm run data`:  npm run check:data
+ * Sanity check for public/data, run in CI and after `npm run data`:  npm run check:data
+ * - every era listed in src/data/eras.json has a map file that decodes
+ * - no shape is wound inside-out (it would cover the whole map)
+ * - the daily-challenge pool and the Antarctic claims exist and match
  */
 import fs from "node:fs";
 import path from "node:path";
 import { feature } from "topojson-client";
-import { geoArea, geoMercator, geoPath } from "d3-geo";
+import { geoArea } from "d3-geo";
 
-const dir = path.join(process.cwd(), "public/data/years");
-const path2d = geoPath(geoMercator().scale(1000 / (2 * Math.PI)).translate([500, 500]));
-const rewind = (f) => {
-  const fix = (rings) => (geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI ? rings.map((r) => r.slice().reverse()) : rings);
-  const g = f.geometry;
-  return { ...f, geometry: g.type === "Polygon" ? { type: "Polygon", coordinates: fix(g.coordinates) } : { type: "MultiPolygon", coordinates: g.coordinates.map(fix) } };
-};
-let bad = 0;
-let total = 0;
-for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json"))) {
-  const topo = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
+const root = process.cwd();
+const read = (p) => JSON.parse(fs.readFileSync(path.join(root, p), "utf8"));
+const problems = [];
+let shapes = 0;
+
+const eras = read("src/data/eras.json");
+for (const e of eras) {
+  const file = `public/data/eras/${e.key}.json`;
+  if (!fs.existsSync(path.join(root, file))) {
+    problems.push(`missing ${file}`);
+    continue;
+  }
+  const topo = read(file);
   for (const obj of Object.values(topo.objects)) {
-    for (const f0 of feature(topo, obj).features) {
-      total++;
-      const [[x0, y0], [x1, y1]] = path2d.bounds(rewind(f0));
-      if (x1 - x0 > 900 && y1 - y0 > 900) {
-        bad++;
-        console.log(`inside-out: ${file} ${f0.id}`);
-      }
+    for (const f of feature(topo, obj).features) {
+      shapes++;
+      if (geoArea(f) > 2 * Math.PI) problems.push(`inside-out: ${e.key} ${f.properties?.n || "(unnamed)"}`);
     }
   }
 }
-console.log(`${total} shapes checked, ${bad} problems`);
-process.exit(bad ? 1 : 0);
+
+const pool = read("public/data/daily/index.json");
+const serverPool = read("src/data/daily-pool.json");
+if (JSON.stringify(pool) !== JSON.stringify(serverPool)) problems.push("daily pool: public/data/daily/index.json and src/data/daily-pool.json differ (run npm run data)");
+for (const p of pool) if (!fs.existsSync(path.join(root, `public/data/daily/shapes/${p.id}.json`))) problems.push(`daily pool: missing shape ${p.id}`);
+
+const claims = read("public/data/antarctic-claims.json");
+for (const c of read("src/content/antarctic-claims.json").claims) if (!claims[c.id]) problems.push(`antarctic claims: missing ${c.id}`);
+
+for (const p of problems) console.log(p);
+console.log(`${eras.length} eras, ${shapes} shapes, ${pool.length} daily shapes checked: ${problems.length} problems`);
+process.exit(problems.length ? 1 : 0);

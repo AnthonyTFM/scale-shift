@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+/* Design tokens — change colours/fonts here and the whole site follows. */
+@theme {
+  --color-ink: #1f1712;
+  --color-ink-soft: #4a3d35;
+  --color-muted: #6e6058;
+  --color-paper: #fbf6ee;
+  --color-card: #ffffff;
+  --color-line: #eadfce;
+  --color-panel: #221b2e;
+  --color-panel-2: #2e2640;
+  --color-panel-line: #433a58;
+  --color-panel-text: #f6f0ea;
+  --color-panel-muted: #bdb1c9;
+  --color-accent: #ffb547;
+  --color-accent-strong: #f29e1f;
+  --color-link: #b4401a;
+  --color-focus: #ff9f43;
+  --color-danger: #b4235a;
+  --color-formal: #0f7a55;
+  --color-force: #9a5b00;
+  --color-disputed: #b4235a;
+
+  /* system UI font for body text: zero download, instant first paint */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --radius-card: 14px;
+  --shadow-float: 0 10px 30px rgba(34, 20, 12, 0.24), 0 2px 6px rgba(34, 20, 12, 0.12);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* readable long-form text on content pages */
+.prose-atlas p {
+  margin: 0 0 1rem;
+  line-height: 1.7;
+  color: var(--color-ink-soft);
+}
+.prose-atlas h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1.2;
+  margin: 2.5rem 0 0.75rem;
+  color: var(--color-ink);
+}
+.prose-atlas h3 {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 1.5rem 0 0.5rem;
+}
+.prose-atlas ul {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0 0 1rem;
+  color: var(--color-ink-soft);
+  line-height: 1.7;
+}
+.prose-atlas a {
+  color: var(--color-link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* range input used by the era slider */
+.era-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  width: 100%;
+  height: 28px;
+}
+.era-range::-webkit-slider-runnable-track {
+  height: 4px;
+  background: var(--color-panel-line);
+  border-radius: 4px;
+}
+.era-range::-moz-range-track {
+  height: 4px;
+  background: var(--color-panel-line);
+  border-radius: 4px;
+}
+.era-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-panel);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+.era-range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  border: 3px solid var(--color-panel);
+}
+
+/* set by an inline script in the root layout before first paint */
+.intro-seen [data-intro] {
+  display: none;
+}
+
+/* printing (teacher handouts): drop site chrome and keep each activity on its own page where possible */
+@media print {
+  header,
+  footer,
+  .no-print,
+  [href="#main"] {
+    display: none !important;
+  }
+  body {
+    background: #fff;
+  }
+  .print-card {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+}

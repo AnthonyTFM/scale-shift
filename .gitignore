@@ -45,3 +45,6 @@ next-env.d.ts
 /data-src/
 /data/
 /e2e-shots/
+
+# data build download cache
+/.cache/

@@ -1,0 +1,753 @@
+{
+  "_readme": "Fixes applied to the historical-basemaps source when `npm run data` builds the map. years = snapshot years (negative = BCE). n = new name, s = new 'ruled by' (null clears it), note = shown on the map as a data note. Every rule is listed on /about.",
+  "rules": [
+    {
+      "name": "Thai",
+      "years": [
+        -2000
+      ],
+      "note": "The source labels most of China in 2000 BCE as 'Thai'. The ancestors of the Tai peoples lived in southern China; the north was home to Longshan-era cultures and the early Erlitou (traditionally Xia) state.",
+      "why": "An ethnic label stretched over regions it does not describe."
+    },
+    {
+      "name": "Kingdom of Brazil",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Empire of Brazil",
+      "why": "Brazil was an empire from 1822 until the republic was proclaimed in November 1889."
+    },
+    {
+      "name": "Kingdom of Brazil",
+      "years": [
+        1900
+      ],
+      "n": "Brazil",
+      "s": null,
+      "why": "Brazil had been a republic since 1889, independent of Portugal since 1822."
+    },
+    {
+      "name": "White Russia",
+      "years": [
+        1930
+      ],
+      "n": "USSR",
+      "why": "The whole Soviet Union (about 19.5 million km²) was labelled 'White Russia', the old English name for Belarus."
+    },
+    {
+      "name": "Luisiana",
+      "years": [
+        1783
+      ],
+      "n": "Louisiana (Spain)",
+      "s": "Spain",
+      "why": "France ceded Louisiana to Spain in 1762; it went back to France secretly in 1800."
+    },
+    {
+      "name": "Zhoa",
+      "years": [
+        -1500
+      ],
+      "n": "Shang",
+      "why": "The Shang dynasty ruled the Yellow River valley c. 1600–1046 BCE; the Zhou came later."
+    },
+    {
+      "name": "Zhoa",
+      "years": [
+        -1000,
+        -700
+      ],
+      "n": "Zhou",
+      "why": "Misspelling of Zhou (dynasty from 1046 BCE)."
+    },
+    {
+      "name": "Hittites",
+      "years": [
+        -1000,
+        -700
+      ],
+      "n": "Neo-Hittite states",
+      "why": "The Hittite Empire collapsed around 1180 BCE; small Neo-Hittite kingdoms survived in Syria and Anatolia."
+    },
+    {
+      "name": "Urartu",
+      "years": [
+        -1500,
+        -1000
+      ],
+      "note": "Urartu only emerged around 860 BCE. Earlier, this highland was home to Hurrian peoples (the Mitanni kingdom in 1500 BCE).",
+      "why": "Urartu appears centuries before it existed."
+    },
+    {
+      "name": "Xiongnu",
+      "years": [
+        -400
+      ],
+      "note": "The Xiongnu confederation formed around 209 BCE; in 400 BCE these steppes were held by earlier nomadic peoples.",
+      "why": "Xiongnu shown about 200 years early."
+    },
+    {
+      "name": "Kushan Empire",
+      "years": [
+        -100
+      ],
+      "n": "Yuezhi",
+      "why": "The Kushan Empire was founded by the Yuezhi around 30 CE."
+    },
+    {
+      "name": "Mauryan Empire",
+      "years": [
+        -100
+      ],
+      "n": "Shunga Empire",
+      "note": "The Mauryan Empire fell around 185 BCE. Its successor, the Shunga Empire, was much smaller than the outline shown here.",
+      "why": "Mauryan Empire shown about 85 years after it fell."
+    },
+    {
+      "name": "Seleucid Kingdom",
+      "years": [
+        -100
+      ],
+      "note": "By 100 BCE the Seleucids held little beyond Syria; Parthia had taken Mesopotamia and Iran. The source outline is too large.",
+      "why": "Outline far larger than Seleucid territory in 100 BCE."
+    },
+    {
+      "name": "Parthian Empire",
+      "years": [
+        300
+      ],
+      "n": "Sasanian Empire",
+      "why": "The Sasanians overthrew the Parthians in 224 CE."
+    },
+    {
+      "name": "Persia",
+      "years": [
+        400
+      ],
+      "n": "Sasanian Empire",
+      "s": null,
+      "why": "Persia in 400 CE was the Sasanian Empire."
+    },
+    {
+      "name": "Suren Kingdom",
+      "years": [
+        200,
+        300,
+        400
+      ],
+      "note": "The Indo-Parthian (Suren) kingdom had ended by the late 1st century CE; the source keeps it too long.",
+      "why": "Kingdom shown long after it ended."
+    },
+    {
+      "name": "Satavahanihara",
+      "years": [
+        300,
+        400
+      ],
+      "note": "The Satavahana dynasty ended around 220 CE; by 300 the Deccan was split among successor states.",
+      "why": "Dynasty shown after it ended."
+    },
+    {
+      "name": "Jin Empire",
+      "years": [
+        500
+      ],
+      "n": "Southern Qi",
+      "why": "The Jin dynasty ended in 420; southern China was ruled by the Southern Qi (479–502)."
+    },
+    {
+      "name": "Sui Empire",
+      "years": [
+        700
+      ],
+      "n": "Tang Empire",
+      "note": "Empress Wu Zetian ruled under the name 'Zhou' from 690 to 705, between Tang reigns.",
+      "why": "The Sui dynasty ended in 618."
+    },
+    {
+      "name": "Sasanian Empire",
+      "years": [
+        700
+      ],
+      "n": "Umayyad Caliphate",
+      "why": "The Sasanian Empire fell to the Arab conquests by 651."
+    },
+    {
+      "name": "Sasanian dependencies",
+      "years": [
+        700
+      ],
+      "note": "The Sasanian Empire had fallen by 651; these lands were ruled by local dynasties or the Caliphate.",
+      "why": "Shown as Sasanian after the empire fell."
+    },
+    {
+      "name": "Western Gokturk Khaganate",
+      "years": [
+        700
+      ],
+      "n": "Türgesh Khaganate",
+      "why": "The Western Turkic Khaganate fell to the Tang in 657; the Türgesh dominated the region by 699."
+    },
+    {
+      "name": "Koguryo",
+      "years": [
+        700
+      ],
+      "n": "Balhae",
+      "why": "Goguryeo fell in 668; Balhae was founded in its northern lands in 698."
+    },
+    {
+      "name": "Yamato",
+      "years": [
+        900
+      ],
+      "n": "Japan (Heian period)",
+      "why": "The Yamato period ended in 710."
+    },
+    {
+      "name": "Denmark-Norway",
+      "years": [
+        1000
+      ],
+      "note": "Denmark and Norway were not one kingdom in 1000. Denmark's Sweyn Forkbeard controlled much of Norway after the Battle of Svolder (1000); the lasting union dates from 1380. Greenland was a self-governing Norse settlement.",
+      "why": "Union shown centuries early."
+    },
+    {
+      "name": "Xixia",
+      "years": [
+        1000
+      ],
+      "note": "The Western Xia state was proclaimed in 1038; in 1000 this was Tangut territory under Song and Liao influence.",
+      "why": "Western Xia shown before it was founded."
+    },
+    {
+      "name": "Mongol Empire",
+      "years": [
+        1200
+      ],
+      "n": "Mongol tribes",
+      "why": "Temüjin was proclaimed Genghis Khan, founding the Mongol Empire, in 1206."
+    },
+    {
+      "name": "Liao",
+      "years": [
+        1200
+      ],
+      "note": "The Liao dynasty fell in 1125. In 1200 northern China was ruled by the Jurchen Jin dynasty, which this source does not draw.",
+      "why": "Liao shown 75 years after it fell; Jin missing."
+    },
+    {
+      "name": "Fatimid Caliphate",
+      "years": [
+        1200
+      ],
+      "n": "Ayyubid Sultanate",
+      "why": "Saladin ended the Fatimid Caliphate in 1171."
+    },
+    {
+      "name": "Ghaznavid Emirate",
+      "years": [
+        1200
+      ],
+      "n": "Ghurid Sultanate",
+      "why": "The Ghurids took the last Ghaznavid lands in 1186."
+    },
+    {
+      "name": "Sultanate of Delhi",
+      "years": [
+        1200
+      ],
+      "n": "Ghurid Sultanate",
+      "why": "The Delhi Sultanate was founded in 1206; in 1200 northern India was ruled by the Ghurids."
+    },
+    {
+      "name": "Buwayhid Emirates",
+      "years": [
+        1200
+      ],
+      "note": "The Buyid emirates ended in 1062. In 1200 this region was held by Seljuk successor states and the Khwarazmians.",
+      "why": "Buyids shown long after they ended."
+    },
+    {
+      "name": "Tibet",
+      "years": [
+        1400
+      ],
+      "s": null,
+      "why": "Yuan (Mongol) control of Tibet ended in 1354."
+    },
+    {
+      "name": "Novgorod",
+      "years": [
+        1400
+      ],
+      "s": null,
+      "why": "The Mongol Empire no longer existed as one state in 1400."
+    },
+    {
+      "name": "Inca Empire",
+      "years": [
+        1600
+      ],
+      "n": "Viceroyalty of Peru",
+      "s": "Spain",
+      "why": "The last Inca state fell in 1572."
+    },
+    {
+      "name": "Songhai",
+      "years": [
+        1600,
+        1650,
+        1700,
+        1715,
+        1783,
+        1800
+      ],
+      "note": "The Songhai Empire fell to Morocco in 1591. This area was then split between the Moroccan Pashalik of Timbuktu and smaller successor states; the source keeps the old outline.",
+      "why": "Empire shown after its conquest."
+    },
+    {
+      "name": "Vijayanagara",
+      "years": [
+        1650
+      ],
+      "note": "The Vijayanagara Empire ended in 1646; its lands passed to Nayak successor states and the Deccan sultanates.",
+      "why": "Empire shown after it ended."
+    },
+    {
+      "name": "Dutch Brazil",
+      "years": [
+        1700
+      ],
+      "n": "Portuguese Brazil",
+      "s": "Portugal",
+      "why": "The Dutch were expelled from Brazil in 1654."
+    },
+    {
+      "name": "Austrian Empire",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783,
+        1800
+      ],
+      "n": "Habsburg Monarchy",
+      "why": "The Austrian Empire was only proclaimed in 1804."
+    },
+    {
+      "name": "Dutch East Indies",
+      "years": [
+        1715
+      ],
+      "s": "Netherlands",
+      "why": "Typo in the source ('Neterlands')."
+    },
+    {
+      "name": "Quebec",
+      "years": [
+        1783
+      ],
+      "n": "Province of Quebec",
+      "s": "Great Britain",
+      "why": "France ceded Canada to Britain in 1763."
+    },
+    {
+      "name": "Quebec",
+      "years": [
+        1800
+      ],
+      "n": "Upper and Lower Canada",
+      "s": "Great Britain",
+      "why": "British since 1763; split into Upper and Lower Canada in 1791."
+    },
+    {
+      "name": "Luisiana",
+      "years": [
+        1800
+      ],
+      "n": "Louisiana",
+      "s": "Spain",
+      "note": "Spain secretly agreed to return Louisiana to France in October 1800 (Treaty of San Ildefonso) but governed it until 1803.",
+      "why": "Spain still governed Louisiana in 1800."
+    },
+    {
+      "name": "Canada",
+      "years": [
+        1815
+      ],
+      "n": "British North America",
+      "s": "United Kingdom",
+      "why": "Canada was only formed in 1867."
+    },
+    {
+      "name": "United Provinces of the Río de la Plata",
+      "years": [
+        1815
+      ],
+      "s": null,
+      "why": "Self-governing since 1810; independence declared in 1816."
+    },
+    {
+      "name": "Manchu Empire",
+      "years": [
+        1914
+      ],
+      "n": "Republic of China",
+      "why": "The Qing (Manchu) dynasty abdicated in February 1912."
+    },
+    {
+      "name": "Papua New Guinea",
+      "years": [
+        1492,
+        1500,
+        1715,
+        1783,
+        1800,
+        1878,
+        1880
+      ],
+      "n": "Papuan peoples",
+      "why": "Papua New Guinea became a country in 1975."
+    },
+    {
+      "name": "Papua New Guinea",
+      "years": [
+        1900,
+        1914
+      ],
+      "n": "New Guinea (British and German colonies)",
+      "why": "Papua New Guinea became a country in 1975."
+    },
+    {
+      "name": "Papua New Guinea",
+      "years": [
+        1920,
+        1930,
+        1945
+      ],
+      "n": "Papua and New Guinea (Australian territories)",
+      "s": "Australia",
+      "why": "Papua New Guinea became a country in 1975."
+    },
+    {
+      "name": "Papua New Guinea",
+      "years": [
+        1960
+      ],
+      "n": "Territory of Papua and New Guinea",
+      "s": "Australia",
+      "why": "Independence came in 1975."
+    },
+    {
+      "name": "USSR",
+      "years": [
+        1920
+      ],
+      "n": "Soviet Russia (RSFSR)",
+      "why": "The USSR was founded in December 1922."
+    },
+    {
+      "name": "Far Eastern SSR",
+      "years": [
+        1920
+      ],
+      "n": "Far Eastern Republic",
+      "why": "The buffer state's actual name (1920–1922)."
+    },
+    {
+      "name": "Far Eastern SSR",
+      "years": [
+        1930
+      ],
+      "n": "USSR",
+      "why": "The Far Eastern Republic joined Soviet Russia in 1922."
+    },
+    {
+      "name": "Iran",
+      "years": [
+        1920,
+        1930
+      ],
+      "n": "Persia",
+      "why": "The country asked to be called Iran internationally in 1935."
+    },
+    {
+      "name": "Zaire (Belgium)",
+      "years": [
+        1920,
+        1930
+      ],
+      "n": "Belgian Congo",
+      "s": "Belgium",
+      "why": "The name Zaire was used only from 1971 to 1997."
+    },
+    {
+      "name": "Zaire",
+      "years": [
+        1945
+      ],
+      "n": "Belgian Congo",
+      "s": "Belgium",
+      "why": "The name Zaire was used only from 1971 to 1997."
+    },
+    {
+      "name": "Zaire",
+      "years": [
+        1960
+      ],
+      "n": "Congo-Léopoldville",
+      "why": "Independent as the Republic of the Congo in June 1960; Zaire only from 1971."
+    },
+    {
+      "name": "Zaire",
+      "years": [
+        2000,
+        2010
+      ],
+      "n": "DR Congo",
+      "why": "Renamed the Democratic Republic of the Congo in 1997."
+    },
+    {
+      "name": "Tanzania, United Republic of",
+      "years": [
+        1920,
+        1930,
+        1938,
+        1945
+      ],
+      "n": "Tanganyika Territory",
+      "s": "United Kingdom",
+      "why": "Tanzania was formed in 1964; this was the British mandate of Tanganyika."
+    },
+    {
+      "name": "Tanzania, United Republic of",
+      "years": [
+        1960
+      ],
+      "n": "Tanganyika",
+      "s": "United Kingdom",
+      "why": "Tanganyika became independent in December 1961."
+    },
+    {
+      "name": "Tanzania, United Republic of",
+      "years": [
+        1994,
+        2000,
+        2010
+      ],
+      "n": "Tanzania",
+      "why": "Shorter common name."
+    },
+    {
+      "name": "Zambia",
+      "years": [
+        1920,
+        1930,
+        1960
+      ],
+      "n": "Northern Rhodesia",
+      "s": "United Kingdom",
+      "why": "Zambia became independent in 1964."
+    },
+    {
+      "name": "Zimbabwe",
+      "years": [
+        1920,
+        1930,
+        1960
+      ],
+      "n": "Southern Rhodesia",
+      "s": "United Kingdom",
+      "why": "Zimbabwe became independent in 1980."
+    },
+    {
+      "name": "Rhodesia",
+      "years": [
+        1945
+      ],
+      "n": "Southern Rhodesia",
+      "why": "Official name of the colony."
+    },
+    {
+      "name": "Botswana",
+      "years": [
+        1914,
+        1920,
+        1930,
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Bechuanaland Protectorate",
+      "s": "United Kingdom",
+      "why": "Botswana became independent in 1966."
+    },
+    {
+      "name": "Malaysia",
+      "years": [
+        1920,
+        1930,
+        1938,
+        1945
+      ],
+      "n": "British Malaya",
+      "s": "United Kingdom",
+      "why": "Malaysia was formed in 1963."
+    },
+    {
+      "name": "Malaysia",
+      "years": [
+        1960
+      ],
+      "n": "Federation of Malaya",
+      "why": "Malaysia was formed in 1963."
+    },
+    {
+      "name": "Hejaz",
+      "years": [
+        1930
+      ],
+      "n": "Kingdom of Hejaz and Nejd",
+      "why": "Ibn Saud conquered the Hejaz in 1925."
+    },
+    {
+      "name": "Hejaz",
+      "years": [
+        1938
+      ],
+      "n": "Saudi Arabia",
+      "why": "Part of Saudi Arabia since 1932."
+    },
+    {
+      "name": "Chinese Warlords",
+      "years": [
+        1930
+      ],
+      "n": "Republic of China",
+      "why": "The Nationalist government reunified most of China in 1928."
+    },
+    {
+      "name": "Chinese warlords",
+      "years": [
+        1938
+      ],
+      "n": "Republic of China",
+      "note": "Japan occupied much of eastern China from 1937, which this snapshot does not show.",
+      "why": "The Nationalist government ruled China in 1938."
+    },
+    {
+      "name": "India",
+      "years": [
+        1945
+      ],
+      "n": "British Raj",
+      "s": "United Kingdom",
+      "why": "India and Pakistan became independent in August 1947."
+    },
+    {
+      "name": "Pakistan",
+      "years": [
+        1945
+      ],
+      "n": "British Raj",
+      "s": "United Kingdom",
+      "why": "Pakistan was created in August 1947."
+    },
+    {
+      "name": "Namibia",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "South West Africa",
+      "s": "South Africa",
+      "why": "Namibia became independent in 1990."
+    },
+    {
+      "name": "Central African Republic",
+      "years": [
+        1945
+      ],
+      "n": "Ubangi-Shari",
+      "s": "France",
+      "why": "Independent as the Central African Republic in 1960."
+    },
+    {
+      "name": "Burkina Faso",
+      "years": [
+        1945
+      ],
+      "n": "Upper Volta",
+      "note": "France dissolved Upper Volta among neighbouring colonies from 1932 to 1947.",
+      "why": "Renamed Burkina Faso in 1984."
+    },
+    {
+      "name": "Burkina Faso",
+      "years": [
+        1960
+      ],
+      "n": "Upper Volta",
+      "why": "Renamed Burkina Faso in 1984."
+    },
+    {
+      "name": "Mali",
+      "years": [
+        1945
+      ],
+      "n": "French Sudan",
+      "s": "France",
+      "why": "Mali became independent in 1960."
+    },
+    {
+      "name": "Western Sahara",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "Spanish Sahara",
+      "s": "Spain",
+      "why": "Spain held the territory until 1975–76."
+    },
+    {
+      "name": "Tibet",
+      "years": [
+        1960
+      ],
+      "s": "China",
+      "note": "Under the control of the People's Republic of China since 1950–51.",
+      "why": "Shown as independent in 1960."
+    },
+    {
+      "name": "Vietnam",
+      "years": [
+        1960
+      ],
+      "note": "Divided into North and South Vietnam from 1954 to 1976.",
+      "why": "Shown as one country in 1960."
+    }
+  ],
+  "geometry": [
+    {
+      "era": "1400",
+      "what": "Split the 'Great Khanate' into the Ming Empire (outline from the 1492 snapshot) and the Northern Yuan.",
+      "why": "The Ming dynasty had ruled China since 1368; the source still drew the Mongol Yuan state."
+    },
+    {
+      "era": "1279–1920",
+      "what": "Separated Svalbard from Norway / Denmark-Norway / Sweden–Norway.",
+      "why": "Svalbard belonged to no country until the 1920 Svalbard Treaty, which took effect in 1925."
+    },
+    {
+      "era": "Present",
+      "what": "Separated Crimea from Russia as its own disputed shape.",
+      "why": "Russia has controlled Crimea since 2014, but most UN members recognize it as part of Ukraine."
+    },
+    {
+      "era": "All",
+      "what": "Filled land the source leaves blank (for example Sumbawa in Indonesia) as 'not mapped in the source', so the map has no false sea.",
+      "why": "Islands and coasts missing from the historical outlines."
+    }
+  ]
+}

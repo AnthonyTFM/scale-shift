@@ -1,2 +1,0 @@
-IM Fell English (Igino Marini) and Libre Franklin (Impallari Type) are licensed under the SIL Open Font License 1.1.
-Files copied from @fontsource packages (latin subset).

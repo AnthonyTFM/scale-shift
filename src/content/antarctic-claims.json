@@ -1,0 +1,74 @@
+{
+  "_readme": "Territorial claims in Antarctica. Each claim is a wedge between two meridians (degrees east; west is negative), from 60°S to the South Pole. year = first formal claim. Used by scripts/build-antarctica.mjs (map shapes) and by the map's key and info panel. All claims were frozen by the Antarctic Treaty (signed 1959, in force 1961).",
+  "treatyYear": 1959,
+  "claims": [
+    {
+      "id": "uk",
+      "claimant": "United Kingdom",
+      "name": "British Antarctic Territory",
+      "ranges": [[-80, -20]],
+      "year": 1908,
+      "color": "#2F6FDE",
+      "note": "First claimed in 1908 as part of the Falkland Islands Dependencies; the borders were redrawn in 1917."
+    },
+    {
+      "id": "nz",
+      "claimant": "New Zealand",
+      "name": "Ross Dependency",
+      "ranges": [[160, 180], [-180, -150]],
+      "year": 1923,
+      "color": "#0A97A8",
+      "note": "Claimed by Britain in 1923 and placed under New Zealand's administration."
+    },
+    {
+      "id": "fr",
+      "claimant": "France",
+      "name": "Adélie Land",
+      "ranges": [[136.183, 142.033]],
+      "year": 1924,
+      "color": "#12976F",
+      "note": "Claimed in 1924; its side borders were fixed in 1938."
+    },
+    {
+      "id": "au",
+      "claimant": "Australia",
+      "name": "Australian Antarctic Territory",
+      "ranges": [[44.633, 136.183], [142.033, 160]],
+      "year": 1933,
+      "color": "#E89A00",
+      "note": "Transferred from Britain in 1933. At about 42% of the continent, it is the largest claim."
+    },
+    {
+      "id": "no",
+      "claimant": "Norway",
+      "name": "Queen Maud Land",
+      "ranges": [[-20, 44.633]],
+      "year": 1939,
+      "color": "#8A4FFF",
+      "note": "Claimed in 1939. Norway has never defined how far south its claim reaches, so the map draws it to the pole like the others."
+    },
+    {
+      "id": "cl",
+      "claimant": "Chile",
+      "name": "Chilean Antarctic Territory",
+      "ranges": [[-90, -53]],
+      "year": 1940,
+      "color": "#E2561F",
+      "note": "Claimed in 1940. Chile bases its claim on rights inherited from Spanish colonial rule and on the peninsula's closeness to South America."
+    },
+    {
+      "id": "ar",
+      "claimant": "Argentina",
+      "name": "Argentine Antarctica",
+      "ranges": [[-74, -25]],
+      "year": 1943,
+      "color": "#E8366B",
+      "note": "Claimed in 1943. Argentina has run a base in the South Orkney Islands since 1904, the oldest station in Antarctica still in use."
+    }
+  ],
+  "unclaimed": {
+    "name": "Marie Byrd Land",
+    "ranges": [[-150, -90]],
+    "note": "The largest unclaimed land on Earth. No country has ever formally claimed it."
+  }
+}
