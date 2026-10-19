@@ -2,7 +2,9 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { dayNumber, loadSave, localDateKey, stats } from "@/lib/daily";
+import { dayNumber, loadSave, localDateKey, mergeDays, stats } from "@/lib/daily";
+import { playerId, rememberPlayer } from "@/lib/player";
+import { signInOn } from "@/lib/sign-in";
 import { home } from "@/content/home";
 import type { DayBoard } from "@/lib/leaderboard-types";
 
@@ -20,10 +22,23 @@ export function DailyTeaser({ example }: { example: ReactNode }) {
       const rec = save.days[today];
       return { day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: stats(save, today).streak };
     };
-    fetch(`/api/leaderboard?scope=day&date=${today}&limit=3`)
-      .then((r) => (r.ok ? r.json() : null))
-      .catch(() => null)
-      .then((board: DayBoard | null) => setS({ ...mine(), board }));
+    const board = () =>
+      fetch(`/api/leaderboard?scope=day&date=${today}&limit=3${playerId() ? `&player=${playerId()}` : ""}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null)
+        .then((b: DayBoard | null) => setS({ ...mine(), board: b }));
+    board();
+    // signed in: show the account's official score (its first try), and mark "(you)" on the board
+    if (signInOn)
+      fetch(`/api/leaderboard/me?today=${today}`)
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d: { player?: { id: string; name: string | null } | null; days?: Record<string, { c: number[]; s: number }> } | null) => {
+          if (!d?.player) return;
+          if (d.player.name) rememberPlayer({ id: d.player.id, name: d.player.name });
+          if (d.days) mergeDays(d.days);
+          board();
+        })
+        .catch(() => {});
     // finished in another tab: show the score here without a reload
     const sync = () => setS((prev) => (prev ? { ...prev, ...mine() } : prev));
     window.addEventListener("storage", sync);
@@ -71,7 +86,7 @@ export function DailyTeaser({ example }: { example: ReactNode }) {
               {s.board.rows.map((r) => (
                 <li key={r.rank + r.name} className="flex items-center gap-2">
                   <span className="w-5 text-right font-bold text-muted">{r.rank}</span>
-                  <span className="min-w-0 flex-1 truncate font-semibold">{r.name}</span>
+                  <span className="min-w-0 flex-1 truncate font-semibold">{r.name}{r.me ? <span className="font-normal text-muted"> (you)</span> : null}</span>
                   <span className="font-mono">{r.score}/5</span>
                 </li>
               ))}
