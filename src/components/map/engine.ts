@@ -312,7 +312,9 @@ export class MapEngine {
     const r = this.container.getBoundingClientRect();
     this.w = Math.max(1, Math.round(r.width));
     this.h = Math.max(1, Math.round(r.height));
-    this.dpr = Math.min(2, window.devicePixelRatio || 1);
+    // phones: draw at 1.5x at most; full retina density doubles the work and makes panning lag
+    const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+    this.dpr = Math.min(coarse ? 1.5 : 2, window.devicePixelRatio || 1);
     for (const c of [this.base, this.top]) {
       c.width = Math.round(this.w * this.dpr);
       c.height = Math.round(this.h * this.dpr);
@@ -709,6 +711,18 @@ export class MapEngine {
     return null;
   }
 
+  /** Fingers are less precise than a mouse: also count a tap that lands just outside a shape. */
+  private hitOverlayNear(x: number, y: number, radius: number): Overlay | null {
+    const direct = this.hitOverlay(x, y);
+    if (direct) return direct;
+    for (const r of [radius / 2, radius])
+      for (let a = 0; a < 8; a++) {
+        const hit = this.hitOverlay(x + r * Math.cos((a * Math.PI) / 4), y + r * Math.sin((a * Math.PI) / 4));
+        if (hit) return hit;
+      }
+    return null;
+  }
+
   /** The band the map covers on screen: full width (the world repeats sideways), 2π·k tall. Taller than the screen unless zoomed far out. */
   private worldRect() {
     const size = 2 * Math.PI * this.view.k;
@@ -742,7 +756,7 @@ export class MapEngine {
       this.gesture = { kind: "pinch", dist: Math.hypot(a.x - b.x, a.y - b.y), midX: (a.x + b.x) / 2, midY: (a.y + b.y) / 2 };
       return;
     }
-    const hit = this.hitOverlay(x, y);
+    const hit = e.pointerType === "mouse" ? this.hitOverlay(x, y) : this.hitOverlayNear(x, y, 16);
     if (hit) {
       // bring to front
       this.overlays = [...this.overlays.filter((o) => o.id !== hit.id), hit];
