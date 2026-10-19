@@ -27,5 +27,14 @@ export function savePlayer(name: string, email?: string, reminders?: boolean): P
   return p;
 }
 
+/** Become a player who joined on another device (after entering their link code). Their email stays on the server. */
+export function adoptPlayer(p: Player) {
+  try {
+    localStorage.setItem(KEY, JSON.stringify({ id: p.id, name: p.name, reminders: p.reminders }));
+  } catch {
+    /* storage blocked */
+  }
+}
+
 /** Player ID for "highlight me" on the leaderboard, without creating one. */
 export const playerId = () => loadPlayer()?.id ?? null;

@@ -2,6 +2,7 @@ import { PageHero } from "@/components/site/PageHero";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { LeaderboardView } from "@/components/daily/LeaderboardView";
+import { DeviceLink } from "@/components/daily/DeviceLink";
 
 export const metadata: Metadata = {
   title: "Leaderboard: daily challenge scores",
@@ -28,6 +29,9 @@ export default function LeaderboardPage() {
         <div className="max-w-2xl">
           <div>
             <LeaderboardView />
+          </div>
+          <div className="mt-6">
+            <DeviceLink />
           </div>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Scores are checked on our server, and only your first try each day counts. Each email gets one player, and each nickname belongs to the

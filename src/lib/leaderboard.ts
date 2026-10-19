@@ -7,7 +7,7 @@
 //           On Vercel without Redis this falls back to /tmp, which is wiped regularly, so scores won't last.
 //
 // Scores are never trusted from the browser: the server rebuilds the day's questions and marks the answers itself.
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import pool from "@/data/daily-pool.json";
@@ -67,11 +67,22 @@ export function scoreAnswers(date: string, choices: unknown): number | null {
 
 // ---------- storage ----------
 
-type DayEntry = { s: number; t: number };
+/** s = score, t = when it was posted, c = the picks (kept so a linked device can show the same results). */
+type DayEntry = { s: number; t: number; c?: number[] };
 
 interface Store {
   /** false if this player already has a score for this date (the first one counts) */
-  submit(date: string, id: string, score: number, at: number): Promise<boolean>;
+  submit(date: string, id: string, score: number, at: number, choices: number[]): Promise<boolean>;
+  /** this player's saved result for each date (null where they didn't play) */
+  records(id: string, dates: string[]): Promise<(DayEntry | null)[]>;
+  /** add the picks to a result saved before picks were kept */
+  addChoices(date: string, id: string, choices: number[]): Promise<void>;
+  nameOf(id: string): Promise<string | null>;
+  remindersOn(id: string): Promise<boolean>;
+  /** a one-time code that signs another device in as this player; false if the code is already in use */
+  saveLink(code: string, id: string, ttlSeconds: number): Promise<boolean>;
+  /** use up a code: the player it belongs to, or null if it's wrong or expired */
+  takeLink(code: string): Promise<string | null>;
   setName(id: string, name: string): Promise<void>;
   /** has this player already posted a score for this date? */
   has(date: string, id: string): Promise<boolean>;
@@ -113,8 +124,8 @@ function redisStore(url: string, token: string): Store {
     return m;
   };
   return {
-    async submit(date, id, score, at) {
-      const [added] = await run([["HSETNX", `lb:day:${date}`, id, JSON.stringify({ s: score, t: at })]]);
+    async submit(date, id, score, at, choices) {
+      const [added] = await run([["HSETNX", `lb:day:${date}`, id, JSON.stringify({ s: score, t: at, c: choices })]]);
       if (Number(added) !== 1) return false;
       await run([
         ["ZINCRBY", "lb:points", score, id],
@@ -124,6 +135,33 @@ function redisStore(url: string, token: string): Store {
     },
     async setName(id, name) {
       await run([["HSET", "lb:names", id, name]]);
+    },
+    async records(id, dates) {
+      if (!dates.length) return [];
+      const raw = await run(dates.map((d) => ["HGET", `lb:day:${d}`, id]));
+      return raw.map((r) => (typeof r === "string" ? (JSON.parse(r) as DayEntry) : null));
+    },
+    async addChoices(date, id, choices) {
+      const [raw] = await run([["HGET", `lb:day:${date}`, id]]);
+      if (typeof raw !== "string") return;
+      const e = JSON.parse(raw) as DayEntry;
+      if (!e.c) await run([["HSET", `lb:day:${date}`, id, JSON.stringify({ ...e, c: choices })]]);
+    },
+    async nameOf(id) {
+      const [n] = await run([["HGET", "lb:names", id]]);
+      return typeof n === "string" ? n : null;
+    },
+    async remindersOn(id) {
+      const [r] = await run([["HEXISTS", "lb:reminders", id]]);
+      return Number(r) === 1;
+    },
+    async saveLink(code, id, ttlSeconds) {
+      const [ok] = await run([["SET", `lb:link:${code}`, id, "EX", ttlSeconds, "NX"]]);
+      return ok === "OK";
+    },
+    async takeLink(code) {
+      const [id] = await run([["GETDEL", `lb:link:${code}`]]);
+      return typeof id === "string" ? id : null;
     },
     async has(date, id) {
       const [r] = await run([["HEXISTS", `lb:day:${date}`, id]]);
@@ -222,6 +260,7 @@ type FileData = {
   emails?: Record<string, string>;
   emailOwners?: Record<string, string>;
   reminders?: Record<string, number>;
+  links?: Record<string, { id: string; until: number }>;
 };
 
 function fileStore(file: string): Store {
@@ -229,9 +268,9 @@ function fileStore(file: string): Store {
   const read = async (): Promise<FileData> => {
     try {
       const d = JSON.parse(await fs.readFile(file, "utf8"));
-      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {}, reminders: d.reminders ?? {} };
+      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {}, reminders: d.reminders ?? {}, links: d.links ?? {} };
     } catch {
-      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {}, reminders: {} };
+      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {}, reminders: {}, links: {} };
     }
   };
   // serialize writes so two players finishing at once can't overwrite each other
@@ -248,12 +287,42 @@ function fileStore(file: string): Store {
     return job;
   };
   return {
-    submit: (date, id, score, at) =>
+    submit: (date, id, score, at, choices) =>
       write((d) => {
         const day = (d.days[date] ??= {});
         if (day[id]) return false;
-        day[id] = { s: score, t: at };
+        day[id] = { s: score, t: at, c: choices };
         return true;
+      }),
+    async records(id, dates) {
+      const d = await read();
+      return dates.map((date) => d.days[date]?.[id] ?? null);
+    },
+    addChoices: (date, id, choices) =>
+      write((d) => {
+        const e = d.days[date]?.[id];
+        if (e && !e.c) e.c = choices;
+      }),
+    async nameOf(id) {
+      return (await read()).names[id] ?? null;
+    },
+    async remindersOn(id) {
+      return !!(await read()).reminders?.[id];
+    },
+    saveLink: (code, id, ttlSeconds) =>
+      write((d) => {
+        const links = (d.links ??= {});
+        const now = Date.now();
+        for (const [k, v] of Object.entries(links)) if (v.until < now) delete links[k];
+        if (links[code]) return false;
+        links[code] = { id, until: now + ttlSeconds * 1000 };
+        return true;
+      }),
+    takeLink: (code) =>
+      write((d) => {
+        const link = d.links?.[code];
+        if (link) delete d.links![code];
+        return link && link.until > Date.now() ? link.id : null;
       }),
     setName: (id, name) =>
       write((d) => {
@@ -380,6 +449,64 @@ export function checkUnsubscribeToken(id: string, token: string) {
 
 /** New players allowed per network per day (a household or friends on one Wi-Fi). */
 export const NEW_PLAYERS_PER_NETWORK = 5;
+
+// ---------- linking another device ----------
+//
+// A player's ID is the private key to their leaderboard spot, kept in the browser that joined. To play on a second
+// device, the first one asks for a short one-time code and the second one trades it for the ID. Only a device that
+// already holds the ID can make a code, codes last 10 minutes and work once, so no email check is needed.
+
+// no 0/O, 1/I/L, 5/S or 2/Z, which are easy to misread
+const CODE_LETTERS = "ABCDEFGHJKMNPQRTUVWXY346789";
+export const LINK_CODE_LENGTH = 8;
+export const LINK_TTL_SECONDS = 600;
+/** How far back a linked device gets your results (also how far back a device may fill in its picks). */
+export const LINK_HISTORY_DAYS = 60;
+
+export function makeLinkCode() {
+  return Array.from(randomBytes(LINK_CODE_LENGTH), (b) => CODE_LETTERS[b % CODE_LETTERS.length]).join("");
+}
+
+/** Accepts the code however it was typed ("k7qm-2xp4", spaces, lower case). Null if it can't be a code. */
+export function readLinkCode(raw: unknown) {
+  const code = (typeof raw === "string" ? raw : "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  return code.length === LINK_CODE_LENGTH && [...code].every((c) => CODE_LETTERS.includes(c)) ? code : null;
+}
+
+/** The dates a linked device may receive, newest first. */
+export function historyDates(today: string) {
+  return Array.from({ length: LINK_HISTORY_DAYS }, (_, i) => shiftDate(today, -i));
+}
+
+/**
+ * Results saved before picks were kept have no picks on the server. The device making a code sends its own picks;
+ * each one is re-marked and stored only if it gives the score already on the board.
+ */
+export async function fillInChoices(id: string, today: string, sent: unknown) {
+  if (!sent || typeof sent !== "object") return;
+  const store = getStore();
+  const dates = historyDates(today).filter((d) => d in (sent as Record<string, unknown>));
+  const saved = await store.records(id, dates);
+  await Promise.all(
+    dates.map((date, i) => {
+      const e = saved[i];
+      const choices = (sent as Record<string, unknown>)[date];
+      return e && !e.c && scoreAnswers(date, choices) === e.s ? store.addChoices(date, id, choices as number[]) : null;
+    }),
+  );
+}
+
+/** A player's results with picks, for a newly linked device: { date: { c, s } }. */
+export async function playerHistory(id: string, today: string) {
+  const dates = historyDates(today);
+  const saved = await getStore().records(id, dates);
+  const days: Record<string, { c: number[]; s: number }> = {};
+  dates.forEach((date, i) => {
+    const e = saved[i];
+    if (e?.c) days[date] = { c: e.c, s: e.s };
+  });
+  return days;
+}
 
 export async function dayBoard(date: string, limit: number, me: string | null): Promise<DayBoard> {
   const entries = (await getStore().day(date)).filter((e) => !isOffensive(e.name)).sort((a, b) => b.s - a.s || a.t - b.t);

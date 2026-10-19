@@ -6,6 +6,7 @@ import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, savePlayer, type Player } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
+import { DeviceLink } from "./DeviceLink";
 
 type Props = { date: string; choices: number[] };
 
@@ -90,6 +91,8 @@ export function LeaderboardJoin({ date, choices }: Props) {
   }, []);
 
   const showForm = !player || editing;
+  // signed in from another device with a link code: the email is already on file on the server
+  const linked = !!player && !player.email;
 
   return (
     <div className="mt-5 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
@@ -113,7 +116,7 @@ export function LeaderboardJoin({ date, choices }: Props) {
               setErrorField(field);
               (field === "name" ? inputRef : emailRef).current?.focus();
             };
-            if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return invalid("email", "Enter your email to join the leaderboard.");
+            if (!linked && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return invalid("email", "Enter your email to join the leaderboard.");
             if (name.length < 3) return invalid("name", "Use 3 to 16 characters.");
             if (isOffensive(name)) return invalid("name", "Please pick a different nickname.");
             const reminders = remindRef.current?.checked ?? false;
@@ -125,10 +128,13 @@ export function LeaderboardJoin({ date, choices }: Props) {
           <p className="text-sm text-ink-soft">
             {player ? "Update your leaderboard sign-up." : "Sign up with your email and a nickname to put your score on the public leaderboard."}
           </p>
-          <label htmlFor="lb-email" className="mt-2 block text-sm font-semibold text-ink">
-            Email <span className="font-normal text-muted">(private, never shown)</span>
-          </label>
+          {linked ? null : (
+            <label htmlFor="lb-email" className="mt-2 block text-sm font-semibold text-ink">
+              Email <span className="font-normal text-muted">(private, never shown)</span>
+            </label>
+          )}
           <input
+            hidden={linked}
             id="lb-email"
             ref={emailRef}
             type="email"
@@ -176,6 +182,7 @@ export function LeaderboardJoin({ date, choices }: Props) {
           </p>
         </form>
       ) : null}
+      {showForm ? <DeviceLink redeemOnly /> : null}
 
       <div aria-live="polite">
         {status === "error" && error ? (

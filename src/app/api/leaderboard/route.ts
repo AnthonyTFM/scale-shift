@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       const mail = checkEmail(body.email);
       if (mail.error) return fail(mail.error, 422, "email");
       if (!(await store.claimEmail(mail.key, body.player, mail.email))) {
-        return fail("That email is already signed up on another device or browser.", 422, "email");
+        return fail("That email is already on the leaderboard from another device. Link this device instead (just below).", 422, "email");
       }
     }
     // a nickname belongs to the first player who used it, so a second browser can't post under the same name
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
     }
     await store.setName(body.player, name);
-    const fresh = await store.submit(body.date, body.player, score, Date.now());
+    const fresh = await store.submit(body.date, body.player, score, Date.now(), body.choices as number[]);
     const board = await dayBoard(body.date, 0, body.player);
     // a repeat submission keeps the first score; report that one
     const mine = board.me;

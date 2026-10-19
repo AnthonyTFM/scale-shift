@@ -194,6 +194,20 @@ export function writeSave(save: DailySave) {
   }
 }
 
+/**
+ * Brings in results from the leaderboard after linking this device. Those are the official first tries, so they replace
+ * whatever this browser had for the same day.
+ */
+export function mergeDays(days: Record<string, DayRecord>) {
+  const save = loadSave();
+  writeSave({ ...save, days: { ...save.days, ...days } });
+}
+
+/** This browser's finished days' picks, to send along when making a link code (the server checks them). */
+export function finishedPicks(save = loadSave()) {
+  return Object.fromEntries(Object.entries(save.days).filter(([, d]) => typeof d.s === "number").map(([date, d]) => [date, d.c]));
+}
+
 export type Stats = { played: number; average: number; streak: number; best: number };
 
 export function stats(save: DailySave, today: string): Stats {
