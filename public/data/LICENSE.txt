@@ -1,0 +1,20 @@
+Map data licences for the files in this folder
+==============================================
+
+eras/*.json (2000 BCE to 2010), polities.json, rulers-grid.json, era-stats.json
+  Derived from historical-basemaps by André Ourednik and contributors
+  https://github.com/aourednik/historical-basemaps
+  Licence: GNU General Public License v3.0 (GPL-3.0)
+  https://www.gnu.org/licenses/gpl-3.0.html
+
+  Changes made for this site: simplified and quantized outlines, renamed or
+  re-assigned rulers where the source was wrong for its year, filled unmapped
+  land, and split a few shapes. Every change is listed at /about and in
+  src/content/data-corrections.json; the build script is scripts/build-data.mjs.
+  These derived files are distributed under the same GPL-3.0 licence.
+
+eras/present.json and us-states.json
+  Natural Earth (public domain), https://www.naturalearthdata.com/
+  US states: US Census Bureau via us-atlas (public domain)
+
+Population figures: World Bank (CC BY 4.0), https://data.worldbank.org/

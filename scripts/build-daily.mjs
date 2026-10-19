@@ -1,0 +1,226 @@
+// Builds the shape pool for the Daily Challenge (/daily) from the map data that build-data.mjs wrote.
+// Run with `npm run data` (it runs after build-data.mjs), or on its own: `node scripts/build-daily.mjs`.
+//
+// Output:
+//   public/data/daily/index.json        every shape in the pool: name, label, real area, web-map area, latitude
+//   src/data/daily-pool.json            copy of index.json for the leaderboard API (scores answers on the server)
+//   public/data/daily/shapes/{id}.json  two pre-drawn SVG outlines per shape:
+//                                       "merc" = how it looks on a normal web map (Mercator)
+//                                       "ea"   = its true size (equal-area projection centred on the shape)
+// Both outlines are in km, so two shapes drawn with the same scale compare correctly.
+
+import fs from "node:fs";
+import path from "node:path";
+import { geoArea, geoAzimuthalEqualArea, geoCentroid, geoMercator, geoPath } from "d3-geo";
+import * as client from "topojson-client";
+
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const DATA = path.join(ROOT, "public", "data");
+const OUT = path.join(DATA, "daily");
+const R = 6371; // Earth radius, km
+const eras = JSON.parse(fs.readFileSync(path.join(ROOT, "src", "data", "eras.json"), "utf8"));
+const keyForYear = new Map(eras.map((e) => [e.year, e.key]));
+const labelForKey = new Map(eras.map((e) => [e.key, e.label]));
+
+// Well-known historical states, shown at the snapshot where they are largest in our data
+// (or a fixed snapshot). n = name in the map data, show = display name.
+const HISTORY = [
+  { n: "Roman Empire" },
+  { n: "Western Roman Empire" },
+  { n: "Byzantine Empire" },
+  { n: "Empire of Alexander", show: "Alexander the Great's empire" },
+  { n: "Achaemenid Empire", show: "Achaemenid Persian Empire" },
+  { n: "Seleucid Kingdom", show: "Seleucid Empire" },
+  { n: "Parthian Empire" },
+  { n: "Sasanian Empire" },
+  { n: "Carthaginian Empire" },
+  { n: "Mauryan Empire" },
+  { n: "Gupta Empire" },
+  { n: "Mughal Empire" },
+  { n: "Maratha Confederacy" },
+  { n: "British Raj" },
+  { n: "Han", show: "Han Empire" },
+  { n: "Sui Empire" },
+  { n: "Tang Empire" },
+  { n: "Song Empire" },
+  { n: "Great Khanate", show: "Great Khanate (Mongol Yuan)" },
+  { n: "Ming Chinese Empire", show: "Ming Empire" },
+  { n: "Qing Empire" },
+  { n: "Tibetan Empire" },
+  { n: "Khmer Empire" },
+  { n: "Empire of Japan" },
+  { n: "Umayyad Caliphate" },
+  { n: "Abbasid Caliphate" },
+  { n: "Fatimid Caliphate" },
+  { n: "Seljuk Empire" },
+  { n: "Ottoman Empire" },
+  { n: "Safavid Empire" },
+  { n: "Timurid Empire" },
+  { n: "Khanate of the Golden Horde", show: "Golden Horde" },
+  { n: "Kievan Rus" },
+  { n: "Russian Empire" },
+  { n: "USSR", show: "Soviet Union", year: 1960 },
+  { n: "Carolingian Empire" },
+  { n: "Holy Roman Empire" },
+  { n: "Polish–Lithuanian Commonwealth" },
+  { n: "Kalmar Union" },
+  { n: "Austro-Hungarian Empire", show: "Austria-Hungary" },
+  { n: "German Empire" },
+  { n: "Axum", show: "Kingdom of Aksum" },
+  { n: "Mali", show: "Mali Empire" },
+  { n: "Songhai", show: "Songhai Empire" },
+  { n: "Inca Empire" },
+  { n: "Aztec Empire" },
+  { n: "Viceroyalty of New Spain" },
+  { n: "Viceroyalty of Peru" },
+  { n: "Empire of Brazil" },
+  { n: "British North America" },
+];
+
+const loadTopo = (file) => {
+  const topo = JSON.parse(fs.readFileSync(file, "utf8"));
+  return { topo, geoms: Object.values(topo.objects)[0].geometries };
+};
+
+const slug = (s) =>
+  s
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+// ---------- drawing ----------
+
+/** Project a geometry and return a compact SVG path (integer km) plus its bounding box. */
+function draw(geom, projection) {
+  // geoPath with a recording context hands us the projected (and clipped) rings
+  const rings = [];
+  const ctx = {
+    moveTo(x, y) {
+      rings.push([[x, y]]);
+    },
+    lineTo(x, y) {
+      rings[rings.length - 1].push([x, y]);
+    },
+    closePath() {},
+  };
+  geoPath(projection, ctx)(geom);
+
+  let x0 = Infinity,
+    y0 = Infinity,
+    x1 = -Infinity,
+    y1 = -Infinity;
+  for (const r of rings)
+    for (const [x, y] of r) {
+      if (x < x0) x0 = x;
+      if (y < y0) y0 = y;
+      if (x > x1) x1 = x;
+      if (y > y1) y1 = y;
+    }
+  const extent = Math.max(x1 - x0, y1 - y0);
+  const tol = Math.max(extent / 260, 0.6); // drop points closer than this (km)
+  const minArea = (extent / 90) ** 2; // drop specks
+
+  const parts = [];
+  for (const ring of rings) {
+    const kept = [];
+    for (const p of ring) {
+      const last = kept[kept.length - 1];
+      if (!last || Math.hypot(p[0] - last[0], p[1] - last[1]) >= tol) kept.push(p);
+    }
+    if (kept.length < 3) continue;
+    let a = 0;
+    for (let i = 0; i < kept.length; i++) {
+      const [ax, ay] = kept[i];
+      const [bx, by] = kept[(i + 1) % kept.length];
+      a += ax * by - bx * ay;
+    }
+    if (Math.abs(a / 2) < minArea) continue;
+    const pts = kept.map(([x, y]) => `${Math.round(x)} ${Math.round(y)}`);
+    parts.push(`M${pts.join(" ")}Z`);
+  }
+  return { d: parts.join(""), b: [Math.round(x0), Math.round(y0), Math.round(x1), Math.round(y1)] };
+}
+
+function shapeFiles(geom) {
+  const [lon, lat] = geoCentroid(geom);
+  // Mercator only distorts by latitude, so turning it to the shape's longitude keeps the distortion
+  // exact while stopping shapes that cross the 180° line (Russia, Fiji) from splitting in two.
+  const merc = geoMercator().rotate([-lon, 0]).scale(R).translate([0, 0]).precision(0.5);
+  const ea = geoAzimuthalEqualArea().rotate([-lon, -lat]).scale(R).translate([0, 0]).precision(0.5);
+  const mercArea = geoPath(merc).area(geom); // km² as drawn on a web map, at equator scale
+  return { lon, lat, mercArea, merc: draw(geom, merc), ea: draw(geom, ea) };
+}
+
+// ---------- pool ----------
+
+const pool = [];
+const add = (entry, geom) => {
+  const id = slug(`${entry.n}-${entry.era}`);
+  if (pool.some((p) => p.id === id)) return;
+  const s = shapeFiles(geom);
+  const area = Math.round(geoArea(geom) * R * R);
+  fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), JSON.stringify({ merc: s.merc, ea: s.ea }));
+  pool.push({
+    id,
+    n: entry.show ?? entry.n,
+    src: entry.n,
+    era: entry.era,
+    kind: entry.kind,
+    sub: entry.sub,
+    a: area,
+    m: Math.round(s.mercArea),
+    lat: Math.round(s.lat * 10) / 10,
+  });
+};
+
+fs.rmSync(OUT, { recursive: true, force: true });
+fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
+
+// Present-day countries: 30,000 km² and up, excluding Antarctica and disputed shapes
+{
+  const { topo, geoms } = loadTopo(path.join(DATA, "eras", "present.json"));
+  for (const g of geoms) {
+    const p = g.properties;
+    if (!p.n || p.d || p.m || p.a < 30000 || p.n === "Antarctica") continue;
+    add({ n: p.n, era: "present", kind: "country", sub: "today" }, client.feature(topo, g).geometry);
+  }
+}
+
+// US states: 100,000 km² and up
+{
+  const { topo, geoms } = loadTopo(path.join(DATA, "us-states.json"));
+  for (const g of geoms) {
+    const p = g.properties;
+    if (!p.n || p.a < 100000) continue;
+    add({ n: p.n, era: "us", kind: "state", sub: "US state" }, client.feature(topo, g).geometry);
+  }
+}
+
+// Historical states
+{
+  const polities = JSON.parse(fs.readFileSync(path.join(DATA, "polities.json"), "utf8"));
+  for (const h of HISTORY) {
+    const row = polities.find((p) => p.n === h.n);
+    if (!row) {
+      console.warn(`  ! daily: "${h.n}" not found in the map data, skipped`);
+      continue;
+    }
+    const year = h.year ?? row.y[row.a.indexOf(Math.max(...row.a))];
+    const key = year === "present" ? "present" : keyForYear.get(year);
+    if (!key || key === "present") continue;
+    const { topo, geoms } = loadTopo(path.join(DATA, "eras", `${key}.json`));
+    const parts = geoms.filter((g) => g.properties.n === h.n);
+    if (!parts.length) continue;
+    const geom = client.merge(topo, parts);
+    add({ n: h.n, show: h.show, era: key, kind: "history", sub: `in ${labelForKey.get(key)}` }, geom);
+  }
+}
+
+fs.writeFileSync(path.join(OUT, "index.json"), JSON.stringify(pool));
+// the same pool, bundled into the server so the leaderboard can score answers itself
+fs.writeFileSync(path.join(ROOT, "src", "data", "daily-pool.json"), JSON.stringify(pool));
+const bytes = fs.readdirSync(path.join(OUT, "shapes")).reduce((s, f) => s + fs.statSync(path.join(OUT, "shapes", f)).size, 0);
+const counts = pool.reduce((c, p) => ((c[p.kind] = (c[p.kind] ?? 0) + 1), c), {});
+console.log(`daily pool: ${pool.length} shapes ${JSON.stringify(counts)}, outlines ${(bytes / 1024).toFixed(0)} KB total`);

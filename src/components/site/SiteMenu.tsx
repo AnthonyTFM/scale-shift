@@ -1,0 +1,129 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { footerNav, nav, site } from "@/content/site";
+
+/**
+ * The "three lines" menu. variant="map" is the floating button on the map page (always visible);
+ * variant="header" is the mobile button in the content-page header.
+ */
+export function SiteMenu({ variant }: { variant: "map" | "header" }) {
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  const [lastPath, setLastPath] = useState(pathname);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // close when the route changes
+  if (pathname !== lastPath) {
+    setLastPath(pathname);
+    setOpen(false);
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    const panel = panelRef.current;
+    panel?.querySelector<HTMLElement>("a, button")?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+      if (e.key === "Tab" && panel) {
+        const items = [...panel.querySelectorAll<HTMLElement>("a, button")];
+        const first = items[0];
+        const last = items[items.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
+
+  const close = () => setOpen(false);
+  const links = [...nav, ...footerNav.filter((f) => !nav.some((n) => n.href === f.href))];
+
+  return (
+    <div className={variant === "header" ? "ml-auto md:hidden" : ""}>
+      <button
+        ref={buttonRef}
+        type="button"
+        aria-expanded={open}
+        aria-controls="site-menu"
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpen((v) => !v)}
+        className={
+          variant === "map"
+            ? "grid size-11 place-items-center rounded-xl bg-panel text-panel-text shadow-float hover:bg-panel-2"
+            : "grid size-11 place-items-center rounded-lg hover:bg-white/10"
+        }
+      >
+        <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2">
+          {open ? <path d="M6 6l12 12M18 6 6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
+        </svg>
+      </button>
+      {open
+        ? createPortal(
+        <div className="fixed inset-0 z-[100]">
+          <button type="button" aria-label="Close menu" tabIndex={-1} onClick={close} className="absolute inset-0 bg-black/40" />
+          <div
+            id="site-menu"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menu"
+            className="absolute inset-y-0 right-0 flex w-[min(88vw,340px)] flex-col overflow-y-auto bg-panel px-5 py-5 text-panel-text shadow-float"
+          >
+            <div className="flex items-center justify-between">
+              <span className="font-display text-2xl font-bold">{site.name}</span>
+              <button type="button" onClick={close} aria-label="Close menu" className="grid size-10 place-items-center rounded-lg hover:bg-white/10">
+                <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 6l12 12M18 6 6 18" />
+                </svg>
+              </button>
+            </div>
+            <nav aria-label="Site" className="mt-6">
+              <ul className="space-y-1">
+                {links.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={close}
+                      aria-current={pathname === item.href ? "page" : undefined}
+                      className="block rounded-lg px-3 py-3 text-lg font-semibold hover:bg-white/10 aria-[current=page]:bg-white/10 aria-[current=page]:text-accent"
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+            <Link
+              href="/map"
+              onClick={close}
+              className="mt-auto flex h-12 items-center justify-center rounded-lg bg-accent font-bold text-panel hover:bg-accent-strong"
+            >
+              {pathname === "/map" ? "Back to the map" : "Open the map"}
+            </Link>
+          </div>
+        </div>,
+            document.body,
+          )
+        : null}
+    </div>
+  );
+}
