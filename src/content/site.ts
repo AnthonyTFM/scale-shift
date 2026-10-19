@@ -19,6 +19,7 @@ export const nav: { href: string; label: string; from?: "lg" | "xl" }[] = [
   { href: "/eras", label: "Eras" },
   { href: "/timeline", label: "Timeline", from: "lg" },
   { href: "/disputes", label: "Disputed borders", from: "xl" },
+  { href: "/compare", label: "Comparisons", from: "xl" },
 ];
 
 export const footerNav = [
