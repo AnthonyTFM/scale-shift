@@ -9,31 +9,35 @@ import { isOffensive } from "@/lib/name-filter";
 
 type Props = { date: string; choices: number[] };
 
-/** After the daily round: post the score under a nickname and show where it ranks today. */
+/** After the daily round: sign up with an email and a nickname, post the score and show where it ranks today. */
 export function LeaderboardJoin({ date, choices }: Props) {
   const [player, setPlayer] = useState<Player | null>(null);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const [errorField, setErrorField] = useState<"name" | "email" | null>(null);
   const [result, setResult] = useState<Extract<SubmitResult, { ok: true }> | null>(null);
   const [top, setTop] = useState<DayBoard | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
   const sent = useRef(false);
 
   const submit = async (p: Player) => {
     setStatus("sending");
     setError("");
+    setErrorField(null);
     try {
       const res = await fetch("/api/leaderboard", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ player: p.id, name: p.name, date, choices, website: "" }),
+        body: JSON.stringify({ player: p.id, name: p.name, email: p.email ?? "", date, choices, website: "" }),
       });
       const data = (await res.json()) as SubmitResult;
       if (!data.ok) {
         setStatus("error");
         setError(data.error);
-        if (data.field === "name") setEditing(true);
+        setErrorField(data.field ?? null);
+        if (data.field) setEditing(true);
         return;
       }
       setResult(data);
@@ -75,25 +79,43 @@ export function LeaderboardJoin({ date, choices }: Props) {
           onSubmit={(e) => {
             e.preventDefault();
             const name = inputRef.current?.value.trim() ?? "";
-            if (name.length < 3) {
+            const email = emailRef.current?.value.trim() ?? "";
+            const invalid = (field: "name" | "email", message: string) => {
               setStatus("error");
-              setError("Use 3 to 16 characters.");
-              return;
-            }
-            if (isOffensive(name)) {
-              setStatus("error");
-              setError("Please pick a different nickname.");
-              return;
-            }
-            const p = savePlayer(name);
+              setError(message);
+              setErrorField(field);
+              (field === "name" ? inputRef : emailRef).current?.focus();
+            };
+            if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return invalid("email", "Enter your email to join the leaderboard.");
+            if (name.length < 3) return invalid("name", "Use 3 to 16 characters.");
+            if (isOffensive(name)) return invalid("name", "Please pick a different nickname.");
+            const p = savePlayer(name, email);
             setPlayer(p);
             submit(p);
           }}
         >
-          <label htmlFor="lb-name" className="text-sm text-ink-soft">
-            {player ? "Change your nickname" : "Pick a nickname to put your score on the public leaderboard."}
+          <p className="text-sm text-ink-soft">
+            {player ? "Update your leaderboard sign-up." : "Sign up with your email and a nickname to put your score on the public leaderboard."}
+          </p>
+          <label htmlFor="lb-email" className="mt-2 block text-sm font-semibold text-ink">
+            Email <span className="font-normal text-muted">(private, never shown)</span>
           </label>
-          <div className="mt-2 flex gap-2">
+          <input
+            id="lb-email"
+            ref={emailRef}
+            type="email"
+            defaultValue={player?.email ?? ""}
+            maxLength={254}
+            autoComplete="email"
+            placeholder="you@example.com"
+            aria-invalid={errorField === "email"}
+            aria-describedby="lb-help"
+            className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-3 text-ink"
+          />
+          <label htmlFor="lb-name" className="mt-2 block text-sm font-semibold text-ink">
+            Nickname <span className="font-normal text-muted">(shown publicly)</span>
+          </label>
+          <div className="mt-1 flex gap-2">
             <input
               id="lb-name"
               ref={inputRef}
@@ -101,7 +123,7 @@ export function LeaderboardJoin({ date, choices }: Props) {
               maxLength={16}
               autoComplete="nickname"
               placeholder="e.g. MapWizard"
-              aria-invalid={status === "error" && !!error}
+              aria-invalid={errorField === "name"}
               aria-describedby="lb-help"
               className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-ink"
             />
@@ -114,7 +136,8 @@ export function LeaderboardJoin({ date, choices }: Props) {
             </button>
           </div>
           <p id="lb-help" className="mt-1 text-xs text-muted">
-            Shown publicly. Please don&apos;t use your full real name. Only your first try each day counts.
+            One nickname per email. Your email is only used to keep the leaderboard fair; we never show or share it. Please don&apos;t use
+            your full real name as a nickname. Only your first try each day counts.
           </p>
         </form>
       ) : null}

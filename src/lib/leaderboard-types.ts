@@ -8,4 +8,4 @@ export type AllTimeBoard = { total: number; rows: AllTimeRow[]; me?: AllTimeRow 
 
 export type SubmitResult =
   | { ok: true; score: number; rank: number; total: number; duplicate: boolean }
-  | { ok: false; error: string; field?: "name" };
+  | { ok: false; error: string; field?: "name" | "email" };

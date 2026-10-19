@@ -63,7 +63,7 @@ Five "which is bigger?" questions a day, the same for everyone on the same date,
 
 ## Leaderboard (/leaderboard)
 
-Players pick a nickname after finishing the daily challenge. The server re-checks every answer, so scores can't be faked by editing the page, and only the first try each day counts.
+Players sign up with an email (kept private, one player per inbox) and a nickname after finishing the daily challenge. The server re-checks every answer, so scores can't be faked by editing the page, and only the first try each day counts.
 
 - **On your computer:** works with no setup. Scores are saved in `data/leaderboard.json`.
 - **When the site is live on Vercel:** you must add a free Redis database, or scores get wiped every few hours:
@@ -71,7 +71,7 @@ Players pick a nickname after finishing the daily challenge. The server re-check
   2. Or create one at [upstash.com](https://upstash.com) and add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel → Settings → Environment Variables.
   3. Redeploy.
 - **Removing a nickname:** with Redis, open the database console and delete the player's ID from `lb:names`. With the JSON file, edit `data/leaderboard.json`.
-- **Blocked words** for nicknames are at the top of `src/lib/leaderboard.ts`.
+- **Blocked words** for nicknames are in `src/lib/name-filter.ts`. It catches disguised spellings (n1gg3r, niqqer, f4g0t). The boards also hide any saved name that fails it, so adding a word there takes a bad name down on the next deploy.
 
 ## Map data
 

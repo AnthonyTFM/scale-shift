@@ -18,7 +18,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 | Home `/` | A directory, not a map: today's daily challenge with your streak and the top players, links to every section and famous comparisons |
 | Map `/map` | Drag countries, US states and historical states at real size; rotate; 49 border snapshots from 2000 BCE to today; type any year; click land for "who ruled here?" through every era; map key; Antarctic claims; disputed territories; edge-scrolling while dragging; share links and PNG download |
 | Daily challenge `/daily` | 5 "which is bigger?" puzzles a day, the same for everyone; true-size reveal; context for every empire; streaks; practice rounds; shareable score grid |
-| Leaderboard `/leaderboard` | Daily and all-time rankings under a nickname; scores re-marked on the server; first try of the day counts |
+| Leaderboard `/leaderboard` | Daily and all-time rankings; joining needs an email (private, one player per inbox) and a nickname; disguised slurs blocked; scores re-marked on the server; first try of the day counts |
 | Eras, timeline, disputes | 49 era pages, 104 events (when land was taken vs. made official), 19 present-day disputes |
 | About, how it works, contact, privacy | Sources, every data correction, the border-error form |
 
@@ -28,6 +28,8 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **Data pipeline:** `npm run data` turns historical-basemaps (GPL-3.0) and Natural Earth (public domain) into TopoJSON per snapshot in `public/data/eras/`, with fixes from `src/content/data-corrections.json`, then builds the Antarctic claims and the daily puzzle pool. `npm run check:data` guards it in CI.
 - **The map lives only on `/map`.** The homepage leads to games, the map and information pages.
 - **Daily puzzles** are picked by a seeded shuffle of the date, so everyone gets the same five. The leaderboard re-marks answers on the server.
+- **Leaderboard sign-up (Oct 19):** an email and a nickname are required to join. Emails are stored privately in Redis (`lb:emails`), never returned by the API, and each inbox gets one player. Emails are not verified yet: that needs a real domain plus Resend (see roadmap).
+- **Nickname filter:** `src/lib/name-filter.ts` reads names several ways (l33t, q-for-g, lookalike letters, repeats, separators). Boards hide any saved name that fails it, so adding a word removes a live bad name on the next deploy.
 - **Storage:** form messages and leaderboard scores need Vercel settings to persist (see the setup log).
 
 ## Quality bar (every change must keep these)
@@ -47,13 +49,14 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - Borders before about 1800 are approximate; snapshots are 50–200 years apart in ancient times.
 - Antarctic claim areas exclude the floating ice shelves.
 - Searchable places are countries, US states and historical states. The v1 site also had Canadian and other provinces, continents and "all claims" realms; bringing those back needs data-pipeline work.
-- Forms and the leaderboard don't keep anything on Vercel until their settings are added (see below).
+- Forms don't keep anything on Vercel until their settings are added (see below).
+- Leaderboard emails aren't verified, so someone could sign up with an address that isn't theirs. One player per inbox and the 5-new-players-per-network daily cap limit the damage.
 - Vercel's Hobby plan is for non-commercial use. Keep the repo public, or move to Pro, if either owner's merges stop deploying.
 
 ## Roadmap (best-site-first order)
 **Now**
 1. Bring back the best of v1: `/history/[empire]` timeline pages and `/compare/[slug]` share pages, the email-updates signup, and provinces/continents in search.
-2. Turn on Upstash Redis (leaderboard) and form delivery on Vercel.
+2. Form delivery on Vercel (Resend). With a real domain, also send a code to verify leaderboard emails.
 3. Choose the final name and domain.
 
 **Next**
@@ -82,7 +85,7 @@ _Last updated: October 19, 2026_
 | `NEXT_PUBLIC_SITE_URL` | Set to `https://scale-shift.vercel.app` (all environments). A typo (`ttps://`) was fixed on Oct 18; the live sitemap was checked on Oct 19 and all 69 links are correct. |
 | `NEXT_PUBLIC_GA4_ID` | Not set yet (no analytics) |
 | `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` (+ `NOTIFY_EMAIL_FROM`) | Not set yet, so the live site's forms don't save anything |
-| Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`, added by Vercel → Storage) | Not set yet, so leaderboard scores are wiped every few hours |
+| Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`, added by Vercel → Storage) | Set Oct 19. The live API reports `X-Leaderboard-Store: redis`. |
 
 **GitHub**
 - `main` is protected: changes go through a pull request, approvals are not required, and the CI status check `build` must pass (lint, typecheck, build, data check).
@@ -91,9 +94,9 @@ _Last updated: October 19, 2026_
 
 **Open setup items**
 1. ~~Invite Evan as a collaborator~~ Done Oct 19.
-2. Confirm Evan's test PR (adding `CONTRIBUTORS.md`) deploys. If Vercel marks his deployment "Blocked", the Hobby plan is refusing a second author: either move the project to Vercel Pro or host somewhere that allows free collaborators.
+2. ~~Confirm Evan's test PR deploys~~ Done Oct 19: PR #5 merged and deployed to production under his name.
 3. Connect form delivery: set `SUBMISSIONS_WEBHOOK_URL` or the Resend settings in Vercel. Until then the live site's forms don't save.
-4. Add Upstash Redis in Vercel → Storage so leaderboard scores persist.
+4. ~~Add Upstash Redis~~ Done Oct 19.
 5. Pick the final name and domain.
 6. Later: Slack with @Claude for both owners.
 

@@ -36,6 +36,28 @@ export function checkName(raw: unknown): { name: string; error?: string } {
   return { name };
 }
 
+// Throwaway inboxes: someone using these isn't signing up, they're dodging the one-nickname-per-email rule.
+const DISPOSABLE = new Set([
+  "mailinator.com", "guerrillamail.com", "guerrillamail.net", "sharklasers.com", "10minutemail.com", "tempmail.com", "temp-mail.org",
+  "yopmail.com", "trashmail.com", "getnada.com", "dispostable.com", "maildrop.cc", "throwawaymail.com", "fakeinbox.com", "mintemail.com",
+  "mohmal.com", "emailondeck.com", "tempail.com", "burnermail.io", "spamgourmet.com", "mailnesia.com", "tempr.email", "discard.email",
+]);
+
+/** Checks an email address and returns the key used to keep one leaderboard player per inbox. */
+export function checkEmail(raw: unknown): { email: string; key: string; error?: string } {
+  const email = (typeof raw === "string" ? raw : "").trim().toLowerCase();
+  const fail = (error: string) => ({ email, key: "", error });
+  if (!email) return fail("Enter your email to join the leaderboard.");
+  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/.test(email)) return fail("That email doesn't look right.");
+  const [user, domain] = email.split("@");
+  if (DISPOSABLE.has(domain)) return fail("Please use your own email, not a throwaway inbox.");
+  // the same inbox written differently (name+tag@, or dots in a Gmail name) still counts once
+  let base = user.split("+")[0];
+  const gmail = domain === "gmail.com" || domain === "googlemail.com";
+  if (gmail) base = base.replace(/\./g, "");
+  return { email, key: `${base}@${gmail ? "gmail.com" : domain}` };
+}
+
 /** Marks a day's answers on the server. Returns null if the answers aren't a valid set of five picks. */
 export function scoreAnswers(date: string, choices: unknown): number | null {
   const questions = buildQuestions(pool as PoolEntry[], date);
@@ -55,6 +77,10 @@ interface Store {
   has(date: string, id: string): Promise<boolean>;
   /** reserve a nickname (case-insensitive) for this player; false if someone else already owns it */
   claimName(nameKey: string, id: string): Promise<boolean>;
+  /** the email this player signed up with (private, never sent to the browser) */
+  emailOf(id: string): Promise<string | null>;
+  /** tie an email to this player; false if another player already signed up with it */
+  claimEmail(emailKey: string, id: string, email: string): Promise<boolean>;
   /** count one more new player from this network today; returns the new count */
   bumpNetwork(date: string, netKey: string): Promise<number>;
   day(date: string): Promise<{ id: string; name: string; s: number; t: number }[]>;
@@ -105,6 +131,19 @@ function redisStore(url: string, token: string): Store {
         ["HGET", "lb:owners", nameKey],
       ]);
       return owner === id;
+    },
+    async emailOf(id) {
+      const [email] = await run([["HGET", "lb:emails", id]]);
+      return (email as string | null) ?? null;
+    },
+    async claimEmail(emailKey, id, email) {
+      const [, owner] = await run([
+        ["HSETNX", "lb:email-owners", emailKey, id],
+        ["HGET", "lb:email-owners", emailKey],
+      ]);
+      if (owner !== id) return false;
+      await run([["HSET", "lb:emails", id, email]]);
+      return true;
     },
     async bumpNetwork(date, netKey) {
       const key = `lb:net:${date}:${netKey}`;
@@ -160,6 +199,8 @@ type FileData = {
   days: Record<string, Record<string, DayEntry>>;
   owners?: Record<string, string>;
   nets?: Record<string, number>;
+  emails?: Record<string, string>;
+  emailOwners?: Record<string, string>;
 };
 
 function fileStore(file: string): Store {
@@ -167,9 +208,9 @@ function fileStore(file: string): Store {
   const read = async (): Promise<FileData> => {
     try {
       const d = JSON.parse(await fs.readFile(file, "utf8"));
-      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {} };
+      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {} };
     } catch {
-      return { names: {}, days: {}, owners: {}, nets: {} };
+      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {} };
     }
   };
   // serialize writes so two players finishing at once can't overwrite each other
@@ -205,6 +246,17 @@ function fileStore(file: string): Store {
         const owners = (d.owners ??= {});
         owners[nameKey] ??= id;
         return owners[nameKey] === id;
+      }),
+    async emailOf(id) {
+      return (await read()).emails?.[id] ?? null;
+    },
+    claimEmail: (emailKey, id, email) =>
+      write((d) => {
+        const owners = (d.emailOwners ??= {});
+        owners[emailKey] ??= id;
+        if (owners[emailKey] !== id) return false;
+        (d.emails ??= {})[id] = email;
+        return true;
       }),
     bumpNetwork: (date, netKey) =>
       write((d) => {
