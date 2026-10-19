@@ -1,3 +1,4 @@
+import { PageHero } from "@/components/site/PageHero";
 import type { Metadata } from "next";
 import { DailyChallenge } from "@/components/daily/DailyChallenge";
 
@@ -10,20 +11,28 @@ export const metadata: Metadata = {
 
 export default function DailyPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-8 md:py-12">
-      <p className="text-xs font-bold uppercase tracking-wide text-link">Daily challenge</p>
-      <h1 className="mt-1 font-display text-4xl text-ink md:text-5xl">Which is bigger?</h1>
-      <p className="mt-2 max-w-prose leading-relaxed text-ink-soft">
-        Five new puzzles every day, the same for everyone. Normal web maps stretch land near the poles, so trust the numbers, not your eyes. New
-        questions at midnight your time.
-      </p>
-      <div className="mt-6">
-        <DailyChallenge />
+    <>
+      <PageHero
+        eyebrow="Daily challenge"
+        title="Which is bigger?"
+        lead={
+          <p>
+            5 matchups a day, the same for everyone. Normal maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the
+            leaderboard. New matchups at midnight your time.
+          </p>
+        }
+      />
+      <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
+        <div className="max-w-2xl">
+          <div>
+            <DailyChallenge />
+          </div>
+          <p className="mt-6 text-xs leading-relaxed text-muted">
+            Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few
+            percent. Your scores and streak are saved in this browser only.
+          </p>
+        </div>
       </div>
-      <p className="mt-6 text-xs leading-relaxed text-muted">
-        Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few
-        percent. Your scores and streak are saved in this browser only.
-      </p>
-    </div>
+    </>
   );
 }

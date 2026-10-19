@@ -50,8 +50,8 @@ export type EngineCallbacks = {
   onViewChange: (view: View) => void;
 };
 
-/** Warm political-map pastels. The data assigns each owner an index so neighbours never match. */
-export const POLITICAL = ["#F6C28B", "#F29E8E", "#F5D671", "#B6D98A", "#8DD0B8", "#C4ACE5", "#F2A6C6", "#E2B88E"];
+import { POLITICAL } from "@/lib/palette";
+export { POLITICAL };
 
 const COLORS = {
   ocean: "#9FCBE0",

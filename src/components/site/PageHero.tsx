@@ -4,10 +4,10 @@ type Crumb = { href: string; label: string };
 
 export function PageHero({ eyebrow, title, lead, crumbs }: { eyebrow?: string; title: string; lead?: React.ReactNode; crumbs?: Crumb[] }) {
   return (
-    <section className="border-b border-line bg-white">
+    <section className="ocean-band text-panel-text">
       <div className="mx-auto max-w-6xl px-4 pb-10 pt-8 md:pb-14 md:pt-12">
         {crumbs ? (
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
+          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-panel-muted">
             <ol className="flex flex-wrap gap-1">
               {crumbs.map((c, i) => (
                 <li key={c.href} className="flex gap-1">
@@ -24,9 +24,9 @@ export function PageHero({ eyebrow, title, lead, crumbs }: { eyebrow?: string; t
             </ol>
           </nav>
         ) : null}
-        {eyebrow ? <p className="text-sm font-semibold uppercase tracking-wide text-force">{eyebrow}</p> : null}
-        <h1 className="mt-1 max-w-3xl font-display text-4xl leading-tight text-ink md:text-5xl">{title}</h1>
-        {lead ? <div className="mt-4 max-w-2xl text-lg leading-relaxed text-ink-soft">{lead}</div> : null}
+        {eyebrow ? <p className="text-sm font-semibold uppercase tracking-wide text-accent">{eyebrow}</p> : null}
+        <h1 className="mt-1 max-w-3xl font-display text-4xl leading-tight text-white md:text-5xl">{title}</h1>
+        {lead ? <div className="mt-4 max-w-2xl text-lg leading-relaxed text-panel-muted">{lead}</div> : null}
       </div>
     </section>
   );
