@@ -13,7 +13,7 @@ import path from "node:path";
 import pool from "@/data/daily-pool.json";
 import { buildQuestions, shiftDate, type PoolEntry } from "./daily";
 import { isOffensive } from "./name-filter";
-import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow } from "./leaderboard-types";
+import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow, WeekBoard } from "./leaderboard-types";
 
 // ---------- validation ----------
 
@@ -406,4 +406,40 @@ export async function allTimeBoard(limit: number, me: string | null): Promise<Al
     ? { rank: mine.above + 1, name: mine.name, points: mine.points, days: mine.days, average: mine.days ? Math.round((mine.points / mine.days) * 10) / 10 : 0, me: true }
     : null;
   return { total, rows, me: meRow };
+}
+
+/** The Monday (YYYY-MM-DD) of the week a date falls in. Weeks run Monday to Sunday. */
+export function weekStart(date: string) {
+  const dow = (new Date(`${date}T00:00:00Z`).getUTCDay() + 6) % 7; // 0 = Monday
+  return shiftDate(date, -dow);
+}
+
+/** This week's ranking: points from each day's first try, added up from Monday. */
+export async function weekBoard(date: string, limit: number, me: string | null): Promise<WeekBoard> {
+  const start = weekStart(date);
+  const dates = Array.from({ length: 7 }, (_, i) => shiftDate(start, i));
+  const days = await Promise.all(dates.map((d) => getStore().day(d)));
+  const totals = new Map<string, { name: string; points: number; days: number; t: number }>();
+  for (const day of days)
+    for (const e of day) {
+      if (isOffensive(e.name)) continue;
+      const t = totals.get(e.id) ?? { name: e.name, points: 0, days: 0, t: 0 };
+      t.points += e.s;
+      t.days += 1;
+      t.t = Math.max(t.t, e.t);
+      totals.set(e.id, t);
+    }
+  // most points first; on a tie, fewer days played (a better average) wins
+  const all = [...totals].sort(([, a], [, b]) => b.points - a.points || a.days - b.days);
+  const toRow = (id: string, t: { name: string; points: number; days: number }, rank: number): AllTimeRow => ({
+    rank,
+    name: t.name,
+    points: t.points,
+    days: t.days,
+    average: Math.round((t.points / t.days) * 10) / 10,
+    ...(id === me ? { me: true } : {}),
+  });
+  const ranked = rankBy(all, ([, t]) => t.points).map(({ r: [id, t], rank }) => toRow(id, t, rank));
+  const mine = me ? ranked.find((r) => r.me) : undefined;
+  return { start, end: dates[6], total: all.length, rows: ranked.slice(0, limit), me: mine ?? null };
 }
