@@ -1,6 +1,6 @@
 // Canvas map engine: draws the era basemap + draggable real-size overlays, handles pan/zoom/drag.
 // Framework-free on purpose so dragging stays at 60fps; React talks to it through a few setters and callbacks.
-import { geoPath, type GeoPermissibleObjects } from "d3-geo";
+import { geoMercator, geoPath, type GeoPermissibleObjects } from "d3-geo";
 import type { MultiPolygon } from "geojson";
 import { featureAtIn, type Layer, type PolityFeature, type PolityProps } from "@/lib/data";
 import {
@@ -66,10 +66,27 @@ const COLORS = {
   dispute: "#B4235A",
 };
 
-// Parallels as dense point lists: a 2-point line would be drawn as a great circle and bend across the map.
-const PARALLELS: Record<number, [number, number][]> = Object.fromEntries(
-  [-60, -30, 30, 60].map((lat) => [lat, Array.from({ length: 181 }, (_, i) => [-180 + i * 2, lat] as [number, number])]),
-);
+const RAD = Math.PI / 180;
+// The cached world is cut at 168.5°W, in the Bering Strait between Russia and Alaska, so no country is split by the cut.
+const CUT_CENTER = 11.5;
+
+/** Overlap between neighbouring tiles, in pixels, so no hairline seams show where they meet. */
+const TILE_PAD = 2;
+
+/** Everything needed to draw the world at one zoom level: shape boxes, outlines made on demand and bitmap tiles. */
+type BaseCache = {
+  /** zoom (scale) the cache is for */ k: number;
+  dpr: number;
+  proj: ReturnType<typeof geoMercator>;
+  /** tile edge in CSS pixels */ size: number;
+  shapes: { f: PolityFeature; fill: string; box: [number, number, number, number] }[];
+  claims: { c: ClaimShape; box: [number, number, number, number]; p2d?: Path2D }[];
+  paths: Map<PolityFeature, Path2D>;
+  /** state lines: undefined until first needed, null when not shown at this zoom */
+  states: { mesh: Path2D; clip: Path2D } | null | undefined;
+  /** "col,row" → bitmap, least recently used first */ tiles: Map<string, HTMLCanvasElement>;
+  /** how many tiles to keep */ keep: number;
+};
 
 function hashIndex(s: string) {
   let h = 0;
@@ -108,9 +125,12 @@ export class MapEngine {
   private patterns = new Map<string, CanvasPattern | null>();
 
   private baseDirty = true;
-  // While a finger (or the mouse) is moving the map, the base layer is a shifted copy of the last full drawing;
-  // the full redraw waits until the gesture pauses or ends. Redrawing ~250 shapes per move made phones stutter.
-  private snap: { canvas: HTMLCanvasElement; view: View; at: number } | null = null;
+  // Converting ~250 shapes to screen points every frame made phones stutter while panning. They are converted once per
+  // zoom level instead (see BaseCache); panning only moves them, so every frame is a complete, exact drawing.
+  private cache: BaseCache | null = null;
+  private tilePool: HTMLCanvasElement[] = [];
+  private prefetchTimer = 0;
+  private lastViewChange = 0;
   private settleTimer = 0;
   private topDirty = true;
   private raf = 0;
@@ -164,6 +184,7 @@ export class MapEngine {
 
   destroy() {
     clearTimeout(this.settleTimer);
+    clearTimeout(this.prefetchTimer);
     cancelAnimationFrame(this.raf);
     cancelAnimationFrame(this.edgeRaf);
     cancelAnimationFrame(this.flight);
@@ -184,14 +205,17 @@ export class MapEngine {
 
   setLayer(layer: Layer | null) {
     this.layer = layer;
+    this.cache = null;
     this.markBase();
   }
   setStates(states: Layer | null) {
     this.states = states;
+    this.cache = null;
     this.markBase();
   }
   setClaims(list: ClaimShape[]) {
     this.claims = list;
+    this.cache = null;
     this.markBase();
   }
   setLabels(on: boolean) {
@@ -298,65 +322,8 @@ export class MapEngine {
     this.topDirty = true;
     this.schedule();
   }
-  /** A pan, pinch or shape drag is in progress (shape drags can edge-scroll the map). */
-  private moving() {
-    const g = this.gesture;
-    return !!g && (g.kind === "pinch" || g.kind === "drag" || g.moved);
-  }
-
-  /** Keep a copy of the full drawing to slide around during the next gesture. */
-  private takeSnapshot() {
-    const c = this.snap?.canvas ?? document.createElement("canvas");
-    if (c.width !== this.base.width || c.height !== this.base.height) {
-      c.width = this.base.width;
-      c.height = this.base.height;
-    }
-    const ctx = c.getContext("2d")!;
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, c.width, c.height);
-    ctx.drawImage(this.base, 0, 0);
-    this.snap = { canvas: c, view: { ...this.view }, at: performance.now() };
-  }
-
-  /**
-   * Draws the snapshot moved and scaled to the current view: Mercator panning is a pure shift and zooming a pure scale,
-   * so this matches the full drawing except at the newly exposed edges, which fill in when the gesture pauses.
-   */
-  /** Where the snapshot sits on screen for the current view: x' = s·x + tx, y' = s·y + ty. */
-  private snapTransform() {
-    const v0 = this.snap!.view;
-    const v = this.view;
-    const s = v.k / v0.k;
-    const dLon = ((((v0.lon - v.lon + 180) % 360) + 360) % 360) - 180;
-    return { s, tx: (this.w / 2) * (1 - s) + v.k * dLon * (Math.PI / 180), ty: (this.h / 2) * (1 - s) + v.k * (v.y - v0.y) };
-  }
-
-  /**
-   * The shifted copy is only good while it still covers the screen. Past ~12% uncovered (a long pan, or the map
-   * edge-scrolling under a dragged shape) or after 0.4 s, draw the real thing; otherwise the world goes blank.
-   */
-  private snapUsable() {
-    if (!this.snap || !this.moving() || performance.now() - this.snap.at > 400) return false;
-    const { s, tx, ty } = this.snapTransform();
-    if (s < 0.8 || s > 1.25) return false;
-    const gap = Math.max(tx, ty, this.w - (tx + this.w * s), this.h - (ty + this.h * s), 0);
-    return gap < 0.12 * Math.min(this.w, this.h);
-  }
-
-  private drawBaseFast() {
-    const { canvas } = this.snap!;
-    const { s, tx, ty } = this.snapTransform();
-    const ctx = this.bctx;
-    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-    const world = this.worldRect();
-    ctx.fillStyle = COLORS.offMap;
-    ctx.fillRect(0, 0, this.w, this.h);
-    ctx.fillStyle = COLORS.ocean;
-    ctx.fillRect(world.x, world.y, world.w, world.h);
-    ctx.drawImage(canvas, tx, ty, this.w * s, this.h * s);
-  }
-
   private viewChanged() {
+    this.lastViewChange = performance.now();
     this.baseDirty = true;
     this.topDirty = true;
     this.schedule();
@@ -388,19 +355,7 @@ export class MapEngine {
   private drawNow() {
     const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
     if (this.baseDirty) {
-      if (this.snapUsable()) {
-        this.drawBaseFast();
-        // full quality once the finger rests for a moment
-        clearTimeout(this.settleTimer);
-        this.settleTimer = window.setTimeout(() => {
-          this.snap = null;
-          this.markBase();
-        }, 150);
-      } else {
-        clearTimeout(this.settleTimer);
-        this.drawBase(projs);
-        this.takeSnapshot();
-      }
+      this.drawBase(projs);
       this.baseDirty = false;
     }
     if (this.topDirty) {
@@ -450,33 +405,210 @@ export class MapEngine {
     ctx.beginPath();
     ctx.rect(world.x, world.y, world.w, world.h);
     ctx.clip();
-    projs.forEach((proj, i) => this.drawBaseCopy(proj, i === 0));
+    const cache = this.freshCache();
+    this.drawTiles(cache);
+    this.drawHighlight(cache);
+    this.drawLines();
+    if (this.labels) {
+      const vb = this.visibleBox();
+      const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+      const feats = cache.shapes
+        .filter((s) => s.f.bbox[2] - s.f.bbox[0] + (s.f.bbox[3] - s.f.bbox[1]) > minDeg && this.isVisible(s.f.bbox, vb))
+        .map((s) => s.f);
+      const states = this.showStates() ? this.states : null;
+      for (const proj of projs) {
+        this.drawLabels(ctx, proj, feats, states);
+        this.drawClaimLabels(ctx, proj);
+      }
+    }
+    if (this.pin) for (const proj of projs) this.drawPin(ctx, proj, this.pin);
     ctx.restore();
   }
 
-  /** One copy of the world: land, borders, labels and the pin. */
-  private drawBaseCopy(proj: ReturnType<typeof projectionFor>, main: boolean) {
-    const ctx = this.bctx;
-    const path = geoPath(proj, ctx);
-    const vb = this.visibleBox();
+  /**
+   * The tiles for the current zoom. Rebuilt when the zoom has changed by more than half (until then the tiles are
+   * drawn scaled), and 150 ms after the map stops moving if the zoom changed at all, so the resting map is always sharp.
+   */
+  private freshCache(): BaseCache {
+    const c = this.cache;
+    const s = c ? this.view.k / c.k : 1;
+    const settled = performance.now() - this.lastViewChange > 150;
+    if (!c || c.dpr !== this.dpr || s < 0.67 || s > 1.5 || (settled && Math.abs(s - 1) > 1e-3)) {
+      clearTimeout(this.settleTimer);
+      if (c) this.recycle(...c.tiles.values());
+      return (this.cache = this.buildCache());
+    }
+    if (Math.abs(s - 1) > 1e-3) {
+      clearTimeout(this.settleTimer);
+      this.settleTimer = window.setTimeout(() => this.markBase(), 160);
+    }
+    return c;
+  }
 
+  /** Works out each shape's box at this zoom. Outlines are converted to screen units later, the first time a tile needs them. */
+  private buildCache(): BaseCache {
+    const k = this.view.k;
+    const proj = geoMercator()
+      .rotate([-CUT_CENTER, 0])
+      .scale(k)
+      .translate([0, 0])
+      .precision(k > minScale(this.w, this.h) * 4 ? 0.5 : 0);
     // skip shapes smaller than ~1px on screen
-    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
-    const feats =
-      this.layer?.features.filter(
-        (f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg && this.isVisible(f.bbox, vb),
-      ) ?? [];
-    // Each era is drawn only from its own shapes (no separate coastline layer), so coasts and borders always line up.
-    const shapes = feats.map((f) => {
-      const p2d = new Path2D();
-      geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(f.geom as GeoPermissibleObjects);
-      const fill = f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land;
-      return { f, p2d, fill };
+    const minDeg = (1.2 / k) * (180 / Math.PI);
+    const shapes = (this.layer?.features ?? [])
+      .filter((f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg)
+      .map((f) => ({
+        f,
+        fill: f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land,
+        box: this.cacheBox(f.bbox, k),
+      }));
+    const claims = this.claims.map((c) => {
+      let [w, s, e, n] = [180, 90, -180, -90];
+      for (const poly of c.geom.coordinates)
+        for (const [lon, lat] of poly[0]) [w, s, e, n] = [Math.min(w, lon), Math.min(s, lat), Math.max(e, lon), Math.max(n, lat)];
+      return { c, box: this.cacheBox([w, s, e, n], k) };
     });
+    // big screens get bigger tiles, so a desktop window needs fewer of them
+    const size = this.w * this.h > 900_000 ? 512 : 256;
+    return { k, dpr: this.dpr, proj, size, shapes, claims, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
+  }
+
+  /** A box in the cache's units (screen pixels at its zoom, the cut meridian at ±π·k), for skipping shapes outside a tile. */
+  private cacheBox(b: [number, number, number, number], k: number): [number, number, number, number] {
+    const west = normLon(b[0] - CUT_CENTER);
+    const width = b[2] - b[0];
+    const whole = width > 300 || west + width > 180;
+    return [whole ? -Math.PI * k : west * RAD * k, -k * mercY(b[3]), whole ? Math.PI * k : (west + width) * RAD * k, -k * mercY(b[1])];
+  }
+
+  private showStates() {
+    return !!this.states?.mesh && this.layer?.key === "present" && this.view.k > minScale(this.w, this.h) * 2.2;
+  }
+
+  /** Where the cache's origin lands on screen for each copy of the world (only one unless zoomed far out). */
+  private cacheOrigins(c: BaseCache) {
+    const v = this.view;
+    const s = v.k / c.k;
+    const size = 2 * Math.PI * v.k;
+    let x0 = this.w / 2 + v.k * normLon(CUT_CENTER - v.lon) * RAD;
+    let y = this.h / 2 + v.k * v.y;
+    // at the tiles' own zoom, land on whole device pixels so the tiles are copied pixel for pixel (sharp, no seams)
+    if (Math.abs(s - 1) < 1e-3) {
+      x0 = Math.round(x0 * this.dpr) / this.dpr;
+      y = Math.round(y * this.dpr) / this.dpr;
+    }
+    const out: [number, number][] = [];
+    for (let n = -3; n <= 3; n++) {
+      const x = x0 + n * size;
+      if (x + size / 2 > 0 && x - size / 2 < this.w) out.push([x, y]);
+    }
+    return out;
+  }
+
+  /** The tile rows and columns covering the screen (plus `ring` tiles around it) for one copy of the world. */
+  private tileRange(c: BaseCache, ox: number, oy: number, ring: number) {
+    const s = this.view.k / c.k;
+    const half = Math.ceil(Math.PI * c.k / 2) * 2; // an even number of pixels, so tile corners land on whole device pixels
+    const count = Math.ceil((2 * half) / c.size);
+    const col = (x: number) => Math.floor(((x - ox) / s + half) / c.size);
+    const row = (y: number) => Math.floor(((y - oy) / s + half) / c.size);
+    return {
+      half,
+      i0: Math.max(0, col(0) - ring),
+      i1: Math.min(count - 1, col(this.w) + ring),
+      j0: Math.max(0, row(0) - ring),
+      j1: Math.min(count - 1, row(this.h) + ring),
+    };
+  }
+
+  /**
+   * Land, borders, claims and state lines come from bitmap tiles drawn once per zoom level, so a frame is just a few
+   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. A tile that is not ready yet is
+   * drawn on the spot, so the map is never shown blank or half drawn; the tiles around the screen are drawn ahead of time.
+   */
+  private drawTiles(c: BaseCache) {
+    const ctx = this.bctx;
+    const s = this.view.k / c.k;
+    const pad = TILE_PAD;
+    let missing = false;
+    let shown = 0;
+    for (const [ox, oy] of this.cacheOrigins(c)) {
+      const { half, i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 0);
+      for (let j = j0; j <= j1; j++)
+        for (let i = i0; i <= i1; i++) {
+          const tile = this.tile(c, i, j);
+          const src = (c.size + 2 * pad) * c.dpr;
+          ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
+          shown++;
+        }
+      const ring = this.tileRange(c, ox, oy, 1);
+      for (let j = ring.j0; j <= ring.j1 && !missing; j++)
+        for (let i = ring.i0; i <= ring.i1 && !missing; i++) missing = !c.tiles.has(`${i},${j}`);
+    }
+    c.keep = Math.max(24, shown * 3);
+    if (missing && !this.prefetchTimer) this.prefetchTimer = window.setTimeout(this.prefetch, 0);
+  }
+
+  /** Draw the tiles just off screen between frames (a few ms at a time), so panning finds them ready. */
+  private prefetch = () => {
+    this.prefetchTimer = 0;
+    const c = this.cache;
+    if (!c) return;
+    const start = performance.now();
+    for (const [ox, oy] of this.cacheOrigins(c)) {
+      const { i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 1);
+      for (let j = j0; j <= j1; j++)
+        for (let i = i0; i <= i1; i++) {
+          if (c.tiles.has(`${i},${j}`)) continue;
+          if (performance.now() - start > 6) {
+            this.prefetchTimer = window.setTimeout(this.prefetch, 0);
+            return;
+          }
+          this.tile(c, i, j);
+        }
+    }
+  };
+
+  /** One tile, from the cache or drawn now. Least recently used tiles are dropped beyond what the screen needs. */
+  private tile(c: BaseCache, i: number, j: number) {
+    const key = `${i},${j}`;
+    let tile = c.tiles.get(key);
+    if (tile) c.tiles.delete(key);
+    else tile = this.renderTile(c, i, j);
+    c.tiles.set(key, tile);
+    while (c.tiles.size > c.keep) {
+      const [oldest, canvas] = c.tiles.entries().next().value!;
+      c.tiles.delete(oldest);
+      this.recycle(canvas);
+    }
+    return tile;
+  }
+
+  /** Keep a few spare tile canvases to reuse rather than making new ones. */
+  private recycle(...tiles: HTMLCanvasElement[]) {
+    for (const t of tiles) if (this.tilePool.length < 16) this.tilePool.push(t);
+  }
+
+  private renderTile(c: BaseCache, i: number, j: number) {
+    const pad = TILE_PAD;
+    const half = Math.ceil(Math.PI * c.k / 2) * 2;
+    const x0 = i * c.size - half - pad;
+    const y0 = j * c.size - half - pad;
+    const span = c.size + 2 * pad;
+    const tile = this.tilePool.pop() ?? document.createElement("canvas");
+    const px = Math.ceil(span * c.dpr);
+    if (tile.width !== px || tile.height !== px) tile.width = tile.height = px;
+    const ctx = tile.getContext("2d")!;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, px, px);
+    ctx.setTransform(c.dpr, 0, 0, c.dpr, -x0 * c.dpr, -y0 * c.dpr);
+    const hits = (b: [number, number, number, number]) => b[0] < x0 + span && b[2] > x0 && b[1] < y0 + span && b[3] > y0;
+    const shapes = c.shapes.filter((sh) => hits(sh.box)).map((sh) => ({ ...sh, p2d: this.cachedPath(c, sh.f) }));
+
     // pass 1: fill, and stroke in the same colour to seal hairline gaps between neighbouring shapes
+    const hatch = this.pattern(COLORS.dispute, 0.35);
     ctx.lineJoin = "round";
     ctx.lineWidth = 1.2;
-    const hatch = this.pattern(COLORS.dispute, 0.35);
     for (const { f, p2d, fill } of shapes) {
       ctx.fillStyle = fill;
       ctx.fill(p2d);
@@ -503,91 +635,121 @@ export class MapEngine {
     ctx.setLineDash([]);
 
     // claim wedges (Antarctica): tinted and hatched in the claimant's colour, so overlapping claims show through each other
-    for (const c of this.claims) {
-      const p2d = new Path2D();
-      geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(c.geom as GeoPermissibleObjects);
-      ctx.fillStyle = hexToRgba(c.color, 0.18);
+    for (const cl of c.claims) {
+      if (!hits(cl.box)) continue;
+      const p2d = (cl.p2d ??= this.projected(c, cl.c.geom as GeoPermissibleObjects));
+      ctx.fillStyle = hexToRgba(cl.c.color, 0.18);
       ctx.fill(p2d);
-      const hatch = this.pattern(c.color, 0.3);
-      if (hatch) {
-        ctx.fillStyle = hatch;
+      const claimHatch = this.pattern(cl.c.color, 0.3);
+      if (claimHatch) {
+        ctx.fillStyle = claimHatch;
         ctx.fill(p2d);
       }
       ctx.setLineDash([5, 3]);
       ctx.lineWidth = 1.2;
-      ctx.strokeStyle = hexToRgba(c.color, 0.9);
+      ctx.strokeStyle = hexToRgba(cl.c.color, 0.9);
       ctx.stroke(p2d);
     }
     ctx.setLineDash([]);
 
     // US state lines on the present-day map once zoomed in: shared borders only, clipped to the US coastline
-    const showStates = this.states?.mesh && this.layer?.key === "present" && this.view.k > minScale(this.w, this.h) * 2.2;
-    const usa = this.layer?.byName.get("United States");
-    if (showStates && this.states?.mesh && usa) {
+    const states = this.layer?.key === "present" ? this.statePaths(c) : null;
+    if (states) {
       ctx.save();
-      const clip = new Path2D();
-      geoPath(proj, clip as unknown as CanvasRenderingContext2D)(usa.geom as GeoPermissibleObjects);
-      ctx.clip(clip);
-      ctx.beginPath();
-      path(this.states.mesh);
+      ctx.clip(states.clip);
       ctx.strokeStyle = COLORS.stateLine;
       ctx.lineWidth = 0.7;
-      ctx.stroke();
+      ctx.stroke(states.mesh);
       ctx.restore();
     }
+    return tile;
+  }
 
-    if (this.highlight && this.layer) {
-      const f = this.layer.byName.get(this.highlight);
-      if (f) {
-        ctx.beginPath();
-        path(f.geom as GeoPermissibleObjects);
-        ctx.strokeStyle = "#2A1A12";
-        ctx.lineWidth = 2.2;
-        ctx.stroke();
-      }
+  /** The highlighted country's outline, drawn live on top of the tiles. */
+  private drawHighlight(c: BaseCache) {
+    const f = this.highlight ? this.layer?.byName.get(this.highlight) : undefined;
+    if (!f) return;
+    const ctx = this.bctx;
+    const s = this.view.k / c.k;
+    const p2d = this.cachedPath(c, f);
+    for (const [ox, oy] of this.cacheOrigins(c)) {
+      ctx.save();
+      ctx.setTransform(this.dpr * s, 0, 0, this.dpr * s, this.dpr * ox, this.dpr * oy);
+      ctx.strokeStyle = "#2A1A12";
+      ctx.lineWidth = 2.2 / s;
+      ctx.stroke(p2d);
+      ctx.restore();
     }
+  }
 
-    // equator (dashed, like the reference) + faint graticule
+  private projected(c: BaseCache, g: GeoPermissibleObjects) {
+    const p2d = new Path2D();
+    geoPath(c.proj, p2d as unknown as CanvasRenderingContext2D)(g);
+    return p2d;
+  }
+
+  /** A shape's outline in the cache's units, made the first time it is needed at this zoom. */
+  private cachedPath(c: BaseCache, f: PolityFeature) {
+    let p2d = c.paths.get(f);
+    if (!p2d) {
+      p2d = this.projected(c, f.geom as GeoPermissibleObjects);
+      c.paths.set(f, p2d);
+    }
+    return p2d;
+  }
+
+  /** State lines and the US outline that clips them (only zoomed in far enough to show them). */
+  private statePaths(c: BaseCache) {
+    if (c.states === undefined) {
+      const usa = this.layer?.byName.get("United States");
+      const mesh = this.states?.mesh;
+      c.states = usa && mesh ? { mesh: this.projected(c, mesh as GeoPermissibleObjects), clip: this.cachedPath(c, usa) } : null;
+    }
+    return c.states;
+  }
+
+  /** Equator (dashed) and faint parallels. On this map they are straight across, so they are drawn as plain lines. */
+  private drawLines() {
+    const ctx = this.bctx;
+    const v = this.view;
+    const yOf = (lat: number) => this.h / 2 + v.k * v.y - v.k * mercY(lat);
     ctx.beginPath();
-    for (let lat = -60; lat <= 60; lat += 30) {
-      if (lat === 0) continue;
-      path({ type: "LineString", coordinates: PARALLELS[lat] });
+    for (const lat of [-60, -30, 30, 60]) {
+      ctx.moveTo(0, yOf(lat));
+      ctx.lineTo(this.w, yOf(lat));
     }
     ctx.strokeStyle = COLORS.graticule;
     ctx.lineWidth = 1;
     ctx.stroke();
+    const eq = yOf(0);
     ctx.beginPath();
-    path({ type: "LineString", coordinates: [[-180, 0], [-90, 0], [0, 0], [90, 0], [180, 0]] });
+    ctx.moveTo(0, eq);
+    ctx.lineTo(this.w, eq);
     ctx.setLineDash([6, 5]);
+    // the dashes travel with the map as it pans
+    ctx.lineDashOffset = -((((this.w / 2 - v.k * v.lon * RAD) % 11) + 11) % 11);
     ctx.strokeStyle = COLORS.equator;
-    ctx.lineWidth = 1;
     ctx.stroke();
     ctx.setLineDash([]);
-    const eq = proj([this.view.lon, 0]);
-    if (main && eq && eq[1] > 12 && eq[1] < this.h - 4) {
+    ctx.lineDashOffset = 0;
+    if (eq > 12 && eq < this.h - 4) {
       ctx.font = "600 10px system-ui, sans-serif";
       ctx.fillStyle = COLORS.equator;
-      ctx.fillText("EQUATOR", 8, eq[1] - 5);
+      ctx.fillText("EQUATOR", 8, eq - 5);
     }
+  }
 
-    if (this.labels) {
-      this.drawLabels(ctx, proj, feats, showStates ? this.states : null);
-      this.drawClaimLabels(ctx, proj);
-    }
-
-    if (this.pin) {
-      const p = proj(this.pin);
-      if (p) {
-        ctx.beginPath();
-        ctx.arc(p[0], p[1], 7, 0, Math.PI * 2);
-        ctx.fillStyle = "#2A1A12";
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(p[0], p[1], 3, 0, Math.PI * 2);
-        ctx.fillStyle = "#fff";
-        ctx.fill();
-      }
-    }
+  private drawPin(ctx: CanvasRenderingContext2D, proj: ReturnType<typeof projectionFor>, pin: LonLat) {
+    const p = proj(pin);
+    if (!p) return;
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 7, 0, Math.PI * 2);
+    ctx.fillStyle = "#2A1A12";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(p[0], p[1], 3, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
   }
 
   private drawLabels(
@@ -963,8 +1125,6 @@ export class MapEngine {
 
   private onPointerUp = (e: PointerEvent) => {
     this.pointers.delete(e.pointerId);
-    // the gesture is over: replace the shifted copy with a sharp full drawing
-    if (this.moving()) queueMicrotask(() => this.markBase());
     cancelAnimationFrame(this.edgeRaf);
     this.edgeRaf = 0;
     this.pointerAt = null;
