@@ -17,6 +17,8 @@ export type PoolEntry = {
   /** area as drawn on a web map (Mercator, equator scale), km² */
   m: number;
   lat: number;
+  /** first date (YYYY-MM-DD) this shape can appear in a daily puzzle; shapes added later never change past days */
+  since?: string;
 };
 
 export type Question = {
@@ -106,7 +108,10 @@ function pick<T>(list: T[], r: () => number) {
 }
 
 /** The day's five questions. `seed` is the date key, or anything else for a practice round. */
-export function buildQuestions(pool: PoolEntry[], seed: string): Question[] {
+export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[] {
+  // a dated round only uses shapes that were in the pool that day (practice rounds use everything)
+  const dated = /^\d{4}-\d{2}-\d{2}$/.test(seed);
+  const pool = allShapes.filter((e) => !e.since || !dated || e.since <= seed);
   const r = rng(`atlas-daily:${seed}`);
   const used = new Set<string>();
   const out: Question[] = [];
