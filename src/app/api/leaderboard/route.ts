@@ -17,6 +17,7 @@ import {
 } from "@/lib/leaderboard";
 import type { SubmitResult } from "@/lib/leaderboard-types";
 import { rateLimited } from "@/lib/submissions";
+import { playerFor, signInEnabled, verifiedUser } from "@/lib/account";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
@@ -45,7 +46,11 @@ export async function GET(request: Request) {
   }
 }
 
-/** POST { player, name, email, date, choices: [0|1 ×5], website } → your score and rank for the day. The email is needed once per player. */
+/**
+ * POST { player, name, email, date, choices: [0|1 ×5], website } → your score and rank for the day.
+ * With sign-in on, the player is whoever is signed in (their verified email), and `player` is only a hint for a brand-new
+ * one. Without it, the email is needed once per player.
+ */
 export async function POST(request: Request) {
   const fail = (error: string, status: number, field?: "name" | "email") => Response.json({ ok: false, error, ...(field ? { field } : {}) } satisfies SubmitResult, { status });
   if (rateLimited(`lb-post:${ipOf(request)}`, 30)) return fail("Too many tries. Please wait a few minutes.", 429);
@@ -57,7 +62,8 @@ export async function POST(request: Request) {
     return fail("Invalid request.", 400);
   }
   if (body.website) return fail("Invalid request.", 400); // honeypot
-  if (!isPlayerId(body.player)) return fail("Invalid player.", 400);
+  const accounts = signInEnabled();
+  if (!accounts && !isPlayerId(body.player)) return fail("Invalid player.", 400);
   const { name, error } = checkName(body.name);
   if (error) return fail(error, 422, "name");
   if (!isDateKey(body.date) || !isPlayableDate(body.date)) return fail("Only today's challenge can go on the leaderboard.", 422);
@@ -66,24 +72,33 @@ export async function POST(request: Request) {
 
   try {
     const store = getStore();
-    // joining needs an email (kept private): one player per inbox
-    if (!(await store.emailOf(body.player))) {
-      const mail = checkEmail(body.email);
-      if (mail.error) return fail(mail.error, 422, "email");
-      if (!(await store.claimEmail(mail.key, body.player, mail.email))) {
-        return fail("That email is already signed up on another device or browser.", 422, "email");
+    let player: string;
+    if (accounts) {
+      // only a verified email can post, and it always posts as the same player on every device
+      const user = await verifiedUser();
+      if (!user) return fail("Sign in to put your score on the leaderboard.", 401);
+      player = await playerFor(user, body.player);
+    } else {
+      player = body.player as string;
+      // joining needs an email (kept private): one player per inbox
+      if (!(await store.emailOf(player))) {
+        const mail = checkEmail(body.email);
+        if (mail.error) return fail(mail.error, 422, "email");
+        if (!(await store.claimEmail(mail.key, player, mail.email))) {
+          return fail("That email is already signed up on another device or browser.", 422, "email");
+        }
       }
     }
     // a nickname belongs to the first player who used it, so a second browser can't post under the same name
-    if (!(await store.claimName(nameKey(name), body.player))) return fail("That nickname is taken. Please pick another.", 422, "name");
+    if (!(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
     // a brand-new score for today: cap how many different players one network can add per day
-    if (!(await store.has(body.date, body.player))) {
+    if (!(await store.has(body.date, player))) {
       const n = await store.bumpNetwork(body.date, networkKey(ipOf(request), body.date));
       if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
     }
-    await store.setName(body.player, name);
-    const fresh = await store.submit(body.date, body.player, score, Date.now());
-    const board = await dayBoard(body.date, 0, body.player);
+    await store.setName(player, name);
+    const fresh = await store.submit(body.date, player, score, Date.now());
+    const board = await dayBoard(body.date, 0, player);
     // a repeat submission keeps the first score; report that one
     const mine = board.me;
     return Response.json({
@@ -92,6 +107,7 @@ export async function POST(request: Request) {
       rank: mine?.rank ?? board.total,
       total: board.total,
       duplicate: !fresh,
+      player: { id: player, name },
     } satisfies SubmitResult);
   } catch (e) {
     console.error("[leaderboard] write failed", e);

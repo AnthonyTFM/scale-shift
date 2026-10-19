@@ -29,6 +29,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **The map lives only on `/map`.** The homepage leads to games, the map and information pages.
 - **Daily puzzles** are picked by a seeded shuffle of the date, so everyone gets the same five. The leaderboard re-marks answers on the server.
 - **Leaderboard sign-up (Oct 19):** an email and a nickname are required to join. Emails are stored privately in Redis (`lb:emails`), never returned by the API, and each inbox gets one player. Emails are not verified yet: that needs a real domain plus Resend (see roadmap).
+- **Verified sign-in with Clerk (Oct 19):** to post a score you sign in with an email code or Google (Clerk), so nobody can play under an email they don't own, and you keep one nickname on every device and browser. Clerk only proves the email: the player, nickname, scores and reminders stay in our Redis, found by the verified email (`lb:email-owners`) and tied to the Clerk account (`lb:accounts`). A player who joined before sign-in keeps their spot by signing in with the same email. **Switching away later** (e.g. our own email codes via Resend once there's a domain) only means replacing `verifiedUser()` in `src/lib/account.ts`; everyone signs in once more and lands on the same player. Off until Clerk's keys are in Vercel. **Caveat:** Clerk's production mode needs a domain we own; on `scale-shift.vercel.app` it runs in development mode (a small badge, and Clerk caps development sign-ups at 100), fine until the domain is decided.
 - **Reminder emails are opt-in (Oct 19):** an unticked "Email me when a new daily challenge is up" box at sign-up, and a toggle on the results screen. Consent and its date live in `lb:reminders`. Every reminder must carry the signed one-click unsubscribe link (`unsubscribeToken`). Sending is not built yet: it needs a real domain, Resend and `UNSUBSCRIBE_SECRET` in Vercel.
 - **Nickname filter:** `src/lib/name-filter.ts` reads names several ways (l33t, q-for-g, lookalike letters, repeats, separators). Boards hide any saved name that fails it, so adding a word removes a live bad name on the next deploy.
 - **Storage:** form messages and leaderboard scores need Vercel settings to persist (see the setup log).
@@ -89,6 +90,7 @@ _Last updated: October 19, 2026_
 | `NEXT_PUBLIC_GA4_ID` | Not set yet (no analytics) |
 | `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` (+ `NOTIFY_EMAIL_FROM`) | Not set yet, so the live site's forms don't save anything |
 | Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`, added by Vercel → Storage) | Set Oct 19. The live API reports `X-Leaderboard-Store: redis`. |
+| Clerk (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY`, added by Vercel → Marketplace → Clerk) | Not set yet. In Clerk: Email verification code on, Google on, Password off. Development keys until we own a domain. |
 
 **GitHub**
 - `main` is protected: changes go through a pull request, approvals are not required, and the CI status check `build` must pass (lint, typecheck, build, data check).

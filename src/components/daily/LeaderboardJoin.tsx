@@ -6,11 +6,18 @@ import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, savePlayer, type Player } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
+import { signInOn } from "@/lib/sign-in";
+import { AccountJoin } from "./AccountJoin";
 
 type Props = { date: string; choices: number[] };
 
-/** After the daily round: sign up with an email and a nickname, post the score and show where it ranks today. */
-export function LeaderboardJoin({ date, choices }: Props) {
+/** After the daily round: post the score. With sign-in on, players sign in (verified email); otherwise they type an email. */
+export function LeaderboardJoin(props: Props) {
+  return signInOn ? <AccountJoin {...props} /> : <EmailJoin {...props} />;
+}
+
+/** Sign up with an email and a nickname, post the score and show where it ranks today. */
+function EmailJoin({ date, choices }: Props) {
   const [player, setPlayer] = useState<Player | null>(null);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");

@@ -1,6 +1,7 @@
 import { PageHero } from "@/components/site/PageHero";
 import type { Metadata } from "next";
 import { DailyChallenge } from "@/components/daily/DailyChallenge";
+import { SignInProvider } from "@/components/daily/SignInProvider";
 
 export const metadata: Metadata = {
   title: "Daily challenge: which is bigger?",
@@ -25,7 +26,9 @@ export default function DailyPage() {
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <div className="max-w-2xl">
           <div>
-            <DailyChallenge />
+            <SignInProvider>
+              <DailyChallenge />
+            </SignInProvider>
           </div>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few

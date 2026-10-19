@@ -9,5 +9,5 @@ export type AllTimeBoard = { total: number; rows: AllTimeRow[]; me?: AllTimeRow 
 export type WeekBoard = AllTimeBoard & { start: string; end: string };
 
 export type SubmitResult =
-  | { ok: true; score: number; rank: number; total: number; duplicate: boolean }
+  | { ok: true; score: number; rank: number; total: number; duplicate: boolean; player?: { id: string; name: string } }
   | { ok: false; error: string; field?: "name" | "email" };

@@ -1,5 +1,6 @@
 import { getStore, isPlayerId } from "@/lib/leaderboard";
 import { rateLimited } from "@/lib/submissions";
+import { existingPlayer, signInEnabled, verifiedUser } from "@/lib/account";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
@@ -13,11 +14,21 @@ export async function POST(request: Request) {
   } catch {
     return fail("Invalid request.", 400);
   }
-  if (!isPlayerId(body.player) || typeof body.on !== "boolean") return fail("Invalid request.", 400);
+  if (typeof body.on !== "boolean") return fail("Invalid request.", 400);
   try {
     const store = getStore();
-    if (!(await store.emailOf(body.player))) return fail("Join the leaderboard with your email first.", 422);
-    await store.setReminders(body.player, body.on, Date.now());
+    let player: string | null;
+    if (signInEnabled()) {
+      // with sign-in on, only the signed-in person can change their own reminders
+      const user = await verifiedUser();
+      player = user ? await existingPlayer(user) : null;
+      if (!player) return fail("Sign in and post a score first.", 401);
+    } else {
+      if (!isPlayerId(body.player)) return fail("Invalid request.", 400);
+      player = body.player;
+      if (!(await store.emailOf(player))) return fail("Join the leaderboard with your email first.", 422);
+    }
+    await store.setReminders(player, body.on, Date.now());
     return Response.json({ ok: true, on: body.on });
   } catch (e) {
     console.error("[leaderboard] reminders failed", e);
