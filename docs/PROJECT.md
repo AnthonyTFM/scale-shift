@@ -29,6 +29,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **The map lives only on `/map`.** The homepage leads to games, the map and information pages.
 - **Daily puzzles** are picked by a seeded shuffle of the date, so everyone gets the same five. The leaderboard re-marks answers on the server.
 - **Leaderboard sign-up (Oct 19):** an email and a nickname are required to join. Emails are stored privately in Redis (`lb:emails`), never returned by the API, and each inbox gets one player. Emails are not verified yet: that needs a real domain plus Resend (see roadmap).
+- **Reminder emails are opt-in (Oct 19):** an unticked "Email me when a new daily challenge is up" box at sign-up, and a toggle on the results screen. Consent and its date live in `lb:reminders`. Every reminder must carry the signed one-click unsubscribe link (`unsubscribeToken`). Sending is not built yet: it needs a real domain, Resend and `UNSUBSCRIBE_SECRET` in Vercel.
 - **Nickname filter:** `src/lib/name-filter.ts` reads names several ways (l33t, q-for-g, lookalike letters, repeats, separators). Boards hide any saved name that fails it, so adding a word removes a live bad name on the next deploy.
 - **Storage:** form messages and leaderboard scores need Vercel settings to persist (see the setup log).
 

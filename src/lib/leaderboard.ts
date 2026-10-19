@@ -7,7 +7,7 @@
 //           On Vercel without Redis this falls back to /tmp, which is wiped regularly, so scores won't last.
 //
 // Scores are never trusted from the browser: the server rebuilds the day's questions and marks the answers itself.
-import { createHash } from "node:crypto";
+import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import pool from "@/data/daily-pool.json";
@@ -81,6 +81,10 @@ interface Store {
   emailOf(id: string): Promise<string | null>;
   /** tie an email to this player; false if another player already signed up with it */
   claimEmail(emailKey: string, id: string, email: string): Promise<boolean>;
+  /** turn daily-challenge reminder emails on (recording when they agreed) or off */
+  setReminders(id: string, on: boolean, at: number): Promise<void>;
+  /** players who agreed to reminders, with their email and nickname */
+  reminderRecipients(): Promise<{ id: string; email: string; name: string; since: number }[]>;
   /** count one more new player from this network today; returns the new count */
   bumpNetwork(date: string, netKey: string): Promise<number>;
   day(date: string): Promise<{ id: string; name: string; s: number; t: number }[]>;
@@ -145,6 +149,22 @@ function redisStore(url: string, token: string): Store {
       await run([["HSET", "lb:emails", id, email]]);
       return true;
     },
+    async setReminders(id, on, at) {
+      await run([on ? ["HSET", "lb:reminders", id, at] : ["HDEL", "lb:reminders", id]]);
+    },
+    async reminderRecipients() {
+      const [raw] = await run([["HGETALL", "lb:reminders"]]);
+      const since = pairs(raw);
+      const ids = Object.keys(since);
+      if (!ids.length) return [];
+      const [emails, names] = await run([
+        ["HMGET", "lb:emails", ...ids],
+        ["HMGET", "lb:names", ...ids],
+      ]);
+      return ids
+        .map((id, i) => ({ id, email: (emails as (string | null)[])[i] ?? "", name: (names as (string | null)[])[i] ?? "Player", since: Number(since[id]) }))
+        .filter((r) => r.email);
+    },
     async bumpNetwork(date, netKey) {
       const key = `lb:net:${date}:${netKey}`;
       const [n] = await run([
@@ -201,6 +221,7 @@ type FileData = {
   nets?: Record<string, number>;
   emails?: Record<string, string>;
   emailOwners?: Record<string, string>;
+  reminders?: Record<string, number>;
 };
 
 function fileStore(file: string): Store {
@@ -208,9 +229,9 @@ function fileStore(file: string): Store {
   const read = async (): Promise<FileData> => {
     try {
       const d = JSON.parse(await fs.readFile(file, "utf8"));
-      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {} };
+      return { names: d.names ?? {}, days: d.days ?? {}, owners: d.owners ?? {}, nets: d.nets ?? {}, emails: d.emails ?? {}, emailOwners: d.emailOwners ?? {}, reminders: d.reminders ?? {} };
     } catch {
-      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {} };
+      return { names: {}, days: {}, owners: {}, nets: {}, emails: {}, emailOwners: {}, reminders: {} };
     }
   };
   // serialize writes so two players finishing at once can't overwrite each other
@@ -258,6 +279,18 @@ function fileStore(file: string): Store {
         (d.emails ??= {})[id] = email;
         return true;
       }),
+    setReminders: (id, on, at) =>
+      write((d) => {
+        const r = (d.reminders ??= {});
+        if (on) r[id] = at;
+        else delete r[id];
+      }),
+    async reminderRecipients() {
+      const d = await read();
+      return Object.entries(d.reminders ?? {})
+        .map(([id, since]) => ({ id, email: d.emails?.[id] ?? "", name: d.names[id] ?? "Player", since }))
+        .filter((r) => r.email);
+    },
     bumpNetwork: (date, netKey) =>
       write((d) => {
         const nets = (d.nets ??= {});
@@ -327,6 +360,22 @@ export const nameKey = (name: string) => name.toLowerCase().replace(/[^\p{L}\p{N
 /** One-way hash of the visitor's network address plus the date, so no IP address is ever stored. */
 export function networkKey(ip: string, date: string) {
   return createHash("sha256").update(`${ip}|${date}|scale-shift`).digest("hex").slice(0, 16);
+}
+
+// ---------- reminder emails ----------
+
+// Signs unsubscribe links so nobody can unsubscribe someone else by guessing. Set UNSUBSCRIBE_SECRET in Vercel;
+// until then the Redis token (also server-only) is used.
+const unsubscribeSecret = () =>
+  process.env.UNSUBSCRIBE_SECRET || process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || "local-dev-only";
+
+/** Token for a player's one-click unsubscribe link (/api/leaderboard/unsubscribe?p=<id>&t=<token>). Put it in every reminder email. */
+export const unsubscribeToken = (id: string) => createHmac("sha256", unsubscribeSecret()).update(`unsubscribe:${id}`).digest("base64url").slice(0, 32);
+
+export function checkUnsubscribeToken(id: string, token: string) {
+  const want = Buffer.from(unsubscribeToken(id));
+  const got = Buffer.from(token);
+  return want.length === got.length && timingSafeEqual(want, got);
 }
 
 /** New players allowed per network per day (a household or friends on one Wi-Fi). */
