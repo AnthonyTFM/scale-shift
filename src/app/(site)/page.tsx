@@ -56,6 +56,13 @@ const directory = [
     body: `${disputes.length} places where who controls the land and who the world recognizes don't match, from Crimea to Antarctica.`,
     cta: "See the disputes",
   },
+  {
+    href: "/teachers",
+    icon: "🍎",
+    title: "For teachers",
+    body: "Everything in one place for the classroom: why maps distort, real sizes for every country, eras, border changes and disputes.",
+    cta: "Open the teacher hub",
+  },
 ];
 
 

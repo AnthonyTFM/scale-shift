@@ -35,7 +35,7 @@ export default function DisputesPage() {
         </p>
         <ol className="grid gap-4 md:grid-cols-2">
           {disputes.map((d) => (
-            <li key={d.id} className="rounded-card border border-line bg-white p-5 shadow-sm">
+            <li key={d.id} id={d.id} className="scroll-mt-24 rounded-card border border-line bg-white p-5 shadow-sm">
               <h2 className="font-display text-xl text-ink">{d.name}</h2>
               <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>

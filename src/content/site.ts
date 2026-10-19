@@ -22,6 +22,7 @@ export const nav: { href: string; label: string; from?: "lg" | "xl" }[] = [
 ];
 
 export const footerNav = [
+  { href: "/teachers", label: "For teachers" },
   { href: "/about", label: "About & sources" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/contact", label: "Report a border error" },
