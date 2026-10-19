@@ -172,38 +172,6 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
         <Close onClose={onClose} />
       </div>
 
-      <AntarcticClaims at={info.at} era={info.era} />
-
-      {first ? (
-        <div className="mb-3 rounded-xl bg-rose-500/15 p-3 ring-1 ring-rose-300/40">
-          <p className="text-xs font-bold uppercase tracking-wide text-rose-200">Disputed · {first.name}</p>
-          <div className="mt-2">
-            <DisputeBody d={first} />
-          </div>
-          {others.length ? (
-            <div className="mt-3 space-y-1 border-t border-rose-300/20 pt-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wide text-rose-200/80">
-                Other disputes involving {f?.props.n ?? "this area"}
-              </p>
-              {others.map((d) => (
-                <details key={d.id} className="rounded-lg bg-black/15 px-2 py-1.5">
-                  <summary className="cursor-pointer text-sm font-semibold">{d.name}</summary>
-                  <div className="mt-2">
-                    <DisputeBody d={d} />
-                  </div>
-                </details>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-
-      {f?.props.w ? (
-        <div className="mb-3">
-          <DataNote text={f.props.w} />
-        </div>
-      ) : null}
-
       {f ? (
         <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
           <span className="font-semibold">≈ {formatArea(f.props.a, unit)}</span>
@@ -215,6 +183,12 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
           >
             Drag its real size
           </button>
+        </div>
+      ) : null}
+
+      {f?.props.w ? (
+        <div className="mb-3">
+          <DataNote text={f.props.w} />
         </div>
       ) : null}
 
@@ -242,6 +216,35 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
           );
         })}
       </ol>
+
+      {/* order: drag its real size, who ruled here, then any disputes */}
+      <div className="mt-4 empty:hidden">
+      <AntarcticClaims at={info.at} era={info.era} />
+
+      {first ? (
+        <div className="rounded-xl bg-rose-500/15 p-3 ring-1 ring-rose-300/40">
+          <p className="text-xs font-bold uppercase tracking-wide text-rose-200">Disputed · {first.name}</p>
+          <div className="mt-2">
+            <DisputeBody d={first} />
+          </div>
+          {others.length ? (
+            <div className="mt-3 space-y-1 border-t border-rose-300/20 pt-2">
+              <p className="text-[11px] font-semibold uppercase tracking-wide text-rose-200/80">
+                Other disputes involving {f?.props.n ?? "this area"}
+              </p>
+              {others.map((d) => (
+                <details key={d.id} className="rounded-lg bg-black/15 px-2 py-1.5">
+                  <summary className="cursor-pointer text-sm font-semibold">{d.name}</summary>
+                  <div className="mt-2">
+                    <DisputeBody d={d} />
+                  </div>
+                </details>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      </div>
 
       {nearby.length ? (
         <>
