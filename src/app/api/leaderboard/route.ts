@@ -1,5 +1,5 @@
 import { connection } from "next/server";
-import { allTimeBoard, checkName, dayBoard, getStore, isDateKey, isPlayableDate, isPlayerId, scoreAnswers } from "@/lib/leaderboard";
+import { allTimeBoard, checkName, dayBoard, getStore, isDateKey, isPlayableDate, isPlayerId, scoreAnswers, storeKind } from "@/lib/leaderboard";
 import type { SubmitResult } from "@/lib/leaderboard-types";
 import { rateLimited } from "@/lib/submissions";
 
@@ -17,10 +17,10 @@ export async function GET(request: Request) {
   const player = q.get("player");
   const me = isPlayerId(player) ? player : null;
   try {
-    if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers: { "Cache-Control": "no-store" } });
+    if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
     const date = q.get("date");
     if (!isDateKey(date)) return Response.json({ error: "Use date=YYYY-MM-DD." }, { status: 400 });
-    return Response.json(await dayBoard(date, limit, me), { headers: { "Cache-Control": "no-store" } });
+    return Response.json(await dayBoard(date, limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
   } catch (e) {
     console.error("[leaderboard] read failed", e);
     return Response.json({ error: "The leaderboard is unavailable right now." }, { status: 503 });

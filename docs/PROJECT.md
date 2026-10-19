@@ -15,11 +15,10 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 
 | Page | What it does |
 |---|---|
-| Home `/` | A directory, not a map: today's daily challenge with your streak and the top players, links to every section, famous comparisons and the teachers' area |
+| Home `/` | A directory, not a map: today's daily challenge with your streak and the top players, links to every section and famous comparisons |
 | Map `/map` | Drag countries, US states and historical states at real size; rotate; 49 border snapshots from 2000 BCE to today; type any year; click land for "who ruled here?" through every era; map key; Antarctic claims; disputed territories; edge-scrolling while dragging; share links and PNG download |
 | Daily challenge `/daily` | 5 "which is bigger?" puzzles a day, the same for everyone; true-size reveal; context for every empire; streaks; practice rounds; shareable score grid |
 | Leaderboard `/leaderboard` | Daily and all-time rankings under a nickname; scores re-marked on the server; first try of the day counts |
-| Teachers `/teachers` | Six printable classroom activities with map links |
 | Eras, timeline, disputes | 49 era pages, 104 events (when land was taken vs. made official), 19 present-day disputes |
 | About, how it works, contact, privacy | Sources, every data correction, the border-error form |
 
@@ -35,7 +34,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - `npm run lint`, `typecheck`, `build` and `check:data` pass; CI enforces it on every PR.
 - No console errors. Works at 375px, 768px, 1280px and 1920px with no sideways scrolling.
 - Keyboard and screen-reader friendly: labels on every control, visible focus, sensible tab order.
-- Lighthouse: Performance 90+, Accessibility/Best Practices/SEO 100. Last measured Oct 19: home 98, teachers 99, leaderboard 98, daily 100 performance; 100 on everything else.
+- Lighthouse: Performance 90+, Accessibility/Best Practices/SEO 100. Last measured Oct 19: home 98, leaderboard 98, daily 100 performance; 100 on everything else.
 - Copy lives in `src/content/`, never hardcoded in components.
 
 ## Design system

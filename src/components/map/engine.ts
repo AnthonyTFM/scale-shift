@@ -33,6 +33,8 @@ export type Overlay = {
   moved: boolean;
   geom: MultiPolygon;
   hiddenParts: number;
+  /** built from a shape cut into slices around a pole: fill only, an outline would show the cuts */
+  sliced?: boolean;
   /** area of the drawn geometry (far-off parts excluded) */ km2: number;
   props: PolityProps;
 };
@@ -381,7 +383,7 @@ export class MapEngine {
     // pass 2: borders: solid where the source says they are precise, dashed where approximate
     ctx.lineWidth = 0.7;
     for (const { f, p2d } of shapes) {
-      if (f.props.m) continue; // land filled in where the source has a gap: no outline
+      if (f.props.m || f.sliced) continue; // filled-in gaps and sliced polar shapes: no outline (it would show the cuts)
       if (f.props.n) {
         ctx.setLineDash(f.props.b >= 2 ? [] : [3, 3]);
         ctx.strokeStyle = COLORS.border;
@@ -616,6 +618,7 @@ export class MapEngine {
       ctx.fill(p2d);
       ctx.fillStyle = this.pattern(color, 0.45) ?? "transparent";
       ctx.fill(p2d);
+      if (o.sliced) continue;
       ctx.lineJoin = "round";
       ctx.lineWidth = sel ? 6 : 4;
       ctx.strokeStyle = "rgba(255, 252, 245, 0.9)";

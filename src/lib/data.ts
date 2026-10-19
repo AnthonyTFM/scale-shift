@@ -2,7 +2,7 @@
 import { feature, mesh } from "topojson-client";
 import type { Feature, MultiLineString, MultiPolygon, Polygon } from "geojson";
 import type { Topology, GeometryCollection } from "topojson-specification";
-import { containsLonLat, toMulti } from "./geo";
+import { containsLonLat, splitPolar, toMulti, wrapsPole } from "./geo";
 import dataVersion from "@/data/data-version.json";
 
 /** Changes whenever the map data is rebuilt, so browsers never show stale cached files. */
@@ -31,6 +31,8 @@ export type PolityFeature = {
   props: PolityProps;
   geom: MultiPolygon;
   bbox: [number, number, number, number];
+  /** was wrapped around a pole and has been cut into slices (see splitPolar): don't outline the cuts */
+  sliced?: boolean;
 };
 
 export type Layer = {
@@ -99,7 +101,10 @@ async function toLayer(key: string, topo: Topology): Promise<Layer> {
     const f = feature(topo, geoms[i]) as Feature<Polygon | MultiPolygon, PolityProps>;
     if (!f.geometry) continue;
     const geom = toMulti(f.geometry);
-    features.push({ props: f.properties, geom, bbox: bboxOf(geom) });
+    const bbox = bboxOf(geom);
+    // shapes around a pole (Antarctica, polar "not mapped" land) are sliced so the map never floods when zoomed in
+    if (wrapsPole(geom, bbox)) features.push({ props: f.properties, geom: splitPolar(geom), bbox, sliced: true });
+    else features.push({ props: f.properties, geom, bbox });
   }
   const byName = new Map<string, PolityFeature>();
   for (const f of features) if (f.props.n) byName.set(f.props.n, f);

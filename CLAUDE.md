@@ -34,7 +34,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 - React won't run a `<script>` it renders in the browser. Inline scripts belong in the root layout (`src/app/layout.tsx`), which only renders on the server.
 
 ## Where things live
-- `src/app/(site)/`: content pages with header and footer (home `/`, `/daily`, `/leaderboard`, `/teachers`, `/eras`, `/timeline`, `/disputes`, `/about`, `/how-it-works`, `/contact`, `/privacy`).
+- `src/app/(site)/`: content pages with header and footer (home `/`, `/daily`, `/leaderboard`, `/eras`, `/timeline`, `/disputes`, `/about`, `/how-it-works`, `/contact`, `/privacy`).
 - `src/app/map/`: the interactive map, its own full-screen page. The homepage never shows the map; it leads to the games, the map and the information pages.
 - `src/content/*`: all copy. Change words here, not in components (`site.ts` holds the site name).
 - `src/components/map/engine.ts`: canvas map engine (drawing, drag, edge-scrolling). `src/lib/geo.ts`: real-size math. Shapes are rotated on the sphere, never shifted in flat pixels.

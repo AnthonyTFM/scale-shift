@@ -53,13 +53,6 @@ const directory = [
     body: `${disputes.length} places where who controls the land and who the world recognizes don't match, from Crimea to Antarctica.`,
     cta: "See the disputes",
   },
-  {
-    href: "/teachers",
-    icon: "🍎",
-    title: "For teachers",
-    body: "Ready-to-run classroom activities with timings, questions and direct map links. No accounts, no setup.",
-    cta: "Get lesson ideas",
-  },
 ];
 
 const featured = presets.filter((p) =>
@@ -84,7 +77,7 @@ export default function HomePage() {
       <section className="bg-panel text-panel-text">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-12 md:grid-cols-[1.2fr_1fr] md:py-16">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-accent">Free · No sign-up · Built for curious minds and classrooms</p>
+            <p className="text-xs font-bold uppercase tracking-wide text-accent">Free · No sign-up · Built for curious minds</p>
             <h1 className="mt-3 font-display text-4xl leading-[1.05] md:text-6xl">Maps lie about size. Find out the truth.</h1>
             <p className="mt-4 max-w-xl text-lg leading-relaxed text-panel-muted">
               Most world maps stretch land near the poles, so Greenland looks as big as Africa. {site.name} lets you drag any country or empire
@@ -189,30 +182,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Teachers */}
-      <section aria-labelledby="teach" className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid items-center gap-8 rounded-card bg-emerald-50 p-6 ring-1 ring-emerald-200 md:grid-cols-[1.4fr_1fr] md:p-10">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-formal">For teachers</p>
-            <h2 id="teach" className="mt-1 font-display text-3xl text-ink">
-              A ready-made geography and history lesson
-            </h2>
-            <ul className="mt-4 space-y-2 text-ink-soft">
-              <li>✔ Six classroom activities, 5 to 40 minutes, with questions and answer notes</li>
-              <li>✔ Works on a projector, laptops or phones. No logins and no student data collected</li>
-              <li>✔ Covers map projections, empires, colonization and disputed borders</li>
-            </ul>
-          </div>
-          <div className="flex flex-col gap-3">
-            <Link href="/teachers" className="flex h-12 items-center justify-center rounded-lg bg-formal font-bold text-white hover:bg-emerald-800">
-              See the activities
-            </Link>
-            <Link href="/daily" className="flex h-12 items-center justify-center rounded-lg border border-emerald-300 bg-white font-bold text-ink hover:bg-emerald-100">
-              Use the daily challenge as a warm-up
-            </Link>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

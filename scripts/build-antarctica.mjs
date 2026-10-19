@@ -19,11 +19,15 @@ if (!ant) throw new Error("Antarctica not found in present.json");
 const land = client.feature(topo, ant).geometry;
 const landPolys = land.type === "Polygon" ? [land.coordinates] : land.coordinates;
 
-// a wedge as a planar lon/lat box: edges are meridians and the 60°S parallel (densified so it stays a parallel)
+// a wedge as a planar lon/lat box: edges are meridians, the 60°S parallel and 85°S, where the map ends.
+// Stopping short of the pole matters: d3 can't reliably draw a shape that touches a pole on a zoomed-in map.
+// Both parallels are densified so they stay parallels.
 const wedge = ([w, e]) => {
-  const ring = [[w, -90], [e, -90]];
+  const ring = [];
+  for (let lon = w; lon <= e; lon += 1) ring.push([lon, -85]);
+  ring.push([e, -85]);
   for (let lon = e; lon >= w; lon -= 1) ring.push([lon, -60]);
-  ring.push([w, -60], [w, -90]);
+  ring.push([w, -60], [w, -85]);
   return [ring.map(([x, y]) => [x, y])];
 };
 
