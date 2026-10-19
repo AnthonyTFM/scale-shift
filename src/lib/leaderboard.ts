@@ -13,6 +13,7 @@ import path from "node:path";
 import pool from "@/data/daily-pool.json";
 import { buildQuestions, shiftDate, type PoolEntry } from "./daily";
 import { isOffensive } from "./name-filter";
+import removed from "@/content/removed-players.json";
 import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow, WeekBoard } from "./leaderboard-types";
 
 // ---------- validation ----------
@@ -381,8 +382,12 @@ export function checkUnsubscribeToken(id: string, token: string) {
 /** New players allowed per network per day (a household or friends on one Wi-Fi). */
 export const NEW_PLAYERS_PER_NETWORK = 5;
 
+const REMOVED = new Set(removed.names.map((n) => nameKey(n)));
+/** Kept off the boards: offensive names, and anyone listed in src/content/removed-players.json. */
+const hidden = (name: string) => isOffensive(name) || REMOVED.has(nameKey(name));
+
 export async function dayBoard(date: string, limit: number, me: string | null): Promise<DayBoard> {
-  const entries = (await getStore().day(date)).filter((e) => !isOffensive(e.name)).sort((a, b) => b.s - a.s || a.t - b.t);
+  const entries = (await getStore().day(date)).filter((e) => !hidden(e.name)).sort((a, b) => b.s - a.s || a.t - b.t);
   const ranked = rankBy(entries, (e) => e.s);
   const toRow = ({ r, rank }: (typeof ranked)[number]): DayRow => ({ rank, name: r.name, score: r.s, ...(r.id === me ? { me: true } : {}) });
   const mine = me ? ranked.find((x) => x.r.id === me) : undefined;
@@ -392,7 +397,7 @@ export async function dayBoard(date: string, limit: number, me: string | null): 
 export async function allTimeBoard(limit: number, me: string | null): Promise<AllTimeBoard> {
   const { total: stored, top: all, me: mine } = await getStore().allTime(limit, me);
   // names saved before the filter was tightened are hidden until someone removes them from the store
-  const top = all.filter((t) => !isOffensive(t.name));
+  const top = all.filter((t) => !hidden(t.name));
   const total = stored - (all.length - top.length);
   const rows: AllTimeRow[] = rankBy(top, (t) => t.points).map(({ r, rank }) => ({
     rank,
@@ -422,7 +427,7 @@ export async function weekBoard(date: string, limit: number, me: string | null):
   const totals = new Map<string, { name: string; points: number; days: number; t: number }>();
   for (const day of days)
     for (const e of day) {
-      if (isOffensive(e.name)) continue;
+      if (hidden(e.name)) continue;
       const t = totals.get(e.id) ?? { name: e.name, points: 0, days: 0, t: 0 };
       t.points += e.s;
       t.days += 1;
