@@ -108,6 +108,10 @@ export class MapEngine {
   private patterns = new Map<string, CanvasPattern | null>();
 
   private baseDirty = true;
+  // While a finger (or the mouse) is moving the map, the base layer is a shifted copy of the last full drawing;
+  // the full redraw waits until the gesture pauses or ends. Redrawing ~250 shapes per move made phones stutter.
+  private snap: { canvas: HTMLCanvasElement; view: View } | null = null;
+  private settleTimer = 0;
   private topDirty = true;
   private raf = 0;
   private ro: ResizeObserver;
@@ -159,6 +163,7 @@ export class MapEngine {
   }
 
   destroy() {
+    clearTimeout(this.settleTimer);
     cancelAnimationFrame(this.raf);
     cancelAnimationFrame(this.edgeRaf);
     cancelAnimationFrame(this.flight);
@@ -293,6 +298,47 @@ export class MapEngine {
     this.topDirty = true;
     this.schedule();
   }
+  /** A pan, pinch or shape drag is in progress (shape drags can edge-scroll the map). */
+  private moving() {
+    const g = this.gesture;
+    return !!g && (g.kind === "pinch" || g.kind === "drag" || g.moved);
+  }
+
+  /** Keep a copy of the full drawing to slide around during the next gesture. */
+  private takeSnapshot() {
+    const c = this.snap?.canvas ?? document.createElement("canvas");
+    if (c.width !== this.base.width || c.height !== this.base.height) {
+      c.width = this.base.width;
+      c.height = this.base.height;
+    }
+    const ctx = c.getContext("2d")!;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, c.width, c.height);
+    ctx.drawImage(this.base, 0, 0);
+    this.snap = { canvas: c, view: { ...this.view } };
+  }
+
+  /**
+   * Draws the snapshot moved and scaled to the current view: Mercator panning is a pure shift and zooming a pure scale,
+   * so this matches the full drawing except at the newly exposed edges, which fill in when the gesture pauses.
+   */
+  private drawBaseFast() {
+    const { canvas, view: v0 } = this.snap!;
+    const v = this.view;
+    const s = v.k / v0.k;
+    const dLon = ((((v0.lon - v.lon + 180) % 360) + 360) % 360) - 180;
+    const tx = (this.w / 2) * (1 - s) + v.k * dLon * (Math.PI / 180);
+    const ty = (this.h / 2) * (1 - s) + v.k * (v.y - v0.y);
+    const ctx = this.bctx;
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    const world = this.worldRect();
+    ctx.fillStyle = COLORS.offMap;
+    ctx.fillRect(0, 0, this.w, this.h);
+    ctx.fillStyle = COLORS.ocean;
+    ctx.fillRect(world.x, world.y, world.w, world.h);
+    ctx.drawImage(canvas, tx, ty, this.w * s, this.h * s);
+  }
+
   private viewChanged() {
     this.baseDirty = true;
     this.topDirty = true;
@@ -325,7 +371,20 @@ export class MapEngine {
   private drawNow() {
     const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
     if (this.baseDirty) {
-      this.drawBase(projs);
+      const scale = this.snap ? this.view.k / this.snap.view.k : 0;
+      if (this.moving() && this.snap && scale > 0.5 && scale < 2) {
+        this.drawBaseFast();
+        // full quality once the finger rests for a moment
+        clearTimeout(this.settleTimer);
+        this.settleTimer = window.setTimeout(() => {
+          this.snap = null;
+          this.markBase();
+        }, 150);
+      } else {
+        clearTimeout(this.settleTimer);
+        this.drawBase(projs);
+        this.takeSnapshot();
+      }
       this.baseDirty = false;
     }
     if (this.topDirty) {
@@ -888,6 +947,8 @@ export class MapEngine {
 
   private onPointerUp = (e: PointerEvent) => {
     this.pointers.delete(e.pointerId);
+    // the gesture is over: replace the shifted copy with a sharp full drawing
+    if (this.moving()) queueMicrotask(() => this.markBase());
     cancelAnimationFrame(this.edgeRaf);
     this.edgeRaf = 0;
     this.pointerAt = null;
