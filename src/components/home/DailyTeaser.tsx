@@ -15,13 +15,23 @@ export function DailyTeaser({ example }: { example: ReactNode }) {
 
   useEffect(() => {
     const today = localDateKey();
-    const save = loadSave();
-    const rec = save.days[today];
-    const base = { day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: stats(save, today).streak };
+    const mine = () => {
+      const save = loadSave();
+      const rec = save.days[today];
+      return { day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: stats(save, today).streak };
+    };
     fetch(`/api/leaderboard?scope=day&date=${today}&limit=3`)
       .then((r) => (r.ok ? r.json() : null))
       .catch(() => null)
-      .then((board: DayBoard | null) => setS({ ...base, board }));
+      .then((board: DayBoard | null) => setS({ ...mine(), board }));
+    // finished in another tab: show the score here without a reload
+    const sync = () => setS((prev) => (prev ? { ...prev, ...mine() } : prev));
+    window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
+    };
   }, []);
 
   return (

@@ -72,6 +72,19 @@ async function prepare(practice: boolean): Promise<Game> {
   return { round, today, save, choices, step: Math.min(choices.length, round.questions.length) };
 }
 
+/**
+ * Today's progress lives in this browser's storage, shared by all its tabs. If another tab has answered more of today's
+ * questions, take its answers (the first answer to each question counts, as on the leaderboard). Practice rounds are
+ * per tab and left alone.
+ */
+function catchUp(g: Game): Game {
+  if (!g.round.date) return g;
+  const save = loadSave();
+  const saved = save.days[g.round.date]?.c ?? [];
+  if (saved.length <= g.choices.length) return g;
+  return { ...g, save, choices: saved, step: Math.min(saved.length, g.round.questions.length) };
+}
+
 export function DailyChallenge() {
   const [game, setGame] = useState<Game | null>(null);
   const [failed, setFailed] = useState(false);
@@ -84,6 +97,14 @@ export function DailyChallenge() {
     prepare(false)
       .then(setGame)
       .catch(() => setFailed(true));
+    // another tab answered: show its progress here too, so tabs never disagree (or let today be played twice)
+    const sync = () => setGame((g) => (g ? catchUp(g) : g));
+    window.addEventListener("storage", sync);
+    window.addEventListener("focus", sync);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener("focus", sync);
+    };
   }, []);
 
   const start = (practice: boolean) => {
@@ -110,13 +131,17 @@ export function DailyChallenge() {
 
   const answer = (choice: number) => {
     if (choices.length > step) return;
+    // this question was already answered in another tab: that answer stands
+    const caught = catchUp(game);
+    if (caught !== game) return setGame(caught);
     const next = [...choices, choice];
     const q = round.questions[step];
     track("daily_answer", { n: step + 1, correct: q.answer === choice, practice: !round.date });
     let updated = save;
     if (round.date) {
+      const fresh = loadSave(); // keep anything other tabs saved
       const done = next.length >= round.questions.length;
-      updated = { ...save, days: { ...save.days, [round.date]: { c: next, ...(done ? { s: scoreOf(round, next) } : {}) } } };
+      updated = { ...fresh, days: { ...fresh.days, [round.date]: { c: next, ...(done ? { s: scoreOf(round, next) } : {}) } } };
       writeSave(updated);
       if (done) track("daily_complete", { score: scoreOf(round, next), day: dayNumber(round.date) });
     }
