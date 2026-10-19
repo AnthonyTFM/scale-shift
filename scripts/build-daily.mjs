@@ -75,6 +75,33 @@ const HISTORY = [
   { n: "Viceroyalty of Peru" },
   { n: "Empire of Brazil" },
   { n: "British North America" },
+  // added Oct 19, in the daily puzzles from Oct 21 (see "since" below)
+  { n: "Assyria", show: "Assyrian Empire" },
+  { n: "Babylonia", show: "Babylonian Empire" },
+  { n: "Hittites", show: "Hittite Empire" },
+  { n: "Ptolemaic Kingdom", show: "Ptolemaic Egypt" },
+  { n: "Kushan Empire" },
+  { n: "Xiongnu", show: "Xiongnu Empire" },
+  { n: "Hunnic Empire", show: "Attila's Hunnic Empire" },
+  { n: "Khazars", show: "Khazar Khaganate" },
+  { n: "Ilkhanate" },
+  { n: "Chagatai Khanate" },
+  { n: "Sultanate of Delhi", show: "Delhi Sultanate" },
+  { n: "Vijayanagara", show: "Vijayanagara Empire" },
+  { n: "Chola Empire" },
+  { n: "Srivijaya Empire" },
+  { n: "Ayyubid Sultanate" },
+  { n: "Mamluke Sultanate", show: "Mamluk Sultanate" },
+  { n: "Almohad Caliphate" },
+  { n: "Ghaznavid Emirate", show: "Ghaznavid Empire" },
+  { n: "Khwarazmian dynasty", show: "Khwarazmian Empire" },
+  { n: "Empire of Ghana", show: "Ghana Empire" },
+  { n: "Kanem-Bornu", show: "Kanem-Bornu Empire" },
+  { n: "Toltec Empire" },
+  { n: "Tsardom of Muscovy" },
+  { n: "Frankish Kingdom" },
+  { n: "Austrian Empire" },
+  { n: "Liao", show: "Liao Empire" },
 ];
 
 const loadTopo = (file) => {
@@ -172,28 +199,41 @@ const add = (entry, geom) => {
     a: area,
     m: Math.round(s.mercArea),
     lat: Math.round(s.lat * 10) / 10,
+    ...(previous.size && !previous.has(id) ? { since: firstDay } : previous.get(id)?.since ? { since: previous.get(id).since } : {}),
   });
 };
 
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
 
-// Present-day countries: 30,000 km² and up, excluding Antarctica and disputed shapes
+// Shapes added after launch only join the daily puzzles from their "since" date, so every day already played keeps
+// exactly the same questions (the leaderboard re-marks answers from this pool). New ids start two days after the build
+// (UTC), a date no time zone has reached yet, so nobody can have played it with the old pool.
+const previous = (() => {
+  try {
+    return new Map(JSON.parse(fs.readFileSync(path.join(ROOT, "src", "data", "daily-pool.json"), "utf8")).map((p) => [p.id, p]));
+  } catch {
+    return new Map();
+  }
+})();
+const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10);
+
+// Present-day countries: 10,000 km² and up (30,000 before Oct 21), excluding Antarctica and disputed shapes
 {
   const { topo, geoms } = loadTopo(path.join(DATA, "eras", "present.json"));
   for (const g of geoms) {
     const p = g.properties;
-    if (!p.n || p.d || p.m || p.a < 30000 || p.n === "Antarctica") continue;
+    if (!p.n || p.d || p.m || p.a < 10000 || p.n === "Antarctica") continue;
     add({ n: p.n, era: "present", kind: "country", sub: "today" }, client.feature(topo, g).geometry);
   }
 }
 
-// US states: 100,000 km² and up
+// US states: 10,000 km² and up (100,000 before Oct 21)
 {
   const { topo, geoms } = loadTopo(path.join(DATA, "us-states.json"));
   for (const g of geoms) {
     const p = g.properties;
-    if (!p.n || p.a < 100000) continue;
+    if (!p.n || p.a < 10000) continue;
     add({ n: p.n, era: "us", kind: "state", sub: "US state" }, client.feature(topo, g).geometry);
   }
 }
@@ -219,6 +259,8 @@ fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
 }
 
 fs.writeFileSync(path.join(OUT, "index.json"), JSON.stringify(pool));
+// new version stamp, so browsers fetch the new pool instead of a cached one (a stale pool would build different puzzles)
+fs.writeFileSync(path.join(ROOT, "src", "data", "data-version.json"), JSON.stringify({ v: Date.now().toString(36) }));
 // the same pool, bundled into the server so the leaderboard can score answers itself
 fs.writeFileSync(path.join(ROOT, "src", "data", "daily-pool.json"), JSON.stringify(pool));
 const bytes = fs.readdirSync(path.join(OUT, "shapes")).reduce((s, f) => s + fs.statSync(path.join(OUT, "shapes", f)).size, 0);
