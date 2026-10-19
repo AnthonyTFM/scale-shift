@@ -20,7 +20,7 @@ export default async function Image() {
             top: 40,
             display: "flex",
             flexDirection: "column",
-            background: "rgba(34,27,46,0.93)",
+            background: "rgba(14,42,71,0.93)",
             color: "#fff",
             padding: "26px 34px",
             borderRadius: 18,

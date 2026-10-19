@@ -8,11 +8,13 @@
   --color-paper: #fbf6ee;
   --color-card: #ffffff;
   --color-line: #eadfce;
-  --color-panel: #221b2e;
-  --color-panel-2: #2e2640;
-  --color-panel-line: #433a58;
-  --color-panel-text: #f6f0ea;
-  --color-panel-muted: #bdb1c9;
+  /* deep ocean: headers, heroes, footer and the map panels */
+  --color-panel: #0e2a47;
+  --color-panel-2: #173b60;
+  --color-panel-line: #2c5379;
+  --color-panel-text: #f3f7fb;
+  --color-panel-muted: #b3c7db;
+  --color-ocean: #9fcbe0;
   --color-accent: #ffb547;
   --color-accent-strong: #f29e1f;
   --color-link: #b4401a;
@@ -126,4 +128,22 @@ body {
 /* set by an inline script in the root layout before first paint */
 .intro-seen [data-intro] {
   display: none;
+}
+
+/* Dark ocean band with a faint world map behind it: page headers across the site. */
+.ocean-band {
+  background-color: var(--color-panel);
+  background-image:
+    url("/world.svg"),
+    radial-gradient(ellipse at 80% 0%, rgba(84, 160, 214, 0.35), transparent 60%),
+    linear-gradient(180deg, #0e2a47 0%, #0b2139 100%);
+  background-repeat: no-repeat;
+  background-position:
+    right -6rem center,
+    center,
+    center;
+  background-size:
+    min(1100px, 140%) auto,
+    cover,
+    cover;
 }

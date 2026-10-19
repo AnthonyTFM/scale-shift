@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { dayNumber, loadSave, localDateKey, stats } from "@/lib/daily";
+import { home } from "@/content/home";
 import type { DayBoard } from "@/lib/leaderboard-types";
 
 type State = { day: number; done: boolean; score?: number; streak: number; board: DayBoard | null };
@@ -28,15 +29,15 @@ export function DailyTeaser() {
         <p className="text-xs font-bold uppercase tracking-wide text-link">Daily challenge{s ? ` #${s.day}` : ""}</p>
         {s?.streak ? <p className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-900">🔥 {s.streak}-day streak</p> : null}
       </div>
-      <p className="mt-1 font-display text-2xl leading-tight">Which is bigger?</p>
+      <p className="mt-1 font-display text-2xl leading-tight">{home.teaser.title}</p>
       <p className="mt-1 text-sm text-ink-soft">
-        {s?.done ? `You scored ${s.score}/5 today. New puzzles at midnight.` : "5 new puzzles today. Web maps will try to fool you."}
+        {s?.done ? home.teaser.done(s.score ?? 0) : home.teaser.lead}
       </p>
       <Link
         href="/daily"
         className="mt-4 flex h-12 items-center justify-center rounded-lg bg-accent font-bold text-panel hover:bg-accent-strong"
       >
-        {s?.done ? "See today's answers" : "Play today's 5"}
+        {s?.done ? home.teaser.doneCta : home.teaser.cta}
       </Link>
       <div className="mt-4 border-t border-line pt-3">
         <div className="flex items-baseline justify-between">
