@@ -11,6 +11,29 @@ const pre = presimplify(topo);
 const small = quantize(simplify(pre, quantile(pre, 0.12)), 1e4);
 // keep only what the globe draws: name and colour index
 for (const g of small.objects.p.geometries) g.properties = { n: g.properties.n, k: g.properties.k ?? 0 };
+// Simplifying squashes some tiny islands into slivers of 2 points with no area. On the globe, a sliver lying exactly on
+// the visible edge makes the clipping think it covers the whole sphere, and the ocean flashes that country's colour.
+const solid = (ring) => new Set(ring.map((p) => p.join())).size >= 3;
+let dropped = 0;
+for (const g of small.objects.p.geometries) {
+  if (g.type !== "Polygon" && g.type !== "MultiPolygon") continue;
+  const coords = feature(small, g).geometry.coordinates;
+  const polys = g.type === "Polygon" ? [coords] : coords;
+  const keep = polys.map((rings) => solid(rings[0]));
+  dropped += keep.filter((k) => !k).length;
+  if (g.type === "Polygon") {
+    if (!keep[0]) {
+      g.type = null;
+      delete g.arcs;
+    }
+  } else {
+    g.arcs = g.arcs.filter((_, i) => keep[i]);
+    if (!g.arcs.length) {
+      g.type = null;
+      delete g.arcs;
+    }
+  }
+}
 writeFileSync("public/data/globe.json", JSON.stringify(small));
 
 // land as one faint outline drawing, Equal Earth projection, 1000 × 487
@@ -28,4 +51,4 @@ writeFileSync(
   "public/world.svg",
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 487"><path d="${d}" fill="#8fc3ea" fill-opacity="0.16"/></svg>\n`,
 );
-console.log(`globe.json ${(JSON.stringify(small).length / 1024).toFixed(0)} KB, world.svg ${(d.length / 1024).toFixed(0)} KB`);
+console.log(`globe.json ${(JSON.stringify(small).length / 1024).toFixed(0)} KB (${dropped} slivers removed), world.svg ${(d.length / 1024).toFixed(0)} KB`);
