@@ -1,4 +1,4 @@
-import { cacheLife } from "next/cache";
+import { connection } from "next/server";
 import Link from "next/link";
 import { presets, type Preset } from "@/content/presets";
 import { mapUrl } from "@/lib/share";
@@ -12,10 +12,9 @@ function rotate<T>(list: T[], n: number, week: number) {
   return Array.from({ length: Math.min(n, list.length) }, (_, i) => list[(week * n + i) % list.length]);
 }
 
-/** Weeks since 1970 (Monday to Monday, UTC). Cached and refreshed every few hours, so a new week shows up soon after it starts. */
+/** Weeks since 1970 (Monday to Monday, UTC), read when the page is requested (see currentDay in DailyFact for why). */
 async function currentWeek() {
-  "use cache";
-  cacheLife("hours");
+  await connection();
   return Math.floor((Date.now() - MONDAY_EPOCH) / (7 * DAY));
 }
 

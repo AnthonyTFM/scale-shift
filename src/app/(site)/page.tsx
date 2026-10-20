@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { preload } from "react-dom";
 import pool from "@/data/daily-pool.json";
@@ -127,7 +128,10 @@ export default function HomePage() {
       {/* Today's game and a fact that proves the point, overlapping the hero */}
       <section aria-label="Play" className="relative z-10 mx-auto -mt-12 grid max-w-6xl gap-4 px-4">
         <DailyTeaser example={<ExampleMatchup />} />
-        <DailyFact />
+        {/* the fact and the weekly picks change by date, so they are filled in per request; the placeholders keep their space */}
+        <Suspense fallback={<div aria-hidden="true" className="h-[341px] rounded-card bg-white shadow-sm ring-1 ring-line md:h-[185px]" />}>
+          <DailyFact />
+        </Suspense>
       </section>
 
       {/* Directory */}
@@ -178,7 +182,9 @@ export default function HomePage() {
           <h2 id="try" className="font-display text-3xl text-ink">
             Jump straight in
           </h2>
-          <WeeklyPicks />
+          <Suspense fallback={<div aria-hidden="true" className="h-[989px] sm:h-[512px] lg:h-[322px]" />}>
+            <WeeklyPicks />
+          </Suspense>
         </div>
       </section>
 

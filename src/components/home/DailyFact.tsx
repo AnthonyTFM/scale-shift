@@ -1,4 +1,4 @@
-import { cacheLife } from "next/cache";
+import { connection } from "next/server";
 import Link from "next/link";
 import pool from "@/data/daily-pool.json";
 import { home } from "@/content/home";
@@ -67,10 +67,12 @@ for (let i = 0, c = 0; i < generated.length || c < curated.length; i++) {
   if (i < generated.length) facts.push(generated[i]);
 }
 
-/** Days since 1970 (UTC). Cached for an hour so the fact flips soon after midnight UTC. */
+/**
+ * Days since 1970 (UTC), read when the page is requested. Not "use cache": a timed cache made Vercel regenerate the
+ * homepage in the background, and those regenerated copies are recorded as "/index", which broke hydration on "/".
+ */
 async function currentDay() {
-  "use cache";
-  cacheLife("hours");
+  await connection();
   return Math.floor(Date.now() / DAY);
 }
 
