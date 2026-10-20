@@ -1,25 +1,24 @@
 import { challengeHash } from "@/lib/challenge";
 import { dayNumber, localDateKey } from "@/lib/daily";
 import { loadPlayer } from "@/lib/player";
-import { track } from "@/lib/analytics";
 import { site } from "@/content/site";
 
-/**
- * Shares (phones) or copies (desktop) a "beat my score" link to today's challenge, like the results screen does.
- * Returns a note to show, or null when the phone's share sheet handled it.
- */
-export async function challengeFriend(score: number, total = 5): Promise<string | null> {
-  const url = `${location.origin}/daily${challengeHash(dayNumber(localDateKey()), score, loadPlayer()?.name ?? null)}`;
-  const text = `I got ${score}/${total} on today's ${site.name} challenge. Think you can beat me?\n${url}`;
-  track("daily_challenge_friend", { score, from: "home" });
+export type ShareMessage = { kind: "challenge" | "score"; text: string; url: string };
+
+/** The "beat my score" message for a daily challenge (today's unless a date is given). */
+export function challengeMessage(score: number, total = 5, date = localDateKey()): ShareMessage {
+  const url = `${location.origin}/daily${challengeHash(dayNumber(date), score, loadPlayer()?.name ?? null)}`;
+  return { kind: "challenge", url, text: `I got ${score}/${total} on today's ${site.name} challenge. Think you can beat me?\n${url}` };
+}
+
+/** Phones open their own share sheet. Returns false when the caller should show the share box instead. */
+export async function nativeShare(text: string): Promise<boolean> {
+  if (!navigator.share || !matchMedia("(pointer: coarse)").matches) return false;
   try {
-    if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-      await navigator.share({ text });
-      return null;
-    }
-    await navigator.clipboard.writeText(text);
-    return "copied";
-  } catch {
-    return text;
+    await navigator.share({ text });
+    return true;
+  } catch (e) {
+    // closing the share sheet is a choice, not a failure
+    return e instanceof DOMException && e.name === "AbortError";
   }
 }

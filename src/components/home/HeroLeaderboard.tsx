@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { loadSave, localDateKey } from "@/lib/daily";
-import { challengeFriend } from "@/lib/challenge-friend";
+import { challengeMessage } from "@/lib/challenge-friend";
+import { useShareBox } from "@/components/site/ShareBox";
 import { playerId } from "@/lib/player";
 import { home } from "@/content/home";
 import type { DayBoard } from "@/lib/leaderboard-types";
@@ -12,7 +13,7 @@ import type { DayBoard } from "@/lib/leaderboard-types";
 export function HeroLeaderboard() {
   const [board, setBoard] = useState<DayBoard | null | undefined>(undefined);
   const [myScore, setMyScore] = useState<number | null>(null);
-  const [note, setNote] = useState("");
+  const { share, box } = useShareBox();
   const t = home.hub;
 
   useEffect(() => {
@@ -83,10 +84,7 @@ export function HeroLeaderboard() {
         ) : (
           <button
             type="button"
-            onClick={async () => {
-              const r = await challengeFriend(myScore);
-              setNote(r === null ? "" : r === "copied" ? t.challengeCopied : r);
-            }}
+            onClick={() => share(challengeMessage(myScore), "home-board")}
             className="mt-1.5 flex w-full items-center gap-3 rounded-lg border border-dashed border-white/25 px-3 py-2 text-left text-panel-muted hover:border-accent hover:text-white"
           >
             <span className="w-6 text-center font-bold">+</span>
@@ -97,11 +95,7 @@ export function HeroLeaderboard() {
           </button>
         )
       ) : null}
-      {note ? (
-        <p role="status" className="mt-2 break-words text-xs text-panel-muted">
-          {note}
-        </p>
-      ) : null}
+      {box}
       <Link href="/leaderboard" className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">
         {t.boardCta} →
       </Link>
