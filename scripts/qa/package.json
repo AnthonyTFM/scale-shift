@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "description": "Live-site checks run by the scheduled QA task. Kept apart from the app so they add no app dependencies.",
+  "type": "module",
+  "scripts": {
+    "check": "node site-check.mjs"
+  },
+  "dependencies": {
+    "playwright-core": "1.56"
+  }
+}
