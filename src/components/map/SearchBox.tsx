@@ -152,7 +152,7 @@ export function SearchBox({ index, onNeedIndex, currentEra, unit, onPick }: Prop
             setOpen(true);
           }}
           onKeyDown={onKeyDown}
-          className="h-11 w-full bg-transparent text-[15px] text-ink placeholder:text-slate-500 focus:outline-none"
+          className="h-10 w-full bg-transparent sm:h-11 text-[15px] text-ink placeholder:text-slate-500 focus:outline-none"
         />
       </div>
       {showList ? (
