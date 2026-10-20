@@ -18,7 +18,7 @@ import {
   mercatorInflation,
   EARTH_RADIUS_KM,
 } from "@/lib/geo";
-import { type MorphPlan, type OwnerGrid, paintMorph, planMorph } from "./morph";
+import { LINE, type MorphPlan, type OwnerGrid, borderLines, paintMorph, planMorph } from "./morph";
 
 
 export type Overlay = {
@@ -78,8 +78,6 @@ const TILE_PAD = 2;
 const MORPH_MS = 1000;
 const MORPH_CELLS = 1_400_000; // one cell per screen pixel on all but very big screens, so the slide is sharp
 const MORPH_CELLS_TOUCH = 450_000; // phones too
-/** COLORS.border as rgb + opacity, for the borders painted during a slide */
-const MORPH_BORDER: [number, number, number, number] = [88, 60, 46, 0.6];
 
 /** An era change in progress: painted from two owner grids (see morph.ts), screen-sized, until it ends or the map moves. */
 type Pt = [number, number];
@@ -94,6 +92,10 @@ type Morph = {
   /** grid cells per screen pixel */ g: number;
   /** fill colour (rgb) per new owner */ colB: Uint8Array;
   labels: (MorphLabel | null)[];
+  /** border style (LINE) per old and per new owner, as the tiles draw it */
+  lineA: Uint8Array;
+  lineB: Uint8Array;
+  /** border style of the shape really in each cell, in the frame just drawn */ line: Uint8Array;
   /** which new owner each cell shows in the frame just drawn */ ids: Int32Array;
   /** how far through the slide the frame just drawn is, 0–1 */ e: number;
   canvas: HTMLCanvasElement;
@@ -751,8 +753,15 @@ export class MapEngine {
     // names: where each sits at the start and the end, so it can follow its shape's middle in between
     const nB = b.feats.length + 1;
     const pt = (l?: [number, number]) => (l ? ((projs[0](l) as Pt | null) ?? undefined) : undefined);
-    const c0 = this.middles(paintMorph(plan, 0, b.cols, MORPH_BORDER, image.data), gw, nB, g).at;
-    const c1 = this.middles(paintMorph(plan, 1, b.cols, MORPH_BORDER, image.data), gw, nB, g).at;
+    const lineOf = (feats: PolityFeature[]) => {
+      const out = new Uint8Array(feats.length + 1); // 0: the sea
+      feats.forEach((f, n) => (out[n + 1] = f.props.m || f.sliced ? LINE.none : !f.props.n ? LINE.soft : f.props.b >= 2 ? LINE.solid : LINE.dashed));
+      return out;
+    };
+    const lineA = lineOf(a.feats);
+    const lineB = lineOf(b.feats);
+    const c0 = this.middles(paintMorph(plan, 0, b.cols, lineA, lineB, image.data), gw, nB, g).at;
+    const c1 = this.middles(paintMorph(plan, 1, b.cols, lineA, lineB, image.data), gw, nB, g).at;
     const labels = Array.from({ length: nB }, (_, k): MorphLabel | null => {
       if (k === 0) return null; // the sea
       const to = b.feats[k - 1].props;
@@ -760,7 +769,7 @@ export class MapEngine {
       const from = j > 0 && plan.succ[j] === k ? a.feats[j - 1].props : undefined; // carries on an old shape
       return { from, to, l0: pt(from?.l), l1: pt(to.l), c0: c0[k], c1: c1[k] };
     });
-    return { plan, g, colB: b.cols, labels, ids: new Int32Array(gw * gh), e: 0, canvas, image, start: performance.now() };
+    return { plan, g, colB: b.cols, labels, lineA, lineB, line: new Uint8Array(gw * gh), ids: new Int32Array(gw * gh), e: 0, canvas, image, start: performance.now() };
   }
 
   /**
@@ -815,13 +824,33 @@ export class MapEngine {
       return false;
     }
     const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-    paintMorph(m.plan, e, m.colB, MORPH_BORDER, m.image.data, m.ids);
+    paintMorph(m.plan, e, m.colB, m.lineA, m.lineB, m.image.data, m.ids, m.line);
     m.e = e;
     m.canvas.getContext("2d")!.putImageData(m.image, 0, 0);
     const ctx = this.bctx;
     ctx.imageSmoothingEnabled = false; // sharp cells, no blur
     ctx.drawImage(m.canvas, 0, 0, this.w, this.h);
     ctx.imageSmoothingEnabled = true;
+    // border lines exactly as the tiles draw them (pass 2 of renderTile): same width, colours and dashes
+    ctx.lineWidth = 0.7;
+    ctx.lineJoin = "round";
+    for (const { kind, twice, lines } of borderLines(m.ids, m.line, m.plan.w, m.plan.h)) {
+      const p2d = new Path2D();
+      for (const xy of lines) {
+        p2d.moveTo(xy[0] / m.g, xy[1] / m.g);
+        for (let i = 2; i < xy.length; i += 2) p2d.lineTo(xy[i] / m.g, xy[i + 1] / m.g);
+      }
+      ctx.setLineDash(kind === LINE.solid ? [] : kind === LINE.dashed ? [3, 3] : [2, 4]);
+      ctx.strokeStyle = kind === LINE.soft ? COLORS.borderSoft : COLORS.border;
+      ctx.stroke(p2d);
+      if (twice) {
+        // a shared border: each neighbour's outline, as on the tiles, where the two outlines' dashes rarely line up
+        ctx.lineDashOffset = kind === LINE.dashed ? 1.5 : 3;
+        ctx.stroke(p2d);
+        ctx.lineDashOffset = 0;
+      }
+    }
+    ctx.setLineDash([]);
     return true;
   }
 

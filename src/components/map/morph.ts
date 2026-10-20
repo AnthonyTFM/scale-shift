@@ -124,32 +124,110 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
   return { w, h, a, b, flip, pred, succ };
 }
 
+/** Border style per shape, as the tiles draw it: none (sea, filled-in gaps), soft (unclaimed land), dashed (approximate), solid. */
+export const LINE = { none: 0, soft: 1, dashed: 2, solid: 3 } as const;
+
 /**
  * Paints the map `e` of the way through the change (0 old, 1 new). Each cell is drawn in the solid colour of the
  * shape it belongs to right now (its new owner, or for ground not reached yet, the shape its old owner becomes), with
  * no blending, so only the borders move: nothing looks blurred or faded. colB holds rgb triples per new owner.
+ * Fills `id` (which new owner each cell shows) and `line` (the border style of the shape really there: the old one
+ * until the new owner reaches the cell), for the names and border lines drawn on top.
  */
-export function paintMorph(p: MorphPlan, e: number, colB: Uint8Array, border: [number, number, number, number], out: Uint8ClampedArray, id: Int32Array = new Int32Array(p.w * p.h)) {
-  const { w, h, a, b, flip, succ } = p;
-  const n = w * h;
-  // which shape each cell shows right now, named by its new owner, so no border shows inside a shape that is growing
-  for (let i = 0; i < n; i++) id[i] = e >= flip[i] ? b[i] : succ[a[i]];
-  const [br, bg, bb, ba] = border;
-  for (let i = 0, o = 0; i < n; i++, o += 4) {
-    const c = id[i] * 3;
-    let r = colB[c];
-    let g = colB[c + 1];
-    let bl = colB[c + 2];
-    const x = i % w;
-    if ((x + 1 < w && id[i + 1] !== id[i]) || (i + w < n && id[i + w] !== id[i])) {
-      r += (br - r) * ba;
-      g += (bg - g) * ba;
-      bl += (bb - bl) * ba;
-    }
-    out[o] = r;
-    out[o + 1] = g;
-    out[o + 2] = bl;
+export function paintMorph(
+  p: MorphPlan,
+  e: number,
+  colB: Uint8Array,
+  lineA: Uint8Array,
+  lineB: Uint8Array,
+  out: Uint8ClampedArray,
+  id: Int32Array = new Int32Array(p.w * p.h),
+  line: Uint8Array = new Uint8Array(p.w * p.h),
+) {
+  const { a, b, flip, succ } = p;
+  for (let i = 0, o = 0; i < id.length; i++, o += 4) {
+    const flipped = e >= flip[i];
+    const k = flipped ? b[i] : succ[a[i]];
+    id[i] = k; // named by its new owner, so no border shows inside a shape that is growing
+    line[i] = flipped ? lineB[b[i]] : lineA[a[i]];
+    const c = k * 3;
+    out[o] = colB[c];
+    out[o + 1] = colB[c + 1];
+    out[o + 2] = colB[c + 2];
     out[o + 3] = 255;
   }
-  return id; // also used to place the names
+  return id;
+}
+
+/**
+ * The border lines for one frame, drawn the way the tiles draw them, so a border looks the same during the slide as
+ * before and after it. Lines run between cells of different shapes (grid units; cell centres at +0.5), grouped by
+ * style, and joined into long polylines so dashes stay evenly spaced. A border between two shapes is marked `twice`:
+ * the tiles stroke each shape's outline, so a shared border is drawn twice and looks darker than a coastline.
+ */
+export function borderLines(ids: Int32Array, line: Uint8Array, w: number, h: number) {
+  // segments per group (style × twice), as point keys on the half-cell lattice
+  const W = 2 * w + 3;
+  const groups: number[][] = Array.from({ length: 8 }, () => []);
+  for (let y = 0; y + 1 < h; y++)
+    for (let x = 0; x + 1 < w; x++) {
+      const i = y * w + x;
+      const tl = ids[i];
+      const tr = ids[i + 1];
+      const bl = ids[i + w];
+      const br = ids[i + w + 1];
+      if (tl === tr && tl === bl && tl === br) continue;
+      const kind = Math.max(line[i], line[i + 1], line[i + w], line[i + w + 1]);
+      if (kind === LINE.none) continue;
+      // two different shapes on land (not just a coast): drawn twice, as each shape's outline is on the tiles
+      const land = [tl, tr, bl, br].filter((v) => v !== 0);
+      const twice = land.some((v) => v !== land[0]) ? 1 : 0;
+      const list = groups[kind * 2 + twice];
+      // midpoints of the square's sides that a border crosses, on the doubled lattice (whole numbers)
+      const cx = 2 * x + 2;
+      const cy = 2 * y + 2;
+      const mids: number[] = [];
+      if (tl !== tr) mids.push((cy - 1) * W + cx);
+      if (tr !== br) mids.push(cy * W + cx + 1);
+      if (bl !== br) mids.push((cy + 1) * W + cx);
+      if (tl !== bl) mids.push(cy * W + cx - 1);
+      if (mids.length === 2) list.push(mids[0], mids[1]);
+      else for (const m of mids) list.push(m, cy * W + cx); // borders meeting in the square's middle
+    }
+  // join each group's segments into polylines
+  const out: { kind: number; twice: boolean; lines: Float32Array[] }[] = [];
+  groups.forEach((segs, g) => {
+    if (!segs.length) return;
+    const ends = new Map<number, number[]>();
+    for (let s = 0; s < segs.length; s += 2)
+      for (const p of [segs[s], segs[s + 1]]) {
+        const at = ends.get(p);
+        if (at) at.push(s);
+        else ends.set(p, [s]);
+      }
+    const used = new Uint8Array(segs.length / 2);
+    const lines: Float32Array[] = [];
+    const walk = (start: number, s0: number) => {
+      const pts = [start];
+      let p = start;
+      let s = s0;
+      while (s >= 0 && !used[s / 2]) {
+        used[s / 2] = 1;
+        p = segs[s] === p ? segs[s + 1] : segs[s];
+        pts.push(p);
+        s = (ends.get(p) ?? []).find((t) => !used[t / 2]) ?? -1;
+      }
+      const xy = new Float32Array(pts.length * 2);
+      pts.forEach((q, n) => {
+        xy[2 * n] = (q % W) / 2;
+        xy[2 * n + 1] = Math.floor(q / W) / 2;
+      });
+      lines.push(xy);
+    };
+    // open lines from their loose ends first, then closed loops
+    for (const [p, list] of ends) if (list.length === 1 && !used[list[0] / 2]) walk(p, list[0]);
+    for (let s = 0; s < segs.length; s += 2) if (!used[s / 2]) walk(segs[s], s);
+    out.push({ kind: g >> 1, twice: (g & 1) === 1, lines });
+  });
+  return out;
 }
