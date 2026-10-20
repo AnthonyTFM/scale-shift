@@ -125,23 +125,22 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
 }
 
 /**
- * Paints the map `e` of the way through the change (0 old, 1 new). colA/colB are rgb triples per owner; a cell takes
- * its new owner's colour once it has flipped, and every colour eases from the old shape's to the new one's on the way.
+ * Paints the map `e` of the way through the change (0 old, 1 new). Each cell is drawn in the solid colour of the
+ * shape it belongs to right now (its new owner, or for ground not reached yet, the shape its old owner becomes), with
+ * no blending, so only the borders move: nothing looks blurred or faded. colB holds rgb triples per new owner.
  */
-export function paintMorph(p: MorphPlan, e: number, colA: Uint8Array, colB: Uint8Array, border: [number, number, number, number], out: Uint8ClampedArray) {
-  const { w, h, a, b, flip, pred, succ } = p;
+export function paintMorph(p: MorphPlan, e: number, colB: Uint8Array, border: [number, number, number, number], out: Uint8ClampedArray) {
+  const { w, h, a, b, flip, succ } = p;
   const n = w * h;
   // which shape each cell shows right now, named by its new owner, so no border shows inside a shape that is growing
   const id = new Int32Array(n);
   for (let i = 0; i < n; i++) id[i] = e >= flip[i] ? b[i] : succ[a[i]];
   const [br, bg, bb, ba] = border;
   for (let i = 0, o = 0; i < n; i++, o += 4) {
-    const flipped = e >= flip[i];
-    const from = (flipped ? pred[b[i]] : a[i]) * 3;
-    const to = (flipped ? b[i] : succ[a[i]]) * 3;
-    let r = colA[from] + (colB[to] - colA[from]) * e;
-    let g = colA[from + 1] + (colB[to + 1] - colA[from + 1]) * e;
-    let bl = colA[from + 2] + (colB[to + 2] - colA[from + 2]) * e;
+    const c = id[i] * 3;
+    let r = colB[c];
+    let g = colB[c + 1];
+    let bl = colB[c + 2];
     const x = i % w;
     if ((x + 1 < w && id[i + 1] !== id[i]) || (i + w < n && id[i + w] !== id[i])) {
       r += (br - r) * ba;

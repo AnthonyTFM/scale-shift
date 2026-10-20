@@ -74,18 +74,17 @@ const CUT_CENTER = 11.5;
 /** Overlap between neighbouring tiles, in pixels, so no hairline seams show where they meet. */
 const TILE_PAD = 2;
 
-/** How long borders take to slide into a new era, and the most grid cells the slide is worked out on (fewer on phones). */
+/** How long borders take to slide into a new era, and the most grid cells the slide is worked out on. */
 const MORPH_MS = 1000;
-const MORPH_CELLS = 300_000;
-const MORPH_CELLS_TOUCH = 140_000;
+const MORPH_CELLS = 1_400_000; // one cell per screen pixel on all but very big screens, so the slide is sharp
+const MORPH_CELLS_TOUCH = 450_000; // phones too
 /** COLORS.border as rgb + opacity, for the borders painted during a slide */
 const MORPH_BORDER: [number, number, number, number] = [88, 60, 46, 0.6];
 
 /** An era change in progress: painted from two owner grids (see morph.ts), screen-sized, until it ends or the map moves. */
 type Morph = {
   plan: MorphPlan;
-  colA: Uint8Array;
-  colB: Uint8Array;
+  /** fill colour (rgb) per new owner */ colB: Uint8Array;
   canvas: HTMLCanvasElement;
   image: ImageData;
   start: number;
@@ -735,7 +734,7 @@ export class MapEngine {
     const b = this.ownerGrid(next, ctx, g, projs);
     const plan = planMorph(a.grid, b.grid, a.cols.length / 3, b.cols.length / 3, gw, gh);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    return { plan, colA: a.cols, colB: b.cols, canvas, image: ctx.createImageData(gw, gh), start: performance.now() };
+    return { plan, colB: b.cols, canvas, image: ctx.createImageData(gw, gh), start: performance.now() };
   }
 
   /**
@@ -790,12 +789,12 @@ export class MapEngine {
       return false;
     }
     const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-    paintMorph(m.plan, e, m.colA, m.colB, MORPH_BORDER, m.image.data);
+    paintMorph(m.plan, e, m.colB, MORPH_BORDER, m.image.data);
     m.canvas.getContext("2d")!.putImageData(m.image, 0, 0);
     const ctx = this.bctx;
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = "high";
+    ctx.imageSmoothingEnabled = false; // sharp cells, no blur
     ctx.drawImage(m.canvas, 0, 0, this.w, this.h);
+    ctx.imageSmoothingEnabled = true;
     return true;
   }
 
