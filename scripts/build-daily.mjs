@@ -76,13 +76,13 @@ const HISTORY = [
   { n: "Empire of Brazil" },
   { n: "British North America" },
   // added Oct 19, in the daily puzzles from Oct 21 (see "since" below)
-  { n: "Assyria", show: "Assyrian Empire" },
-  { n: "Babylonia", show: "Babylonian Empire" },
+  { n: "Assyria" },
+  { n: "Babylonia" },
   { n: "Hittites", show: "Hittite Empire" },
   { n: "Ptolemaic Kingdom", show: "Ptolemaic Egypt" },
   { n: "Kushan Empire" },
-  { n: "Xiongnu", show: "Xiongnu Empire" },
-  { n: "Hunnic Empire", show: "Attila's Hunnic Empire" },
+  { n: "Xiongnu", show: "Xiongnu Empire", year: -200 }, // the confederation formed c. 209 BCE
+  { n: "Hunnic Empire" },
   { n: "Khazars", show: "Khazar Khaganate" },
   { n: "Ilkhanate" },
   { n: "Chagatai Khanate" },
@@ -102,6 +102,51 @@ const HISTORY = [
   { n: "Frankish Kingdom" },
   { n: "Austrian Empire" },
   { n: "Liao", show: "Liao Empire" },
+  // added Oct 20 (round 2)
+  { n: "Republic of China" },
+  { n: "Viceroyalty of Brazil" },
+  { n: "Rupert's Land", show: "Rupert's Land (Hudson's Bay Company)" },
+  { n: "Northern Yuan" },
+  { n: "French West Africa" },
+  { n: "Kara Khitai Khaganate", show: "Qara Khitai" },
+  { n: "Göktürks", show: "Göktürk Khaganate" },
+  { n: "Jin", show: "Jin Empire" },
+  { n: "Viceroyalty of New Granada" },
+  { n: "Grand Duchy of Moscow" },
+  { n: "Anglo-Egyptian Sudan" },
+  { n: "Denmark-Norway" },
+  { n: "French Equatorial Africa" },
+  { n: "Viceroyalty of the Río de la Plata" },
+  { n: "Belgian Congo" },
+  { n: "Almoravid dynasty", show: "Almoravid Empire" },
+  { n: "Ghurid Sultanate" },
+  { n: "Persia", show: "Qajar Persia" },
+  { n: "Union of South Africa" },
+  { n: "Karkhanids", show: "Kara-Khanid Khanate" },
+  { n: "Nogai Horde" },
+  { n: "Saffarids", show: "Saffarid Empire" },
+  { n: "Shunga Empire" },
+  { n: "Bactria" },
+  { n: "Dutch East Indies" },
+  { n: "Samanid Empire" },
+  { n: "Far Eastern Republic" },
+  { n: "Toba Wei", show: "Northern Wei" },
+  { n: "Magadha" },
+  { n: "Roman Republic" },
+  { n: "Shang", show: "Shang dynasty" },
+  { n: "Zhou", show: "Zhou dynasty" },
+  { n: "Rhodesia" },
+  { n: "Abyssinia", show: "Ethiopian Empire" },
+  { n: "Sokoto Caliphate" },
+  { n: "Khiva Khanate" },
+  { n: "Ayutthaya", show: "Ayutthaya Kingdom" },
+  { n: "Rattanakosin Kingdom", show: "Kingdom of Siam" },
+  { n: "German South-West Africa" },
+  { n: "Kamerun", show: "German Kamerun" },
+  { n: "French Indochina" },
+  { n: "Sweden–Norway" },
+  { n: "Pagan", show: "Pagan Kingdom" },
+  { n: "Caliphate of Córdoba" },
 ];
 
 const loadTopo = (file) => {
@@ -218,22 +263,23 @@ const previous = (() => {
 })();
 const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10);
 
-// Present-day countries: 10,000 km² and up (30,000 before Oct 21), excluding Antarctica and disputed shapes
+// Present-day countries: 5,000 km² and up (30,000 before Oct 21, 10,000 before Oct 22), excluding Antarctica and disputed shapes
 {
   const { topo, geoms } = loadTopo(path.join(DATA, "eras", "present.json"));
   for (const g of geoms) {
     const p = g.properties;
-    if (!p.n || p.d || p.m || p.a < 10000 || p.n === "Antarctica") continue;
+    if (!p.n || p.d || p.m || p.a < 5000 || p.n === "Antarctica" || p.n === "French Southern Lands") continue;
     add({ n: p.n, era: "present", kind: "country", sub: "today" }, client.feature(topo, g).geometry);
   }
 }
 
-// US states: 10,000 km² and up (100,000 before Oct 21)
+// US states: 5,000 km² and up (100,000 before Oct 21, 10,000 before Oct 22)
 {
   const { topo, geoms } = loadTopo(path.join(DATA, "us-states.json"));
   for (const g of geoms) {
     const p = g.properties;
-    if (!p.n || p.a < 10000) continue;
+    // Puerto Rico is a territory, not a state (it's in the pool as a country-level shape already)
+    if (!p.n || p.a < 5000 || p.n === "Puerto Rico") continue;
     add({ n: p.n, era: "us", kind: "state", sub: "US state" }, client.feature(topo, g).geometry);
   }
 }
