@@ -126,20 +126,6 @@ export function loadLayer(key: string): Promise<Layer> {
   });
 }
 
-/** A big natural lake, drawn as water on every era so lakes never come and go between snapshots. */
-export type Lake = { geom: MultiPolygon; bbox: [number, number, number, number] };
-
-export function loadLakes(): Promise<Lake[]> {
-  return once("lakes", async () => {
-    const topo = await getJson<Topology>(`/data/lakes.json${V}`);
-    const fc = feature(topo, topo.objects.lakes as GeometryCollection) as unknown as { features: Feature<Polygon | MultiPolygon>[] };
-    return fc.features.filter((f) => f.geometry).map((f) => {
-      const geom = toMulti(f.geometry);
-      return { geom, bbox: bboxOf(geom) };
-    });
-  });
-}
-
 export function loadIndex(): Promise<IndexRow[]> {
   return once("index", () => getJson<IndexRow[]>(`/data/polities.json${V}`));
 }

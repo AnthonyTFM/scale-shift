@@ -6,7 +6,7 @@ import { presets, type Preset } from "@/content/presets";
 import { site } from "@/content/site";
 import { track } from "@/lib/analytics";
 import { claims as allClaims, claimsForEra, loadClaimShapes, unclaimed } from "@/lib/antarctica";
-import { featureAtIn, loadGrid, loadIndex, loadLakes, loadLayer, type IndexRow, type RulersGrid } from "@/lib/data";
+import { featureAtIn, loadGrid, loadIndex, loadLayer, type IndexRow, type RulersGrid } from "@/lib/data";
 import { eraByKey, eraIndex, eras, snapshotForYear } from "@/lib/eras";
 import type { AreaUnit } from "@/lib/format";
 import { boundsOf, fitView, mergeBounds, placeGeometry } from "@/lib/geo";
@@ -230,10 +230,6 @@ export default function AtlasApp() {
       onViewChange: () => {},
     });
     engineRef.current = engine;
-    // the same big lakes on every era (the sources disagree about which lakes they leave out)
-    loadLakes()
-      .then((lakes) => engine.setLakes(lakes))
-      .catch(() => {});
 
     let alive = true;
     (async () => {
