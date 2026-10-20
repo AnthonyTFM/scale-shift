@@ -128,6 +128,15 @@ export default function AtlasApp() {
 
   const addShape = useCallback(
     async (name: string, eraKey: string, opts: { fly?: boolean } = {}) => {
+      // the same shape from the same era is already on the map: select it instead of adding a copy
+      const existing = overlaysRef.current.find((o) => o.name === name && o.era === eraKey);
+      if (existing) {
+        setSelected(existing.id);
+        setPanelOpen(true);
+        if (opts.fly !== false) fitTo([existing]);
+        showToast(`${name} is already on the map.`);
+        return;
+      }
       if (overlaysRef.current.length >= MAX_SHAPES) {
         showToast(`You can compare up to ${MAX_SHAPES} shapes at once.`);
         return;
