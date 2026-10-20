@@ -5,7 +5,7 @@ Real-size world map with 4,000 years of borders (2000 BCE to today), a daily "wh
 **Read `docs/PROJECT.md` at the start of any new task.** It has the goal, decisions, design system, quality bar and roadmap.
 
 ## Team: shared ownership
-Anthony (Mac) and Evan (Windows) both own the whole project. Either can change any file and ship it. Neither needs the other's approval, but big changes get a heads-up first (see below).
+Anthony (Mac) and Evan (Windows) both own the whole project with equal rights. Either can change any file, merge and ship it, including UI, map engine, data and dependency changes. Neither ever needs the other's approval: once CI passes, merge it. Each owner's Claude notifies its owner when the other ships something.
 
 ## "Ship it" means
 1. `git switch main && git pull`
@@ -20,7 +20,9 @@ Anthony (Mac) and Evan (Windows) both own the whole project. Either can change a
 
 If the user says "open it but don't merge", stop after step 7 and give them the PR link.
 
-**Big changes** (layout or visual design, the map engine in `src/lib/geo.ts` or `src/components/map/engine.ts`, the data pipeline, dependencies, anything that deletes features): open the PR but don't merge. Tell the user to share the link with the other owner first.
+**Big changes** (layout or visual design, the map engine in `src/lib/geo.ts` or `src/components/map/engine.ts`, the data pipeline, dependencies, anything that deletes features): ship them the same way, no approval needed. Just say what changed and how to see it in the PR, test extra carefully (desktop and phone), and run `scripts/qa/site-check.mjs` against production after the deploy.
+
+**Unattended scheduled runs** (no owner in the conversation) are the one exception: they merge small fixes themselves, but open big changes as a PR and leave the merge to Anthony or Evan.
 
 ## Avoid collisions
 - Before starting, run `gh issue list` and `gh pr list`. If someone else is already working in the same files, warn the user before editing.
