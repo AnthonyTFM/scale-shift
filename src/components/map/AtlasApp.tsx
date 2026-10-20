@@ -68,7 +68,8 @@ export default function AtlasApp() {
   const [keyOpen, setKeyOpen] = useState(false);
   /** set by "go to year": the typed year and the snapshot chosen for it */
   const [yearAsked, setYearAsked] = useState<{ year: number; era: string } | null>(null);
-  const [playing, setPlaying] = useState(false);
+  /** 1 plays forward through the eras, -1 plays back in time, 0 is stopped */
+  const [playing, setPlaying] = useState<0 | 1 | -1>(0);
   // shown in the server HTML (fast first paint); hidden on mount for returning visitors and shared links
   const [showIntro, setShowIntro] = useState(true);
   const [shareOpen, setShareOpen] = useState(false);
@@ -185,12 +186,12 @@ export default function AtlasApp() {
       setShowIntro(false);
       writeStorage(INTRO_KEY, "1");
       setInfo(null);
-      setPlaying(false);
+      setPlaying(0);
       setActivePreset(p.id);
       await applyState({ era: p.baseEra, shapes: p.shapes.map((s, i) => ({ ...s, color: i })), at: p.at });
       if (!p.at) setSelected(null);
       track("preset", { id: p.id });
-      if (p.play) setPlaying(true);
+      if (p.play) setPlaying(1);
     },
     [applyState],
   );
@@ -286,7 +287,7 @@ export default function AtlasApp() {
       .catch(() => {
         if (!alive) return;
         setLoadingEra(false);
-        setPlaying(false);
+        setPlaying(0);
         showToast("Couldn't load that era. Check your connection and try again.");
       });
     // US state lines only show when zoomed in, so fetch them once the page is idle
@@ -354,13 +355,13 @@ export default function AtlasApp() {
     return () => clearTimeout(t);
   }, [era, overlays, ready]);
 
-  // ---- play through eras (waits for each era to load) ----
+  // ---- play through eras, forward or back in time (waits for each era to load) ----
   useEffect(() => {
     if (!playing || loadingEra) return;
     const t = setTimeout(() => {
-      const i = eraIndex(eraRef.current);
-      if (i >= eras.length - 1) setPlaying(false);
-      else changeEra(eras[i + 1].key);
+      const next = eraIndex(eraRef.current) + playing;
+      if (next < 0 || next > eras.length - 1) setPlaying(0);
+      else changeEra(eras[next].key);
     }, 1400);
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
@@ -757,7 +758,7 @@ export default function AtlasApp() {
         <EraBar
           onYear={(y) => {
             const snap = snapshotForYear(y);
-            setPlaying(false);
+            setPlaying(0);
             setYearAsked({ year: y, era: snap.key });
             changeEra(snap.key);
             track("year_search", { year: y });
@@ -766,12 +767,16 @@ export default function AtlasApp() {
           loading={loadingEra}
           playing={playing}
           onEra={(k) => {
-            setPlaying(false);
+            setPlaying(0);
             changeEra(k);
           }}
-          onTogglePlay={() => {
-            if (!playing && eraIndex(era) >= eras.length - 1) changeEra(eras[0].key);
-            setPlaying((p) => !p);
+          onTogglePlay={(dir) => {
+            if (playing === dir) return setPlaying(0);
+            // at the end of the line, start again from the other end
+            const i = eraIndex(era);
+            if (dir === 1 && i >= eras.length - 1) changeEra(eras[0].key);
+            if (dir === -1 && i <= 0) changeEra(eras[eras.length - 1].key);
+            setPlaying(dir);
           }}
           onChanges={() => {
             setChangesOpen((v) => !v);
