@@ -14,6 +14,7 @@ export default function DailyPage() {
   return (
     <>
       <PageHero
+        center
         eyebrow="Daily challenge"
         title="Which is bigger?"
         lead={
@@ -24,7 +25,7 @@ export default function DailyPage() {
         }
       />
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-2xl">
           <div>
             <SignInProvider>
               <DailyChallenge />
