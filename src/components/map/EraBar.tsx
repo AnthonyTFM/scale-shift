@@ -7,9 +7,11 @@ import { appCopy } from "@/content/site";
 type Props = {
   era: string;
   loading: boolean;
-  playing: boolean;
+  /** 1 playing forward, -1 playing back in time, 0 stopped */
+  playing: 0 | 1 | -1;
   onEra: (key: string) => void;
-  onTogglePlay: () => void;
+  /** start playing in this direction, or pause if it's already playing that way */
+  onTogglePlay: (dir: 1 | -1) => void;
   onChanges: () => void;
   changesOpen: boolean;
   /** jump to any typed year (shows the closest snapshot) */
@@ -93,6 +95,15 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
   );
 }
 
+function PauseIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="currentColor">
+      <rect x="6" y="5" width="4" height="14" rx="1" />
+      <rect x="14" y="5" width="4" height="14" rx="1" />
+    </svg>
+  );
+}
+
 export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, changesOpen, onYear }: Props) {
   const i = eraIndex(era);
   const meta = eraByKey(era);
@@ -105,15 +116,30 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
       <div className="flex items-center gap-2 sm:gap-3">
         <button
           type="button"
-          onClick={onTogglePlay}
-          aria-label={playing ? "Pause timeline" : "Play timeline"}
+          onClick={() => onTogglePlay(-1)}
+          aria-label={playing === -1 ? "Pause timeline" : "Play timeline backward"}
+          title={playing === -1 ? "Pause" : "Play back in time"}
+          className={`grid size-9 shrink-0 place-items-center rounded-full ${
+            playing === -1 ? "bg-accent text-panel hover:bg-accent-strong" : "bg-white/10 hover:bg-white/15"
+          }`}
+        >
+          {playing === -1 ? (
+            <PauseIcon />
+          ) : (
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="mr-0.5 size-4" fill="currentColor">
+              <path d="M17 5v14L5 12z" />
+            </svg>
+          )}
+        </button>
+        <button
+          type="button"
+          onClick={() => onTogglePlay(1)}
+          aria-label={playing === 1 ? "Pause timeline" : "Play timeline"}
+          title={playing === 1 ? "Pause" : "Play forward in time"}
           className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-panel hover:bg-accent-strong"
         >
-          {playing ? (
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="currentColor">
-              <rect x="6" y="5" width="4" height="14" rx="1" />
-              <rect x="14" y="5" width="4" height="14" rx="1" />
-            </svg>
+          {playing === 1 ? (
+            <PauseIcon />
           ) : (
             <svg aria-hidden="true" viewBox="0 0 24 24" className="ml-0.5 size-5" fill="currentColor">
               <path d="M7 5v14l12-7z" />
