@@ -184,3 +184,50 @@ body {
   .press, .reveal-map, .reveal-true { transition: none; }
   .pop-in { animation: none; }
 }
+
+/* ---------- page transitions (homepage → daily game, homepage globe → map) ---------- */
+::view-transition-group(.morph) {
+  animation-duration: 480ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+::view-transition-image-pair(.morph) {
+  animation-name: via-blur;
+}
+@keyframes via-blur {
+  35% {
+    filter: blur(4px);
+  }
+}
+/* the rest of the page fades quickly, so the morphing card or globe carries the eye */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+}
+/* the map page sits on deep ocean, so zooming into it never flashes the light page colour */
+html:has(.atlas-page),
+html:has(.atlas-page) body {
+  background: #0a1f36;
+}
+/* the homepage globe drifts gently */
+@keyframes globe-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-16px);
+  }
+}
+.globe-float {
+  animation: globe-float 9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .globe-float {
+    animation: none;
+  }
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

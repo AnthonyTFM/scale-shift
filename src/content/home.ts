@@ -42,4 +42,24 @@ export const home = {
   },
 
   stickyCta: "Explore the real-size map",
+
+  // the game-first hero: play card, map card and today's leaderboard over a floating globe
+  hub: {
+    heading: "Scale Shift: the real size of countries and empires, 2000 BCE to today",
+    playEyebrow: "Today's game",
+    playTitle: "Which is bigger?",
+    playLead: "Five matchups, about two minutes. The map will try to fool you.",
+    playCta: "Play today's game",
+    playDone: (score: number) => `You scored ${score}/5 today. New matchups at midnight.`,
+    playDoneCta: "See today's answers",
+    mapEyebrow: "The real-size map",
+    mapTitle: "Drag any country anywhere",
+    mapLead: "Watch shapes shrink and grow as they move, across 4,000 years of borders.",
+    mapCta: "Open the map",
+    boardTitle: "Today's leaderboard",
+    boardEmpty: "No scores yet today. Be the first on the board!",
+    boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
+    boardCta: "Full leaderboard",
+    moreTitle: "How a round works",
+  },
 };

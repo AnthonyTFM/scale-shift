@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
+import { Suspense, ViewTransition } from "react";
 import Link from "next/link";
 import { preload } from "react-dom";
 import pool from "@/data/daily-pool.json";
@@ -7,7 +7,8 @@ import { disputes } from "@/content/disputes";
 import { events } from "@/content/events";
 import { site } from "@/content/site";
 import { eras } from "@/lib/eras";
-import { DailyTeaser } from "@/components/home/DailyTeaser";
+import { HeroPlay } from "@/components/home/HeroPlay";
+import { HeroLeaderboard } from "@/components/home/HeroLeaderboard";
 import { LegacyMapRedirect } from "@/components/home/LegacyMapRedirect";
 import { JsonLd } from "@/components/site/PageHero";
 import { WeeklyPicks } from "@/components/home/WeeklyPicks";
@@ -84,50 +85,80 @@ export default function HomePage() {
         }}
       />
 
-      {/* Hero: the hook, the two main actions and a globe to spin */}
-      <section data-hero className="relative overflow-hidden bg-panel bg-[radial-gradient(ellipse_at_75%_40%,rgba(84,160,214,0.35),transparent_60%),linear-gradient(180deg,#0e2a47,#0a1f36)] text-panel-text">
-        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 pb-20 pt-10 md:grid-cols-[1.15fr_1fr] md:pb-24 md:pt-14">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-wide text-accent">{home.eyebrow}</p>
-            <h1 className="mt-3 font-display text-4xl leading-[1.05] text-white md:text-6xl">{home.title}</h1>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-panel-muted">{home.lead}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/daily" className="inline-flex h-12 items-center rounded-lg bg-accent px-5 font-bold text-panel shadow-float hover:bg-accent-strong">
-                {home.playCta}
-              </Link>
-              <Link href="/map" className="inline-flex h-12 items-center rounded-lg border border-white/30 bg-white/5 px-5 font-bold text-white hover:bg-white/15">
-                {home.mapCta}
+      {/* Hero: today's game first, the map under it, today's leaderboard on the right, all over a floating globe */}
+      <section
+        data-hero
+        className="relative isolate overflow-hidden bg-panel bg-[radial-gradient(ellipse_at_75%_40%,rgba(84,160,214,0.35),transparent_60%),linear-gradient(180deg,#0e2a47,#0a1f36)] text-panel-text"
+      >
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="globe-float absolute left-1/2 top-[-4%] w-[120vw] max-w-[620px] -translate-x-1/2 opacity-35 lg:left-auto lg:right-[-6%] lg:top-[48%] lg:w-[min(62vw,880px)] lg:max-w-none lg:-translate-y-1/2 lg:translate-x-0 lg:opacity-60">
+            {/* the same "world" as the map page: opening the map grows this globe into it */}
+            <ViewTransition name="world" share="morph" default="none">
+              <div>
+                <GlobeLazy label={home.globeLabel} />
+              </div>
+            </ViewTransition>
+          </div>
+        </div>
+        <div className="mx-auto max-w-6xl px-4 pb-14 pt-8 md:pb-20 md:pt-12">
+          <h1 className="sr-only">{home.hub.heading}</h1>
+          <p className="text-xs font-bold uppercase tracking-wide text-accent">{home.eyebrow}</p>
+          <div className="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
+            <div className="grid gap-4">
+              <HeroPlay />
+              <Link
+                href="/map"
+                transitionTypes={["to-map"]}
+                className="group flex items-center gap-4 rounded-card bg-white/10 p-5 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/15"
+              >
+                <span
+                  aria-hidden="true"
+                  className="grid size-14 shrink-0 place-items-center rounded-full bg-[radial-gradient(circle_at_38%_32%,#b9def0,#4f8fbf_75%)] text-2xl shadow-[0_0_24px_rgba(120,190,240,0.45)]"
+                >
+                  🗺️
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-xs font-bold uppercase tracking-wide text-accent">{home.hub.mapEyebrow}</span>
+                  <span className="mt-0.5 block font-display text-2xl leading-tight">{home.hub.mapTitle}</span>
+                  <span className="mt-1 block text-sm text-panel-muted">{home.hub.mapLead}</span>
+                </span>
+                <span className="hidden shrink-0 font-bold text-accent sm:inline">
+                  {home.hub.mapCta} <span aria-hidden="true" className="inline-block transition group-hover:translate-x-1">→</span>
+                </span>
               </Link>
             </div>
-            <dl className="mt-8 grid max-w-lg grid-cols-4 gap-3 text-center">
-              {[
-                ["4,000", "years"],
-                [String(eras.length), "map snapshots"],
-                [String(events.length), "border events"],
-                [String(pool.length), "daily puzzle shapes"],
-              ].map(([n, label]) => (
-                <div key={label}>
-                  <dt className="sr-only">{label}</dt>
-                  <dd>
-                    <span className="block font-display text-2xl text-white md:text-3xl">{n}</span>
-                    <span className="block text-[11px] leading-tight text-panel-muted">{label}</span>
-                  </dd>
-                </div>
-              ))}
-            </dl>
+            <HeroLeaderboard />
           </div>
-          <div className="mx-auto w-full max-w-[300px] sm:max-w-[380px] md:max-w-[480px]">
-            <GlobeLazy label={home.globeLabel} />
-            <p aria-hidden="true" className="mt-2 text-center text-xs text-panel-muted">
-              {home.globeHint}
-            </p>
-          </div>
+          <dl className="mt-8 grid max-w-lg grid-cols-4 gap-3 text-center">
+            {[
+              ["4,000", "years"],
+              [String(eras.length), "map snapshots"],
+              [String(events.length), "border events"],
+              [String(pool.length), "daily puzzle shapes"],
+            ].map(([n, label]) => (
+              <div key={label}>
+                <dt className="sr-only">{label}</dt>
+                <dd>
+                  <span className="block font-display text-2xl text-white md:text-3xl">{n}</span>
+                  <span className="block text-[11px] leading-tight text-panel-muted">{label}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </section>
 
-      {/* Today's game and a fact that proves the point, overlapping the hero */}
-      <section aria-label="Play" className="relative z-10 mx-auto -mt-12 grid max-w-6xl gap-4 px-4">
-        <DailyTeaser example={<ExampleMatchup />} />
+      {/* Everything else: how a round works, the daily fact, then the directory */}
+      <section aria-labelledby="round" className="mx-auto grid max-w-6xl gap-4 px-4 pt-12">
+        <div className="grid items-center gap-6 rounded-card bg-white p-5 text-ink shadow-sm ring-1 ring-line md:grid-cols-[1fr_1.1fr] md:p-7">
+          <div>
+            <h2 id="round" className="font-display text-3xl">
+              {home.hub.moreTitle}
+            </h2>
+            <p className="mt-2 text-ink-soft">{home.teaser.lead}</p>
+          </div>
+          <ExampleMatchup />
+        </div>
         {/* the fact and the weekly picks change by date, so they are filled in per request; the placeholders keep their space */}
         <Suspense fallback={<div aria-hidden="true" className="h-[341px] rounded-card bg-white shadow-sm ring-1 ring-line md:h-[185px]" />}>
           <DailyFact />

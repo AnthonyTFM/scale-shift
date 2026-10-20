@@ -1,5 +1,6 @@
 import { PageHero } from "@/components/site/PageHero";
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import { DailyChallenge } from "@/components/daily/DailyChallenge";
 import { SignInProvider } from "@/components/daily/SignInProvider";
 
@@ -26,11 +27,14 @@ export default function DailyPage() {
       />
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <div className="mx-auto max-w-2xl">
-          <div>
-            <SignInProvider>
-              <DailyChallenge />
-            </SignInProvider>
-          </div>
+          {/* the homepage's play card grows into the game */}
+          <ViewTransition name="daily-card" share="morph" default="none">
+            <div>
+              <SignInProvider>
+                <DailyChallenge />
+              </SignInProvider>
+            </div>
+          </ViewTransition>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few
             percent. Your scores and streak are saved in this browser only.
