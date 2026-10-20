@@ -263,13 +263,15 @@ const previous = (() => {
 })();
 const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10);
 
-// Present-day countries: 5,000 km² and up (30,000 before Oct 21, 10,000 before Oct 22), excluding Antarctica and disputed shapes
+// Present-day countries: 5,000 km² and up (30,000 before Oct 21, 10,000 before Oct 22), excluding disputed shapes.
+// Antarctica joins as a continent (from Oct 22): web maps draw it about 24 times too big, so it makes the best trap of all.
 {
   const { topo, geoms } = loadTopo(path.join(DATA, "eras", "present.json"));
   for (const g of geoms) {
     const p = g.properties;
-    if (!p.n || p.d || p.m || p.a < 5000 || p.n === "Antarctica" || p.n === "French Southern Lands") continue;
-    add({ n: p.n, era: "present", kind: "country", sub: "today" }, client.feature(topo, g).geometry);
+    if (!p.n || p.d || p.m || p.a < 5000 || p.n === "French Southern Lands") continue;
+    const sub = p.n === "Antarctica" ? "continent" : "today";
+    add({ n: p.n, era: "present", kind: "country", sub }, client.feature(topo, g).geometry);
   }
 }
 
