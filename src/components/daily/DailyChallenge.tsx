@@ -22,13 +22,15 @@ import { dailyContext } from "@/content/daily-context";
 import { LeaderboardJoin } from "./LeaderboardJoin";
 import { formatBoth } from "@/lib/format";
 import { mapUrl } from "@/lib/share";
-import { challengeHash, readChallenge, type Challenge } from "@/lib/challenge";
-import { loadPlayer, rememberPlayer } from "@/lib/player";
+import { readChallenge, type Challenge } from "@/lib/challenge";
+import { rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
 import { resultImage } from "@/lib/result-image";
+import { challengeMessage } from "@/lib/challenge-friend";
+import { useShareBox } from "@/components/site/ShareBox";
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -510,6 +512,7 @@ function Results({
   const s = stats(save, today);
   const grid = round.questions.map((q, i) => (choices[i] === q.answer ? "🟩" : "🟥")).join("");
   const [copied, setCopied] = useState("");
+  const shareBox = useShareBox();
   const verdict =
     score === total
       ? "Perfect. Mercator can't fool you."
@@ -519,21 +522,8 @@ function Results({
           ? "Not bad. The map tricked you twice."
           : "The map fooled you today. New questions tomorrow.";
 
-  const challengeFriend = async () => {
-    if (!round.date) return;
-    const url = `${location.origin}/daily${challengeHash(dayNumber(round.date), score, loadPlayer()?.name ?? null)}`;
-    const text = `I got ${score}/${total} on today's ${site.name} challenge. Think you can beat me?\n${url}`;
-    track("daily_challenge_friend", { score });
-    try {
-      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-        await navigator.share({ text });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-      setCopied("Challenge link copied! Send it to a friend.");
-    } catch {
-      setCopied(text);
-    }
+  const challengeFriend = () => {
+    if (round.date) shareBox.share(challengeMessage(score, total, round.date), "results");
   };
 
   const shareImage = async () => {
@@ -558,20 +548,9 @@ function Results({
     setCopied("Picture saved. Post it anywhere.");
   };
 
-  const share = async () => {
+  const share = () => {
     const url = `${location.origin}/daily`;
-    const text = `${site.name} Daily #${dayNumber(today)} · ${score}/${total}\n${grid}\n${url}`;
-    track("daily_share", { score });
-    try {
-      if (navigator.share && matchMedia("(pointer: coarse)").matches) {
-        await navigator.share({ text });
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-      setCopied("Copied! Paste it anywhere.");
-    } catch {
-      setCopied(text);
-    }
+    shareBox.share({ kind: "score", url, text: `${site.name} Daily #${dayNumber(today)} · ${score}/${total}\n${grid}\n${url}` }, "results");
   };
 
   return (
@@ -636,6 +615,7 @@ function Results({
           <p aria-live="polite" className="mt-2 whitespace-pre-line text-sm text-formal">
             {copied}
           </p>
+          {shareBox.box}
           <LeaderboardJoin date={round.date} choices={choices} />
           <Countdown />
         </>

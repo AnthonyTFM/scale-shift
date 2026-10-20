@@ -3,7 +3,8 @@
 import { useEffect, useState, ViewTransition } from "react";
 import Link from "next/link";
 import { dayNumber, loadSave, localDateKey, stats } from "@/lib/daily";
-import { challengeFriend } from "@/lib/challenge-friend";
+import { challengeMessage } from "@/lib/challenge-friend";
+import { useShareBox } from "@/components/site/ShareBox";
 import { home } from "@/content/home";
 
 type State = { day: number; done: boolean; score?: number; streak: number };
@@ -19,7 +20,7 @@ function untilMidnight() {
 export function HeroPlay() {
   const [s, setS] = useState<State | null>(null);
   const [left, setLeft] = useState<ReturnType<typeof untilMidnight> | null>(null);
-  const [note, setNote] = useState("");
+  const { share: open, box } = useShareBox();
   const t = home.hub;
 
   useEffect(() => {
@@ -39,10 +40,7 @@ export function HeroPlay() {
     };
   }, []);
 
-  const share = async () => {
-    const r = await challengeFriend(s?.score ?? 0);
-    setNote(r === null ? "" : r === "copied" ? t.challengeCopied : r);
-  };
+  const share = () => open(challengeMessage(s?.score ?? 0), "home");
 
   return (
     <ViewTransition name="daily-card" share="morph" default="none">
@@ -88,11 +86,7 @@ export function HeroPlay() {
             </p>
           ) : null}
         </div>
-        {note ? (
-          <p role="status" className="mt-2 break-words text-sm font-semibold">
-            {note}
-          </p>
-        ) : null}
+        {box}
       </div>
     </ViewTransition>
   );
