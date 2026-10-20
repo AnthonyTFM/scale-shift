@@ -18,7 +18,7 @@ import {
   mercatorInflation,
   EARTH_RADIUS_KM,
 } from "@/lib/geo";
-import { LINE, type MorphPlan, type OwnerGrid, borderLines, paintMorph, planMorph } from "./morph";
+import { LINE, type MorphPlan, type OwnerGrid, borderLines, frameIds, planMorph } from "./morph";
 
 
 export type Overlay = {
@@ -91,15 +91,16 @@ type MorphLabel = { name: PolityProps; sized: boolean; l0?: Pt; l1?: Pt; c0?: Pt
 type Morph = {
   plan: MorphPlan;
   /** grid cells per screen pixel */ g: number;
-  /** per id (see MorphPlan.idA): fill colour (rgb), border style (LINE), name */
-  colId: Uint8Array;
+  /** per id (see MorphPlan.idA): border style (LINE) of the moving border, name */
   lineId: Uint8Array;
   labels: (MorphLabel | null)[];
   /** each cell's border style, in the frame just drawn */ line: Uint8Array;
   /** which id each cell shows, in the frame just drawn */ ids: Int32Array;
   /** how far through the slide the frame just drawn is, 0–1 */ e: number;
-  canvas: HTMLCanvasElement;
-  image: ImageData;
+  /** the old era's tiles, shown where the new owner hasn't arrived yet */ oldCache: BaseCache;
+  /** where the new owner has arrived (opaque), one cell per grid cell */ mask: HTMLCanvasElement;
+  maskImage: ImageData;
+  /** the new era's tiles, cut down to the mask before they go on the map */ layer: HTMLCanvasElement;
   start: number;
 };
 
@@ -127,11 +128,6 @@ function hashIndex(s: string) {
 
 function fillOf(f: PolityFeature) {
   return f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land;
-}
-
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function hexToRgba(hex: string, a: number) {
@@ -171,7 +167,7 @@ export class MapEngine {
   private cache: BaseCache | null = null;
   private morph: Morph | null = null;
   /** the last owner grid worked out, reused as the start of the next slide while the view hasn't moved */
-  private lastGrid: { layer: Layer; at: string; grid: OwnerGrid; cols: Uint8Array; feats: PolityFeature[] } | null = null;
+  private lastGrid: { layer: Layer; at: string; grid: OwnerGrid; feats: PolityFeature[] } | null = null;
   private tilePool: HTMLCanvasElement[] = [];
   private prefetchTimer = 0;
   private lastViewChange = 0;
@@ -249,13 +245,14 @@ export class MapEngine {
 
   setLayer(layer: Layer | null) {
     const prev = this.layer;
+    const prevCache = this.cache;
     this.layer = layer;
     this.cache = null;
     this.morph = null;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (prev && layer && prev.key !== layer.key && !reduce) {
       try {
-        this.morph = this.startMorph(prev, layer);
+        this.morph = this.startMorph(prev, layer, prevCache);
       } catch (e) {
         console.warn("[map] border slide skipped", e); // the new era still shows, just without the slide
       }
@@ -471,6 +468,7 @@ export class MapEngine {
     if (this.morph && this.drawMorph(this.morph)) {
       this.drawLines();
       if (this.labels) this.drawMorphLabels(this.morph, projs);
+      if (this.pin) for (const proj of projs) this.drawPin(ctx, proj, this.pin);
       ctx.restore();
       return;
     }
@@ -592,8 +590,7 @@ export class MapEngine {
    * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. A tile that is not ready yet is
    * drawn on the spot, so the map is never shown blank or half drawn; the tiles around the screen are drawn ahead of time.
    */
-  private drawTiles(c: BaseCache) {
-    const ctx = this.bctx;
+  private drawTiles(c: BaseCache, ctx = this.bctx) {
     const s = this.view.k / c.k;
     const pad = TILE_PAD;
     let missing = false;
@@ -762,7 +759,7 @@ export class MapEngine {
   // ---------- era changes: borders slide into place (see morph.ts) ----------
 
   /** Works out the slide from the era on screen to the next, for the current view. Null if the screen has no size yet. */
-  private startMorph(prev: Layer, next: Layer): Morph | null {
+  private startMorph(prev: Layer, next: Layer, prevCache: BaseCache | null): Morph | null {
     if (this.w < 2 || this.h < 2) return null;
     const cells = window.matchMedia?.("(pointer: coarse)").matches ? MORPH_CELLS_TOUCH : MORPH_CELLS;
     const g = Math.min(1, Math.sqrt(cells / (this.w * this.h)));
@@ -780,10 +777,9 @@ export class MapEngine {
     this.lastGrid = b;
     const plan = planMorph(a.grid, b.grid, a.feats.length + 1, b.feats.length + 1, gw, gh);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    const image = ctx.createImageData(gw, gh);
 
-    // per id: new owners first (a shape carrying on an old one keeps the old one's look until the slide ends), then old
-    // shapes nothing carries on. The tiles take over at the end with the new era's colours, styles and names.
+    // per id: new owners first (a shape carrying on an old one keeps the old one's name and border style until the slide
+    // ends), then old shapes nothing carries on.
     const { nA, nB } = plan;
     const lineOf = (f: PolityFeature | undefined) => (!f || f.props.m || f.sliced ? LINE.none : !f.props.n ? LINE.soft : f.props.b >= 2 ? LINE.solid : LINE.dashed);
     const looks = (id: number) => {
@@ -791,18 +787,15 @@ export class MapEngine {
       const j = plan.carries[id];
       return j > 0 ? a.feats[j - 1] : b.feats[id - 1]; // carries on an old shape, or a new one
     };
-    const colId = new Uint8Array((nA + nB) * 3);
     const lineId = new Uint8Array(nA + nB);
-    for (let id = 0; id < nA + nB; id++) {
-      const f = id === 0 || id === nB ? undefined : looks(id);
-      colId.set(hexToRgb(f ? fillOf(f) : COLORS.ocean), id * 3);
-      lineId[id] = lineOf(f);
-    }
+    for (let id = 0; id < nA + nB; id++) lineId[id] = lineOf(id === 0 || id === nB ? undefined : looks(id));
 
     // names: where each sits at the start and the end, so it can follow its shape's middle in between
     const pt = (l?: [number, number]) => (l ? ((projs[0](l) as Pt | null) ?? undefined) : undefined);
-    const c0 = this.middles(paintMorph(plan, 0, colId, lineId, image.data), gw, nA + nB, g).at;
-    const c1 = this.middles(paintMorph(plan, 1, colId, lineId, image.data), gw, nA + nB, g).at;
+    const ids = new Int32Array(gw * gh);
+    const line = new Uint8Array(gw * gh);
+    const c0 = this.middles(frameIds(plan, 0, lineId, ids, line), gw, nA + nB, g).at;
+    const c1 = this.middles(frameIds(plan, 1, lineId, ids, line), gw, nA + nB, g).at;
     const labels = Array.from({ length: nA + nB }, (_, id): MorphLabel | null => {
       if (id === 0 || id === nB) return null; // the sea
       if (id > nB) {
@@ -815,24 +808,31 @@ export class MapEngine {
       const from = a.feats[j - 1].props;
       return { name: from, sized: false, l0: pt(from.l), l1: pt(to.l), c0: c0[id], c1: c1[id] };
     });
-    return { plan, g, colId, lineId, labels, line: new Uint8Array(gw * gh), ids: new Int32Array(gw * gh), e: 0, canvas, image, start: performance.now() };
+    // the old era's tiles: the ones on screen, or drawn now for the old era if there were none at this zoom
+    let oldCache = prevCache && prevCache.k === this.view.k && prevCache.dpr === this.dpr ? prevCache : null;
+    if (!oldCache) {
+      this.layer = prev;
+      oldCache = this.buildCache();
+      this.layer = next;
+    }
+    const layer = document.createElement("canvas");
+    layer.width = this.base.width;
+    layer.height = this.base.height;
+    return { plan, g, lineId, labels, line, ids, e: 0, oldCache, mask: canvas, maskImage: ctx.createImageData(gw, gh), layer, start: performance.now() };
   }
 
   /**
-   * Which shape owns each grid cell on screen (0: sea), and each owner's fill colour. Shapes are drawn one at a time
+   * Which shape owns each grid cell on screen (0: sea), with the shapes in owner order. Shapes are drawn one at a time
    * and read back as solid cells, so the anti-aliased edges never blend two owners into a made-up one.
    */
   private ownerGrid(layer: Layer, ctx: CanvasRenderingContext2D, g: number, projs: ReturnType<typeof projectionFor>[]) {
     const { width: gw, height: gh } = ctx.canvas;
     const feats = layer.features.filter((f) => !f.props.x);
     const grid: OwnerGrid = new Int32Array(gw * gh);
-    const cols = new Uint8Array((feats.length + 1) * 3);
-    cols.set(hexToRgb(COLORS.ocean), 0);
     const vb = this.visibleBox();
     ctx.fillStyle = ctx.strokeStyle = "#000";
     ctx.lineJoin = "round";
     feats.forEach((f, n) => {
-      cols.set(hexToRgb(fillOf(f)), (n + 1) * 3);
       if (!this.isVisible(f.bbox, vb)) return;
       for (const proj of projs) {
         // the shape's box on screen, in grid cells (the whole grid when it wraps around the world)
@@ -879,28 +879,49 @@ export class MapEngine {
         for (let i = 0; i < grid.length; i++) if (px[i * 4 + 3] >= 128) grid[i] = 0;
       }
     }
-    return { grid, cols, feats };
+    return { grid, feats };
   }
 
-  /** One frame of the slide. False once it has finished (the tiles take over). */
+  /**
+   * One frame of the slide, drawn from the real tiles: the old era's where the new owner hasn't arrived yet, the new
+   * era's where it has, and only the moving border line on top. Countries, their fills, borders, dashes, hatching and
+   * lakes look exactly as they do on the map. False once the slide has finished (the tiles take over).
+   */
   private drawMorph(m: Morph) {
     const t = (performance.now() - m.start) / MORPH_MS;
     if (t >= 1) {
       this.morph = null;
+      if (m.oldCache !== this.cache) this.recycle(...m.oldCache.tiles.values());
       return false;
     }
     const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-    paintMorph(m.plan, e, m.colId, m.lineId, m.image.data, m.ids, m.line);
     m.e = e;
-    m.canvas.getContext("2d")!.putImageData(m.image, 0, 0);
+    frameIds(m.plan, e, m.lineId, m.ids, m.line, m.maskImage.data);
+    m.mask.getContext("2d")!.putImageData(m.maskImage, 0, 0);
     const ctx = this.bctx;
-    ctx.imageSmoothingEnabled = false; // sharp cells, no blur
-    ctx.drawImage(m.canvas, 0, 0, this.w, this.h);
-    ctx.imageSmoothingEnabled = true;
-    // border lines exactly as the tiles draw them (pass 2 of renderTile): same width, colours and dashes
+    // the old era, everywhere
+    this.drawTiles(m.oldCache);
+    // the new era, only where the new owner has arrived
+    const lctx = m.layer.getContext("2d")!;
+    lctx.setTransform(1, 0, 0, 1, 0, 0);
+    lctx.globalCompositeOperation = "source-over";
+    lctx.clearRect(0, 0, m.layer.width, m.layer.height);
+    lctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    this.drawTiles(this.freshCache(), lctx);
+    lctx.setTransform(1, 0, 0, 1, 0, 0);
+    lctx.globalCompositeOperation = "destination-in";
+    lctx.imageSmoothingEnabled = false;
+    lctx.drawImage(m.mask, 0, 0, m.layer.width, m.layer.height);
+    lctx.imageSmoothingEnabled = true;
+    lctx.globalCompositeOperation = "source-over";
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(m.layer, 0, 0);
+    ctx.restore();
+    // the moving border, drawn the way the tiles draw borders (pass 2 of renderTile): same width, colours and dashes
     ctx.lineWidth = 0.7;
     ctx.lineJoin = "round";
-    for (const { kind, twice, lines } of borderLines(m.ids, m.line, m.plan.w, m.plan.h)) {
+    for (const { kind, twice, lines } of borderLines(m.ids, m.line, m.plan.w, m.plan.h, { p: m.plan, e })) {
       const p2d = new Path2D();
       for (const xy of lines) {
         p2d.moveTo(xy[0] / m.g, xy[1] / m.g);
@@ -919,6 +940,7 @@ export class MapEngine {
     ctx.setLineDash([]);
     return true;
   }
+
 
   /** The middle of each owner's cells on screen (CSS pixels), and how many cells it has. */
   private middles(ids: Int32Array, gw: number, count: number, g: number) {

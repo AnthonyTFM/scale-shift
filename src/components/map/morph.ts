@@ -147,41 +147,38 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
 export const LINE = { none: 0, soft: 1, dashed: 2, solid: 3 } as const;
 
 /**
- * Paints the map `e` of the way through the change (0 old, 1 new). Each cell shows the shape it belongs to right now:
- * its new owner once the moving border has reached it, else the shape that was there before. Colours and border styles
- * come per id (see MorphPlan.idA) and stay as they were until the slide ends, so only the borders move: no blending,
- * no colour or style changes on the way. Fills `id` and `line` (each cell's id and border style) for what is drawn on top.
+ * One frame of the change, `e` of the way through (0 old, 1 new): fills `id` (which shape each cell shows: its new
+ * owner once the moving border has reached it, else the shape that was there before; see MorphPlan.idA), `line` (that
+ * shape's border style) and `mask` (RGBA, opaque where the new owner has arrived). The map itself is drawn from the
+ * real tiles of both eras through the mask, so countries and their lines look exactly as they always do.
  */
-export function paintMorph(
-  p: MorphPlan,
-  e: number,
-  colId: Uint8Array,
-  lineId: Uint8Array,
-  out: Uint8ClampedArray,
-  id: Int32Array = new Int32Array(p.w * p.h),
-  line: Uint8Array = new Uint8Array(p.w * p.h),
-) {
-  const { a, b, flip, idA } = p;
-  for (let i = 0, o = 0; i < id.length; i++, o += 4) {
+export function frameIds(p: MorphPlan, e: number, lineId: Uint8Array, id: Int32Array, line: Uint8Array, mask?: Uint8ClampedArray) {
+  const { a, b, flip, idA, w } = p;
+  for (let i = 0; i < id.length; i++) {
     const k = e >= flip[i] ? b[i] : idA[a[i]];
     id[i] = k;
     line[i] = lineId[k];
-    const c = k * 3;
-    out[o] = colId[c];
-    out[o + 1] = colId[c + 1];
-    out[o + 2] = colId[c + 2];
-    out[o + 3] = 255;
   }
+  if (mask)
+    for (let i = 0; i < id.length; i++) {
+      // the new era shows one cell in from where the new owner has arrived: right at that edge its tiles carry the new
+      // owner's final border line, which must not show before the border gets there
+      const x = i % w;
+      const arrived = (j: number) => j < 0 || j >= id.length || e >= flip[j];
+      const inside = e >= flip[i] && (x === 0 || arrived(i - 1)) && (x === w - 1 || arrived(i + 1)) && arrived(i - w) && arrived(i + w);
+      mask[i * 4 + 3] = inside ? 255 : 0;
+    }
   return id;
 }
 
 /**
- * The border lines for one frame, drawn the way the tiles draw them, so a border looks the same during the slide as
- * before and after it. Lines run between cells of different shapes (grid units; cell centres at +0.5), grouped by
- * style, and joined into long polylines so dashes stay evenly spaced. A border between two shapes is marked `twice`:
- * the tiles stroke each shape's outline, so a shared border is drawn twice and looks darker than a coastline.
+ * Border lines between cells of different shapes (with `front`: only the moving border), drawn the way the tiles
+ * draw them so a border looks the same during the slide as before and after it. Lines run between cells of different
+ * shapes (grid units; cell centres at +0.5), grouped by style, and joined into long polylines so dashes stay evenly
+ * spaced. A border between two shapes is marked `twice`: the tiles stroke each shape's outline, so a shared border is
+ * drawn twice and looks darker than a coastline.
  */
-export function borderLines(ids: Int32Array, line: Uint8Array, w: number, h: number) {
+export function borderLines(ids: Int32Array, line: Uint8Array, w: number, h: number, front?: { p: MorphPlan; e: number }) {
   // segments per group (style × twice), as point keys on the half-cell lattice
   const W = 2 * w + 3;
   const groups: number[][] = Array.from({ length: 8 }, () => []);
@@ -193,6 +190,13 @@ export function borderLines(ids: Int32Array, line: Uint8Array, w: number, h: num
       const bl = ids[i + w];
       const br = ids[i + w + 1];
       if (tl === tr && tl === bl && tl === br) continue;
+      if (front) {
+        // only the moving border: where the new owner has reached some of these cells but not all, inside one old shape
+        // (where the old shapes differ, the old era's tiles already draw that border)
+        const { a, flip } = front.p;
+        const n = Number(front.e >= flip[i]) + Number(front.e >= flip[i + 1]) + Number(front.e >= flip[i + w]) + Number(front.e >= flip[i + w + 1]);
+        if (n === 0 || n === 4 || a[i] !== a[i + 1] || a[i] !== a[i + w] || a[i] !== a[i + w + 1]) continue;
+      }
       const kind = Math.max(line[i], line[i + 1], line[i + w], line[i + w + 1]);
       if (kind === LINE.none) continue;
       // two different shapes on land (not just a coast): drawn twice, as each shape's outline is on the tiles
