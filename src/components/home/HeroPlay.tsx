@@ -51,7 +51,7 @@ export function HeroPlay() {
           <p className="rounded-full bg-panel px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-accent">{t.playEyebrow}</p>
           {s ? (
             <p className="text-xs font-bold uppercase tracking-wide">
-              <span className="hidden sm:inline">Daily challenge </span>#{s.day}
+              <span className="hidden sm:inline">{t.playDay} </span>#{s.day}
             </p>
           ) : null}
           {s?.streak ? <p className="rounded-full bg-white/60 px-2.5 py-1 text-xs font-bold">🔥 {s.streak}-day streak</p> : null}
