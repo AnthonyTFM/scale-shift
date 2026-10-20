@@ -6,6 +6,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { geoContains } from "d3-geo";
 import * as client from "topojson-client";
 
 export const PALETTE_SIZE = 8;
@@ -49,7 +50,94 @@ export function ownersOf(geoms, canon = new Map(), rulers = new Set()) {
 export function eraContext(topos) {
   const rulers = new Set();
   for (const topo of topos) for (const g of topo.objects.p.geometries) if (g.properties?.s) rulers.add(g.properties.s);
-  return { canon: canonicalNames(topos), rulers };
+  const canon = canonicalNames(topos);
+  lineages(topos, canon, rulers);
+  return { canon, rulers };
+}
+
+/**
+ * Countries that carry on under a new name from one era to the next (German Empire → Germany, Russian Empire → Soviet
+ * Russia → USSR → Russia) are one country for colour: each one's label point lies inside the other's own land, or the
+ * new one is the old one's main successor (its label point inside the old land, and at least a quarter of its size, or
+ * a twentieth when the names share a word: Ottoman Empire → Ottoman Sultanate → Turkey). They are joined into `canon` unless any two of them are ever on the map at the same time.
+ */
+function lineages(topos, canon, rulers) {
+  const eras = topos.map((topo) => {
+    const ownerOf = ownersOf(topo.objects.p.geometries, canon, rulers);
+    const land = new Map(); // owner → its own shapes (not colonies), with boxes
+    const label = new Map(); // owner → label point of its biggest own shape
+    const size = new Map(); // owner → area of its own land
+    for (const f of client.feature(topo, topo.objects.p).features) {
+      const o = ownerOf(f.properties);
+      // own land: not a colony, or the homeland a ruler is read as (1914 lists the Russian Empire under "Russia")
+      if (!o || !f.geometry || (f.properties.s && o !== (canon.get(f.properties.n) ?? f.properties.n))) continue;
+      size.set(o, (size.get(o) || 0) + (f.properties.a || 0));
+      const box = bboxOf(f.geometry);
+      if (!land.has(o)) land.set(o, []);
+      land.get(o).push({ f, box });
+      const cur = label.get(o);
+      if (f.properties.l && (!cur || f.properties.a > cur.a)) label.set(o, { a: f.properties.a, l: f.properties.l });
+    }
+    return { land, label, size };
+  });
+  const inside = (pt, shapes) => shapes?.some(({ f, box }) => pt[0] >= box[0] && pt[0] <= box[2] && pt[1] >= box[1] && pt[1] <= box[3] && geoContains(f, pt));
+  const holderOf = (pt, era) => {
+    for (const [o, shapes] of era.land) if (inside(pt, shapes)) return o;
+    return null;
+  };
+  // eras each name is on the map
+  const when = new Map();
+  eras.forEach((e, i) => {
+    for (const o of e.land.keys()) {
+      if (!when.has(o)) when.set(o, new Set());
+      when.get(o).add(i);
+    }
+  });
+  const root = new Map();
+  const find = (x) => (root.has(x) && root.get(x) !== x ? find(root.get(x)) : x);
+  const members = new Map();
+  const group = (x) => members.get(find(x)) ?? [x];
+  for (let i = 0; i + 1 < eras.length; i++) {
+    // biggest first, so an empire's main successor is matched before its smaller pieces
+    const order = [...eras[i].label.keys()].sort((a, b) => (eras[i].size.get(b) || 0) - (eras[i].size.get(a) || 0));
+    for (const x of order) {
+      const l = eras[i].label.get(x).l;
+      const back = (o) => {
+        const ly = eras[i + 1].label.get(o)?.l;
+        return !!ly && inside(ly, eras[i].land.get(x));
+      };
+      const bigger = (p, q) => (eras[i + 1].size.get(q) || 0) - (eras[i + 1].size.get(p) || 0);
+      const share = (o) => (eras[i + 1].size.get(o) || 0) / Math.max(1, eras[i].size.get(x) || 0);
+      const words = new Set(plain(x).split(/[^\p{L}]+/u).filter((w) => w.length >= 4 && !["empire", "kingdom", "republic", "state", "states"].includes(w)));
+      const kin = (o) => plain(o).split(/[^\p{L}]+/u).some((w) => words.has(w));
+      const inOld = [...eras[i + 1].label.keys()].filter(back);
+      // a successor sharing the old name first, then a two-way match, then the biggest new country lying inside the old
+      // one if it is at least a quarter of its size
+      const two = holderOf(l, eras[i + 1]);
+      const y =
+        inOld.filter((o) => kin(o) && share(o) >= 0.05).sort(bigger)[0] ??
+        (two && back(two) ? two : undefined) ??
+        inOld.filter((o) => share(o) >= 0.25).sort(bigger)[0];
+      if (!y || find(y) === find(x)) continue;
+      const gx = group(x);
+      const gy = group(y);
+      if (gx.some((a) => gy.some((b) => [...(when.get(a) ?? [])].some((k) => when.get(b)?.has(k))))) continue; // on the map together
+      // the later name becomes the group's name
+      const [rx, ry] = [find(x), find(y)];
+      root.set(rx, ry);
+      members.set(ry, [...gx, ...gy]);
+      members.delete(rx);
+    }
+  }
+  for (const [name, r] of canon) if (find(r) !== r) canon.set(name, find(r));
+  for (const x of root.keys()) if (find(x) !== x) canon.set(x, find(x));
+}
+
+function bboxOf(geom) {
+  const polys = geom.type === "Polygon" ? [geom.coordinates] : geom.coordinates;
+  let [w, s, e, n] = [180, 90, -180, -90];
+  for (const poly of polys) for (const [x, y] of poly[0]) [w, s, e, n] = [Math.min(w, x), Math.min(s, y), Math.max(e, x), Math.max(n, y)];
+  return [w, s, e, n];
 }
 
 export function canonicalNames(topos) {

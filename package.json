@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "data": "node scripts/build-data.mjs && node scripts/build-antarctica.mjs && node scripts/build-daily.mjs && node scripts/build-globe.mjs",
+    "data": "node scripts/build-data.mjs && node scripts/build-antarctica.mjs && node scripts/build-daily.mjs && node scripts/build-globe.mjs && node scripts/build-lakes.mjs",
     "leads": "node scripts/show-feedback.mjs",
     "typecheck": "tsc --noEmit",
     "check:data": "node scripts/check-data.mjs"
