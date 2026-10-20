@@ -128,7 +128,9 @@ export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[]
       const second = pick(partners, r);
       used.add(first.id).add(second.id);
       const options: [PoolEntry, PoolEntry] = r() < 0.5 ? [first, second] : [second, first];
-      out.push({ kind, prompt: PROMPTS[kind], options, answer: options[0].a > options[1].a ? 0 : 1 });
+      // Antarctica isn't a country: "Which country is bigger?" becomes "Which is bigger?"
+      const prompt = options.some((o) => o.sub === "continent") ? PROMPTS[kind].replace(" country", "") : PROMPTS[kind];
+      out.push({ kind, prompt, options, answer: options[0].a > options[1].a ? 0 : 1 });
       break;
     }
   }
