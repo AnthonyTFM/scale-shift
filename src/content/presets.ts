@@ -53,6 +53,17 @@ export const presets: Preset[] = [
     ],
   },
   {
+    id: "antarctica-vs-usa",
+    category: "surprising",
+    title: "Antarctica vs the USA",
+    hook: "Flat maps stretch Antarctica into an endless strip. Brought north, it's bigger than the whole United States, Alaska included.",
+    baseEra: "present",
+    shapes: [
+      { era: "present", name: "United States" },
+      { era: "present", name: "Antarctica", lon: -100, lat: 8 },
+    ],
+  },
+  {
     id: "greenland-vs-australia",
     category: "surprising",
     title: "Greenland vs Australia",
