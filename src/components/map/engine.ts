@@ -2,7 +2,7 @@
 // Framework-free on purpose so dragging stays at 60fps; React talks to it through a few setters and callbacks.
 import { geoMercator, geoPath, type GeoPermissibleObjects } from "d3-geo";
 import type { MultiPolygon } from "geojson";
-import { featureAtIn, type Layer, type PolityFeature, type PolityProps } from "@/lib/data";
+import { featureAtIn, type Lake, type Layer, type PolityFeature, type PolityProps } from "@/lib/data";
 import {
   type LonLat,
   type View,
@@ -108,6 +108,7 @@ type BaseCache = {
   /** tile edge in CSS pixels */ size: number;
   shapes: { f: PolityFeature; fill: string; box: [number, number, number, number] }[];
   claims: { c: ClaimShape; box: [number, number, number, number]; p2d?: Path2D }[];
+  lakes: { l: Lake; box: [number, number, number, number]; p2d?: Path2D }[];
   paths: Map<PolityFeature, Path2D>;
   /** state lines: undefined until first needed, null when not shown at this zoom */
   states: { mesh: Path2D; clip: Path2D } | null | undefined;
@@ -151,6 +152,7 @@ export class MapEngine {
   private states: Layer | null = null;
   private labels = true;
   private claims: ClaimShape[] = [];
+  private lakes: Lake[] = [];
   private highlight: string | null = null;
   private pin: LonLat | null = null;
 
@@ -265,6 +267,13 @@ export class MapEngine {
   setClaims(list: ClaimShape[]) {
     this.claims = list;
     this.cache = null;
+    this.markBase();
+  }
+  /** Big lakes, drawn as water over every era (and in the slide) so they never appear or vanish between snapshots. */
+  setLakes(list: Lake[]) {
+    this.lakes = list;
+    this.cache = null;
+    this.lastGrid = null;
     this.markBase();
   }
   setLabels(on: boolean) {
@@ -523,7 +532,8 @@ export class MapEngine {
     });
     // big screens get bigger tiles, so a desktop window needs fewer of them
     const size = this.w * this.h > 900_000 ? 512 : 256;
-    return { k, dpr: this.dpr, proj, size, shapes, claims, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
+    const lakes = this.lakes.filter((l) => l.bbox[2] - l.bbox[0] + (l.bbox[3] - l.bbox[1]) > minDeg).map((l) => ({ l, box: this.cacheBox(l.bbox, k) }));
+    return { k, dpr: this.dpr, proj, size, shapes, claims, lakes, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
   }
 
   /** A box in the cache's units (screen pixels at its zoom, the cut meridian at ±π·k), for skipping shapes outside a tile. */
@@ -715,6 +725,17 @@ export class MapEngine {
       ctx.stroke(states.mesh);
       ctx.restore();
     }
+
+    // big lakes last, as water with a shoreline, the same on every era
+    for (const lk of c.lakes) {
+      if (!hits(lk.box)) continue;
+      const p2d = (lk.p2d ??= this.projected(c, lk.l.geom as GeoPermissibleObjects));
+      ctx.fillStyle = COLORS.ocean;
+      ctx.fill(p2d);
+      ctx.lineWidth = 0.7;
+      ctx.strokeStyle = COLORS.border;
+      ctx.stroke(p2d);
+    }
     return tile;
   }
 
@@ -824,6 +845,26 @@ export class MapEngine {
           for (let x = x0; x < x1; x++, i += 4) if (px[i] >= 128) grid[y * gw + x] = n + 1;
       }
     });
+    // big lakes are water in every era, so they stay put during the slide
+    if (this.lakes.length) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, gw, gh);
+      ctx.setTransform(g, 0, 0, g, 0, 0);
+      let any = false;
+      for (const lk of this.lakes) {
+        if (!this.isVisible(lk.bbox, vb)) continue;
+        for (const proj of projs) {
+          const p2d = new Path2D();
+          geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(lk.geom as GeoPermissibleObjects);
+          ctx.fill(p2d);
+          any = true;
+        }
+      }
+      if (any) {
+        const px = ctx.getImageData(0, 0, gw, gh).data;
+        for (let i = 0; i < grid.length; i++) if (px[i * 4 + 3] >= 128) grid[i] = 0;
+      }
+    }
     return { grid, feats };
   }
 
