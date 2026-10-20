@@ -77,6 +77,13 @@ export default function AboutPage() {
             1:50m country boundaries (public domain), packaged by world-atlas. US states come from the US Census Bureau via us-atlas.
           </li>
           <li>
+            <strong>Flags:</strong>{" "}
+            <a href="https://gitlab.com/catamphetamine/country-flag-icons" rel="noopener noreferrer">
+              country-flag-icons
+            </a>{" "}
+            by catamphetamine (MIT license, see the <a href="/flags/LICENSE.txt">flag license</a>).
+          </li>
+          <li>
             <strong>Population:</strong> World Bank, latest year available, shown for present-day countries only.
           </li>
           <li>

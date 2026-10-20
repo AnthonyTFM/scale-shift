@@ -1,11 +1,13 @@
-// Homepage copy. Facts here must stay true: Africa is 30.37M km², Greenland 2.17M km² (14× smaller).
+// Homepage copy. Facts here must stay true: Africa is 30.37M km², Russia 16.85M km² (1.8× smaller), yet a web map draws
+// Russia at about 83M km², more than twice the size of Africa. (Greenland vs Africa is thetruesize.com's signature
+// example, so we lead with our own.)
 
 export const home = {
   eyebrow: "Free to play · No sign-up needed",
   title: "Your map has been lying to you.",
-  lead: "On most maps, Greenland looks as big as Africa. In reality, Africa is 14 times larger. Drag any country or empire to see its true size, travel through 4,000 years of borders, and put your eye to the test in today's challenge.",
+  lead: "On most maps, Russia looks far bigger than Africa. In reality, Africa is nearly twice its size. Drag any country or empire to see its true size, travel through 4,000 years of borders, and put your eye to the test in today's challenge.",
   playCta: "Take today's challenge",
-  mapCta: "Explore the true-size map",
+  mapCta: "Explore the real-size map",
   globeLabel: "A slowly turning globe of today's countries. Drag to spin it.",
   globeHint: "Drag to spin",
 
@@ -39,5 +41,5 @@ export const home = {
     realLabel: "Real size",
   },
 
-  stickyCta: "Explore the true-size map",
+  stickyCta: "Explore the real-size map",
 };

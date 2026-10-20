@@ -48,7 +48,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **Feel:** show off the world without getting in the way of reading. Deep-ocean headers with a faint world map behind them, warm land colours, light paper for reading. One bold accent (amber `#ffb547`) for primary actions.
 - **Colours** (`src/app/globals.css`): deep ocean panel `#0e2a47` (headers, heroes, footer, map panels), ink `#1f1712`, paper `#fbf6ee`, link `#b4401a`; eight warm political-map pastels (`src/lib/palette.ts`); map ocean `#9FCBE0`. Changed from purple-black on Oct 19.
 - **Homepage globe** (`src/components/home/Globe.tsx`): drawn from `public/data/globe.json` (built by `scripts/build-globe.mjs`). Only the countries are redrawn as it turns (20 fps, starts after page load); the sea, glow and shading are CSS. Keep it that way or homepage performance drops below 90.
-- **Copy voice for hooks:** a dare backed by a true fact ("Greenland looks as big as Africa. Africa is 14 times bigger."). Never invent statistics about players.
+- **Copy voice for hooks:** a dare backed by a true fact ("On most maps, Russia looks far bigger than Africa. In reality, Africa is nearly twice its size."). Don't lead with Greenland vs Africa: it's thetruesize.com's signature example (originality check, Oct 20). Never invent statistics about players.
 - **Type:** Fraunces (headings) + the system font (body), so text paints instantly.
 - **Writing voice:** plain, specific, active. Buttons say what happens. Errors say what to do next.
 
