@@ -85,7 +85,7 @@ export default function HomePage() {
       />
 
       {/* Hero: the hook, the two main actions and a globe to spin */}
-      <section className="relative overflow-hidden bg-panel bg-[radial-gradient(ellipse_at_75%_40%,rgba(84,160,214,0.35),transparent_60%),linear-gradient(180deg,#0e2a47,#0a1f36)] text-panel-text">
+      <section data-hero className="relative overflow-hidden bg-panel bg-[radial-gradient(ellipse_at_75%_40%,rgba(84,160,214,0.35),transparent_60%),linear-gradient(180deg,#0e2a47,#0a1f36)] text-panel-text">
         <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 pb-20 pt-10 md:grid-cols-[1.15fr_1fr] md:pb-24 md:pt-14">
           <div>
             <p className="text-xs font-bold uppercase tracking-wide text-accent">{home.eyebrow}</p>
