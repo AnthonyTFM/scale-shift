@@ -2,9 +2,11 @@
 // the old snapshot and the new one, instead of the tiles. Every spot always belongs to exactly one shape (or the sea),
 // so borders slide without ever opening gaps or overlaps between neighbours.
 //
-// Names change between snapshots ("German Empire" → "Germany"), so nothing is matched by name: each new shape takes
-// over from the old shape it overlaps most, keeps the ground they share, and spreads from there into the ground it
-// gains. A shape with no ground in common (a brand-new state) grows out of its middle. Pure functions, no DOM.
+// Names change between snapshots ("German Empire" → "Germany"), so nothing is matched by name: a new shape carries on
+// an old one when each is the other's biggest overlap. It keeps the ground they share and spreads from there into the
+// ground it gains. A brand-new state grows out of its middle; an old state nothing carries on keeps its own look while
+// it shrinks. Until the moving border reaches a spot, the spot looks exactly as it did before: only borders move.
+// Pure functions, no DOM.
 
 /** Owner of each grid cell: 0 is sea (no shape), n is shape n - 1. */
 export type OwnerGrid = Int32Array;
@@ -18,6 +20,15 @@ export type MorphPlan = {
   flip: Float32Array;
   /** old owner each new owner takes over from */ pred: Int32Array;
   /** new owner each old owner hands over to */ succ: Int32Array;
+  /** the old owner each new owner carries on (each is the other's biggest overlap), or -1 for a brand-new shape */
+  carries: Int32Array;
+  /**
+   * What an old owner's cells show until the border reaches them: the new owner carrying it on (ids 0…nB-1), or for an
+   * old shape nothing carries on, its own id nB + old owner. Colours, border styles and names are looked up by id.
+   */
+  idA: Int32Array;
+  nA: number;
+  nB: number;
 };
 
 /** Plans the change from grid `a` (nA owners incl. sea) to grid `b` (nB owners incl. sea). */
@@ -121,39 +132,44 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
   for (let i = 0; i < n; i++) if (dist[i] !== UNSET && dist[i] > far[b[i]]) far[b[i]] = dist[i];
   const flip = new Float32Array(n);
   for (let i = 0; i < n; i++) flip[i] = stable(i) ? 0 : dist[i] === UNSET ? 1 : (dist[i] + 1) / (far[b[i]] + 1);
-  return { w, h, a, b, flip, pred, succ };
+  const carries = new Int32Array(nB).fill(-1);
+  const idA = new Int32Array(nA);
+  for (let i = 0; i < nA; i++) idA[i] = nB + i;
+  for (let j = 0; j < nB; j++)
+    if (succ[pred[j]] === j) {
+      carries[j] = pred[j];
+      idA[pred[j]] = j;
+    }
+  return { w, h, a, b, flip, pred, succ, carries, idA, nA, nB };
 }
 
 /** Border style per shape, as the tiles draw it: none (sea, filled-in gaps), soft (unclaimed land), dashed (approximate), solid. */
 export const LINE = { none: 0, soft: 1, dashed: 2, solid: 3 } as const;
 
 /**
- * Paints the map `e` of the way through the change (0 old, 1 new). Each cell is drawn in the solid colour of the
- * shape it belongs to right now (its new owner, or for ground not reached yet, the shape its old owner becomes), with
- * no blending, so only the borders move: nothing looks blurred or faded. colB holds rgb triples per new owner.
- * Fills `id` (which new owner each cell shows) and `line` (the border style of the shape really there: the old one
- * until the new owner reaches the cell), for the names and border lines drawn on top.
+ * Paints the map `e` of the way through the change (0 old, 1 new). Each cell shows the shape it belongs to right now:
+ * its new owner once the moving border has reached it, else the shape that was there before. Colours and border styles
+ * come per id (see MorphPlan.idA) and stay as they were until the slide ends, so only the borders move: no blending,
+ * no colour or style changes on the way. Fills `id` and `line` (each cell's id and border style) for what is drawn on top.
  */
 export function paintMorph(
   p: MorphPlan,
   e: number,
-  colB: Uint8Array,
-  lineA: Uint8Array,
-  lineB: Uint8Array,
+  colId: Uint8Array,
+  lineId: Uint8Array,
   out: Uint8ClampedArray,
   id: Int32Array = new Int32Array(p.w * p.h),
   line: Uint8Array = new Uint8Array(p.w * p.h),
 ) {
-  const { a, b, flip, succ } = p;
+  const { a, b, flip, idA } = p;
   for (let i = 0, o = 0; i < id.length; i++, o += 4) {
-    const flipped = e >= flip[i];
-    const k = flipped ? b[i] : succ[a[i]];
-    id[i] = k; // named by its new owner, so no border shows inside a shape that is growing
-    line[i] = flipped ? lineB[b[i]] : lineA[a[i]];
+    const k = e >= flip[i] ? b[i] : idA[a[i]];
+    id[i] = k;
+    line[i] = lineId[k];
     const c = k * 3;
-    out[o] = colB[c];
-    out[o + 1] = colB[c + 1];
-    out[o + 2] = colB[c + 2];
+    out[o] = colId[c];
+    out[o + 1] = colId[c + 1];
+    out[o + 2] = colId[c + 2];
     out[o + 3] = 255;
   }
   return id;

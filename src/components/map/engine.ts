@@ -2,7 +2,7 @@
 // Framework-free on purpose so dragging stays at 60fps; React talks to it through a few setters and callbacks.
 import { geoMercator, geoPath, type GeoPermissibleObjects } from "d3-geo";
 import type { MultiPolygon } from "geojson";
-import { featureAtIn, type Layer, type PolityFeature, type PolityProps } from "@/lib/data";
+import { featureAtIn, type Lake, type Layer, type PolityFeature, type PolityProps } from "@/lib/data";
 import {
   type LonLat,
   type View,
@@ -82,21 +82,21 @@ const MORPH_CELLS_TOUCH = 450_000; // phones too
 /** An era change in progress: painted from two owner grids (see morph.ts), screen-sized, until it ends or the map moves. */
 type Pt = [number, number];
 /**
- * A name during a slide, per new owner: the old name too when the shape carries on an old one (it switches halfway), and
- * where the map puts the name and where the shape's middle is, before and after.
+ * A name during a slide, per id: the name shown (a shape keeps the name it had before until the slide ends), whether it
+ * only shows once its shape is big enough (a new state growing in, an old one shrinking away), and where the map puts
+ * the name and where the shape's middle is, before and after.
  */
-type MorphLabel = { from?: PolityProps; to: PolityProps; l0?: Pt; l1?: Pt; c0?: Pt; c1?: Pt };
+type MorphLabel = { name: PolityProps; sized: boolean; l0?: Pt; l1?: Pt; c0?: Pt; c1?: Pt };
 
 type Morph = {
   plan: MorphPlan;
   /** grid cells per screen pixel */ g: number;
-  /** fill colour (rgb) per new owner */ colB: Uint8Array;
+  /** per id (see MorphPlan.idA): fill colour (rgb), border style (LINE), name */
+  colId: Uint8Array;
+  lineId: Uint8Array;
   labels: (MorphLabel | null)[];
-  /** border style (LINE) per old and per new owner, as the tiles draw it */
-  lineA: Uint8Array;
-  lineB: Uint8Array;
-  /** border style of the shape really in each cell, in the frame just drawn */ line: Uint8Array;
-  /** which new owner each cell shows in the frame just drawn */ ids: Int32Array;
+  /** each cell's border style, in the frame just drawn */ line: Uint8Array;
+  /** which id each cell shows, in the frame just drawn */ ids: Int32Array;
   /** how far through the slide the frame just drawn is, 0–1 */ e: number;
   canvas: HTMLCanvasElement;
   image: ImageData;
@@ -111,6 +111,7 @@ type BaseCache = {
   /** tile edge in CSS pixels */ size: number;
   shapes: { f: PolityFeature; fill: string; box: [number, number, number, number] }[];
   claims: { c: ClaimShape; box: [number, number, number, number]; p2d?: Path2D }[];
+  lakes: { l: Lake; box: [number, number, number, number]; p2d?: Path2D }[];
   paths: Map<PolityFeature, Path2D>;
   /** state lines: undefined until first needed, null when not shown at this zoom */
   states: { mesh: Path2D; clip: Path2D } | null | undefined;
@@ -154,6 +155,7 @@ export class MapEngine {
   private states: Layer | null = null;
   private labels = true;
   private claims: ClaimShape[] = [];
+  private lakes: Lake[] = [];
   private highlight: string | null = null;
   private pin: LonLat | null = null;
 
@@ -168,6 +170,8 @@ export class MapEngine {
   // zoom level instead (see BaseCache); panning only moves them, so every frame is a complete, exact drawing.
   private cache: BaseCache | null = null;
   private morph: Morph | null = null;
+  /** the last owner grid worked out, reused as the start of the next slide while the view hasn't moved */
+  private lastGrid: { layer: Layer; at: string; grid: OwnerGrid; cols: Uint8Array; feats: PolityFeature[] } | null = null;
   private tilePool: HTMLCanvasElement[] = [];
   private prefetchTimer = 0;
   private lastViewChange = 0;
@@ -249,7 +253,13 @@ export class MapEngine {
     this.cache = null;
     this.morph = null;
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (prev && layer && prev.key !== layer.key && !reduce) this.morph = this.startMorph(prev, layer);
+    if (prev && layer && prev.key !== layer.key && !reduce) {
+      try {
+        this.morph = this.startMorph(prev, layer);
+      } catch (e) {
+        console.warn("[map] border slide skipped", e); // the new era still shows, just without the slide
+      }
+    }
     this.markBase();
   }
   setStates(states: Layer | null) {
@@ -260,6 +270,13 @@ export class MapEngine {
   setClaims(list: ClaimShape[]) {
     this.claims = list;
     this.cache = null;
+    this.markBase();
+  }
+  /** Big lakes, drawn as water over every era (and in the slide) so they never appear or vanish between snapshots. */
+  setLakes(list: Lake[]) {
+    this.lakes = list;
+    this.cache = null;
+    this.lastGrid = null;
     this.markBase();
   }
   setLabels(on: boolean) {
@@ -518,7 +535,8 @@ export class MapEngine {
     });
     // big screens get bigger tiles, so a desktop window needs fewer of them
     const size = this.w * this.h > 900_000 ? 512 : 256;
-    return { k, dpr: this.dpr, proj, size, shapes, claims, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
+    const lakes = this.lakes.filter((l) => l.bbox[2] - l.bbox[0] + (l.bbox[3] - l.bbox[1]) > minDeg).map((l) => ({ l, box: this.cacheBox(l.bbox, k) }));
+    return { k, dpr: this.dpr, proj, size, shapes, claims, lakes, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
   }
 
   /** A box in the cache's units (screen pixels at its zoom, the cut meridian at ±π·k), for skipping shapes outside a tile. */
@@ -710,6 +728,17 @@ export class MapEngine {
       ctx.stroke(states.mesh);
       ctx.restore();
     }
+
+    // big lakes last, as water with a shoreline, the same on every era
+    for (const lk of c.lakes) {
+      if (!hits(lk.box)) continue;
+      const p2d = (lk.p2d ??= this.projected(c, lk.l.geom as GeoPermissibleObjects));
+      ctx.fillStyle = COLORS.ocean;
+      ctx.fill(p2d);
+      ctx.lineWidth = 0.7;
+      ctx.strokeStyle = COLORS.border;
+      ctx.stroke(p2d);
+    }
     return tile;
   }
 
@@ -744,32 +773,49 @@ export class MapEngine {
     canvas.height = gh;
     const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
     const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
-    const a = this.ownerGrid(prev, ctx, g, projs);
-    const b = this.ownerGrid(next, ctx, g, projs);
-    const plan = planMorph(a.grid, b.grid, a.cols.length / 3, b.cols.length / 3, gw, gh);
+    // the last grid worked out is the start of this slide when the view hasn't moved (playing through the eras)
+    const at = `${gw}x${gh}|${this.view.lon},${this.view.y},${this.view.k}`;
+    const a = this.lastGrid?.layer === prev && this.lastGrid.at === at ? this.lastGrid : { layer: prev, at, ...this.ownerGrid(prev, ctx, g, projs) };
+    const b = { layer: next, at, ...this.ownerGrid(next, ctx, g, projs) };
+    this.lastGrid = b;
+    const plan = planMorph(a.grid, b.grid, a.feats.length + 1, b.feats.length + 1, gw, gh);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     const image = ctx.createImageData(gw, gh);
 
-    // names: where each sits at the start and the end, so it can follow its shape's middle in between
-    const nB = b.feats.length + 1;
-    const pt = (l?: [number, number]) => (l ? ((projs[0](l) as Pt | null) ?? undefined) : undefined);
-    const lineOf = (feats: PolityFeature[]) => {
-      const out = new Uint8Array(feats.length + 1); // 0: the sea
-      feats.forEach((f, n) => (out[n + 1] = f.props.m || f.sliced ? LINE.none : !f.props.n ? LINE.soft : f.props.b >= 2 ? LINE.solid : LINE.dashed));
-      return out;
+    // per id: new owners first (a shape carrying on an old one keeps the old one's look until the slide ends), then old
+    // shapes nothing carries on. The tiles take over at the end with the new era's colours, styles and names.
+    const { nA, nB } = plan;
+    const lineOf = (f: PolityFeature | undefined) => (!f || f.props.m || f.sliced ? LINE.none : !f.props.n ? LINE.soft : f.props.b >= 2 ? LINE.solid : LINE.dashed);
+    const looks = (id: number) => {
+      if (id >= nB) return a.feats[id - nB - 1]; // an old shape shrinking away (undefined for the sea)
+      const j = plan.carries[id];
+      return j > 0 ? a.feats[j - 1] : b.feats[id - 1]; // carries on an old shape, or a new one
     };
-    const lineA = lineOf(a.feats);
-    const lineB = lineOf(b.feats);
-    const c0 = this.middles(paintMorph(plan, 0, b.cols, lineA, lineB, image.data), gw, nB, g).at;
-    const c1 = this.middles(paintMorph(plan, 1, b.cols, lineA, lineB, image.data), gw, nB, g).at;
-    const labels = Array.from({ length: nB }, (_, k): MorphLabel | null => {
-      if (k === 0) return null; // the sea
-      const to = b.feats[k - 1].props;
-      const j = plan.pred[k];
-      const from = j > 0 && plan.succ[j] === k ? a.feats[j - 1].props : undefined; // carries on an old shape
-      return { from, to, l0: pt(from?.l), l1: pt(to.l), c0: c0[k], c1: c1[k] };
+    const colId = new Uint8Array((nA + nB) * 3);
+    const lineId = new Uint8Array(nA + nB);
+    for (let id = 0; id < nA + nB; id++) {
+      const f = id === 0 || id === nB ? undefined : looks(id);
+      colId.set(hexToRgb(f ? fillOf(f) : COLORS.ocean), id * 3);
+      lineId[id] = lineOf(f);
+    }
+
+    // names: where each sits at the start and the end, so it can follow its shape's middle in between
+    const pt = (l?: [number, number]) => (l ? ((projs[0](l) as Pt | null) ?? undefined) : undefined);
+    const c0 = this.middles(paintMorph(plan, 0, colId, lineId, image.data), gw, nA + nB, g).at;
+    const c1 = this.middles(paintMorph(plan, 1, colId, lineId, image.data), gw, nA + nB, g).at;
+    const labels = Array.from({ length: nA + nB }, (_, id): MorphLabel | null => {
+      if (id === 0 || id === nB) return null; // the sea
+      if (id > nB) {
+        const old = a.feats[id - nB - 1].props;
+        return { name: old, sized: true, l0: pt(old.l), c0: c0[id] };
+      }
+      const to = b.feats[id - 1].props;
+      const j = plan.carries[id];
+      if (j <= 0) return { name: to, sized: true, l1: pt(to.l), c1: c1[id] };
+      const from = a.feats[j - 1].props;
+      return { name: from, sized: false, l0: pt(from.l), l1: pt(to.l), c0: c0[id], c1: c1[id] };
     });
-    return { plan, g, colB: b.cols, labels, lineA, lineB, line: new Uint8Array(gw * gh), ids: new Int32Array(gw * gh), e: 0, canvas, image, start: performance.now() };
+    return { plan, g, colId, lineId, labels, line: new Uint8Array(gw * gh), ids: new Int32Array(gw * gh), e: 0, canvas, image, start: performance.now() };
   }
 
   /**
@@ -813,6 +859,26 @@ export class MapEngine {
           for (let x = x0; x < x1; x++, i += 4) if (px[i] >= 128) grid[y * gw + x] = n + 1;
       }
     });
+    // big lakes are water in every era, so they stay put during the slide
+    if (this.lakes.length) {
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, gw, gh);
+      ctx.setTransform(g, 0, 0, g, 0, 0);
+      let any = false;
+      for (const lk of this.lakes) {
+        if (!this.isVisible(lk.bbox, vb)) continue;
+        for (const proj of projs) {
+          const p2d = new Path2D();
+          geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(lk.geom as GeoPermissibleObjects);
+          ctx.fill(p2d);
+          any = true;
+        }
+      }
+      if (any) {
+        const px = ctx.getImageData(0, 0, gw, gh).data;
+        for (let i = 0; i < grid.length; i++) if (px[i * 4 + 3] >= 128) grid[i] = 0;
+      }
+    }
     return { grid, cols, feats };
   }
 
@@ -824,7 +890,7 @@ export class MapEngine {
       return false;
     }
     const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-    paintMorph(m.plan, e, m.colB, m.lineA, m.lineB, m.image.data, m.ids, m.line);
+    paintMorph(m.plan, e, m.colId, m.lineId, m.image.data, m.ids, m.line);
     m.e = e;
     m.canvas.getContext("2d")!.putImageData(m.image, 0, 0);
     const ctx = this.bctx;
@@ -886,8 +952,8 @@ export class MapEngine {
     m.labels.forEach((lb, k) => {
       const c = now.at[k];
       if (!lb || !c) return;
-      if (!lb.from && now.n[k] < minCells) return;
-      const props = lb.from && e < 0.5 ? lb.from : lb.to;
+      if (lb.sized && now.n[k] < minCells) return;
+      const props = lb.name;
       let at: Pt | undefined;
       if (projs.length === 1) {
         // the label's offset from the shape's middle, eased from before to after, added to where the middle is now
