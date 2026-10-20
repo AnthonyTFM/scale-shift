@@ -100,6 +100,7 @@ _Last updated: October 19, 2026_
 **GitHub**
 - `main` is protected: changes go through a pull request, approvals are not required, and the CI status check `build` must pass (lint, typecheck, build, data check).
 - Decided Oct 20: Anthony and Evan each merge and ship any change on their own once CI passes, big ones included. No approvals or waiting on the other owner. The hourly checks notify each owner when the other ships.
+- Decided Oct 20: neither owner's Claude ever touches the other owner's branches, open PRs or the files they're changing (see CLAUDE.md, Avoid collisions).
 - Issues are on. Leftover branches from merged PRs are deleted.
 - Working from a Claude Code cloud session: GitHub's GraphQL API is blocked there, so `gh pr list`, `gh pr checks` and `gh pr merge` fail. Use the REST equivalents (`gh api repos/AnthonyTFM/scale-shift/...`) or finish the step from a laptop.
 

@@ -28,6 +28,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 - Before starting, run `gh issue list` and `gh pr list`. If someone else is already working in the same files, warn the user before editing.
 - Suggest opening a GitHub issue for any task bigger than a few minutes and assigning it to whoever is doing it.
 - Never push directly to `main`. Never force-push. Never rewrite shared history.
+- **Hands off the other owner's work.** Never push to, rebase, merge, close, comment on behalf of, or "fix" the other owner's branches or open PRs, even if CI fails or they're stale. Leave their files alone while their PR is open: if your change would touch the same files, tell your owner and wait for their PR to merge (then merge `main` into your branch). Only exception: the other owner explicitly asks you, in a GitHub comment, to change their PR.
 - On a merge conflict: merge `main` into the branch, resolve it keeping both people's intent, rerun the checks.
 
 ## Read first (technical)
