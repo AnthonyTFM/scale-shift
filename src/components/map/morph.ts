@@ -40,41 +40,54 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
   pred[0] = 0;
   succ[0] = 0;
 
-  // spread each new owner from the ground it keeps into the ground it gains (8 neighbours, one step per cell)
-  const dist = new Float32Array(n).fill(-1);
-  const queue = new Int32Array(n);
-  let head = 0;
-  let tail = 0;
-  const stable = (i: number) => a[i] === pred[b[i]];
-  for (let i = 0; i < n; i++) if (stable(i)) dist[i] = 0;
-  const near = (i: number, visit: (q: number) => void) => {
-    const x = i % w;
-    const y = (i - x) / w;
-    for (let dy = -1; dy <= 1; dy++)
-      for (let dx = -1; dx <= 1; dx++) {
-        if (!dx && !dy) continue;
-        const nx = x + dx;
-        const ny = y + dy;
-        if (nx >= 0 && ny >= 0 && nx < w && ny < h) visit(ny * w + nx);
-      }
+  // Ground a new owner keeps: only where it carries on the old owner (each is the other's biggest overlap). A new
+  // state carved out of an empire (Poland out of the Russian Empire) keeps nothing, so it grows in rather than popping up.
+  const stable = (i: number) => a[i] === pred[b[i]] && succ[a[i]] === b[i];
+
+  // spread each new owner from the ground it keeps into the ground it gains, staying inside its new borders. Steps cost
+  // 5 straight and 7 diagonally (≈ 1 : √2), so fronts move out in near-circles rather than squares.
+  const UNSET = 0x7fffffff;
+  const dist = new Int32Array(n).fill(UNSET);
+  // cells waiting to spread, by distance mod 8 (a step costs at most 7, so a bucket never mixes two distances)
+  const buckets: number[][] = Array.from({ length: 8 }, () => []);
+  let waiting = 0;
+  const reach = (i: number, d: number) => {
+    dist[i] = d;
+    buckets[d & 7].push(i, d);
+    waiting++;
   };
+  for (let i = 0; i < n; i++) if (stable(i)) dist[i] = 0;
+  const unreached = (q: number, from: number) => dist[q] === UNSET && b[q] === b[from];
   for (let i = 0; i < n; i++) {
     if (dist[i] !== 0) continue;
-    let edge = false;
-    near(i, (q) => {
-      if (dist[q] < 0 && b[q] === b[i]) edge = true;
-    });
-    if (edge) queue[tail++] = i;
+    const x = i % w;
+    if ((x > 0 && unreached(i - 1, i)) || (x + 1 < w && unreached(i + 1, i)) || (i >= w && unreached(i - w, i)) || (i + w < n && unreached(i + w, i))) {
+      dist[i] = UNSET; // queue it so it spreads, at distance 0
+      reach(i, 0);
+    }
   }
   const spread = () => {
-    while (head < tail) {
-      const i = queue[head++];
-      near(i, (q) => {
-        if (dist[q] < 0 && b[q] === b[i]) {
-          dist[q] = dist[i] + 1;
-          queue[tail++] = q;
-        }
-      });
+    for (let d = 0; waiting > 0; d++) {
+      const list = buckets[d & 7];
+      while (list.length) {
+        const at = list.pop()!;
+        const i = list.pop()!;
+        waiting--;
+        if (at !== d || dist[i] !== d) continue; // reached sooner some other way
+        const x = i % w;
+        const y = (i - x) / w;
+        for (let dy = -1; dy <= 1; dy++)
+          for (let dx = -1; dx <= 1; dx++) {
+            if (!dx && !dy) continue;
+            const nx = x + dx;
+            const ny = y + dy;
+            if (nx < 0 || ny < 0 || nx >= w || ny >= h) continue;
+            const q = ny * w + nx;
+            if (b[q] !== b[i] || dist[q] === 0) continue;
+            const nd = d + (dx && dy ? 7 : 5);
+            if (nd < dist[q]) reach(q, nd);
+          }
+      }
     }
   };
   spread();
@@ -84,7 +97,7 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
     const sy = new Float64Array(nB);
     const cnt = new Float64Array(nB);
     for (let i = 0; i < n; i++)
-      if (dist[i] < 0) {
+      if (dist[i] === UNSET) {
         sx[b[i]] += i % w;
         sy[b[i]] += Math.floor(i / w);
         cnt[b[i]]++;
@@ -93,25 +106,21 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
     const seedD = new Float64Array(nB).fill(Infinity);
     let any = false;
     for (let i = 0; i < n; i++) {
-      if (dist[i] >= 0) continue;
+      if (dist[i] !== UNSET) continue;
       any = true;
       const o = b[i];
       const d = (i % w - sx[o] / cnt[o]) ** 2 + (Math.floor(i / w) - sy[o] / cnt[o]) ** 2;
       if (d < seedD[o]) [seedD[o], seed[o]] = [d, i];
     }
     if (!any) break;
-    for (const s of seed)
-      if (s >= 0) {
-        dist[s] = 0;
-        queue[tail++] = s;
-      }
+    for (const s of seed) if (s >= 0) reach(s, 1); // 1, not 0: 0 means ground kept from before
     spread();
   }
   // each owner's gains take the same time to fill, however big they are
   const far = new Float32Array(nB);
-  for (let i = 0; i < n; i++) if (dist[i] > far[b[i]]) far[b[i]] = dist[i];
+  for (let i = 0; i < n; i++) if (dist[i] !== UNSET && dist[i] > far[b[i]]) far[b[i]] = dist[i];
   const flip = new Float32Array(n);
-  for (let i = 0; i < n; i++) flip[i] = stable(i) ? 0 : dist[i] < 0 ? 1 : (dist[i] + 1) / (far[b[i]] + 1);
+  for (let i = 0; i < n; i++) flip[i] = stable(i) ? 0 : dist[i] === UNSET ? 1 : (dist[i] + 1) / (far[b[i]] + 1);
   return { w, h, a, b, flip, pred, succ };
 }
 
