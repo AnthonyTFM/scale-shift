@@ -6,15 +6,15 @@ export const eraIntros: Record<string, string> = {
   "1000bce":
     "The Late Bronze Age collapse has swept away the Hittites and weakened Egypt. Assyria is rebuilding, and the Zhou dynasty rules northern China.",
   "500bce":
-    "The Achaemenid Persian Empire stretches from the Aegean to the Indus, the largest state the world has yet seen. Greek city-states and Rome are small players on its western edge.",
+    "The Achaemenid Persian Empire stretches from the Aegean to the Indus, the largest state the world has yet seen. The Greek city-states and Rome are minor powers on its western fringe.",
   "323bce":
     "Alexander the Great has just died in Babylon. His empire, built in about ten years, is about to be divided among his generals.",
   "100":
     "Rome and Han China dominate opposite ends of Eurasia, linked by the Silk Road through Parthia and the Kushan Empire.",
   "1200":
-    "On the eve of the Mongol conquests. Within decades, Genghis Khan and his heirs build the largest contiguous land empire in history.",
+    "The world stands on the eve of the Mongol conquests. Within decades, Genghis Khan and his heirs build the largest contiguous land empire in history.",
   "1492":
-    "The year Columbus reaches the Caribbean. This snapshot also maps hundreds of Indigenous nations across the Americas and Australia, which is why it contains far more shapes than its neighbours.",
+    "Columbus reaches the Caribbean. This snapshot also maps hundreds of Indigenous nations across the Americas and Australia, which is why it holds far more shapes than the eras around it.",
   "1783":
     "The Treaty of Paris recognizes the United States. Spain holds most of the Americas west of the Mississippi, and the Mughal Empire is fragmenting as the East India Company expands.",
   "1815":
@@ -28,9 +28,9 @@ export const eraIntros: Record<string, string> = {
   "1945":
     "The war has just ended. Germany and Korea are divided into occupation zones, and decolonization is about to begin.",
   "1960":
-    "The Year of Africa: 17 African countries become independent. The Cold War divides Europe.",
+    "The Year of Africa, when 17 African countries win independence. The Cold War divides Europe.",
   "1994":
     "The Soviet Union and Yugoslavia have broken up, adding more than 20 countries to the map in three years.",
   present:
-    "Today's borders, as drawn by Natural Earth. Hatched markers show areas where control and international recognition do not match.",
+    "Today's borders, as drawn by Natural Earth. Hatched areas show where control on the ground and international recognition don't match.",
 };

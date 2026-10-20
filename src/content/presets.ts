@@ -26,7 +26,7 @@ export const presets: Preset[] = [
     id: "greenland-vs-congo",
     category: "surprising",
     title: "Greenland vs DR Congo",
-    hook: "On most maps Greenland looks several times bigger. In reality DR Congo is slightly larger.",
+    hook: "On most maps, Greenland looks several times bigger. In reality, DR Congo is slightly larger.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "DR Congo" },
@@ -37,7 +37,7 @@ export const presets: Preset[] = [
     id: "russia-at-equator",
     category: "surprising",
     title: "Russia at the equator",
-    hook: "Still the world's largest country, but watch how much it shrinks once you remove the polar stretch.",
+    hook: "Still the world's largest country, but watch how much it shrinks without the polar stretch.",
     baseEra: "present",
     shapes: [{ era: "present", name: "Russia", lon: 20, lat: 2 }],
   },
@@ -129,7 +129,7 @@ export const presets: Preset[] = [
     id: "crimea-vs-belgium",
     category: "controversial",
     title: "Crimea",
-    hook: "Seized by Russia in 2014, recognized as Ukraine by most of the world. It's about the size of Belgium.",
+    hook: "Seized by Russia in 2014, but recognized as part of Ukraine by most of the world. It's about the size of Belgium.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "Crimea" },
@@ -141,7 +141,7 @@ export const presets: Preset[] = [
     id: "russia-1914-vs-today",
     category: "controversial",
     title: "Russian Empire 1914 vs Russia today",
-    hook: "Finland, Poland, the Baltics, Ukraine, the Caucasus and Central Asia: everything Russia ruled and lost.",
+    hook: "Finland, Poland, the Baltics, Ukraine, the Caucasus and Central Asia: all ruled by the tsars, all since lost.",
     baseEra: "present",
     shapes: [
       { era: "1914", name: "Russian Empire" },
@@ -152,7 +152,7 @@ export const presets: Preset[] = [
     id: "taiwan-vs-netherlands",
     category: "controversial",
     title: "Taiwan",
-    hook: "Self-governing, claimed by Beijing, recognized by about a dozen countries. A little smaller than the Netherlands.",
+    hook: "Self-governing, claimed by Beijing and recognized by about a dozen countries. It's a little smaller than the Netherlands.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "Taiwan" },
@@ -175,7 +175,7 @@ export const presets: Preset[] = [
     id: "germany-1914-vs-today",
     category: "controversial",
     title: "German Empire 1914 vs Germany today",
-    hook: "Alsace-Lorraine, West Prussia, Silesia, East Prussia: lost after two world wars.",
+    hook: "Alsace-Lorraine, West Prussia, Silesia and East Prussia, all lost after two world wars.",
     baseEra: "present",
     shapes: [
       { era: "1914", name: "German Empire" },
@@ -197,7 +197,7 @@ export const presets: Preset[] = [
     id: "ottoman-vs-turkiye",
     category: "controversial",
     title: "Ottoman Empire 1600 vs Türkiye",
-    hook: "From Algeria to Iraq and Hungary to Yemen, down to Anatolia and a corner of Europe.",
+    hook: "It once reached from Algeria to Iraq and from Hungary to Yemen. Today it's Anatolia and a corner of Europe.",
     baseEra: "present",
     shapes: [
       { era: "1600", name: "Ottoman Empire" },
@@ -229,7 +229,7 @@ export const presets: Preset[] = [
     id: "watch-us-grow",
     category: "controversial",
     title: "How the United States grew",
-    hook: "Press play to go from the 13 colonies to coast-to-coast, taken from Native nations, Britain, Spain and Mexico.",
+    hook: "Press play to watch 13 colonies spread from coast to coast, on land taken from Native nations, Britain, Spain and Mexico.",
     baseEra: "1783",
     shapes: [{ era: "1783", name: "United States of America" }],
     play: true,
