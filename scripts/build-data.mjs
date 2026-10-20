@@ -16,6 +16,7 @@ import * as simplifyLib from "topojson-simplify";
 import * as client from "topojson-client";
 import iso from "i18n-iso-countries";
 import polygonClipping from "polygon-clipping";
+import { recolorEraFiles } from "./lib/colors.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CACHE = path.join(ROOT, ".cache");
@@ -121,47 +122,11 @@ function toTopology(features, minWeight) {
   return client.quantize(topo, OUTPUT_QUANTIZE);
 }
 
-// ---------- colours ----------
-// Political-map colouring: every owner gets one of PALETTE_SIZE colours, never the same as a neighbour.
-const PALETTE_SIZE = 8;
+// ---------- colours: every owner keeps one colour across all eras, see scripts/lib/colors.mjs (run at the end) ----------
 function hashString(str) {
   let h = 0;
   for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
   return h;
-}
-function assignColors(topo) {
-  const geoms = topo.objects.p.geometries;
-  const nb = client.neighbors(geoms);
-  const ownerOf = (g) => (g.properties?.n ? g.properties.s || g.properties.n : null);
-  const adj = new Map();
-  geoms.forEach((g, i) => {
-    const o = ownerOf(g);
-    if (!o) return;
-    if (!adj.has(o)) adj.set(o, new Set());
-    for (const j of nb[i]) {
-      const other = ownerOf(geoms[j]);
-      if (other && other !== o) adj.get(o).add(other);
-    }
-  });
-  const color = new Map();
-  for (const o of [...adj.keys()].sort((a, b) => adj.get(b).size - adj.get(a).size || a.localeCompare(b))) {
-    const used = new Set([...adj.get(o)].map((x) => color.get(x)).filter((x) => x !== undefined));
-    const start = hashString(o) % PALETTE_SIZE;
-    let pick = start;
-    for (let t = 0; t < PALETTE_SIZE; t++) {
-      const c = (start + t) % PALETTE_SIZE;
-      if (!used.has(c)) {
-        pick = c;
-        break;
-      }
-    }
-    color.set(o, pick);
-  }
-  for (const g of geoms) {
-    const o = ownerOf(g);
-    if (o) g.properties.k = color.get(o);
-  }
-  return topo;
 }
 
 // ---------- gaps: land the source leaves blank ----------
@@ -476,7 +441,6 @@ async function main() {
       } else patches.push(patch);
     }
     if (allPatches.length) topo = toTopology([...grouped, ...patches], SIMPLIFY_HISTORICAL);
-    assignColors(topo);
     gridSources.push(grouped.filter((f) => f.properties.n));
     const key = eraKey(entry.year);
     const bytes = writeJson(path.join(OUT_PUBLIC, "eras", `${key}.json`), topo);
@@ -547,7 +511,7 @@ async function main() {
     if (props.f) rec.f = props.f;
   }
   gridSources.push(present);
-  const presentBytes = writeJson(path.join(OUT_PUBLIC, "eras", "present.json"), assignColors(toTopology(present, SIMPLIFY_PRESENT)));
+  const presentBytes = writeJson(path.join(OUT_PUBLIC, "eras", "present.json"), toTopology(present, SIMPLIFY_PRESENT));
   eras.push({ key: "present", year: "present", label: "Present", count: present.length, precision: 3, bytes: presentBytes });
   console.log(`  Present   ${present.length} countries  ${(presentBytes / 1024).toFixed(0)} KB`);
 
@@ -625,6 +589,9 @@ async function main() {
   // version stamp: the site adds ?v=… to data URLs so browsers fetch fresh files after every rebuild
   const stamp = hashString(JSON.stringify(eras) + fs.statSync(path.join(OUT_PUBLIC, "rulers-grid.json")).size).toString(36);
   writeJson(path.join(OUT_SRC, "data-version.json"), { v: stamp });
+  // one colour per owner across every era (rewrites the era files and the version stamp)
+  const { clashes } = recolorEraFiles(ROOT);
+  console.log(`  colours: one per owner across all eras (${clashes} neighbouring pairs share one)`);
   writeJson(path.join(OUT_SRC, "era-stats.json"), stats);
   writeJson(path.join(OUT_PUBLIC, "era-stats.json"), stats);
   console.log("Done.");
