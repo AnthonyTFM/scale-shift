@@ -129,11 +129,10 @@ export function planMorph(a: OwnerGrid, b: OwnerGrid, nA: number, nB: number, w:
  * shape it belongs to right now (its new owner, or for ground not reached yet, the shape its old owner becomes), with
  * no blending, so only the borders move: nothing looks blurred or faded. colB holds rgb triples per new owner.
  */
-export function paintMorph(p: MorphPlan, e: number, colB: Uint8Array, border: [number, number, number, number], out: Uint8ClampedArray) {
+export function paintMorph(p: MorphPlan, e: number, colB: Uint8Array, border: [number, number, number, number], out: Uint8ClampedArray, id: Int32Array = new Int32Array(p.w * p.h)) {
   const { w, h, a, b, flip, succ } = p;
   const n = w * h;
   // which shape each cell shows right now, named by its new owner, so no border shows inside a shape that is growing
-  const id = new Int32Array(n);
   for (let i = 0; i < n; i++) id[i] = e >= flip[i] ? b[i] : succ[a[i]];
   const [br, bg, bb, ba] = border;
   for (let i = 0, o = 0; i < n; i++, o += 4) {
@@ -152,4 +151,5 @@ export function paintMorph(p: MorphPlan, e: number, colB: Uint8Array, border: [n
     out[o + 2] = bl;
     out[o + 3] = 255;
   }
+  return id; // also used to place the names
 }
