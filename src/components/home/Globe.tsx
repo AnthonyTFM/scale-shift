@@ -1,34 +1,27 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { geoGraticule10, geoOrthographic, geoPath, type GeoPermissibleObjects } from "d3-geo";
+import { geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import { POLITICAL } from "@/lib/palette";
+import { dropSlivers, GLOBE_INSET, GLOBE_START_LON, GLOBE_TILT, type GlobeCountry, type RawGlobeCountry } from "@/lib/globe";
 
-type Country = { type: "Feature"; properties: { n: string; k: number }; geometry: GeoPermissibleObjects };
+type Country = GlobeCountry;
 
-const TILT = -18; // degrees: show a little more of the north, where most people live
+const TILT = GLOBE_TILT;
 const SPEED = 6; // degrees per second
 const FRAME_MS = 50; // 20 frames a second is smooth enough for a slow spin and keeps phones responsive
 
-/**
- * Drops slivers: island outlines squashed to fewer than 3 distinct points. One lying exactly on the globe's edge makes the
- * clipping think it covers the whole sphere, and the ocean flashes that country's colour. scripts/build-globe.mjs already
- * removes them; this also covers a copy of the old file still sitting in a browser's cache.
- */
-function dropSlivers(c: Country): Country {
-  const g = c.geometry as { type: string; coordinates: number[][][][] | number[][][] };
-  const solid = (rings: number[][][]) => new Set(rings[0].map((p) => p.join())).size >= 3;
-  if (g.type === "Polygon") return solid(g.coordinates as number[][][]) ? c : { ...c, geometry: { type: "MultiPolygon", coordinates: [] } as GeoPermissibleObjects };
-  if (g.type !== "MultiPolygon") return c;
-  return { ...c, geometry: { type: "MultiPolygon", coordinates: (g.coordinates as number[][][][]).filter(solid) } as GeoPermissibleObjects };
-}
-
 /** A slowly turning globe drawn from our own borders. Drag to spin it. Decorative: the page works without it. */
-export function Globe({ label }: { label: string }) {
+export function Globe({ label, onReady }: { label: string; onReady?: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
+  // the latest onReady, read once the countries are drawn (keeps the set-up effect from re-running)
+  const readyCb = useRef(onReady);
+  useEffect(() => {
+    readyCb.current = onReady;
+  });
 
   useEffect(() => {
     const el = canvas.current!;
@@ -36,7 +29,7 @@ export function Globe({ label }: { label: string }) {
     const ctx = el.getContext("2d")!;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let countries: Country[] = [];
-    let lon = -20;
+    let lon = GLOBE_START_LON;
     let size = 0;
     let dpr = 1;
     let visible = true;
@@ -60,7 +53,7 @@ export function Globe({ label }: { label: string }) {
 
     // Only the turning parts (grid and countries) are drawn here; the sea, glow and edge shading are CSS layers.
     function draw() {
-      const r = size / 2 - 8;
+      const r = size / 2 - GLOBE_INSET;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, size, size);
       proj.scale(r).translate([size / 2, size / 2]).rotate([lon, TILT]);
@@ -132,12 +125,20 @@ export function Globe({ label }: { label: string }) {
     const ro = new ResizeObserver(resize);
     ro.observe(box);
 
-    fetch("/data/globe.json")
-      .then((r) => r.json())
-      .then((topo: Topology<{ p: GeometryCollection<{ n: string; k: number }> }>) => {
+    // a dropped connection shouldn't leave an empty ocean: try again a couple of times
+    const load = (tries: number): Promise<Topology<{ p: GeometryCollection<{ n: string; k: number }> }>> =>
+      fetch("/data/globe.json")
+        .then((r) => {
+          if (!r.ok) throw new Error(`globe ${r.status}`);
+          return r.json();
+        })
+        .catch((e) => (tries > 0 ? new Promise((ok) => setTimeout(ok, 800)).then(() => load(tries - 1)) : Promise.reject(e)));
+    load(2)
+      .then((topo) => {
         if (disposed) return;
-        countries = (feature(topo, topo.objects.p) as unknown as { features: Country[] }).features.map(dropSlivers);
+        countries = (feature(topo, topo.objects.p) as unknown as { features: RawGlobeCountry[] }).features.map(dropSlivers);
         draw();
+        readyCb.current?.();
         const go = () =>
           window.setTimeout(() => {
             ready = true;
@@ -147,7 +148,7 @@ export function Globe({ label }: { label: string }) {
         else window.addEventListener("load", go, { once: true });
       })
       .catch(() => {
-        /* the globe stays as a plain ocean sphere */
+        /* the still picture of the globe stays in place */
       });
 
     resize();

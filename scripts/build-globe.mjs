@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { feature, quantize } from "topojson-client";
 import { presimplify, simplify, quantile } from "topojson-simplify";
-import { geoEqualEarth, geoPath } from "d3-geo";
+import { geoEqualEarth, geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
 
 const topo = JSON.parse(readFileSync("public/data/eras/present.json", "utf8"));
 const pre = presimplify(topo);
@@ -51,4 +51,28 @@ writeFileSync(
   "public/world.svg",
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 487"><path d="${d}" fill="#8fc3ea" fill-opacity="0.16"/></svg>\n`,
 );
+// The globe's first frame as a picture (public/globe-still.svg): the homepage shows it straight away, so countries are
+// on screen before the live globe's script and data arrive. Keep the rotation, tilt and colours in step with
+// src/lib/globe.ts and src/lib/palette.ts.
+const POLITICAL = ["#F6C28B", "#F29E8E", "#F5D671", "#B6D98A", "#8DD0B8", "#C4ACE5", "#F2A6C6", "#E2B88E"];
+const START_LON = -20;
+const TILT = -18;
+{
+  const lighter = simplify(pre, quantile(pre, 0.06));
+  const shapes = feature(lighter, lighter.objects.p).features.filter((f) => f.geometry && small.objects.p.geometries.find((g) => g.properties.n === f.properties.n)?.type);
+  const ortho = geoOrthographic().clipAngle(90).scale(47.5).translate([50, 50]).rotate([START_LON, TILT]);
+  const p = geoPath(ortho);
+  p.digits?.(1);
+  const fills = POLITICAL.map((color, i) => {
+    const d = shapes
+      .filter((f) => (f.properties.k ?? 0) % POLITICAL.length === i)
+      .map((f) => p(f) ?? "")
+      .join("")
+      .replace(/M[^M]*?Z/g, (ring) => (ring.length > 24 ? ring : ""));
+    return d ? `<path d="${d}" fill="${color}"/>` : "";
+  }).join("");
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="${p(geoGraticule10())}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.15"/><g stroke="rgba(88,60,46,0.45)" stroke-width="0.12" stroke-linejoin="round">${fills}</g></svg>\n`;
+  writeFileSync("public/globe-still.svg", svg);
+  console.log(`globe-still.svg ${(svg.length / 1024).toFixed(0)} KB`);
+}
 console.log(`globe.json ${(JSON.stringify(small).length / 1024).toFixed(0)} KB (${dropped} slivers removed), world.svg ${(d.length / 1024).toFixed(0)} KB`);
