@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { preload } from "react-dom";
 import pool from "@/data/daily-pool.json";
 import { disputes } from "@/content/disputes";
 import { events } from "@/content/events";
@@ -67,6 +68,8 @@ const directory = [
 
 
 export default function HomePage() {
+  // start downloading the globe's country data with the page, instead of after its script loads
+  preload("/data/globe.json", { as: "fetch", crossOrigin: "anonymous" });
   return (
     <>
       <LegacyMapRedirect />
