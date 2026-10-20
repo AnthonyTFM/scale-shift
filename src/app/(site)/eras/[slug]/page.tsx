@@ -118,7 +118,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
             <h2 id="largest" className="font-display text-3xl text-ink">
               Largest {e.key === "present" ? "countries today" : `in ${e.label}`}
             </h2>
-            <p className="mt-1 text-sm text-muted">Areas calculated from the map outlines (≈). Share of Earth&apos;s land area including Antarctica.</p>
+            <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
             <div className="mt-4 overflow-x-auto rounded-card border border-line bg-white">
               <table className="w-full min-w-[520px] text-left text-sm">
                 <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
@@ -160,7 +160,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
               What changed since {prev.label}
             </h2>
             <p className="mt-1 text-sm text-muted">
-              Comparing the two snapshots. Some differences reflect improved mapping rather than real events, especially before 1500.
+              Based on the two snapshots. Some differences reflect better mapping rather than real events, especially before 1500.
             </p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               <ChangeList title="Grew the most" rows={s.gained.map((c) => ({ n: c.n, detail: `${km(c.from)} → ${km(c.to)}` }))} />

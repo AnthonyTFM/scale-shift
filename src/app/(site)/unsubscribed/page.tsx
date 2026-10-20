@@ -4,7 +4,7 @@ import { UnsubscribeResult } from "@/components/site/UnsubscribeResult";
 
 export const metadata: Metadata = {
   title: "Unsubscribed",
-  description: `You won't get ${site.name} reminder emails any more.`,
+  description: `You won't get ${site.name} reminder emails anymore.`,
   robots: { index: false },
 };
 

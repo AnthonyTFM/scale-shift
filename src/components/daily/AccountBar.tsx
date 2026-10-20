@@ -40,7 +40,7 @@ function Bar() {
         </>
       ) : (
         <>
-          <span>Same nickname on every device:</span>
+          <span>Keep your nickname on every device:</span>
           <SignInButton mode="modal" withSignUp forceRedirectUrl="/leaderboard" signUpForceRedirectUrl="/leaderboard">
             <button type="button" className="font-semibold text-link hover:underline">
               Sign in →

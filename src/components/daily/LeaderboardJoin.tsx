@@ -178,7 +178,7 @@ function EmailJoin({ date, choices }: Props) {
             </span>
           </label>
           <p id="lb-help" className="mt-1 text-xs text-muted">
-            One nickname per email. We use your email to keep the leaderboard fair, and for reminders only if you tick the box. We never
+            One nickname per email. We use your email to keep the leaderboard fair, and for reminders only if you check the box. We never
             show or share it. Please don&apos;t use your full real name as a nickname. Only your first try each day counts.
           </p>
         </form>

@@ -60,7 +60,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
         <div className="relative">
           <button
             type="button"
-            aria-label="Change colour"
+            aria-label="Change color"
             aria-expanded={colorOpen}
             onClick={() => setColorOpen((v) => !v)}
             className="flex h-9 items-center gap-1 rounded-lg bg-white/10 px-2 hover:bg-white/15"
@@ -76,7 +76,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
                 <button
                   key={c}
                   type="button"
-                  aria-label={`Colour ${i + 1}`}
+                  aria-label={`Color ${i + 1}`}
                   aria-pressed={i === o.color % PALETTE.length}
                   onClick={() => {
                     onColor(i);

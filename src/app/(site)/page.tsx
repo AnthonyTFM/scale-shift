@@ -47,14 +47,14 @@ const directory = [
     href: "/timeline",
     icon: "📜",
     title: "Timeline",
-    body: `${events.length} key moments when land changed hands, with when it was taken and when (or if) it was made official.`,
+    body: `${events.length} key moments when land changed hands: when each was taken, and when (or whether) it was made official.`,
     cta: "Read the timeline",
   },
   {
     href: "/disputes",
     icon: "⚖️",
     title: "Disputed borders",
-    body: `${disputes.length} places where who controls the land and who the world recognizes don't match, from Crimea to Antarctica.`,
+    body: `${disputes.length} places where control on the ground and international recognition don't match, from Crimea to Antarctica.`,
     cta: "See the disputes",
   },
   {

@@ -25,7 +25,7 @@ const faqs = [
   },
   {
     q: "What do 'taken' and 'made official' mean?",
-    a: "'Taken' is when control on the ground changed: an army arrived, a flag went up, or a declaration was made. 'Made official' is when it was formalized by a treaty, a purchase, or recognition by the former owner or other states. Some took decades, and some never happened.",
+    a: "'Taken' is when control on the ground changed: an army arrived, a flag went up, or a declaration was made. 'Made official' is when it was formalized by a treaty, a purchase, or recognition by the former owner or other states. Some were made official decades later; some never were.",
   },
   {
     q: "How do you draw disputed territories?",
@@ -66,8 +66,8 @@ export default function AboutPage() {
               historical-basemaps
             </a>{" "}
             by André Ourednik and contributors (GPL-3.0). Each feature carries a border-precision rating, which we show on the map as solid
-            (precise) or dashed (approximate) lines. Our processed copies stay under the same licence (see the{" "}
-            <a href="/data/LICENSE.txt">data licence</a>).
+            (precise) or dashed (approximate) lines. Our processed copies stay under the same license (see the{" "}
+            <a href="/data/LICENSE.txt">data license</a>).
           </li>
           <li>
             <strong>Present day:</strong>{" "}
@@ -150,7 +150,7 @@ export default function AboutPage() {
           ))}
         </ul>
         <p>
-          Found something wrong? <Link href="/contact?topic=border">Report a border error</Link>. Every report is read, and fixes go into the
+          Found something wrong? <Link href="/contact?topic=border">Report a border error</Link>. We read every report, and fixes go into the
           corrections table above.
         </p>
 

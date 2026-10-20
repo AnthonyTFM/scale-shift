@@ -36,13 +36,13 @@ export function YearNote({ year, eraKey, onEra, onFocus, onClose }: Props) {
               <>Showing today&apos;s borders for {asked}.</>
             ) : (
               <>
-                Showing the {snap?.label} map for {asked}
+                Showing the {snap?.label} map for {asked}.
               </>
             )}
           </p>
           {!exact && eraKey !== "present" ? (
             <p className="text-xs text-muted">
-              We have a map every 50–200 years in ancient times and every 5–20 years after 1800. This is the last one drawn before {asked}.
+              Our maps are 50–200 years apart in ancient times and 5–20 years apart after 1800. This is the closest one before {asked}.
             </p>
           ) : null}
         </div>

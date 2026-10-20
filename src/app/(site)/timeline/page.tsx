@@ -20,8 +20,8 @@ export default function TimelinePage() {
         title="When land was taken, and when it became official"
         lead={
           <p>
-            Borders change twice: once on the ground, and again on paper. Each event shows both dates. When paperwork lagged behind control, the
-            gap averages about {avgGap} years in this list.
+            Borders change twice: once on the ground, and again on paper. Each event shows both dates. Where the paperwork came later, the gap in
+            this list averages about {avgGap} years.
           </p>
         }
       />
