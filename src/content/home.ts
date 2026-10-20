@@ -45,7 +45,8 @@ export const home = {
 
   // the game-first hero: play card, map card and today's leaderboard over a floating globe
   hub: {
-    heading: "Scale Shift: the real size of countries and empires, 2000 BCE to today",
+    mission:
+      "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Scale Shift shows every country and empire at its real size, across 4,000 years of history.",
     playEyebrow: "Today's game",
     playTitle: "Which is bigger?",
     playLead: "Five matchups, about two minutes. The map will try to fool you.",
@@ -60,6 +61,12 @@ export const home = {
     boardEmpty: "No scores yet today. Be the first on the board!",
     boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
     boardCta: "Full leaderboard",
-    moreTitle: "How a round works",
+    howTitle: "How to play",
+    steps: [
+      ["See two shapes", "Both are drawn the way a normal web map shows them, stretched toward the poles."],
+      ["Tap the bigger one", "Pick the one you think is really bigger. Trust your eyes at your own risk."],
+      ["See the truth", "Watch both shrink or grow to their real sizes, with the areas and why the map lied."],
+    ] as [string, string][],
+    howFacts: ["Five matchups a day", "Same puzzle for everyone", "Keep your streak going"],
   },
 };
