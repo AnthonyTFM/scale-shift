@@ -17,6 +17,7 @@ import * as client from "topojson-client";
 import iso from "i18n-iso-countries";
 import polygonClipping from "polygon-clipping";
 import { recolorEraFiles } from "./lib/colors.mjs";
+import { separateEraFiles } from "./lib/overlaps.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const CACHE = path.join(ROOT, ".cache");
@@ -589,6 +590,9 @@ async function main() {
   // version stamp: the site adds ?v=… to data URLs so browsers fetch fresh files after every rebuild
   const stamp = hashString(JSON.stringify(eras) + fs.statSync(path.join(OUT_PUBLIC, "rulers-grid.json")).size).toString(36);
   writeJson(path.join(OUT_SRC, "data-version.json"), { v: stamp });
+  // every spot belongs to one shape: where the sources draw territories on top of each other, the smaller keeps the ground
+  const cuts = separateEraFiles(ROOT).reduce((n, r) => n + r.cut, 0);
+  console.log(`  overlaps: ${cuts} shapes cut so no outline runs through another shape`);
   // one colour per owner across every era (rewrites the era files and the version stamp)
   const { clashes } = recolorEraFiles(ROOT);
   console.log(`  colours: one per owner across all eras (${clashes} neighbouring pairs share one)`);
