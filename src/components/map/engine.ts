@@ -18,6 +18,7 @@ import {
   mercatorInflation,
   EARTH_RADIUS_KM,
 } from "@/lib/geo";
+import { type MorphPlan, type OwnerGrid, paintMorph, planMorph } from "./morph";
 
 
 export type Overlay = {
@@ -73,6 +74,22 @@ const CUT_CENTER = 11.5;
 /** Overlap between neighbouring tiles, in pixels, so no hairline seams show where they meet. */
 const TILE_PAD = 2;
 
+/** How long borders take to slide into a new era, and the most grid cells the slide is worked out on. */
+const MORPH_MS = 1000;
+const MORPH_CELLS = 1_400_000; // one cell per screen pixel on all but very big screens, so the slide is sharp
+const MORPH_CELLS_TOUCH = 450_000; // phones too
+/** COLORS.border as rgb + opacity, for the borders painted during a slide */
+const MORPH_BORDER: [number, number, number, number] = [88, 60, 46, 0.6];
+
+/** An era change in progress: painted from two owner grids (see morph.ts), screen-sized, until it ends or the map moves. */
+type Morph = {
+  plan: MorphPlan;
+  /** fill colour (rgb) per new owner */ colB: Uint8Array;
+  canvas: HTMLCanvasElement;
+  image: ImageData;
+  start: number;
+};
+
 /** Everything needed to draw the world at one zoom level: shape boxes, outlines made on demand and bitmap tiles. */
 type BaseCache = {
   /** zoom (scale) the cache is for */ k: number;
@@ -92,6 +109,15 @@ function hashIndex(s: string) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return h % POLITICAL.length;
+}
+
+function fillOf(f: PolityFeature) {
+  return f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land;
+}
+
+function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
 function hexToRgba(hex: string, a: number) {
@@ -128,6 +154,7 @@ export class MapEngine {
   // Converting ~250 shapes to screen points every frame made phones stutter while panning. They are converted once per
   // zoom level instead (see BaseCache); panning only moves them, so every frame is a complete, exact drawing.
   private cache: BaseCache | null = null;
+  private morph: Morph | null = null;
   private tilePool: HTMLCanvasElement[] = [];
   private prefetchTimer = 0;
   private lastViewChange = 0;
@@ -204,8 +231,12 @@ export class MapEngine {
   // ---------- public setters ----------
 
   setLayer(layer: Layer | null) {
+    const prev = this.layer;
     this.layer = layer;
     this.cache = null;
+    this.morph = null;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if (prev && layer && prev.key !== layer.key && !reduce) this.morph = this.startMorph(prev, layer);
     this.markBase();
   }
   setStates(states: Layer | null) {
@@ -323,6 +354,7 @@ export class MapEngine {
     this.schedule();
   }
   private viewChanged() {
+    this.morph = null; // the slide is painted for one view; moving the map shows the new era straight away
     this.lastViewChange = performance.now();
     this.baseDirty = true;
     this.topDirty = true;
@@ -357,6 +389,7 @@ export class MapEngine {
     if (this.baseDirty) {
       this.drawBase(projs);
       this.baseDirty = false;
+      if (this.morph) this.markBase(); // the next frame of the slide
     }
     if (this.topDirty) {
       this.drawTop(projs);
@@ -405,6 +438,11 @@ export class MapEngine {
     ctx.beginPath();
     ctx.rect(world.x, world.y, world.w, world.h);
     ctx.clip();
+    if (this.morph && this.drawMorph(this.morph)) {
+      this.drawLines();
+      ctx.restore();
+      return;
+    }
     const cache = this.freshCache();
     this.drawTiles(cache);
     this.drawHighlight(cache);
@@ -457,11 +495,7 @@ export class MapEngine {
     const minDeg = (1.2 / k) * (180 / Math.PI);
     const shapes = (this.layer?.features ?? [])
       .filter((f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg)
-      .map((f) => ({
-        f,
-        fill: f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land,
-        box: this.cacheBox(f.bbox, k),
-      }));
+      .map((f) => ({ f, fill: fillOf(f), box: this.cacheBox(f.bbox, k) }));
     const claims = this.claims.map((c) => {
       let [w, s, e, n] = [180, 90, -180, -90];
       for (const poly of c.geom.coordinates)
@@ -680,6 +714,88 @@ export class MapEngine {
       ctx.stroke(p2d);
       ctx.restore();
     }
+  }
+
+  // ---------- era changes: borders slide into place (see morph.ts) ----------
+
+  /** Works out the slide from the era on screen to the next, for the current view. Null if the screen has no size yet. */
+  private startMorph(prev: Layer, next: Layer): Morph | null {
+    if (this.w < 2 || this.h < 2) return null;
+    const cells = window.matchMedia?.("(pointer: coarse)").matches ? MORPH_CELLS_TOUCH : MORPH_CELLS;
+    const g = Math.min(1, Math.sqrt(cells / (this.w * this.h)));
+    const gw = Math.max(1, Math.round(this.w * g));
+    const gh = Math.max(1, Math.round(this.h * g));
+    const canvas = document.createElement("canvas");
+    canvas.width = gw;
+    canvas.height = gh;
+    const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+    const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
+    const a = this.ownerGrid(prev, ctx, g, projs);
+    const b = this.ownerGrid(next, ctx, g, projs);
+    const plan = planMorph(a.grid, b.grid, a.cols.length / 3, b.cols.length / 3, gw, gh);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    return { plan, colB: b.cols, canvas, image: ctx.createImageData(gw, gh), start: performance.now() };
+  }
+
+  /**
+   * Which shape owns each grid cell on screen (0: sea), and each owner's fill colour. Shapes are drawn one at a time
+   * and read back as solid cells, so the anti-aliased edges never blend two owners into a made-up one.
+   */
+  private ownerGrid(layer: Layer, ctx: CanvasRenderingContext2D, g: number, projs: ReturnType<typeof projectionFor>[]) {
+    const { width: gw, height: gh } = ctx.canvas;
+    const feats = layer.features.filter((f) => !f.props.x);
+    const grid: OwnerGrid = new Int32Array(gw * gh);
+    const cols = new Uint8Array((feats.length + 1) * 3);
+    cols.set(hexToRgb(COLORS.ocean), 0);
+    const vb = this.visibleBox();
+    ctx.fillStyle = ctx.strokeStyle = "#000";
+    ctx.lineJoin = "round";
+    feats.forEach((f, n) => {
+      cols.set(hexToRgb(fillOf(f)), (n + 1) * 3);
+      if (!this.isVisible(f.bbox, vb)) return;
+      for (const proj of projs) {
+        // the shape's box on screen, in grid cells (the whole grid when it wraps around the world)
+        const nw = proj([f.bbox[0], f.bbox[3]]);
+        const se = proj([f.bbox[2], f.bbox[1]]);
+        let [x0, y0, x1, y1] = [0, 0, gw, gh];
+        if (nw && se && f.bbox[2] - f.bbox[0] < 180 && nw[0] <= se[0]) {
+          x0 = Math.max(0, Math.floor(nw[0] * g) - 2);
+          y0 = Math.max(0, Math.floor(nw[1] * g) - 2);
+          x1 = Math.min(gw, Math.ceil(se[0] * g) + 2);
+          y1 = Math.min(gh, Math.ceil(se[1] * g) + 2);
+        }
+        if (x1 <= x0 || y1 <= y0) continue;
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(x0, y0, x1 - x0, y1 - y0);
+        ctx.setTransform(g, 0, 0, g, 0, 0);
+        const p2d = new Path2D();
+        geoPath(proj, p2d as unknown as CanvasRenderingContext2D)(f.geom as GeoPermissibleObjects);
+        ctx.fill(p2d);
+        ctx.lineWidth = 1 / g; // seals hairline gaps between neighbours, as the tiles do
+        ctx.stroke(p2d);
+        const px = ctx.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+        for (let y = y0, i = 3; y < y1; y++)
+          for (let x = x0; x < x1; x++, i += 4) if (px[i] >= 128) grid[y * gw + x] = n + 1;
+      }
+    });
+    return { grid, cols };
+  }
+
+  /** One frame of the slide. False once it has finished (the tiles take over). */
+  private drawMorph(m: Morph) {
+    const t = (performance.now() - m.start) / MORPH_MS;
+    if (t >= 1) {
+      this.morph = null;
+      return false;
+    }
+    const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+    paintMorph(m.plan, e, m.colB, MORPH_BORDER, m.image.data);
+    m.canvas.getContext("2d")!.putImageData(m.image, 0, 0);
+    const ctx = this.bctx;
+    ctx.imageSmoothingEnabled = false; // sharp cells, no blur
+    ctx.drawImage(m.canvas, 0, 0, this.w, this.h);
+    ctx.imageSmoothingEnabled = true;
+    return true;
   }
 
   private projected(c: BaseCache, g: GeoPermissibleObjects) {
