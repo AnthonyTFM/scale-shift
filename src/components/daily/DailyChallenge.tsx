@@ -27,6 +27,8 @@ import { loadPlayer, rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
+import { buzz, confetti } from "@/lib/celebrate";
+import { resultImage } from "@/lib/result-image";
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -160,7 +162,14 @@ export function DailyChallenge() {
     const q = round.questions[step];
     track("daily_answer", { n: step + 1, correct: q.answer === choice, practice: !round.date });
     const last = next.length >= round.questions.length;
-    play(q.answer !== choice ? "wrong" : last && scoreOf(round, next) === round.questions.length ? "perfect" : "right");
+    const perfect = last && scoreOf(round, next) === round.questions.length;
+    play(q.answer !== choice ? "wrong" : perfect ? "perfect" : "right");
+    // a tick for every answer, a double buzz when wrong, and a party on a perfect round
+    buzz(q.answer !== choice ? [30, 50, 30] : 12);
+    if (perfect) {
+      buzz([20, 40, 20, 40, 80]);
+      setTimeout(confetti, 350);
+    }
     let updated = save;
     if (round.date) {
       const fresh = loadSave(); // keep anything other tabs saved
@@ -527,6 +536,28 @@ function Results({
     }
   };
 
+  const shareImage = async () => {
+    if (!round.date) return;
+    track("daily_share_image", { score });
+    const blob = await resultImage({ day: dayNumber(round.date), score, marks: round.questions.map((q, i) => choices[i] === q.answer), verdict, streak: s.streak });
+    if (!blob) return setCopied("Couldn't make the picture. Try Share my score instead.");
+    const file = new File([blob], `scale-shift-daily-${dayNumber(round.date)}.png`, { type: "image/png" });
+    try {
+      if (navigator.canShare?.({ files: [file] }) && matchMedia("(pointer: coarse)").matches) {
+        await navigator.share({ files: [file], text: `${location.origin}/daily` });
+        return;
+      }
+    } catch {
+      /* share sheet closed or failed: fall back to a download */
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = file.name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    setCopied("Picture saved. Post it anywhere.");
+  };
+
   const share = async () => {
     const url = `${location.origin}/daily`;
     const text = `${site.name} Daily #${dayNumber(today)} · ${score}/${total}\n${grid}\n${url}`;
@@ -588,14 +619,17 @@ function Results({
               </div>
             ))}
           </dl>
-          <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-            <button type="button" onClick={share} className="press h-12 flex-1 rounded-xl bg-accent font-bold text-panel [--press-shadow:#c47a10] hover:bg-accent-strong">
+          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+            <button type="button" onClick={share} className="press h-12 rounded-xl bg-accent font-bold text-panel [--press-shadow:#c47a10] hover:bg-accent-strong">
               Share my score
             </button>
-            <button type="button" onClick={challengeFriend} className="press h-12 flex-1 rounded-xl bg-panel font-bold text-panel-text [--press-shadow:#071a2e] hover:bg-panel-2">
+            <button type="button" onClick={shareImage} className="press h-12 rounded-xl bg-accent font-bold text-panel [--press-shadow:#c47a10] hover:bg-accent-strong">
+              📸 Share as a picture
+            </button>
+            <button type="button" onClick={challengeFriend} className="press h-12 rounded-xl bg-panel font-bold text-panel-text [--press-shadow:#071a2e] hover:bg-panel-2">
               Challenge a friend
             </button>
-            <button type="button" onClick={onPractice} className="press h-12 flex-1 rounded-xl border-2 border-line bg-white font-bold text-ink hover:bg-paper">
+            <button type="button" onClick={onPractice} className="press h-12 rounded-xl border-2 border-line bg-white font-bold text-ink hover:bg-paper">
               Play a practice round
             </button>
           </div>
