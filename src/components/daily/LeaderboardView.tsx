@@ -129,7 +129,7 @@ export function LeaderboardView() {
           <AllTable
             board={current.data as WeekBoard}
             caption={`This week: ${shortDate((current.data as WeekBoard).start)} to ${shortDate((current.data as WeekBoard).end)}`}
-            note="Resets every Monday. Every day you play this week adds your points."
+            note="Resets every Monday. Each day you play this week adds to your points."
             empty="No scores yet this week. Play today's challenge to take the lead."
           />
         ) : (

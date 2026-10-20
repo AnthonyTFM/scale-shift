@@ -80,7 +80,7 @@ export const events: TerritoryEvent[] = [
     lon: 35.2,
     lat: 32.3,
     polities: ["Assyria"],
-    summary: "Samaria falls to the Neo-Assyrian Empire and the northern kingdom becomes Assyrian provinces.",
+    summary: "Samaria falls to the Neo-Assyrian Empire and the northern kingdom is divided into Assyrian provinces.",
   },
   {
     id: "cyrus-takes-babylon",
@@ -120,7 +120,7 @@ export const events: TerritoryEvent[] = [
     lat: 33.0,
     polities: ["Empire of Alexander", "Achaemenid Empire"],
     summary:
-      "In about a decade of campaigning (334–325 BCE) Alexander takes Anatolia, Egypt, Persia and reaches the Indus. No treaty ever recognizes the empire, which splits after his death in 323 BCE.",
+      "In about a decade of campaigning (334–325 BCE) Alexander takes Anatolia, Egypt and Persia and reaches the Indus. No treaty ever recognizes the empire, which splits after his death in 323 BCE.",
   },
   {
     id: "partition-of-babylon",
@@ -165,7 +165,7 @@ export const events: TerritoryEvent[] = [
     lon: 14.0,
     lat: 37.5,
     polities: ["Roman Republic", "Carthage"],
-    summary: "The First Punic War (264–241 BCE) is fought over Sicily. When it ends, Carthage hands the island to Rome, which becomes Rome's first overseas province.",
+    summary: "The First Punic War (264–241 BCE) is fought over Sicily. When it ends, Carthage hands the island to Rome, and it becomes Rome's first overseas province.",
   },
   {
     id: "qin-unifies-china",
@@ -205,7 +205,7 @@ export const events: TerritoryEvent[] = [
     lon: 2.5,
     lat: 47.0,
     polities: ["Roman Republic"],
-    summary: "Eight years of campaigns (58–50 BCE) bring all of Gaul to the Rhine under Roman control.",
+    summary: "Eight years of campaigns (58–50 BCE) bring all of Gaul, up to the Rhine, under Roman control.",
   },
   {
     id: "rome-annexes-egypt",
@@ -245,7 +245,7 @@ export const events: TerritoryEvent[] = [
     lat: 45.8,
     polities: ["Roman Empire"],
     summary:
-      "Dacia (101–106) and Arabia Petraea (106) are annexed, and by 117 Rome briefly holds Mesopotamia. His successor Hadrian gives Mesopotamia up almost immediately.",
+      "Trajan annexes Dacia (101–106) and Arabia Petraea (106), and by 117 Rome briefly holds Mesopotamia. His successor, Hadrian, gives it up almost immediately.",
   },
   {
     id: "rome-divided",
@@ -259,7 +259,7 @@ export const events: TerritoryEvent[] = [
     lon: 28.97,
     lat: 41.0,
     polities: ["Western Roman Empire", "Eastern Roman Empire"],
-    summary: "On Theodosius I's death the empire splits between Honorius (West) and Arcadius (East). It is never reunited.",
+    summary: "When Theodosius I dies, the empire splits between Honorius (West) and Arcadius (East). It is never reunited.",
   },
   {
     id: "fall-of-western-rome",
@@ -272,7 +272,7 @@ export const events: TerritoryEvent[] = [
     lon: 12.2,
     lat: 44.4,
     polities: ["Western Roman Empire"],
-    summary: "Odoacer deposes Romulus Augustulus and rules Italy as king. The Eastern Empire continues for almost another thousand years.",
+    summary: "Odoacer deposes Romulus Augustulus and rules Italy as king. The Eastern Empire lasts almost another thousand years.",
   },
   {
     id: "arab-conquests",
@@ -285,7 +285,7 @@ export const events: TerritoryEvent[] = [
     lon: 36.0,
     lat: 32.8,
     polities: ["Rashidun Caliphate", "Persia", "Eastern Roman Empire"],
-    summary: "After Yarmouk (636) the Caliphate takes Syria, Egypt by 642 and ends the Sasanian Empire by 651.",
+    summary: "After Yarmouk (636), the Caliphate takes Syria. It holds Egypt by 642 and ends the Sasanian Empire by 651.",
   },
   {
     id: "umayyad-iberia",
@@ -353,7 +353,7 @@ export const events: TerritoryEvent[] = [
     lat: 47.2,
     polities: ["Mongol Empire", "Mongols"],
     summary:
-      "The Mongol conquests that follow create the largest contiguous land empire in history. By 1260 it splits into four khanates.",
+      "The Mongol conquests that follow create the largest contiguous land empire in history. By 1260 it has split into four khanates.",
   },
   {
     id: "yuan-conquers-song",
@@ -393,7 +393,7 @@ export const events: TerritoryEvent[] = [
     lon: -3.6,
     lat: 37.18,
     polities: ["Castille", "Spain"],
-    summary: "The surrender terms were signed weeks before the handover. Castile and Aragon took the city on 2 January 1492.",
+    summary: "The surrender terms were signed weeks before Castile and Aragon took the city on January 2, 1492.",
   },
   {
     id: "treaty-of-tordesillas",
@@ -421,7 +421,7 @@ export const events: TerritoryEvent[] = [
     lon: -99.13,
     lat: 19.43,
     polities: ["Aztec Empire", "Viceroyalty of New Spain"],
-    summary: "Tenochtitlan falls on 13 August 1521 to Cortés and his Indigenous allies. New Spain is organized as a viceroyalty in 1535.",
+    summary: "Tenochtitlan falls on August 13, 1521, to Cortés and his Indigenous allies. New Spain is organized as a viceroyalty in 1535.",
   },
   {
     id: "inca-conquest",
@@ -487,7 +487,7 @@ export const events: TerritoryEvent[] = [
     lon: 4.9,
     lat: 52.37,
     polities: ["Dutch Republic", "Spain"],
-    summary: "The northern provinces renounce Philip II in the Act of Abjuration. Spain only recognizes their independence 67 years later.",
+    summary: "The northern provinces renounce Philip II in the Act of Abjuration. Spain recognizes their independence only 67 years later.",
   },
   {
     id: "qing-takes-beijing",
@@ -542,7 +542,7 @@ export const events: TerritoryEvent[] = [
     lon: -5.35,
     lat: 36.14,
     polities: ["United Kingdom", "Spain"],
-    summary: "Captured by an Anglo-Dutch fleet in 1704 and ceded to Britain in perpetuity in 1713. Spain still claims it today.",
+    summary: "Gibraltar is captured by an Anglo-Dutch fleet in 1704 and ceded to Britain in perpetuity in 1713. Spain still claims it today.",
   },
   {
     id: "acts-of-union",
@@ -575,7 +575,7 @@ export const events: TerritoryEvent[] = [
   },
   {
     id: "louisiana-to-spain",
-    title: "France gives Louisiana to Spain, which arrives years later",
+    title: "France gives Louisiana to Spain, which is slow to take over",
     taken: 1769,
     formalized: 1762,
     formalizedBy: "Treaty of Fontainebleau (confirmed 1763)",
@@ -586,7 +586,7 @@ export const events: TerritoryEvent[] = [
     lat: 29.95,
     polities: ["Louisiana (Spain)", "Spain", "France"],
     summary:
-      "The transfer was signed in 1762, but Spain only took effective control of New Orleans in 1769. Spain secretly returned Louisiana to France in 1800, just before the Louisiana Purchase.",
+      "The transfer was signed in 1762, but Spain did not take effective control of New Orleans until 1769. Spain secretly returned Louisiana to France in 1800, just before the Louisiana Purchase.",
   },
   {
     id: "new-france-to-britain",
@@ -615,7 +615,7 @@ export const events: TerritoryEvent[] = [
     lat: 52.23,
     polities: ["Russian Empire", "Prussia", "Austrian Empire"],
     summary:
-      "Russia, Prussia and Austria split the Polish–Lithuanian Commonwealth in three steps (1772, 1793, 1795). The first two were forced through the Polish parliament; the third erased the state. Poland only reappears in 1918.",
+      "Russia, Prussia and Austria split the Polish–Lithuanian Commonwealth in three steps (1772, 1793, 1795). The first two were forced through the Polish parliament; the third erased the state. Poland does not reappear until 1918.",
   },
   {
     id: "us-independence",
@@ -629,7 +629,7 @@ export const events: TerritoryEvent[] = [
     lon: -75.15,
     lat: 39.95,
     polities: ["United States of America", "United States", "British American colonies"],
-    summary: "Britain recognizes independence, with a western border on the Mississippi River.",
+    summary: "Britain recognizes American independence, with the new nation's western border on the Mississippi River.",
   },
   {
     id: "new-south-wales",
@@ -755,7 +755,7 @@ export const events: TerritoryEvent[] = [
     lat: 30.27,
     polities: ["United States", "Mexico"],
     summary:
-      "The Republic of Texas wins at San Jacinto in 1836. Mexico never recognizes it, the US annexes it in 1845, and Mexico only accepts the Rio Grande border after losing the 1846–48 war.",
+      "The Republic of Texas wins at San Jacinto in 1836. Mexico never recognizes it, the US annexes it in 1845, and Mexico accepts the Rio Grande border only after losing the 1846–48 war.",
   },
   {
     id: "waitangi",
@@ -770,7 +770,7 @@ export const events: TerritoryEvent[] = [
     lat: -35.27,
     polities: ["New Zealand"],
     summary:
-      "British and Māori chiefs sign, but the English and Māori texts differ on sovereignty. The meaning of what was agreed is still debated and is the basis of settlements today.",
+      "British officials and Māori chiefs sign it, but the English and Māori texts differ on sovereignty. What was agreed is still debated and underpins settlements today.",
   },
   {
     id: "hong-kong-ceded",
@@ -784,7 +784,7 @@ export const events: TerritoryEvent[] = [
     lon: 114.17,
     lat: 22.28,
     polities: ["United Kingdom", "Qing Empire"],
-    summary: "Occupied during the First Opium War and ceded in 1842. Kowloon follows in 1860, and the New Territories are leased for 99 years in 1898.",
+    summary: "The island is occupied during the First Opium War and ceded in 1842. Kowloon follows in 1860, and the New Territories are leased for 99 years in 1898.",
   },
   {
     id: "oregon-treaty",
@@ -869,7 +869,7 @@ export const events: TerritoryEvent[] = [
     lon: -152.0,
     lat: 64.0,
     polities: ["United States", "Russian Empire"],
-    summary: "The US buys about 1.5 million km² from Russia for $7.2 million. The flag changes at Sitka on 18 October 1867.",
+    summary: "The US buys about 1.5 million km² from Russia for $7.2 million. The flag changes at Sitka on October 18, 1867.",
   },
   {
     id: "canadian-confederation",
@@ -897,7 +897,7 @@ export const events: TerritoryEvent[] = [
     lon: 7.75,
     lat: 48.58,
     polities: ["Germany", "France", "Prussia"],
-    summary: "The empire is proclaimed at Versailles in January 1871. France cedes Alsace-Lorraine in May. France takes it back in 1918.",
+    summary: "The empire is proclaimed at Versailles in January 1871. France cedes Alsace-Lorraine in May and takes it back in 1918.",
   },
   {
     id: "congress-of-berlin",
@@ -970,7 +970,7 @@ export const events: TerritoryEvent[] = [
     lat: 37.57,
     polities: ["Empire of Japan", "Korea"],
     summary:
-      "Korea becomes a protectorate in 1905 and is annexed in 1910 under treaties signed under duress. A 1965 Japan–South Korea treaty declared them 'already null and void'.",
+      "Korea becomes a protectorate in 1905 and is annexed in 1910 by treaties signed under duress. A 1965 Japan–South Korea treaty declared them 'already null and void'.",
   },
   {
     id: "versailles",
@@ -998,7 +998,7 @@ export const events: TerritoryEvent[] = [
     lon: 19.04,
     lat: 47.5,
     polities: ["Hungary", "Austro-Hungarian Empire"],
-    summary: "Neighbouring armies occupy much of the kingdom in 1918–19. The treaty confirms Hungary's loss of about two-thirds of its pre-war territory.",
+    summary: "Neighboring armies occupy much of the kingdom in 1918–19. The treaty confirms Hungary's loss of about two-thirds of its pre-war territory.",
   },
   {
     id: "irish-free-state",
@@ -1012,7 +1012,7 @@ export const events: TerritoryEvent[] = [
     lon: -6.26,
     lat: 53.35,
     polities: ["Ireland", "United Kingdom of Great Britain and Ireland"],
-    summary: "The War of Independence (1919–21) ends with a treaty in December 1921. Britain hands over power in 1922 and the Free State is formally established that December. Northern Ireland opts to stay in the UK.",
+    summary: "The War of Independence (1919–21) ends with a treaty in December 1921. Britain hands over power in 1922, and the Free State is formally established that December. Northern Ireland opts to stay in the UK.",
   },
   {
     id: "ussr-formed",
@@ -1123,7 +1123,7 @@ export const events: TerritoryEvent[] = [
     lat: 51.1,
     polities: ["Poland", "Germany", "USSR"],
     summary:
-      "At Potsdam the Allies place Poland's western border on the Oder–Neisse line, provisionally. A reunified Germany only confirms it by treaty 45 years later.",
+      "At Potsdam the Allies place Poland's western border on the Oder–Neisse line, provisionally. A reunified Germany confirms it by treaty only 45 years later.",
   },
   {
     id: "kuril-islands",
@@ -1136,7 +1136,7 @@ export const events: TerritoryEvent[] = [
     lon: 147.9,
     lat: 45.0,
     polities: ["USSR", "Russia", "Japan"],
-    summary: "Occupied in August–September 1945. Japan still claims the four southernmost islands, and the two countries have never signed a peace treaty.",
+    summary: "The Soviet Union occupies the islands in August–September 1945. Japan still claims the four southernmost islands, and the two countries have never signed a peace treaty.",
   },
   {
     id: "partition-of-india",
@@ -1192,7 +1192,7 @@ export const events: TerritoryEvent[] = [
     lon: 121.0,
     lat: 23.7,
     polities: ["China", "Taiwan"],
-    summary: "Mao proclaims the PRC on 1 October 1949. The Republic of China government retreats to Taiwan, and both sides' claims remain unresolved.",
+    summary: "Mao proclaims the PRC on October 1, 1949. The Republic of China government retreats to Taiwan, and both sides' claims remain unresolved.",
   },
   {
     id: "tibet",
@@ -1235,7 +1235,7 @@ export const events: TerritoryEvent[] = [
     lon: 3.06,
     lat: 36.75,
     polities: ["Algeria", "France"],
-    summary: "An eight-year war (1954–62) ends 132 years of French rule. The Évian Accords are signed in March and independence comes on 5 July 1962.",
+    summary: "An eight-year war (1954–62) ends 132 years of French rule. The Évian Accords are signed in March and independence comes on July 5, 1962.",
   },
   {
     id: "six-day-war",
@@ -1318,7 +1318,7 @@ export const events: TerritoryEvent[] = [
     lon: 13.4,
     lat: 52.52,
     polities: ["Germany", "East Germany", "West Germany"],
-    summary: "East Germany joins the Federal Republic on 3 October 1990, three weeks after the four wartime Allies give up their rights.",
+    summary: "East Germany joins the Federal Republic on October 3, 1990, three weeks after the four wartime Allies give up their rights.",
   },
   {
     id: "ussr-dissolved",
@@ -1332,7 +1332,7 @@ export const events: TerritoryEvent[] = [
     lon: 37.62,
     lat: 55.75,
     polities: ["USSR", "Russia", "Ukraine"],
-    summary: "The Soviet flag comes down over the Kremlin on 25 December 1991, and the USSR formally ceases to exist the next day.",
+    summary: "The Soviet flag comes down over the Kremlin on December 25, 1991, and the USSR formally ceases to exist the next day.",
   },
   {
     id: "yugoslavia-breakup",
@@ -1374,7 +1374,7 @@ export const events: TerritoryEvent[] = [
     lon: 17.1,
     lat: 48.15,
     polities: ["Czechia", "Slovakia", "Czechoslovakia"],
-    summary: "Parliament votes for the split in 1992, and two countries exist from 1 January 1993.",
+    summary: "Parliament votes for the split in 1992, and two countries exist from January 1, 1993.",
   },
   {
     id: "hong-kong-handover",
@@ -1388,7 +1388,7 @@ export const events: TerritoryEvent[] = [
     lon: 114.17,
     lat: 22.28,
     polities: ["China", "United Kingdom"],
-    summary: "Agreed 13 years before the handover on 1 July 1997. Portugal returns Macau in 1999 under a similar agreement.",
+    summary: "The handover on July 1, 1997, was agreed 13 years earlier. Portugal returns Macau in 1999 under a similar agreement.",
   },
   {
     id: "kosovo",
@@ -1416,7 +1416,7 @@ export const events: TerritoryEvent[] = [
     lat: 42.23,
     polities: ["Georgia", "Russia"],
     summary:
-      "Both regions break from Georgian control in early-1990s wars. After the August 2008 war Russia recognizes them, but almost no other country does.",
+      "Both regions break from Georgian control in wars in the early 1990s. After the August 2008 war, Russia recognizes them, but almost no other country does.",
   },
   {
     id: "south-sudan",
@@ -1430,7 +1430,7 @@ export const events: TerritoryEvent[] = [
     lon: 31.6,
     lat: 4.85,
     polities: ["South Sudan", "Sudan"],
-    summary: "The 2005 peace agreement grants autonomy. Almost 99% vote for independence, which takes effect on 9 July 2011.",
+    summary: "The 2005 peace agreement grants autonomy. Almost 99% vote for independence, which takes effect on July 9, 2011.",
   },
   {
     id: "crimea-2014",
@@ -1444,7 +1444,7 @@ export const events: TerritoryEvent[] = [
     lat: 45.3,
     polities: ["Crimea", "Russia", "Ukraine"],
     summary:
-      "Russian forces take control in February–March 2014, and Russia declares annexation on 18 March. UN General Assembly Resolution 68/262 affirmed Ukraine's territorial integrity, and most countries do not recognize the annexation.",
+      "Russian forces take control in February–March 2014, and Russia declares annexation on March 18. UN General Assembly Resolution 68/262 affirmed Ukraine's territorial integrity, and most countries do not recognize the annexation.",
   },
   {
     id: "india-bangladesh-enclaves",
@@ -1458,7 +1458,7 @@ export const events: TerritoryEvent[] = [
     lon: 89.0,
     lat: 26.3,
     polities: ["India", "Bangladesh"],
-    summary: "Agreed in 1974 but only carried out on 1 August 2015, 41 years later. It ends one of the world's strangest borders.",
+    summary: "Agreed in 1974 but not carried out until August 1, 2015, 41 years later. It ends one of the world's strangest borders.",
   },
   {
     id: "ukraine-2022",
@@ -1472,7 +1472,7 @@ export const events: TerritoryEvent[] = [
     lat: 48.0,
     polities: ["Russia", "Ukraine"],
     summary:
-      "After its full-scale invasion, Russia declares annexation of Donetsk, Luhansk, Zaporizhzhia and Kherson oblasts on 30 September 2022, though it does not control all of them. UN General Assembly Resolution ES-11/4 rejected it. Front lines shift, so this map does not draw them.",
+      "After its full-scale invasion, Russia declares annexation of Donetsk, Luhansk, Zaporizhzhia and Kherson oblasts on September 30, 2022, though it does not control all of them. UN General Assembly Resolution ES-11/4 rejected it. Front lines keep shifting, so this map does not draw them.",
   },
   {
     id: "nagorno-karabakh",
@@ -1487,7 +1487,7 @@ export const events: TerritoryEvent[] = [
     lat: 39.82,
     polities: ["Azerbaijan", "Armenia"],
     summary:
-      "Armenian forces control the region from 1994. Azerbaijan retakes much of it in 2020 and the rest in September 2023, and the breakaway republic dissolves on 1 January 2024.",
+      "Armenian forces control the region from 1994. Azerbaijan retakes much of it in 2020 and the rest in September 2023, and the breakaway republic dissolves on January 1, 2024.",
   },
   // added Oct 19: major 20th-century border changes that were missing
   {
@@ -1533,7 +1533,7 @@ export const events: TerritoryEvent[] = [
     lat: 41.5,
     polities: ["Ottoman Empire",  "Bulgaria",  "Serbia",  "Greece",  "Montenegro",  "Albania"],
     summary:
-      "Bulgaria, Serbia, Greece and Montenegro seize nearly all Ottoman land in Europe in 1912 and Albania becomes independent. A second war in 1913, over the spoils, leaves Bulgaria with less.",
+      "Bulgaria, Serbia, Greece and Montenegro seize nearly all Ottoman land in Europe in 1912, and Albania becomes independent. A second war in 1913, over the spoils, leaves Bulgaria with less.",
   },
   {
     id: "austria-hungary-ends",
@@ -1576,7 +1576,7 @@ export const events: TerritoryEvent[] = [
     lat: 52.23,
     polities: ["Poland",  "USSR",  "Germany"],
     summary:
-      "Following a secret protocol of the Molotov–Ribbentrop Pact, Germany invades on 1 September 1939 and the Soviet Union on 17 September. The Allies never recognize the division; Poland is restored in 1945 with new borders.",
+      "Following a secret protocol of the Molotov–Ribbentrop Pact, Germany invades on September 1, 1939, and the Soviet Union on September 17. The Allies never recognize the division; Poland is restored in 1945 with new borders.",
   },
   {
     id: "korea-divided",
@@ -1590,7 +1590,7 @@ export const events: TerritoryEvent[] = [
     lat: 38.0,
     polities: ["Korea",  "North Korea",  "South Korea"],
     summary:
-      "US and Soviet forces split Korea at the 38th parallel in 1945 and two rival states form in 1948. The Korean War (1950–53) ends in an armistice, not a peace treaty, and both states still claim the whole peninsula.",
+      "US and Soviet forces split Korea at the 38th parallel in 1945, and two rival states form in 1948. The Korean War (1950–53) ends in an armistice, not a peace treaty, and both states still claim the whole peninsula.",
   },
   {
     id: "germany-divided",
@@ -1620,7 +1620,7 @@ export const events: TerritoryEvent[] = [
     lat: 21.03,
     polities: ["Vietnam"],
     summary:
-      "The 1954 Geneva Accords split Vietnam at the 17th parallel. North Vietnam takes Saigon on 30 April 1975 and the country is formally reunified in July 1976.",
+      "The 1954 Geneva Accords split Vietnam at the 17th parallel. North Vietnam takes Saigon on April 30, 1975, and the country is formally reunified in July 1976.",
   },
   {
     id: "sinai-returned",
@@ -1650,7 +1650,7 @@ export const events: TerritoryEvent[] = [
     lat: -22.56,
     polities: ["Namibia",  "South West Africa",  "South Africa"],
     summary:
-      "Ruled by South Africa since 1915 as South West Africa, and kept after the UN revoked South Africa's mandate in 1966, Namibia becomes independent on 21 March 1990 after UN-supervised elections. Walvis Bay follows in 1994.",
+      "South Africa rules the territory as South West Africa from 1915 and keeps it even after the UN revokes its mandate in 1966. Namibia becomes independent on March 21, 1990, after UN-supervised elections, and Walvis Bay follows in 1994.",
   },
   {
     id: "yemen-1990",
@@ -1665,7 +1665,7 @@ export const events: TerritoryEvent[] = [
     lat: 15.35,
     polities: ["Yemen"],
     summary:
-      "The Yemen Arab Republic (north) and the People's Democratic Republic of Yemen (south) merge on 22 May 1990. A southern attempt to break away again fails in the 1994 civil war.",
+      "The Yemen Arab Republic (north) and the People's Democratic Republic of Yemen (south) merge on May 22, 1990. A southern attempt to break away again fails in the 1994 civil war.",
   },
   {
     id: "macau-1999",
@@ -1680,7 +1680,7 @@ export const events: TerritoryEvent[] = [
     lat: 22.2,
     polities: ["Portugal",  "China"],
     summary:
-      "Portuguese since the 1550s, Macau is handed over on 20 December 1999 under the 1987 Joint Declaration, two years after Hong Kong, and keeps its own system as a Special Administrative Region.",
+      "Portuguese since the 1550s, Macau is handed over on December 20, 1999, under the 1987 Joint Declaration, two years after Hong Kong, and keeps its own system as a Special Administrative Region.",
   },
   {
     id: "montenegro-2006",
@@ -1695,7 +1695,7 @@ export const events: TerritoryEvent[] = [
     lat: 42.44,
     polities: ["Montenegro",  "Serbia"],
     summary:
-      "Montenegro votes to leave its state union with Serbia in May 2006, with 55.5% in favour, just over the 55% the EU required. It ends the last remnant of Yugoslavia.",
+      "Montenegro votes to leave its state union with Serbia in May 2006, with 55.5% in favor, just over the 55% the EU required. The vote ends the last remnant of Yugoslavia.",
   },
   {
     id: "hans-island-2022",
@@ -1710,7 +1710,7 @@ export const events: TerritoryEvent[] = [
     lat: 80.83,
     polities: ["Canada",  "Denmark",  "Greenland"],
     summary:
-      "Ending the good-humoured 'Whisky War', in which each side left bottles of whisky or schnapps on the island, a 2022 agreement splits the 1.3 km² rock between Canada and Greenland, giving the two countries a land border.",
+      "Ending the good-humored 'Whisky War', in which each side left bottles of whisky or schnapps on the island, a 2022 agreement splits the 1.3 km² rock between Canada and Greenland, giving the two countries a land border.",
   },
 ];
 

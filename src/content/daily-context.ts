@@ -7,11 +7,11 @@ export type DailyContext = { what: string; today: string };
 
 export const dailyContext: Record<string, DailyContext> = {
   "Roman Empire": {
-    what: "The empire ruled from Rome, which circled the whole Mediterranean Sea.",
+    what: "An empire ruled from Rome that came to circle the whole Mediterranean Sea.",
     today: "Italy, Spain, France, Greece, Türkiye, Egypt, England and more",
   },
   "Western Roman Empire": {
-    what: "The western half of the Roman Empire after the split of 395 CE. It fell in 476.",
+    what: "The western half of the Roman Empire after the empire split in 395 CE. It fell in 476.",
     today: "Italy, France, Spain, Portugal, England and coastal North Africa",
   },
   "Byzantine Empire": {
@@ -19,7 +19,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Greece, Türkiye and parts of the Balkans",
   },
   "Empire of Alexander": {
-    what: "Conquered by Alexander the Great of Macedon in about 11 years. It broke apart soon after his death in 323 BCE.",
+    what: "Won by Alexander the Great of Macedon in about 11 years, it broke apart soon after his death in 323 BCE.",
     today: "Greece, Türkiye, Egypt, Iraq, Iran, Afghanistan and Pakistan",
   },
   "Achaemenid Empire": {
@@ -27,7 +27,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Türkiye, Egypt, Afghanistan and Central Asia",
   },
   "Seleucid Kingdom": {
-    what: "A Greek-ruled kingdom founded by Seleucus, one of Alexander's generals, from the eastern part of his empire.",
+    what: "A Greek-ruled kingdom carved from the eastern part of Alexander's empire by Seleucus, one of his generals.",
     today: "Syria, Iraq, Iran and parts of Türkiye and Central Asia",
   },
   "Parthian Empire": {
@@ -35,7 +35,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran and Iraq, plus parts of Turkmenistan and Afghanistan",
   },
   "Sasanian Empire": {
-    what: "The last Persian empire before Islam (224–651), rival of Rome and later Byzantium.",
+    what: "The last Persian empire before Islam (224–651), rival first of Rome and later of Byzantium.",
     today: "Iran and Iraq, plus parts of the Caucasus and Central Asia",
   },
   "Carthaginian Empire": {
@@ -71,7 +71,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "China",
   },
   "Tang Empire": {
-    what: "A Chinese dynasty (618–907), a golden age of poetry and Silk Road trade.",
+    what: "A Chinese dynasty (618–907) whose reign was a golden age of poetry and Silk Road trade.",
     today: "China, plus parts of Central Asia and Mongolia",
   },
   "Song Empire": {
@@ -91,7 +91,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "China, Mongolia, Taiwan and part of Russia's Far East",
   },
   "Tibetan Empire": {
-    what: "An empire on the Tibetan Plateau (c. 618–842) that rivalled Tang China.",
+    what: "An empire on the Tibetan Plateau (c. 618–842) that rivaled Tang China.",
     today: "Tibet and western China, plus parts of Nepal, India and Pakistan",
   },
   "Khmer Empire": {
@@ -103,11 +103,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Japan, North and South Korea, Taiwan and northeast China",
   },
   "Umayyad Caliphate": {
-    what: "The first Muslim dynasty to rule an empire (661–750), from Damascus. It reached Spain in 711.",
+    what: "The first Muslim dynasty to rule an empire, from Damascus (661–750). Its armies reached Spain in 711.",
     today: "Syria, Iraq, Iran, Saudi Arabia, Egypt and North Africa",
   },
   "Abbasid Caliphate": {
-    what: "A Muslim caliphate (750–1258) ruled from Baghdad, the centre of the Islamic Golden Age.",
+    what: "A Muslim caliphate (750–1258) ruled from Baghdad, the center of the Islamic Golden Age.",
     today: "Iraq, Iran, Syria, Egypt, Saudi Arabia and Central Asia",
   },
   "Fatimid Caliphate": {
@@ -131,11 +131,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Uzbekistan, Afghanistan, Turkmenistan and more",
   },
   "Khanate of the Golden Horde": {
-    what: "A Mongol state founded by Batu, a grandson of Genghis Khan. It was overlord of the Russian principalities.",
+    what: "A Mongol state founded by Batu, a grandson of Genghis Khan. It ruled the Russian principalities as their overlord.",
     today: "Southern Russia, Ukraine and Kazakhstan",
   },
   "Kievan Rus": {
-    what: "A medieval realm of East Slavic lands centred on Kyiv, the shared ancestor of Ukraine, Belarus and Russia.",
+    what: "A medieval realm of East Slavic lands centered on Kyiv, the shared ancestor of Ukraine, Belarus and Russia.",
     today: "Ukraine, Belarus and western Russia",
   },
   "Russian Empire": {
@@ -155,7 +155,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Germany, Austria, Czechia, Switzerland, the Low Countries and northern Italy",
   },
   "Polish–Lithuanian Commonwealth": {
-    what: "A union of Poland and Lithuania (1569–1795), one of Europe's largest states until its neighbours divided it.",
+    what: "A union of Poland and Lithuania (1569–1795), one of Europe's largest states until its neighbors divided it.",
     today: "Poland, Lithuania, Belarus, Ukraine and Latvia",
   },
   "Kalmar Union": {
@@ -179,7 +179,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Mali, Senegal, Guinea, Gambia and southern Mauritania",
   },
   Songhai: {
-    what: "A West African empire (c. 1464–1591) centred on Gao and Timbuktu. It fell to an invasion from Morocco.",
+    what: "A West African empire (c. 1464–1591) centered on Gao and Timbuktu. It fell to an invasion from Morocco.",
     today: "Mali and Niger, plus parts of Nigeria, Burkina Faso and Mauritania",
   },
   "Inca Empire": {

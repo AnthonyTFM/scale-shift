@@ -40,7 +40,7 @@ export async function WeeklyPicks() {
   return (
     <>
       <p className="mt-1 text-ink-soft">
-        This week&apos;s picks (new every Monday; this set since {label}). Each one opens the map with the comparison already set up.
+        This week&apos;s picks, new every Monday (this set since {label}). Each one opens the map with the comparison ready to go.
       </p>
       <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {picks.map((p) => (

@@ -18,7 +18,7 @@ export const teachers = {
     title: "Why world maps get sizes wrong",
     paras: [
       "Most web and wall maps use the Mercator projection (Gerardus Mercator, 1569). It keeps shapes and compass directions true, which made it ideal for sailors, but to do that it stretches everything more the farther it is from the equator.",
-      "Areas are inflated by 1 ÷ cos²(latitude). At 60° north, land is drawn 4 times too big; near the poles the stretch heads towards infinity, which is why Antarctica looks like a vast strip along the bottom.",
+      "Areas are inflated by 1 ÷ cos²(latitude). At 60° north, land is drawn 4 times too big; near the poles the stretch heads toward infinity, which is why Antarctica looks like a vast strip along the bottom.",
     ],
     tableTitle: "How much a normal map inflates area",
     // latitude, a place at about that latitude

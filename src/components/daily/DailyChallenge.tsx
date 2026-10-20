@@ -181,7 +181,7 @@ export function DailyChallenge() {
           🎯{" "}
           {challenge.day === todayNo
             ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
-            : `${challenge.name} sent you Daily #${challenge.day}. Here's today's: play it and send your score back.`}
+            : `${challenge.name} sent you Daily #${challenge.day}, but this is today's. Play it and send your score back.`}
         </p>
       ) : null}
       {signInOn && !finished && round.date ? <PlayedElsewhere /> : null}
@@ -322,7 +322,7 @@ function QuestionCard({
         {q.prompt}
       </h2>
       <p className="mt-1 text-center text-sm text-muted">
-        {answered ? "Watch them change to their true size." : "Drawn the way a normal web map shows them. Tap the bigger one."}
+        {answered ? "Watch them shrink or grow to their true size." : "Drawn the way a normal web map shows them. Tap the bigger one."}
       </p>
 
       <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-4">

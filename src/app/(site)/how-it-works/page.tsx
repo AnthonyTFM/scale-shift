@@ -13,11 +13,11 @@ export const metadata: Metadata = {
 
 const steps = [
   { title: "Search", body: "Type a country, US state or historical empire. Each result shows which years it appears in." },
-  { title: "Drag", body: "Grab the shape and move it. It shrinks toward the equator and grows toward the poles, showing how big it really is that far from the equator." },
+  { title: "Drag", body: "Grab the shape and move it. It shrinks toward the equator and grows toward the poles, so you see how big it would look at each latitude." },
   { title: "Rotate", body: "Select a shape, then turn the compass rose in the bottom-left corner (or press [ and ])." },
-  { title: "Travel in time", body: "Use the timeline at the bottom, or press play. Shapes you haven't moved update to their borders in each era." },
+  { title: "Travel in time", body: "Use the timeline at the bottom, or press play. Shapes you haven't moved switch to each era's borders." },
   { title: "Ask “who ruled here?”", body: "Click any land to see who controlled that spot in every era, plus the events that changed it. On today's map, any border dispute is shown first." },
-  { title: "Try a comparison", body: "Open the Comparisons tab for the most surprising sizes and the most controversial borders, loaded in one click." },
+  { title: "Try a comparison", body: "Open the Comparisons tab to load the most surprising sizes and the most controversial borders in one click." },
   { title: "Share", body: "The Share button copies a link to exactly what you see, or downloads a PNG." },
 ];
 
@@ -51,8 +51,8 @@ export default function HowItWorksPage() {
             <h2 id="mercator">Why maps lie about size</h2>
             <p>
               Almost every web map uses the Mercator projection. It keeps shapes and directions right locally, which is great for navigation.
-              The cost is size: the further from the equator, the more it inflates area. At 60° north (Oslo, Anchorage) land looks four times
-              bigger than it is. Greenland, centred near 72° north, looks roughly ten times too big.
+              The cost is size: the farther from the equator, the more it inflates area. At 60° north (Oslo, Anchorage), land looks four times
+              bigger than it is. Greenland, centered near 72° north, looks roughly ten times too big.
             </p>
           </div>
           <div className="overflow-x-auto rounded-card border border-line bg-white">

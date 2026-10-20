@@ -27,7 +27,7 @@ export const disputes: Dispute[] = [
     taken: 2014,
     formalStatus: "Annexation not recognized by most UN members (UN General Assembly Resolution 68/262)",
     summary:
-      "Seized in February–March 2014 and declared annexed on 18 March. This map draws Crimea as its own hatched shape, not as part of either country.",
+      "Russia seized it in February–March 2014 and declared it annexed on March 18. This map draws Crimea as its own hatched shape, not as part of either country.",
     polities: ["Crimea", "Russia", "Ukraine"],
   },
   {
@@ -38,9 +38,9 @@ export const disputes: Dispute[] = [
     controlledBy: "Russia (partially)",
     claimedBy: ["Ukraine"],
     taken: 2014,
-    formalStatus: "Claimed annexation of four oblasts (30 September 2022) rejected by UN General Assembly Resolution ES-11/4",
+    formalStatus: "Russia's claimed annexation of four oblasts (September 30, 2022) was rejected by UN General Assembly Resolution ES-11/4",
     summary:
-      "Parts of Donetsk and Luhansk have been under Russian-backed control since 2014, and larger areas since 2022. Front lines move, so they are not drawn. Ukraine's internationally recognized border is shown.",
+      "Parts of Donetsk and Luhansk have been under Russian-backed control since 2014, and larger areas since 2022. Front lines shift, so they are not drawn; the map shows Ukraine's internationally recognized border.",
     polities: ["Ukraine", "Russia"],
   },
   {
@@ -52,7 +52,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["Syria"],
     taken: 1967,
     formalStatus: "Israeli law extended in 1981; UN Security Council Resolution 497 declared it null and void. The US recognized Israeli sovereignty in 2019.",
-    summary: "Captured in the 1967 Six-Day War. The source data draws it inside Israel's de facto border.",
+    summary: "Israel captured it in the 1967 Six-Day War. The source data draws it inside Israel's de facto border.",
     polities: ["Israel", "Syria"],
   },
   {
@@ -77,7 +77,7 @@ export const disputes: Dispute[] = [
     taken: 1947,
     formalStatus: "Divided by the 1949 ceasefire line, renamed the Line of Control in 1972. No agreed border.",
     summary:
-      "China has held Aksai Chin since the 1950s (confirmed by the 1962 war) and received the Shaksgam Valley from Pakistan in 1963, which India does not recognize. The Siachen Glacier has been held by India since 1984.",
+      "China has held Aksai Chin since the 1950s, confirmed by the 1962 war. Pakistan ceded the Shaksgam Valley to China in 1963, a transfer India does not recognize. India has held the Siachen Glacier since 1984.",
     polities: ["India", "Pakistan", "China", "Siachen Glacier"],
   },
   {
@@ -88,7 +88,7 @@ export const disputes: Dispute[] = [
     controlledBy: "India",
     claimedBy: ["China"],
     taken: 1951,
-    formalStatus: "The McMahon Line (1914 Simla Convention) has never been accepted by China",
+    formalStatus: "China has never accepted the McMahon Line (1914 Simla Convention)",
     summary: "China briefly overran much of the area in the 1962 war, then withdrew.",
     polities: ["India", "China"],
   },
@@ -100,9 +100,9 @@ export const disputes: Dispute[] = [
     controlledBy: "Republic of China (Taiwan)",
     claimedBy: ["People's Republic of China"],
     taken: 1945,
-    formalStatus: "Self-governing. Formally recognized by about a dozen UN members; the PRC claims it.",
+    formalStatus: "Self-governing, and formally recognized by about a dozen countries. The PRC claims it.",
     summary:
-      "Japan hands Taiwan to Republic of China administration in 1945. The 1951 San Francisco Treaty has Japan renounce Taiwan without naming a recipient. The ROC government relocates there in 1949.",
+      "Japan handed Taiwan to Republic of China administration in 1945, and the ROC government moved there in 1949. In the 1951 San Francisco Treaty, Japan renounced Taiwan without naming a recipient.",
     polities: ["Taiwan", "China"],
   },
   {
@@ -110,12 +110,12 @@ export const disputes: Dispute[] = [
     name: "Western Sahara",
     lon: -13.2,
     lat: 24.5,
-    controlledBy: "Morocco (about 3/4) and the Sahrawi Republic / Polisario (the east)",
+    controlledBy: "Morocco (about three-quarters) and the Sahrawi Republic / Polisario (the east)",
     claimedBy: ["Morocco", "Sahrawi Arab Democratic Republic"],
     taken: 1975,
     formalStatus: "UN non-self-governing territory. The US recognized Moroccan sovereignty in 2020.",
     summary:
-      "The source data shows Morocco-administered land inside Morocco and only the Polisario-held east as 'Western Sahara', so Morocco's area here includes the disputed part.",
+      "The source data draws Morocco-administered land as part of Morocco and labels only the Polisario-held east 'Western Sahara', so Morocco's area here includes the disputed part.",
     polities: ["Western Sahara", "Morocco"],
   },
   {
@@ -139,7 +139,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["Serbia"],
     taken: 1999,
     formalStatus: "Recognized by roughly half of UN members; Serbia does not recognize it",
-    summary: "Under UN administration from 1999, it declared independence on 17 February 2008.",
+    summary: "Kosovo was under UN administration from 1999 and declared independence on February 17, 2008.",
     polities: ["Kosovo", "Serbia"],
   },
   {
@@ -150,7 +150,7 @@ export const disputes: Dispute[] = [
     controlledBy: "Republic of Somaliland",
     claimedBy: ["Somalia"],
     taken: 1991,
-    formalStatus: "Self-declared independence (18 May 1991); recognition by other states is extremely limited and changing",
+    formalStatus: "Declared independence on May 18, 1991; recognition by other states is extremely limited and changing",
     summary: "It has functioned as a de facto state for over three decades, with its own currency, army and elections.",
     polities: ["Somaliland", "Somalia"],
   },
@@ -163,7 +163,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["Georgia"],
     taken: 1993,
     formalStatus: "Recognized by Russia (2008) and a handful of other states",
-    summary: "Both broke from Georgian control in early-1990s wars. The source data draws them inside Georgia, the internationally recognized border.",
+    summary: "Both broke away from Georgian control in wars in the early 1990s. The source data draws them inside Georgia's internationally recognized border.",
     polities: ["Georgia", "Russia"],
   },
   {
@@ -175,7 +175,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["Moldova"],
     taken: 1992,
     formalStatus: "Not recognized by any UN member",
-    summary: "A strip of land east of the Dniester, de facto independent since the 1992 war, with Russian troops stationed there.",
+    summary: "A strip of land east of the Dniester River, de facto independent since the 1992 war. Russian troops are stationed there.",
     polities: ["Moldova"],
   },
   {
@@ -187,7 +187,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["Argentina"],
     taken: 1833,
     formalStatus: "British Overseas Territory; Argentina maintains its claim",
-    summary: "Argentina invaded in 1982 and Britain retook the islands. In a 2013 referendum 99.8% of voters chose to remain British.",
+    summary: "Argentina invaded in 1982 and Britain retook the islands. In a 2013 referendum, 99.8% of voters chose to remain British.",
     polities: ["Falkland Islands", "United Kingdom", "Argentina"],
   },
   {
@@ -211,7 +211,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["Venezuela"],
     taken: 1899,
     formalStatus: "Set by an 1899 arbitral award that Venezuela rejects; a case is before the International Court of Justice",
-    summary: "About two-thirds of Guyana's territory. Venezuela held a referendum on annexing it in 2023.",
+    summary: "The region makes up about two-thirds of Guyana's territory. In 2023, Venezuela held a referendum on annexing it.",
     polities: ["Guyana", "Venezuela"],
   },
   {
@@ -248,7 +248,7 @@ export const disputes: Dispute[] = [
     taken: 1497,
     formalStatus: "Part of Spain (autonomous cities since 1995); Morocco does not recognize Spanish sovereignty",
     summary:
-      "Spain's two cities on the North African coast, and the European Union's only land borders with Africa. Melilla has been Spanish since 1497; Ceuta, Portuguese from 1415, came under Spain in 1640 and was confirmed Spanish by the Treaty of Lisbon (1668).",
+      "Spain's two cities on the North African coast, which form the European Union's only land borders with Africa. Melilla has been Spanish since 1497; Ceuta, Portuguese from 1415, came under Spain in 1640 and was confirmed Spanish by the Treaty of Lisbon (1668).",
     polities: ["Spain", "Morocco"],
   },
   {
@@ -274,7 +274,7 @@ export const disputes: Dispute[] = [
     taken: 1972,
     formalStatus: "Administered by Japan since the United States returned Okinawa in 1972; China and Taiwan both claim them",
     summary:
-      "Uninhabited islands in the East China Sea. Japan incorporated them in 1895 and the US ran them from 1945 to 1972. China and Taiwan pressed their claims from 1971, after oil and gas were reported nearby.",
+      "Uninhabited islands in the East China Sea. Japan incorporated them in 1895, and the US administered them from 1945 to 1972. China and Taiwan began pressing their claims in 1971, after oil and gas were reported nearby.",
     polities: ["Japan", "China", "Taiwan"],
   },
   {

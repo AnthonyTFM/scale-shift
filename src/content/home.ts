@@ -3,22 +3,22 @@
 export const home = {
   eyebrow: "Free to play · No sign-up needed",
   title: "Your map has been lying to you.",
-  lead: "Greenland looks as big as Africa. Africa is 14 times bigger. Drag any country or empire to its true size, travel through 4,000 years of borders, and see if you can beat today's challenge.",
+  lead: "On most maps, Greenland looks as big as Africa. In reality, Africa is 14 times larger. Drag any country or empire to see its true size, travel through 4,000 years of borders, and put your eye to the test in today's challenge.",
   playCta: "Take today's challenge",
   mapCta: "Explore the true-size map",
-  globeLabel: "A slowly turning globe. Drag it to spin.",
+  globeLabel: "A slowly turning globe of today's countries. Drag to spin it.",
   globeHint: "Drag to spin",
 
   teaser: {
     badge: "Today's game",
     title: "Which is bigger?",
-    lead: "5 matchups. One looks huge, the other really is. Your eyes will lie to you. Can you go 5 for 5?",
+    lead: "Five matchups. In each one, a shape looks huge and the other actually is. The map will try to fool you. Can you go 5 for 5?",
     steps: ["5 quick matchups", "Same puzzle for everyone", "New every midnight"],
-    done: (score: number) => `You scored ${score}/5 today. New matchups at midnight.`,
+    done: (score: number) => `You scored ${score}/5 today. New matchups arrive at midnight.`,
     cta: "Take today's 5 →",
     doneCta: "See today's answers",
     topPlayers: "Today's top players",
-    noScores: "No scores yet today. Be the first on the board.",
+    noScores: "No scores yet today. Be the first on the board!",
     fullBoard: "Full leaderboard →",
   },
 
@@ -28,7 +28,7 @@ export const home = {
     mapLabel: "On a normal map",
     realLabel: "Real size",
     looks: (bigger: string, times: number) => `${bigger} looks ${times}× bigger`,
-    answer: (winner: string) => `${winner} wins`,
+    answer: (winner: string) => `${winner} is bigger`,
   },
 
   fact: {

@@ -97,7 +97,7 @@ export default function TeachersPage() {
                 ))}
                 <p>
                   <Link href="/how-it-works" className="font-semibold text-link hover:underline">
-                    How Scale Shift shows true sizes →
+                    How {site.name} shows true sizes →
                   </Link>
                 </p>
               </div>

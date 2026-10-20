@@ -18,7 +18,7 @@ export default function DailyPage() {
         title="Which is bigger?"
         lead={
           <p>
-            5 matchups a day, the same for everyone. Normal maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the
+            Five matchups a day, the same for everyone. Normal maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the
             leaderboard. New matchups at midnight your time.
           </p>
         }

@@ -49,7 +49,7 @@ const generated: Fact[] = (() => {
     .map(({ a, b }) => ({
       preset: {
         title: `${a.n} vs ${b.n}`,
-        hook: `On a normal map ${a.n} looks ${times(a.m / b.m)}× bigger. In reality ${b.n} is ${b.a / a.a < 1.2 ? "slightly bigger" : `${times(b.a / a.a)}× the size`}.`,
+        hook: `On a normal map, ${a.n} looks ${times(a.m / b.m)}× bigger. In reality, ${b.n} is ${b.a / a.a < 1.2 ? "slightly bigger" : `${times(b.a / a.a)}× the size`}.`,
         baseEra: "present",
         shapes: [
           { era: a.era, name: a.src },

@@ -31,7 +31,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
         ))}
       </Swatch>,
       "Countries and empires",
-      "Colours only tell neighbours apart. They don't mean anything else.",
+      "Colors only tell neighbors apart. They don't mean anything else.",
     ],
     [
       <Swatch key="s">

@@ -7,7 +7,7 @@ import { AccountBar } from "@/components/daily/AccountBar";
 
 export const metadata: Metadata = {
   title: "Leaderboard: daily challenge scores",
-  description: "Who scored best in today's Which is bigger? challenge, and who has the most points of all time.",
+  description: "Today's top scores in the daily size challenge, plus the players with the most points of all time.",
   alternates: { canonical: "/leaderboard" },
 };
 
