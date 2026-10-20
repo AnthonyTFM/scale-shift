@@ -112,7 +112,7 @@ export default function HomePage() {
               <Link
                 href="/map"
                 transitionTypes={["to-map"]}
-                className="group flex items-center gap-4 rounded-card bg-white/10 p-5 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/15"
+                className="group flex items-center gap-4 rounded-card bg-panel/85 p-5 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-panel-2"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- our own small decorative globe picture */}
                 <img

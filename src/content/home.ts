@@ -61,6 +61,13 @@ export const home = {
     boardEmpty: "No scores yet today. Be the first on the board!",
     boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
     boardCta: "Full leaderboard",
+    nextIn: (h: number, m: number) => `Next game in ${h}h ${m}m`,
+    nextReady: "A new game is ready",
+    challengeCta: "Challenge a friend",
+    challengeCopied: "Challenge link copied! Send it to a friend.",
+    spotWaiting: "Your spot is waiting",
+    spotPlay: "Play now",
+    beatMe: "Challenge a friend to beat you",
     howTitle: "How to play",
     steps: [
       ["See two shapes", "Both are drawn the way a normal web map shows them, stretched toward the poles."],
