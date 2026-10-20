@@ -51,7 +51,7 @@ export const home = {
     playTitle: "Which is bigger?",
     playLead: "Five matchups, about two minutes. The map will try to fool you.",
     playCta: "Play today's game",
-    playDone: (score: number) => `You scored ${score}/5 today. New matchups at midnight.`,
+    playDone: (score: number) => `You scored ${score}/5 today.`,
     playDoneCta: "See today's answers",
     mapEyebrow: "The real-size map",
     mapTitle: "Drag any country anywhere",
