@@ -82,9 +82,20 @@ const MORPH_CELLS_TOUCH = 450_000; // phones too
 const MORPH_BORDER: [number, number, number, number] = [88, 60, 46, 0.6];
 
 /** An era change in progress: painted from two owner grids (see morph.ts), screen-sized, until it ends or the map moves. */
+type Pt = [number, number];
+/**
+ * A name during a slide, per new owner: the old name too when the shape carries on an old one (it switches halfway), and
+ * where the map puts the name and where the shape's middle is, before and after.
+ */
+type MorphLabel = { from?: PolityProps; to: PolityProps; l0?: Pt; l1?: Pt; c0?: Pt; c1?: Pt };
+
 type Morph = {
   plan: MorphPlan;
+  /** grid cells per screen pixel */ g: number;
   /** fill colour (rgb) per new owner */ colB: Uint8Array;
+  labels: (MorphLabel | null)[];
+  /** which new owner each cell shows in the frame just drawn */ ids: Int32Array;
+  /** how far through the slide the frame just drawn is, 0–1 */ e: number;
   canvas: HTMLCanvasElement;
   image: ImageData;
   start: number;
@@ -440,6 +451,7 @@ export class MapEngine {
     ctx.clip();
     if (this.morph && this.drawMorph(this.morph)) {
       this.drawLines();
+      if (this.labels) this.drawMorphLabels(this.morph, projs);
       ctx.restore();
       return;
     }
@@ -734,7 +746,21 @@ export class MapEngine {
     const b = this.ownerGrid(next, ctx, g, projs);
     const plan = planMorph(a.grid, b.grid, a.cols.length / 3, b.cols.length / 3, gw, gh);
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    return { plan, colB: b.cols, canvas, image: ctx.createImageData(gw, gh), start: performance.now() };
+    const image = ctx.createImageData(gw, gh);
+
+    // names: where each sits at the start and the end, so it can follow its shape's middle in between
+    const nB = b.feats.length + 1;
+    const pt = (l?: [number, number]) => (l ? ((projs[0](l) as Pt | null) ?? undefined) : undefined);
+    const c0 = this.middles(paintMorph(plan, 0, b.cols, MORPH_BORDER, image.data), gw, nB, g).at;
+    const c1 = this.middles(paintMorph(plan, 1, b.cols, MORPH_BORDER, image.data), gw, nB, g).at;
+    const labels = Array.from({ length: nB }, (_, k): MorphLabel | null => {
+      if (k === 0) return null; // the sea
+      const to = b.feats[k - 1].props;
+      const j = plan.pred[k];
+      const from = j > 0 && plan.succ[j] === k ? a.feats[j - 1].props : undefined; // carries on an old shape
+      return { from, to, l0: pt(from?.l), l1: pt(to.l), c0: c0[k], c1: c1[k] };
+    });
+    return { plan, g, colB: b.cols, labels, ids: new Int32Array(gw * gh), e: 0, canvas, image, start: performance.now() };
   }
 
   /**
@@ -778,7 +804,7 @@ export class MapEngine {
           for (let x = x0; x < x1; x++, i += 4) if (px[i] >= 128) grid[y * gw + x] = n + 1;
       }
     });
-    return { grid, cols };
+    return { grid, cols, feats };
   }
 
   /** One frame of the slide. False once it has finished (the tiles take over). */
@@ -789,13 +815,78 @@ export class MapEngine {
       return false;
     }
     const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
-    paintMorph(m.plan, e, m.colB, MORPH_BORDER, m.image.data);
+    paintMorph(m.plan, e, m.colB, MORPH_BORDER, m.image.data, m.ids);
+    m.e = e;
     m.canvas.getContext("2d")!.putImageData(m.image, 0, 0);
     const ctx = this.bctx;
     ctx.imageSmoothingEnabled = false; // sharp cells, no blur
     ctx.drawImage(m.canvas, 0, 0, this.w, this.h);
     ctx.imageSmoothingEnabled = true;
     return true;
+  }
+
+  /** The middle of each owner's cells on screen (CSS pixels), and how many cells it has. */
+  private middles(ids: Int32Array, gw: number, count: number, g: number) {
+    const sx = new Float64Array(count);
+    const sy = new Float64Array(count);
+    const n = new Float64Array(count);
+    for (let i = 0, x = 0, y = 0; i < ids.length; i++) {
+      const id = ids[i];
+      sx[id] += x;
+      sy[id] += y;
+      n[id]++;
+      if (++x === gw) [x, y] = [0, y + 1];
+    }
+    const at: (Pt | undefined)[] = [];
+    for (let id = 0; id < count; id++) at[id] = n[id] ? [(sx[id] / n[id] + 0.5) / g, (sy[id] / n[id] + 0.5) / g] : undefined;
+    return { at, n };
+  }
+
+  /**
+   * Names during the slide, each following the middle of its shape as the borders move, eased from where the map puts
+   * the name before to where it puts it after, so nothing jumps at either end. A name only changes when the shape's
+   * name does (halfway); a brand-new state gets its name once it has grown big enough to hold it.
+   */
+  private drawMorphLabels(m: Morph, projs: ReturnType<typeof projectionFor>[]) {
+    const ctx = this.bctx;
+    const e = m.e;
+    const now = this.middles(m.ids, m.plan.w, m.labels.length, m.g);
+    const minCells = (28 * m.g) ** 2;
+    const lerp = (p: Pt, q: Pt, t: number): Pt => [p[0] + (q[0] - p[0]) * t, p[1] + (q[1] - p[1]) * t];
+    const shown: { props: PolityProps; at: Pt }[] = [];
+    m.labels.forEach((lb, k) => {
+      const c = now.at[k];
+      if (!lb || !c) return;
+      if (!lb.from && now.n[k] < minCells) return;
+      const props = lb.from && e < 0.5 ? lb.from : lb.to;
+      let at: Pt | undefined;
+      if (projs.length === 1) {
+        // the label's offset from the shape's middle, eased from before to after, added to where the middle is now
+        const before = lb.l0 && lb.c0 ? ([lb.l0[0] - lb.c0[0], lb.l0[1] - lb.c0[1]] as Pt) : undefined;
+        const after = lb.l1 && lb.c1 ? ([lb.l1[0] - lb.c1[0], lb.l1[1] - lb.c1[1]] as Pt) : undefined;
+        const off = before && after ? lerp(before, after, e) : (after ?? before);
+        if (off) at = [c[0] + off[0], c[1] + off[1]];
+      } else at = lb.l0 && lb.l1 ? lerp(lb.l0, lb.l1, e) : (lb.l1 ?? lb.l0); // several world copies: ease between spots
+      if (at) shown.push({ props, at });
+    });
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    const placed: [number, number, number, number][] = [];
+    shown.sort((p, q) => q.props.a - p.props.a);
+    let count = 0;
+    for (const { props, at } of shown) {
+      if (count > 160) break;
+      const fit = this.labelFit(ctx, props);
+      if (!fit) continue;
+      for (const proj of projs) {
+        const shift = projs.length > 1 ? proj.translate()[0] - this.w / 2 : 0;
+        this.placeLabel(ctx, fit.text, [at[0] + shift, at[1]], fit.size, 600, placed);
+      }
+      count++;
+    }
+    ctx.textAlign = "start";
+    ctx.textBaseline = "alphabetic";
   }
 
   private projected(c: BaseCache, g: GeoPermissibleObjects) {
@@ -875,52 +966,58 @@ export class MapEngine {
     states: Layer | null,
   ) {
     const placed: [number, number, number, number][] = [];
-    const fits = (x: number, y: number, w: number, h: number) => {
-      for (const r of placed) if (x < r[2] && x + w > r[0] && y < r[3] && y + h > r[1]) return false;
-      return true;
-    };
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.lineJoin = "round";
-    const draw = (text: string, p: [number, number], size: number, weight: number) => {
-      ctx.font = `${weight} ${size}px system-ui, sans-serif`;
-      const tw = ctx.measureText(text).width;
-      const box: [number, number, number, number] = [p[0] - tw / 2 - 3, p[1] - size / 2 - 2, p[0] + tw / 2 + 3, p[1] + size / 2 + 2];
-      if (box[0] < 0 || box[2] > this.w || box[1] < 0 || box[3] > this.h) return;
-      if (!fits(box[0], box[1], box[2] - box[0], box[3] - box[1])) return;
-      placed.push(box);
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = COLORS.halo;
-      ctx.strokeText(text, p[0], p[1]);
-      ctx.fillStyle = COLORS.label;
-      ctx.fillText(text, p[0], p[1]);
-    };
     const sorted = feats.filter((f) => f.props.n && f.props.l).sort((a, b) => b.props.a - a.props.a);
     let count = 0;
     for (const f of sorted) {
       if (count > 160) break;
-      const [lon, lat] = f.props.l!;
-      const pxPerKm = this.view.k / EARTH_RADIUS_KM / Math.cos((lat * Math.PI) / 180);
-      const sizePx = Math.sqrt(f.props.a) * pxPerKm;
-      if (sizePx < 28) continue;
-      const p = proj([lon, lat]);
+      const fit = this.labelFit(ctx, f.props);
+      if (!fit) continue;
+      const p = proj(f.props.l!);
       if (!p) continue;
-      const size = sizePx > 220 ? 13 : 11;
-      const text = f.props.n.length > 28 && sizePx < 260 ? f.props.n.slice(0, 26) + "…" : f.props.n;
-      ctx.font = `600 ${size}px system-ui, sans-serif`;
-      if (ctx.measureText(text).width > sizePx * 1.6) continue;
-      draw(text, p as [number, number], size, 600);
+      this.placeLabel(ctx, fit.text, p as [number, number], fit.size, 600, placed);
       count++;
     }
     if (states) {
       for (const f of states.features) {
         if (f.props.x || !f.props.c || !f.props.l) continue;
         const p = proj(f.props.l);
-        if (p) draw(f.props.c, p as [number, number], 10, 500);
+        if (p) this.placeLabel(ctx, f.props.c, p as [number, number], 10, 500, placed);
       }
     }
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
+  }
+
+  /** A shape's name and text size at this zoom, or null when the shape is too small on screen to name. */
+  private labelFit(ctx: CanvasRenderingContext2D, props: PolityProps) {
+    if (!props.n || !props.l) return null;
+    const lat = props.l[1];
+    const pxPerKm = this.view.k / EARTH_RADIUS_KM / Math.cos((lat * Math.PI) / 180);
+    const sizePx = Math.sqrt(props.a) * pxPerKm;
+    if (sizePx < 28) return null;
+    const size = sizePx > 220 ? 13 : 11;
+    const text = props.n.length > 28 && sizePx < 260 ? props.n.slice(0, 26) + "…" : props.n;
+    ctx.font = `600 ${size}px system-ui, sans-serif`;
+    if (ctx.measureText(text).width > sizePx * 1.6) return null;
+    return { text, size };
+  }
+
+  /** Draws a name with its halo, unless it would run off screen or into a name already placed. */
+  private placeLabel(ctx: CanvasRenderingContext2D, text: string, p: [number, number], size: number, weight: number, placed: [number, number, number, number][]) {
+    ctx.font = `${weight} ${size}px system-ui, sans-serif`;
+    const tw = ctx.measureText(text).width;
+    const box: [number, number, number, number] = [p[0] - tw / 2 - 3, p[1] - size / 2 - 2, p[0] + tw / 2 + 3, p[1] + size / 2 + 2];
+    if (box[0] < 0 || box[2] > this.w || box[1] < 0 || box[3] > this.h) return;
+    for (const r of placed) if (box[0] < r[2] && box[2] > r[0] && box[1] < r[3] && box[3] > r[1]) return;
+    placed.push(box);
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = COLORS.halo;
+    ctx.strokeText(text, p[0], p[1]);
+    ctx.fillStyle = COLORS.label;
+    ctx.fillText(text, p[0], p[1]);
   }
 
   private drawClaimLabels(ctx: CanvasRenderingContext2D, proj: ReturnType<typeof projectionFor>) {
