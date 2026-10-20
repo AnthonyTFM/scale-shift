@@ -102,17 +102,33 @@ export default function HomePage() {
           {/* keep the headline and cards readable where they sit over the globe */}
           <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#0b2036_0%,rgba(11,32,54,0.85)_38%,rgba(11,32,54,0)_62%)] lg:block" />
         </div>
-        <div className="mx-auto max-w-6xl px-4 pb-14 pt-8 md:pb-20 md:pt-12">
+        <div className="mx-auto max-w-6xl px-4 pb-12 pt-7 md:pb-14 md:pt-9">
           <p className="text-xs font-bold uppercase tracking-wide text-accent">{home.eyebrow}</p>
-          <h1 className="mt-2 font-display text-4xl leading-[1.05] text-white md:text-6xl">{home.title}</h1>
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-panel-muted md:text-lg">{home.hub.mission}</p>
-          <div className="mt-7 grid gap-5 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
+          <h1 className="mt-2 font-display text-4xl leading-[1.05] text-white md:text-5xl lg:text-6xl">{home.title}</h1>
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-panel-muted md:text-lg">{home.hub.mission}</p>
+          <dl className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-panel-muted sm:gap-x-4 sm:text-sm">
+            {[
+              ["4,000", "years"],
+              [String(eras.length), "map snapshots"],
+              [String(events.length), "border events"],
+              [String(pool.length), "daily puzzles"],
+            ].map(([n, label]) => (
+              // the mission already says "4,000 years", so phones skip that one to keep the row on one line
+              <div key={label} className={`items-baseline gap-1.5 ${label === "years" ? "hidden sm:flex" : "flex"}`}>
+                <dt className="sr-only">{label}</dt>
+                <dd>
+                  <span className="font-display text-base font-bold text-white sm:text-lg">{n}</span> {label}
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <div className="mt-6 grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] lg:items-start">
             <div className="grid gap-4">
               <HeroPlay />
               <Link
                 href="/map"
                 transitionTypes={["to-map"]}
-                className="group flex items-center gap-4 rounded-card bg-panel/85 p-5 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-panel-2"
+                className="group flex items-center gap-4 rounded-card bg-panel/85 px-5 py-4 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-panel-2"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- our own small decorative globe picture */}
                 <img
@@ -120,11 +136,11 @@ export default function HomePage() {
                   alt=""
                   width={56}
                   height={56}
-                  className="size-14 shrink-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#b9def0,#4f8fbf_75%)] shadow-[0_0_24px_rgba(120,190,240,0.45)] transition-transform duration-700 group-hover:rotate-12"
+                  className="size-12 shrink-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#b9def0,#4f8fbf_75%)] shadow-[0_0_24px_rgba(120,190,240,0.45)] transition-transform duration-700 group-hover:rotate-12"
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block text-xs font-bold uppercase tracking-wide text-accent">{home.hub.mapEyebrow}</span>
-                  <span className="mt-0.5 block font-display text-2xl leading-tight">{home.hub.mapTitle}</span>
+                  <span className="mt-0.5 block font-display text-xl leading-tight md:text-2xl">{home.hub.mapTitle}</span>
                   <span className="mt-1 block text-sm text-panel-muted">{home.hub.mapLead}</span>
                 </span>
                 <span className="hidden shrink-0 font-bold text-accent sm:inline">
@@ -134,22 +150,6 @@ export default function HomePage() {
             </div>
             <HeroLeaderboard />
           </div>
-          <dl className="mt-8 grid max-w-lg grid-cols-4 gap-3 text-center">
-            {[
-              ["4,000", "years"],
-              [String(eras.length), "map snapshots"],
-              [String(events.length), "border events"],
-              [String(pool.length), "daily puzzle shapes"],
-            ].map(([n, label]) => (
-              <div key={label}>
-                <dt className="sr-only">{label}</dt>
-                <dd>
-                  <span className="block font-display text-2xl text-white md:text-3xl">{n}</span>
-                  <span className="block text-[11px] leading-tight text-panel-muted">{label}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
         </div>
       </section>
 

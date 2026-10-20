@@ -30,9 +30,9 @@ export function HeroLeaderboard() {
   const meBelow = board?.me && !board.rows.some((r) => r.me) ? board.me : null;
   return (
     <div className="rounded-card bg-panel/70 p-5 text-panel-text shadow-float ring-1 ring-white/15 backdrop-blur-md md:p-6">
-      <div className="flex items-baseline justify-between gap-3">
-        <h2 className="font-display text-2xl text-white">🏆 {t.boardTitle}</h2>
-        {board?.total ? <p className="text-xs text-panel-muted">{t.boardPlayers(board.total)}</p> : null}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h2 className="font-display text-xl text-white sm:text-2xl">🏆 {t.boardTitle}</h2>
+        {board?.total ? <p className="whitespace-nowrap text-xs text-panel-muted">{t.boardPlayers(board.total)}</p> : null}
       </div>
       {board === undefined ? (
         <ul aria-hidden="true" className="mt-4 space-y-2">
