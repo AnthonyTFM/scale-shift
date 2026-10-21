@@ -109,6 +109,22 @@ export function DailyChallenge() {
   const [failed, setFailed] = useState(false);
   // someone sent a "can you beat me?" link
   const [challenge, setChallenge] = useState<Challenge | null>(null);
+  // set when the player moves on, so the next question (or the results) takes focus; not on first load
+  const advanced = useRef(false);
+
+  useEffect(() => {
+    if (!advanced.current) return;
+    advanced.current = false;
+    // "Next" has gone, so focus would fall back to the page: move it to the new heading instead, which screen readers
+    // announce and from which Tab reaches the answers; and bring the card back into view if it scrolled off the top
+    const heading = document.getElementById("daily-q") ?? document.getElementById("daily-done");
+    const card = heading?.closest("section");
+    if (!heading || !card) return;
+    const top = card.getBoundingClientRect().top;
+    if (top < 72) scrollTo({ top: top + scrollY - 80, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  }, [game?.step]);
 
   useEffect(() => {
     const c = readChallenge(location.hash);
@@ -222,7 +238,10 @@ export function DailyChallenge() {
           perfect={choices.length === round.questions.length && scoreOf(round, choices) === round.questions.length}
           practice={!round.date}
           onPick={answer}
-          onNext={() => setGame({ ...game, step: step + 1 })}
+          onNext={() => {
+            advanced.current = true;
+            setGame({ ...game, step: step + 1 });
+          }}
         />
       )}
     </div>
@@ -231,13 +250,17 @@ export function DailyChallenge() {
 
 // ---------- pieces ----------
 
+/** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
 function Skeleton() {
   return (
-    <div aria-busy="true" aria-label="Loading today's challenge" className="rounded-card border border-line bg-white p-5">
-      <div className="h-5 w-1/2 animate-pulse rounded bg-line" />
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="aspect-square animate-pulse rounded-xl bg-paper" />
-        <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+    <div aria-busy="true" aria-label="Loading today's challenge">
+      <div aria-hidden="true" className="mb-3 h-7 sm:mb-4 sm:h-8" />
+      <div className="min-h-[calc(50vw+190px)] rounded-card border border-line bg-white px-4 pb-4 pt-3 sm:min-h-[519px] sm:p-6">
+        <div className="h-5 w-1/2 animate-pulse rounded bg-line" />
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+          <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+        </div>
       </div>
     </div>
   );
@@ -702,7 +725,7 @@ function Results({
                 <strong>{big.n}</strong> <span className="text-muted">({big.sub})</span> is {(big.a / small.a).toFixed(1)}× the size of <strong>{small.n}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} className="col-start-2 font-semibold text-link hover:underline">
+              <Link href={mapHref(q)} aria-label={`Drag ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-link hover:underline">
                 Drag them on the map →
               </Link>
             </li>
