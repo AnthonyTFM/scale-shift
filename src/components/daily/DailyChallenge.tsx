@@ -253,7 +253,7 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
           >
             <span
               aria-hidden="true"
-              className={`grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold ${
+              className={`grid size-7 shrink-0 place-items-center rounded-full text-sm font-bold sm:size-8 ${
                 done
                   ? `pop-in text-white ${right ? "bg-formal" : "bg-danger"}`
                   : current
@@ -322,7 +322,7 @@ function QuestionCard({
   }, [answered]);
 
   return (
-    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white p-4 shadow-float sm:p-6">
+    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white px-4 pb-4 pt-3 shadow-float sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-bold uppercase tracking-wide text-muted">
           {practice ? "Practice · " : ""}Question {n + 1} of {total}
