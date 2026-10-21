@@ -616,8 +616,6 @@ function Results({
             {copied}
           </p>
           {shareBox.box}
-          <LeaderboardJoin date={round.date} choices={choices} />
-          <Countdown />
         </>
       ) : (
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
@@ -649,6 +647,13 @@ function Results({
           );
         })}
       </ol>
+
+      {round.date ? (
+        <>
+          <LeaderboardJoin date={round.date} choices={choices} />
+          <Countdown />
+        </>
+      ) : null}
     </section>
   );
 }
