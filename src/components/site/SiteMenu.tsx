@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { menu, site } from "@/content/site";
+import { menu } from "@/content/site";
+import { Wordmark } from "./Wordmark";
 
 /**
  * The "three lines" menu. variant="map" is the floating button on the map page (always visible);
@@ -69,7 +70,7 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
         className={
           variant === "map"
             ? "grid size-11 place-items-center rounded-xl bg-panel text-panel-text shadow-float hover:bg-panel-2"
-            : "grid size-11 place-items-center rounded-lg hover:bg-white/10"
+            : "grid size-11 place-items-center rounded-xl text-ink hover:bg-white"
         }
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth="2">
@@ -79,18 +80,18 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
       {open
         ? createPortal(
         <div className="fixed inset-0 z-[100]">
-          <button type="button" aria-label="Close menu" tabIndex={-1} onClick={close} className="absolute inset-0 bg-black/40" />
+          <button type="button" aria-label="Close menu" tabIndex={-1} onClick={close} className="absolute inset-0 bg-ink/40" />
           <div
             id="site-menu"
             ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="Menu"
-            className="absolute inset-y-0 right-0 flex w-[min(88vw,340px)] flex-col overflow-y-auto bg-panel px-5 py-5 text-panel-text shadow-float"
+            className="absolute inset-y-0 right-0 flex w-[min(88vw,340px)] flex-col overflow-y-auto rounded-l-[28px] bg-paper px-5 py-5 text-ink shadow-float"
           >
             <div className="flex items-center justify-between">
-              <span className="font-display text-2xl font-bold">{site.name}</span>
-              <button type="button" onClick={close} aria-label="Close menu" className="grid size-10 place-items-center rounded-lg hover:bg-white/10">
+              <Wordmark />
+              <button type="button" onClick={close} aria-label="Close menu" className="grid size-11 place-items-center rounded-xl hover:bg-white">
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 6l12 12M18 6 6 18" />
                 </svg>
@@ -104,22 +105,22 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                       href={item.href}
                       onClick={close}
                       aria-current={here(item.href)}
-                      className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-3 ring-1 ring-white/10 hover:bg-white/10 aria-[current=page]:ring-accent/70"
+                      className="press-card flex items-center gap-3 rounded-[20px] px-3 py-3 hover:bg-white aria-[current=page]:border-primary aria-[current=page]:[--press-shadow:var(--color-primary)]"
                     >
-                      <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-lg bg-white/10 text-xl">
+                      <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-xl bg-tile text-xl">
                         {item.icon}
                       </span>
                       <span className="min-w-0">
-                        <span className="block text-lg font-bold leading-tight">
+                        <span className="block font-display text-lg leading-tight">
                           {item.href === "/map" && pathname === "/map" ? menu.backToMap : item.label}
                         </span>
-                        <span className="block text-sm text-panel-muted">{item.blurb}</span>
+                        <span className="block text-sm text-muted">{item.blurb}</span>
                       </span>
                     </Link>
                   </li>
                 ))}
               </ul>
-              <p className="mt-6 px-1 text-xs font-bold uppercase tracking-wide text-panel-muted">{menu.historyTitle}</p>
+              <p className="mt-7 px-1 text-xs font-bold uppercase tracking-wide text-muted">{menu.historyTitle}</p>
               <ul className="mt-2 grid grid-cols-3 gap-2">
                 {menu.history.map((item) => (
                   <li key={item.href}>
@@ -127,7 +128,7 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                       href={item.href}
                       onClick={close}
                       aria-current={here(item.href)}
-                      className="flex h-full min-h-11 items-center justify-center rounded-lg bg-white/5 px-2 py-2 text-center text-sm font-semibold leading-tight hover:bg-white/10 aria-[current=page]:text-accent"
+                      className="press-card flex h-full min-h-12 items-center justify-center rounded-2xl px-2 py-2 text-center text-sm font-bold leading-tight aria-[current=page]:border-primary aria-[current=page]:text-primary"
                     >
                       {item.label}
                     </Link>
@@ -135,11 +136,11 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                 ))}
               </ul>
             </nav>
-            <nav aria-label="About" className="mt-auto border-t border-white/10 pt-4">
-              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-panel-muted">
+            <nav aria-label="About" className="mt-auto border-t border-line pt-4">
+              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted">
                 {menu.more.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} onClick={close} aria-current={here(item.href)} className="hover:text-white hover:underline aria-[current=page]:text-accent">
+                    <Link href={item.href} onClick={close} aria-current={here(item.href)} className="hover:text-primary hover:underline aria-[current=page]:font-semibold aria-[current=page]:text-primary">
                       {item.label}
                     </Link>
                   </li>

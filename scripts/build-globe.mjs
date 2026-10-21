@@ -1,5 +1,5 @@
 // Small world files for decoration: the homepage globe (public/data/globe.json) and the faint map behind page headers
-// (public/world.svg). Built from the present-day snapshot, heavily simplified. Run after build-data.mjs.
+// (public/world.svg, a soft blue silhouette for the light page headers). Built from the present-day snapshot, heavily simplified. Run after build-data.mjs.
 import { readFileSync, writeFileSync } from "node:fs";
 import { feature, quantize } from "topojson-client";
 import { presimplify, simplify, quantile } from "topojson-simplify";
@@ -49,7 +49,7 @@ const d = land.features
   .replace(/M[^M]*?Z/g, (ring) => (ring.length > 40 ? ring : ""));
 writeFileSync(
   "public/world.svg",
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 487"><path d="${d}" fill="#8fc3ea" fill-opacity="0.16"/></svg>\n`,
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 487"><path d="${d}" fill="#2563eb" fill-opacity="0.08"/></svg>\n`,
 );
 // The globe's first frame as a picture (public/globe-still.svg): the homepage shows it straight away, so countries are
 // on screen before the live globe's script and data arrive. Keep the rotation, tilt and colours in step with

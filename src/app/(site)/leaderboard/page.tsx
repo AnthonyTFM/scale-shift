@@ -19,7 +19,7 @@ export default function LeaderboardPage() {
         title="Leaderboard"
         lead={
           <p>
-            Think you know the world? Prove it. Finish the <Link href="/daily" className="font-semibold text-accent underline">
+            Think you know the world? Prove it. Finish the <Link href="/daily" className="font-semibold text-primary underline">
               daily challenge
             </Link>, sign up with your email and a nickname, and
             your score lands here. Every correct answer adds a point to the all-time ranking.

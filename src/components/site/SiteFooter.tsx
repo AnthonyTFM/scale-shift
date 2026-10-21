@@ -1,23 +1,26 @@
 import Link from "next/link";
 import { footerNav, nav, site } from "@/content/site";
+import { Wordmark } from "./Wordmark";
 
 export function SiteFooter() {
   return (
-    <footer className="mt-20 bg-panel pb-24 text-panel-text md:pb-0">
+    <footer className="mt-20 border-t border-line bg-white pb-24 text-ink md:pb-0">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
         <div>
-          <p className="font-display text-2xl font-bold">{site.name}</p>
-          <p className="mt-2 max-w-xs text-sm text-panel-muted">{site.tagline}</p>
-          <Link href="/map" className="mt-4 inline-flex h-11 items-center rounded-lg bg-accent px-4 text-sm font-bold text-panel hover:bg-accent-strong">
+          <Link href="/" aria-label={`${site.name} home`} className="inline-block rounded-lg">
+            <Wordmark />
+          </Link>
+          <p className="mt-3 max-w-xs text-sm text-muted">{site.tagline}</p>
+          <Link href="/map" className="btn btn-primary mt-5 h-11 text-sm">
             Open the map
           </Link>
         </div>
         <nav aria-label="Explore">
-          <p className="text-xs font-semibold uppercase tracking-wide text-panel-muted">Explore</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">Explore</p>
           <ul className="mt-3 space-y-2 text-sm">
             {nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="hover:underline">
+                <Link href={item.href} className="font-medium text-ink-soft hover:text-primary hover:underline">
                   {item.label}
                 </Link>
               </li>
@@ -25,11 +28,11 @@ export function SiteFooter() {
           </ul>
         </nav>
         <nav aria-label="About">
-          <p className="text-xs font-semibold uppercase tracking-wide text-panel-muted">About</p>
+          <p className="text-xs font-bold uppercase tracking-wide text-muted">About</p>
           <ul className="mt-3 space-y-2 text-sm">
             {footerNav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="hover:underline">
+                <Link href={item.href} className="font-medium text-ink-soft hover:text-primary hover:underline">
                   {item.label}
                 </Link>
               </li>
@@ -37,8 +40,8 @@ export function SiteFooter() {
           </ul>
         </nav>
       </div>
-      <div className="border-t border-white/10">
-        <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-panel-muted">
+      <div className="border-t border-line">
+        <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-muted">
           © {site.copyrightHolder}. Historical borders: historical-basemaps by André Ourednik (GPL-3.0). Present-day borders: Natural Earth (public
           domain). Non-commercial educational project.
         </p>
