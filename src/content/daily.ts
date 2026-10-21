@@ -10,4 +10,7 @@ export const dailyCopy = {
   playedElsewhereShort: "Played on another device?",
   signInToSee: "Sign in to see your result",
   signInToSeeShort: "Sign in",
+  // results screen: the leaderboard sign-up waits behind one button
+  joinCta: "Join the leaderboard",
+  joinHint: "Put today's score on the public board and see where you rank.",
 };

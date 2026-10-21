@@ -616,8 +616,6 @@ function Results({
             {copied}
           </p>
           {shareBox.box}
-          <LeaderboardJoin date={round.date} choices={choices} />
-          <Countdown />
         </>
       ) : (
         <div className="mt-5 flex flex-col gap-2 sm:flex-row">
@@ -636,19 +634,26 @@ function Results({
           const big = q.options[q.answer];
           const small = q.options[1 - q.answer];
           return (
-            <li key={i} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2.5 text-sm">
+            <li key={i} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
               <span aria-hidden="true">{choices[i] === q.answer ? "✅" : "❌"}</span>
               <span className="min-w-0 flex-1 text-ink">
                 <strong>{big.n}</strong> <span className="text-muted">({big.sub})</span> is {(big.a / small.a).toFixed(1)}× the size of <strong>{small.n}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} className="font-semibold text-link hover:underline">
+              <Link href={mapHref(q)} className="col-start-2 font-semibold text-link hover:underline">
                 Drag them on the map →
               </Link>
             </li>
           );
         })}
       </ol>
+
+      {round.date ? (
+        <>
+          <LeaderboardJoin date={round.date} choices={choices} />
+          <Countdown />
+        </>
+      ) : null}
     </section>
   );
 }

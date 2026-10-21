@@ -7,13 +7,74 @@ import { loadPlayer, savePlayer, type Player } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
 import { signInOn } from "@/lib/sign-in";
+import { useAuth } from "@clerk/nextjs";
 import { AccountJoin } from "./AccountJoin";
+import { dailyCopy as t } from "@/content/daily";
 
 type Props = { date: string; choices: number[] };
 
-/** After the daily round: post the score. With sign-in on, players sign in (verified email); otherwise they type an email. */
+/**
+ * After the daily round: post the score. With sign-in on, players sign in (verified email); otherwise they type an email.
+ * New players see one "Join the leaderboard" button first, so the score, sharing and answers lead the results screen.
+ * Players already on the board skip the button and see their rank straight away.
+ */
 export function LeaderboardJoin(props: Props) {
-  return signInOn ? <AccountJoin {...props} /> : <EmailJoin {...props} />;
+  return signInOn ? <SignedInGate {...props} /> : <SavedPlayerGate {...props} />;
+}
+
+function SignedInGate(props: Props) {
+  const { isLoaded, isSignedIn } = useAuth();
+  return <JoinGate joined={isLoaded ? !!isSignedIn : undefined}>
+      <AccountJoin {...props} />
+    </JoinGate>;
+}
+
+function SavedPlayerGate(props: Props) {
+  const [joined, setJoined] = useState<boolean | undefined>(undefined);
+  useEffect(() => queueMicrotask(() => setJoined(!!loadPlayer())), []);
+  return <JoinGate joined={joined}>
+      <EmailJoin {...props} />
+    </JoinGate>;
+}
+
+/** Shows the sign-up behind a button until opened; `joined` (already on the board) opens it straight away. */
+function JoinGate({ joined, children }: { joined: boolean | undefined; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const panel = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    // keyboard and screen-reader users land in the sign-up they just opened
+    if (open) panel.current?.focus();
+  }, [open]);
+  if (joined === undefined) return <div className="mt-5 h-[76px]" aria-hidden="true" />;
+  if (joined || open) {
+    return (
+      <div ref={panel} tabIndex={-1} className="outline-none">
+        {children}
+      </div>
+    );
+  }
+  return (
+    <button
+      type="button"
+      aria-expanded={false}
+      onClick={() => {
+        track("leaderboard_join_open");
+        setOpen(true);
+      }}
+      className="press mt-5 flex w-full items-center gap-3 rounded-xl bg-amber-50 p-4 text-left ring-1 ring-amber-200 [--press-shadow:#f2d79b] hover:bg-amber-100"
+    >
+      <span aria-hidden="true" className="text-2xl">
+        🏆
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-bold text-ink">{t.joinCta}</span>
+        <span className="block text-sm text-ink-soft">{t.joinHint}</span>
+      </span>
+      <span aria-hidden="true" className="font-bold text-link">
+        →
+      </span>
+    </button>
+  );
 }
 
 /** Sign up with an email and a nickname, post the score and show where it ranks today. */
