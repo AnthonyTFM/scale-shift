@@ -164,13 +164,35 @@ body {
   transform: translateY(3px);
   box-shadow: 0 1px 0 0 var(--press-shadow, #e3d6c3);
 }
-/* the shrink reveal: the map-size drawing grows or shrinks to the true size, then the true outline fades in */
+/* the shrink reveal: the map-size drawing springs to the true size, then the true outline fades in */
 .reveal-map {
   transform-origin: 50px 50px;
-  transition: transform 0.9s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s ease 0.65s;
+  transition: transform 1.1s cubic-bezier(0.34, 1.35, 0.5, 1) 0.15s, opacity 0.35s ease 1s;
 }
 .reveal-true {
-  transition: opacity 0.3s ease 0.65s;
+  transition: opacity 0.35s ease 1s;
+}
+/* labels that land once the shapes have settled */
+.pop-in.reveal-late {
+  animation-delay: 1.05s;
+}
+/* a wrong pick shakes as soon as it's tapped; the right answer pulses once the shapes settle */
+@keyframes reveal-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+.reveal-shake {
+  animation: reveal-shake 0.4s ease-in-out;
+}
+@keyframes reveal-win {
+  0% { box-shadow: 0 4px 0 0 var(--press-shadow), 0 0 0 0 rgb(15 122 85 / 0.5); }
+  100% { box-shadow: 0 4px 0 0 var(--press-shadow), 0 0 0 16px rgb(15 122 85 / 0); }
+}
+.reveal-win {
+  animation: reveal-win 0.9s ease-out 1.05s 2;
 }
 @keyframes pop-in {
   0% { transform: scale(0.6); opacity: 0; }
@@ -182,7 +204,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .press, .reveal-map, .reveal-true { transition: none; }
-  .pop-in { animation: none; }
+  .pop-in, .reveal-shake, .reveal-win { animation: none; }
 }
 
 /* ---------- page transitions (homepage → daily game, homepage globe → map) ---------- */

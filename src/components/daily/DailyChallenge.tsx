@@ -31,6 +31,10 @@ import { buzz, confetti } from "@/lib/celebrate";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
+import { dailyCopy } from "@/content/daily";
+
+const reveal = dailyCopy.reveal;
+const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -170,7 +174,7 @@ export function DailyChallenge() {
     buzz(q.answer !== choice ? [30, 50, 30] : 12);
     if (perfect) {
       buzz([20, 40, 20, 40, 80]);
-      setTimeout(confetti, 350);
+      setTimeout(confetti, 1050);
     }
     let updated = save;
     if (round.date) {
@@ -215,6 +219,7 @@ export function DailyChallenge() {
           q={round.questions[step]}
           shapes={round.shapes}
           picked={choices[step]}
+          perfect={choices.length === round.questions.length && scoreOf(round, choices) === round.questions.length}
           practice={!round.date}
           onPick={answer}
           onNext={() => setGame({ ...game, step: step + 1 })}
@@ -296,6 +301,7 @@ function QuestionCard({
   q,
   shapes,
   picked,
+  perfect,
   practice,
   onPick,
   onNext,
@@ -305,6 +311,8 @@ function QuestionCard({
   q: Question;
   shapes: Record<string, ShapeFile>;
   picked: number | undefined;
+  /** this was the last question and every answer was right */
+  perfect: boolean;
   practice: boolean;
   onPick: (i: number) => void;
   onNext: () => void;
@@ -316,9 +324,18 @@ function QuestionCard({
   const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
   const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
 
+  const lines = explain(q);
+
   useEffect(() => {
+    if (!answered) return;
     // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
-    if (answered) nextRef.current?.focus({ preventScroll: true });
+    nextRef.current?.focus({ preventScroll: true });
+    // once the shapes have settled, bring the explanation and "Next" into view on short screens
+    const id = setTimeout(
+      () => nextRef.current?.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }),
+      reducedMotion() ? 0 : 1400,
+    );
+    return () => clearTimeout(id);
   }, [answered]);
 
   return (
@@ -332,8 +349,15 @@ function QuestionCard({
       <h2 id="daily-q" className="mt-0.5 text-center font-display text-2xl leading-tight text-ink sm:mt-1 sm:text-3xl">
         {q.prompt}
       </h2>
-      <p className="mt-1 text-center text-sm text-muted">
-        {answered ? "Watch them shrink or grow to their true size." : "Drawn the way a normal web map shows them. Tap the bigger one."}
+      {/* before answering: what to do; after: the verdict, read out by screen readers */}
+      <p aria-live="polite" className={`mt-1 text-center ${answered ? `pop-in text-base font-bold ${correct ? "text-formal" : "text-danger"}` : "text-sm text-muted"}`}>
+        {answered ? (
+          <>
+            {perfect ? reveal.perfect : correct ? reveal.right : reveal.wrong} <span className="font-semibold text-ink">{lines[0]}</span>
+          </>
+        ) : (
+          reveal.ask
+        )}
       </p>
 
       <div className="relative mt-3 grid grid-cols-2 gap-3 sm:mt-4 sm:gap-4">
@@ -342,11 +366,13 @@ function QuestionCard({
           const look = !answered
             ? "border-line hover:border-accent [--press-shadow:#e3d6c3] hover:[--press-shadow:#f29e1f]"
             : isAnswer
-              ? "border-formal [--press-shadow:#0f7a55]"
+              ? "reveal-win border-formal [--press-shadow:#0f7a55]"
               : picked === i
-                ? "border-danger [--press-shadow:#b4235a]"
+                ? "reveal-shake border-danger [--press-shadow:#b4235a]"
                 : "border-line opacity-70 [--press-shadow:#e3d6c3]";
           const inflate = o.m / o.a;
+          const x = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
+          const mapNote = inflate >= 1.15 ? reveal.mapTooBig(x(inflate)) : inflate <= 0.87 ? reveal.mapTooSmall(x(1 / inflate)) : reveal.mapAboutRight;
           return (
             <button
               key={o.id}
@@ -358,20 +384,22 @@ function QuestionCard({
             >
               {answered && (isAnswer || picked === i) ? (
                 <span
-                  className={`pop-in absolute -top-3 right-2 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow ${isAnswer ? "bg-formal" : "bg-danger"}`}
+                  className={`pop-in absolute -top-3 right-2 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow ${isAnswer ? "reveal-late bg-formal" : "bg-danger"}`}
                 >
-                  {isAnswer ? "✓ Bigger" : "✗ Your pick"}
+                  {isAnswer ? reveal.bigger : reveal.yourPick}
                 </span>
               ) : null}
-              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
-              <span className="mt-2 block truncate text-base font-bold text-ink sm:text-lg">{o.n}</span>
-              <span className="block truncate text-xs text-muted">{o.sub}</span>
-              {answered ? (
-                <span className="mt-1 block text-xs font-semibold text-ink-soft">
-                  {formatBoth(o.a)}
-                  {inflate >= 1.3 ? <span className="block font-normal text-muted">Maps show it {inflate >= 10 ? Math.round(inflate) : inflate.toFixed(1)}× too big</span> : null}
-                </span>
-              ) : null}
+              <span className="relative block">
+                <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
+                {answered ? (
+                  <span className="pop-in reveal-late absolute inset-x-1 bottom-1.5 mx-auto w-fit rounded-full bg-white/90 px-2 py-0.5 text-center text-[11px] font-bold leading-tight text-ink shadow-sm">
+                    {mapNote}
+                  </span>
+                ) : null}
+              </span>
+              <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
+              <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
+              {answered ? <TrueArea from={o.m} to={o.a} /> : null}
             </button>
           );
         })}
@@ -387,10 +415,9 @@ function QuestionCard({
 
       <div aria-live="polite">
         {answered ? (
-          <div className={`pop-in mt-4 rounded-xl p-4 ${correct ? "bg-emerald-50 text-emerald-950" : "bg-rose-50 text-rose-950"}`}>
-            <p className="text-lg font-bold">{correct ? "✓ Correct!" : "✗ Not quite."}</p>
-            {explain(q).map((line) => (
-              <p key={line} className="mt-1 text-sm leading-relaxed">
+          <div className={`pop-in reveal-late mt-4 rounded-xl p-4 ${correct ? "bg-emerald-50 text-emerald-950" : "bg-rose-50 text-rose-950"}`}>
+            {lines.slice(1).map((line) => (
+              <p key={line} className="text-sm leading-relaxed">
                 {line}
               </p>
             ))}
@@ -483,6 +510,34 @@ function RevealTile({
         <Shape outline={real} span={spans.ea} color={color} />
       </g>
     </svg>
+  );
+}
+
+/** The real area, counting down (or up) from the size the map makes it look, as the shapes change size. */
+function TrueArea({ from, to }: { from: number; to: number }) {
+  const [v, setV] = useState(from);
+  useEffect(() => {
+    if (reducedMotion()) {
+      const id = requestAnimationFrame(() => setV(to));
+      return () => cancelAnimationFrame(id);
+    }
+    const start = performance.now() + 150;
+    let id = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / 1000));
+      const ease = 1 - Math.pow(1 - t, 3);
+      setV(from + (to - from) * ease);
+      if (t < 1) id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [from, to]);
+  const [km, mi] = formatBoth(v).replace(")", "").split(" (");
+  return (
+    <span className="mt-1.5 block tabular-nums">
+      <span className="block text-sm font-bold text-ink">{km}</span>
+      <span className="block text-xs text-muted">{mi}</span>
+    </span>
   );
 }
 
