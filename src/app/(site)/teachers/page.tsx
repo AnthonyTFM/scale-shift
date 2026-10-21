@@ -82,7 +82,7 @@ export default function TeachersPage() {
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <nav aria-label="On this page" className="mb-10 flex flex-wrap gap-2">
           {t.jump.map((j) => (
-            <a key={j.id} href={`#${j.id}`} className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-ink ring-1 ring-line hover:ring-accent">
+            <a key={j.id} href={`#${j.id}`} className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-ink ring-1 ring-line hover:ring-primary">
               {j.label}
             </a>
           ))}
@@ -139,7 +139,7 @@ export default function TeachersPage() {
                 <li key={e.key}>
                   <Link
                     href={`/eras/${eraSlug(e.key)}`}
-                    className="block rounded-lg bg-white px-3 py-2 text-sm font-semibold text-ink ring-1 ring-line hover:ring-accent"
+                    className="block rounded-lg bg-white px-3 py-2 text-sm font-semibold text-ink ring-1 ring-line hover:ring-primary"
                   >
                     {e.key === "present" ? "Today" : e.label}
                   </Link>
@@ -217,7 +217,7 @@ export default function TeachersPage() {
               ))}
             </ul>
             <p className="mt-4 flex flex-wrap gap-3">
-              <Link href="/map" className="inline-flex h-11 items-center rounded-lg bg-accent px-4 font-bold text-panel hover:bg-accent-strong">
+              <Link href="/map" className="btn btn-primary">
                 Open the map
               </Link>
               <Link href="/daily" className="inline-flex h-11 items-center rounded-lg border border-line bg-white px-4 font-bold text-ink hover:bg-paper">

@@ -111,7 +111,7 @@ export function TimelineFilter() {
               type="button"
               aria-pressed={order === id}
               onClick={() => setOrder(id)}
-              className="rounded-full px-3 py-1.5 aria-pressed:bg-panel aria-pressed:text-panel-text"
+              className="rounded-full px-3 py-1.5 aria-pressed:bg-primary aria-pressed:text-white"
             >
               {label}
             </button>
@@ -122,7 +122,7 @@ export function TimelineFilter() {
       <ol className="relative mt-6 space-y-5 border-l-2 border-line pl-6 sm:ml-24 sm:pl-8">
         {list.map((ev) => (
           <li key={ev.id} className="relative">
-            <span aria-hidden="true" className="absolute -left-[33px] top-6 size-3 rounded-full bg-accent ring-4 ring-paper sm:-left-[41px]" />
+            <span aria-hidden="true" className="absolute -left-[33px] top-6 size-3 rounded-full bg-primary ring-4 ring-paper sm:-left-[41px]" />
             <p className="mb-1 font-display text-lg text-ink sm:absolute sm:-left-36 sm:top-4 sm:mb-0 sm:w-24 sm:text-right">
               {formatYear(ev.taken, ev.approx)}
             </p>
