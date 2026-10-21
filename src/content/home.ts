@@ -60,6 +60,11 @@ export const home = {
     mapCta: "Open the map",
     boardTitle: "Today's leaderboard",
     boardEmpty: "No scores yet today. Be the first on the board!",
+    // when today's board is empty, the card shows these instead of an empty box
+    boardEmptyShort: "No scores yet today. Be the first!",
+    boardYesterday: "Yesterday's top players",
+    boardAllTime: "All-time top players",
+    boardPoints: (n: number) => `${n} pts`,
     boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
     boardCta: "Full leaderboard",
     nextIn: (h: number, m: number) => `Next game in ${h}h ${m}m`,

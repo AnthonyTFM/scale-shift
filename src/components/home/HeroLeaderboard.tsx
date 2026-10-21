@@ -7,25 +7,43 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { playerId } from "@/lib/player";
 import { home } from "@/content/home";
-import type { DayBoard } from "@/lib/leaderboard-types";
+import type { AllTimeBoard, DayBoard } from "@/lib/leaderboard-types";
+
+/** Shown when today has no scores yet: yesterday's top three, or the all-time top three. */
+type Fallback = { kind: "yesterday" | "all"; rows: { rank: number; name: string; score: string }[] };
+
+const getJson = <T,>(url: string) =>
+  fetch(url)
+    .then((r) => (r.ok ? (r.json() as Promise<T>) : null))
+    .catch(() => null);
+
+async function fallbackBoard(): Promise<Fallback | null> {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const y = await getJson<DayBoard>(`/api/leaderboard?scope=day&date=${localDateKey(d)}&limit=3`);
+  if (y?.rows.length) return { kind: "yesterday", rows: y.rows.map((r) => ({ rank: r.rank, name: r.name, score: `${r.score}/5` })) };
+  const all = await getJson<AllTimeBoard>("/api/leaderboard?scope=all&limit=3");
+  if (all?.rows.length) return { kind: "all", rows: all.rows.map((r) => ({ rank: r.rank, name: r.name, score: home.hub.boardPoints(r.points) })) };
+  return null;
+}
 
 /** The hero's right-hand card: today's top five, and your own spot if you've played. */
 export function HeroLeaderboard() {
   const [board, setBoard] = useState<DayBoard | null | undefined>(undefined);
   const [myScore, setMyScore] = useState<number | null>(null);
+  const [fallback, setFallback] = useState<Fallback | null>(null);
   const { share, box } = useShareBox();
   const t = home.hub;
 
   useEffect(() => {
     const id = playerId();
-    fetch(`/api/leaderboard?scope=day&date=${localDateKey()}&limit=5${id ? `&player=${id}` : ""}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .catch(() => null)
-      .then((b: DayBoard | null) => {
-        const mine = loadSave().days[localDateKey()]?.s;
-        setMyScore(typeof mine === "number" ? mine : null);
-        setBoard(b);
-      });
+    getJson<DayBoard>(`/api/leaderboard?scope=day&date=${localDateKey()}&limit=5${id ? `&player=${id}` : ""}`).then(async (b) => {
+      const mine = loadSave().days[localDateKey()]?.s;
+      setMyScore(typeof mine === "number" ? mine : null);
+      // nobody has played yet today: show who did best yesterday (or ever) rather than an empty box
+      if (b && !b.rows.length) setFallback(await fallbackBoard());
+      setBoard(b);
+    });
   }, []);
 
   const meBelow = board?.me && !board.rows.some((r) => r.me) ? board.me : null;
@@ -66,6 +84,20 @@ export function HeroLeaderboard() {
             </li>
           ) : null}
         </ol>
+      ) : fallback ? (
+        <div className="mt-3">
+          <p className="text-sm font-semibold text-white">{t.boardEmptyShort}</p>
+          <p className="mt-3 text-xs font-bold uppercase tracking-wide text-panel-muted">{fallback.kind === "yesterday" ? t.boardYesterday : t.boardAllTime}</p>
+          <ol className="mt-1.5 space-y-1.5" aria-label={fallback.kind === "yesterday" ? t.boardYesterday : t.boardAllTime}>
+            {fallback.rows.map((r) => (
+              <li key={r.rank + r.name} className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2">
+                <span className="w-6 text-center font-bold text-accent">{r.rank}</span>
+                <span className="min-w-0 flex-1 truncate font-semibold">{r.name}</span>
+                <span className="font-mono text-sm">{r.score}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
       ) : (
         <p className="mt-4 rounded-lg bg-white/5 px-3 py-6 text-center text-panel-muted">{t.boardEmpty}</p>
       )}
