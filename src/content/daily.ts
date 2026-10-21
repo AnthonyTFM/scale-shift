@@ -11,18 +11,57 @@ export const dailyCopy = {
   signInToSee: "Sign in to see your result",
   signInToSeeShort: "Sign in",
   // results screen: the leaderboard sign-up waits behind one button
-  joinCta: "Join the leaderboard",
-  joinHint: "Put today's score on the public board and see where you rank.",
+  joinCta: "Get on the leaderboard",
+  joinHint: "See where you rank.",
+  joinButton: "Join",
   // the reveal after each answer
   reveal: {
+    round: (n: number, total: number) => `Round ${n} of ${total}`,
+    practice: "Practice",
     ask: "Drawn the way a normal web map shows them. Tap the bigger one.",
-    right: "✓ Correct!",
-    wrong: "✗ Not quite.",
-    perfect: "🎉 5 for 5! Perfect round.",
+    legend: "Dashed: how big a web map draws it. Solid: its real size.",
+    right: "You got it!",
+    wrong: "Not quite!",
+    perfect: "5 for 5! Perfect round!",
+    next: "Next round",
+    seeResults: "See my results",
     mapTooBig: (x: string) => `Map: ${x}× too big`,
     mapTooSmall: (x: string) => `Map: ${x}× too small`,
     mapAboutRight: "Map: about right",
-    bigger: "✓ Bigger",
-    yourPick: "✗ Your pick",
+    bigger: "Bigger",
+    yourPick: "Your pick",
+    vs: "VS",
+  },
+  // the results screen
+  results: {
+    title: (score: number, total: number) =>
+      score === total ? "Map master!" : score === total - 1 ? "Empire builder!" : score === total - 2 ? "Rising power!" : score >= 2 ? "Border skirmish!" : "The map got you!",
+    verdict: (score: number, total: number) =>
+      score === total
+        ? "Perfect. Mercator can't fool you."
+        : score >= total - 1
+          ? "Sharp eye. One got past you."
+          : score >= 3
+            ? "Not bad. The map tricked you twice."
+            : "The map fooled you today. New questions tomorrow.",
+    scoreSr: (score: number, total: number) => `You got ${score} out of ${total}.`,
+    practiceRound: "Practice round",
+    streak: "Streak",
+    best: (n: number) => `Best ${n}`,
+    rank: "Today's rank",
+    rankOf: (n: number) => `of ${n} today`,
+    rankNone: "Join to rank",
+    allTime: "All-time",
+    allTimeSub: "correct",
+    share: "Share my score",
+    picture: "As a picture",
+    challenge: "Challenge a friend",
+    practice: "Play a practice round",
+    anotherPractice: "Another practice round",
+    backToToday: "Back to today's results",
+    answers: "The answers",
+    dragOnMap: "Drag them on the map",
+    pictureSaved: "Picture saved. Post it anywhere.",
+    pictureFailed: "Couldn't make the picture. Try Share my score instead.",
   },
 };

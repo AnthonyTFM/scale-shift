@@ -16,7 +16,7 @@ export function PlayedElsewhere() {
         <span className="hidden sm:inline">{t.playedElsewhere}</span>
       </span>
       <SignInButton mode="modal" withSignUp forceRedirectUrl="/daily" signUpForceRedirectUrl="/daily">
-        <button type="button" className="font-semibold text-link hover:underline">
+        <button type="button" className="inline-flex min-h-8 items-center font-bold text-primary hover:underline">
           <span className="sm:hidden">{t.signInToSeeShort}</span>
           <span className="hidden sm:inline">{t.signInToSee}</span> →
         </button>

@@ -290,8 +290,8 @@ body {
   animation: reveal-shake 0.4s ease-in-out;
 }
 @keyframes reveal-win {
-  0% { box-shadow: 0 4px 0 0 var(--press-shadow), 0 0 0 0 rgb(15 122 85 / 0.5); }
-  100% { box-shadow: 0 4px 0 0 var(--press-shadow), 0 0 0 16px rgb(15 122 85 / 0); }
+  0% { box-shadow: 0 6px 0 0 var(--press-shadow), 0 0 0 0 rgb(33 178 107 / 0.5); }
+  100% { box-shadow: 0 6px 0 0 var(--press-shadow), 0 0 0 16px rgb(33 178 107 / 0); }
 }
 .reveal-win {
   animation: reveal-win 0.9s ease-out 1.05s 2;

@@ -47,7 +47,7 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
     if (!msg && d.open) d.close();
   }, [msg]);
 
-  const dialogClass = "m-auto w-[min(92vw,440px)] rounded-2xl bg-white p-0 text-ink shadow-float backdrop:bg-slate-900/50";
+  const dialogClass = "m-auto w-[min(92vw,440px)] rounded-[28px] border-2 border-line bg-white p-0 text-ink shadow-float backdrop:bg-ink/50";
   if (!msg) return <dialog ref={ref} className={dialogClass} />;
 
   const copy = async () => {
@@ -83,13 +83,13 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
           <h2 id="share-box-title" className="font-display text-2xl">
             {msg.kind === "challenge" ? t.challengeTitle : t.scoreTitle}
           </h2>
-          <button type="button" onClick={onClose} aria-label={t.close} className="grid size-9 place-items-center rounded-lg hover:bg-slate-100">
+          <button type="button" onClick={onClose} aria-label={t.close} className="grid size-11 place-items-center rounded-xl hover:bg-paper">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M6 6l12 12M18 6 6 18" />
             </svg>
           </button>
         </div>
-        <p role="status" className={`mt-3 rounded-lg px-3 py-2 text-sm font-bold ${copied ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-900"}`}>
+        <p role="status" className={`mt-3 rounded-xl px-3 py-2 text-sm font-bold ${copied ? "bg-[#E3F7EC] text-green-text" : "bg-[#FFF4D1] text-ink"}`}>
           {copied ? `✓ ${t.copied}` : t.notCopied}
         </p>
         <label htmlFor="share-box-text" className="sr-only">
@@ -101,10 +101,10 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
           rows={3}
           value={msg.text}
           onFocus={(e) => e.target.select()}
-          className="mt-3 w-full resize-none rounded-lg border border-line bg-paper px-3 py-2 text-sm"
+          className="mt-3 w-full resize-none rounded-xl border-2 border-line bg-paper px-3 py-2 text-sm"
         />
         <div className="mt-2 flex gap-2">
-          <button type="button" onClick={copy} className="h-11 flex-1 rounded-lg bg-panel text-sm font-bold text-white hover:bg-slate-800">
+          <button type="button" onClick={copy} className="btn btn-primary h-12 flex-1 text-sm">
             {copied ? t.copiedButton : t.copy}
           </button>
           {canNativeShare ? (
@@ -118,7 +118,7 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
                   /* closed */
                 }
               }}
-              className="h-11 flex-1 rounded-lg bg-accent text-sm font-bold text-panel hover:bg-accent-strong"
+              className="btn btn-gold h-12 flex-1 text-sm"
             >
               {t.more}
             </button>
@@ -132,7 +132,7 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
                 target={l.href.startsWith("http") ? "_blank" : undefined}
                 rel="noopener noreferrer"
                 onClick={() => track("share", { method: l.label, kind: msg.kind })}
-                className="flex h-10 items-center justify-center rounded-lg border border-line text-sm font-semibold hover:bg-slate-50"
+                className="flex h-11 items-center justify-center rounded-xl border-2 border-line text-sm font-bold hover:border-primary hover:text-primary"
               >
                 {l.label}
               </a>
