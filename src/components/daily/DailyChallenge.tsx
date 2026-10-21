@@ -226,13 +226,17 @@ export function DailyChallenge() {
 
 // ---------- pieces ----------
 
+/** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
 function Skeleton() {
   return (
-    <div aria-busy="true" aria-label="Loading today's challenge" className="rounded-card border border-line bg-white p-5">
-      <div className="h-5 w-1/2 animate-pulse rounded bg-line" />
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <div className="aspect-square animate-pulse rounded-xl bg-paper" />
-        <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+    <div aria-busy="true" aria-label="Loading today's challenge">
+      <div aria-hidden="true" className="mb-3 h-7 sm:mb-4 sm:h-8" />
+      <div className="min-h-[calc(50vw+190px)] rounded-card border border-line bg-white px-4 pb-4 pt-3 sm:min-h-[519px] sm:p-6">
+        <div className="h-5 w-1/2 animate-pulse rounded bg-line" />
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+          <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+        </div>
       </div>
     </div>
   );
