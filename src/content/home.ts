@@ -62,8 +62,8 @@ export const home = {
     boardEmpty: "No scores yet today. Be the first on the board!",
     // when today's board is empty, the card shows these instead of an empty box
     boardEmptyShort: "No scores yet today. Be the first!",
-    boardYesterday: "Yesterday's top 3",
-    boardAllTime: "All-time top 3",
+    boardYesterday: "Yesterday's top players",
+    boardAllTime: "All-time top players",
     boardPoints: (n: number) => `${n} pts`,
     boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
     boardCta: "Full leaderboard",
