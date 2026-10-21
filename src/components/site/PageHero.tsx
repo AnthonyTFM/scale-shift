@@ -25,16 +25,16 @@ export function PageHero({
   // the band's world map (a CSS background) is the largest thing on the first screen: fetch it before the CSS arrives
   preload("/world.svg", { as: "image", fetchPriority: "high" });
   return (
-    <section className="ocean-band text-panel-text">
+    <section className="ocean-band border-b border-line text-ink">
       <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3" : "pb-10 pt-8"} md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>
         {crumbs ? (
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-panel-muted">
+          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
             <ol className="flex flex-wrap gap-1">
               {crumbs.map((c, i) => (
                 <li key={c.href} className="flex gap-1">
                   {i > 0 ? <span aria-hidden="true">/</span> : null}
                   {i < crumbs.length - 1 ? (
-                    <Link href={c.href} className="hover:underline">
+                    <Link href={c.href} className="font-medium text-primary hover:underline">
                       {c.label}
                     </Link>
                   ) : (
@@ -45,10 +45,10 @@ export function PageHero({
             </ol>
           </nav>
         ) : null}
-        {eyebrow ? <p className="text-sm font-semibold uppercase tracking-wide text-accent">{eyebrow}</p> : null}
-        <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} ${compact ? "text-3xl" : "text-4xl"} leading-tight text-white md:text-5xl`}>{title}</h1>
+        {eyebrow ? <p className="text-sm font-bold uppercase tracking-wide text-primary">{eyebrow}</p> : null}
+        <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} ${compact ? "text-3xl" : "text-4xl"} leading-tight text-ink md:text-5xl`}>{title}</h1>
         {lead ? (
-          <div className={`max-w-2xl leading-relaxed text-panel-muted ${compact ? "mt-1.5 text-base md:mt-4 md:text-lg" : "mt-4 text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
+          <div className={`max-w-2xl leading-relaxed text-muted ${compact ? "mt-1.5 text-base md:mt-4 md:text-lg" : "mt-4 text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
         ) : null}
       </div>
     </section>

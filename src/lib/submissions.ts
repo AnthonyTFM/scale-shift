@@ -6,6 +6,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { FeedbackInput } from "./feedback";
+import { site } from "@/content/site";
 
 export type Submission = Omit<FeedbackInput, "website" | "startedAt"> & { id: string; receivedAt: string; userAgent: string };
 
@@ -45,7 +46,7 @@ async function sendEmail(sub: Submission) {
   const key = process.env.RESEND_API_KEY;
   const to = process.env.NOTIFY_EMAIL_TO;
   if (!key || !to) return;
-  const from = process.env.NOTIFY_EMAIL_FROM || "Scale Shift <onboarding@resend.dev>";
+  const from = process.env.NOTIFY_EMAIL_FROM || `${site.name} <onboarding@resend.dev>`;
   const lines = [
     `Topic: ${sub.topic}`,
     `Era: ${sub.era || "-"}`,
@@ -61,7 +62,7 @@ async function sendEmail(sub: Submission) {
     body: JSON.stringify({
       from,
       to: to.split(",").map((s) => s.trim()),
-      subject: `[Scale Shift] ${sub.topic}: ${sub.region || sub.message.slice(0, 40)}`,
+      subject: `[${site.name}] ${sub.topic}: ${sub.region || sub.message.slice(0, 40)}`,
       text: lines.join("\n"),
       ...(sub.email ? { reply_to: sub.email } : {}),
     }),

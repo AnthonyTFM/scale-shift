@@ -38,11 +38,11 @@ export function StickyMapCta() {
     <div
       aria-hidden={!shown}
       inert={!shown}
-      className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white/95 p-3 backdrop-blur transition-transform duration-200 md:hidden ${
+      className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-3 pb-2 pt-3 backdrop-blur transition-transform duration-200 md:hidden ${
         shown ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <Link href="/map" className="flex h-12 items-center justify-center rounded-lg bg-accent font-bold text-panel">
+      <Link href="/map" className="btn btn-primary btn-lg mb-1.5 w-full">
         {home.stickyCta}
       </Link>
     </div>
