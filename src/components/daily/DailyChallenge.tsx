@@ -105,6 +105,22 @@ export function DailyChallenge() {
   const [failed, setFailed] = useState(false);
   // someone sent a "can you beat me?" link
   const [challenge, setChallenge] = useState<Challenge | null>(null);
+  // set when the player moves on, so the next question (or the results) takes focus; not on first load
+  const advanced = useRef(false);
+
+  useEffect(() => {
+    if (!advanced.current) return;
+    advanced.current = false;
+    // "Next" has gone, so focus would fall back to the page: move it to the new heading instead, which screen readers
+    // announce and from which Tab reaches the answers; and bring the card back into view if it scrolled off the top
+    const heading = document.getElementById("daily-q") ?? document.getElementById("daily-done");
+    const card = heading?.closest("section");
+    if (!heading || !card) return;
+    const top = card.getBoundingClientRect().top;
+    if (top < 72) scrollTo({ top: top + scrollY - 80, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    heading.setAttribute("tabindex", "-1");
+    heading.focus({ preventScroll: true });
+  }, [game?.step]);
 
   useEffect(() => {
     const c = readChallenge(location.hash);
@@ -217,7 +233,10 @@ export function DailyChallenge() {
           picked={choices[step]}
           practice={!round.date}
           onPick={answer}
-          onNext={() => setGame({ ...game, step: step + 1 })}
+          onNext={() => {
+            advanced.current = true;
+            setGame({ ...game, step: step + 1 });
+          }}
         />
       )}
     </div>
@@ -644,7 +663,7 @@ function Results({
                 <strong>{big.n}</strong> <span className="text-muted">({big.sub})</span> is {(big.a / small.a).toFixed(1)}× the size of <strong>{small.n}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} className="col-start-2 font-semibold text-link hover:underline">
+              <Link href={mapHref(q)} aria-label={`Drag ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-link hover:underline">
                 Drag them on the map →
               </Link>
             </li>
