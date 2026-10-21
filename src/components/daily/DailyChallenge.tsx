@@ -389,17 +389,19 @@ function QuestionCard({
                   {isAnswer ? reveal.bigger : reveal.yourPick}
                 </span>
               ) : null}
-              <span className="relative block">
-                <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
-                {answered ? (
-                  <span className="pop-in reveal-late absolute inset-x-1 bottom-1.5 mx-auto w-fit rounded-full bg-white/90 px-2 py-0.5 text-center text-[11px] font-bold leading-tight text-ink shadow-sm">
-                    {mapNote}
-                  </span>
-                ) : null}
-              </span>
+              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
               <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
               <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
-              {answered ? <TrueArea from={o.m} to={o.a} /> : null}
+              {answered ? (
+                <>
+                  <TrueArea from={o.m} to={o.a} />
+                  <span
+                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2 py-0.5 text-[11px] font-bold leading-tight ${inflate >= 1.15 ? "bg-amber-100 text-amber-950" : "bg-paper text-ink-soft"}`}
+                  >
+                    {mapNote}
+                  </span>
+                </>
+              ) : null}
             </button>
           );
         })}
@@ -460,7 +462,7 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
 const size = (o: Outline) => Math.max(o.b[2] - o.b[0], o.b[3] - o.b[1]);
 
 /** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
-function Shape({ outline, span, color }: { outline: Outline; span: number; color: string }) {
+function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
   const [x0, y0, x1, y1] = outline.b;
   const k = 100 / span;
   const tiny = size(outline) < span * 0.06;
@@ -469,22 +471,24 @@ function Shape({ outline, span, color }: { outline: Outline; span: number; color
       <path
         d={outline.d}
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
-        fill={color}
+        fill={ghost ? "none" : color}
         fillOpacity={0.88}
         stroke={color}
-        strokeWidth={1}
+        strokeWidth={ghost ? 1.5 : 1}
+        strokeDasharray={ghost ? "4 3" : undefined}
         vectorEffect="non-scaling-stroke"
         fillRule="evenodd"
         strokeLinejoin="round"
       />
-      {tiny ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
+      {tiny && !ghost ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
     </>
   );
 }
 
 /**
  * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
- * it really is next to the other shape, then the true outline fades in.
+ * it really is next to the other shape, then the true outline fades in, with a dashed trace of the map's version left behind
+ * so the difference stays visible.
  */
 function RevealTile({
   map,
@@ -505,6 +509,9 @@ function RevealTile({
     <svg viewBox="0 0 100 100" className="aspect-square w-full rounded-xl bg-[radial-gradient(circle_at_35%_30%,#dff0f8,#bcdcec)]" aria-hidden="true">
       <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
         <Shape outline={map} span={spans.merc} color={color} />
+      </g>
+      <g className="reveal-true" style={{ opacity: revealed ? 0.55 : 0 }}>
+        <Shape outline={map} span={spans.merc} color={color} ghost />
       </g>
       <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
         <Shape outline={real} span={spans.ea} color={color} />
