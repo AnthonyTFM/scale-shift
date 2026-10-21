@@ -1,7 +1,9 @@
 import { PageHero } from "@/components/site/PageHero";
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import { DailyChallenge } from "@/components/daily/DailyChallenge";
 import { SignInProvider } from "@/components/daily/SignInProvider";
+import { dailyCopy as t } from "@/content/daily";
 
 export const metadata: Metadata = {
   title: "Daily challenge: which is bigger?",
@@ -14,22 +16,27 @@ export default function DailyPage() {
   return (
     <>
       <PageHero
-        eyebrow="Daily challenge"
-        title="Which is bigger?"
+        center
+        compact
+        eyebrow={t.eyebrow}
+        title={t.title}
         lead={
           <p>
-            Five matchups a day, the same for everyone. Normal maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the
-            leaderboard. New matchups at midnight your time.
+            <span className="sm:hidden">{t.leadShort}</span>
+            <span className="hidden sm:inline">{t.lead}</span>
           </p>
         }
       />
-      <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
-        <div className="max-w-2xl">
-          <div>
-            <SignInProvider>
-              <DailyChallenge />
-            </SignInProvider>
-          </div>
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-8 md:py-10">
+        <div className="mx-auto max-w-2xl">
+          {/* the homepage's play card grows into the game */}
+          <ViewTransition name="daily-card" share="morph" default="none">
+            <div>
+              <SignInProvider>
+                <DailyChallenge />
+              </SignInProvider>
+            </div>
+          </ViewTransition>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few
             percent. Your scores and streak are saved in this browser only.

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ViewTransition } from "react";
 import AtlasApp from "@/components/map/AtlasApp";
 import { site } from "@/content/site";
 
@@ -24,7 +25,12 @@ export default function MapPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <AtlasApp />
+      {/* the homepage globe grows into the map */}
+      <div className="atlas-page">
+        <ViewTransition name="world" share="morph" default="none">
+          <AtlasApp />
+        </ViewTransition>
+      </div>
     </>
   );
 }

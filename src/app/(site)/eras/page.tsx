@@ -37,7 +37,7 @@ export default function ErasPage() {
                 <li key={e.key}>
                   <Link
                     href={`/eras/${eraSlug(e.key)}`}
-                    className="flex h-full flex-col rounded-card border border-line bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                    className="flex h-full flex-col press-card rounded-card p-4 hover:border-primary"
                   >
                     <span className="font-display text-2xl text-ink">{e.label}</span>
                     <span className="mt-1 text-sm text-muted">

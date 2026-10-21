@@ -102,10 +102,10 @@ export function AccountJoin({ date, choices }: Props) {
   const askName = isSignedIn && me !== undefined && (!me?.name || editing);
 
   return (
-    <div className="mt-5 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
+    <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="font-bold text-ink">🏆 Today&apos;s leaderboard</h3>
-        <Link href="/leaderboard" className="text-sm font-semibold text-link hover:underline">
+        <Link href="/leaderboard" className="text-sm font-semibold text-primary hover:underline">
           See all →
         </Link>
       </div>
@@ -119,7 +119,7 @@ export function AccountJoin({ date, choices }: Props) {
             you, and you keep the same nickname on every device.
           </p>
           <SignInButton mode="modal" withSignUp forceRedirectUrl="/daily" signUpForceRedirectUrl="/daily">
-            <button type="button" className="mt-3 h-11 rounded-lg bg-panel px-4 font-bold text-panel-text hover:bg-panel-2">
+            <button type="button" className="btn btn-primary mt-3 h-12">
               Sign in to post my score
             </button>
           </SignInButton>
@@ -150,19 +150,19 @@ export function AccountJoin({ date, choices }: Props) {
               maxLength={16}
               autoComplete="nickname"
               placeholder="e.g. MapWizard"
-              className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-ink"
+              className="h-11 min-w-0 flex-1 rounded-xl border-2 border-line bg-white px-3 text-ink"
             />
             <button
               type="submit"
               disabled={status === "sending"}
-              className="h-11 shrink-0 rounded-lg bg-panel px-4 font-bold text-panel-text hover:bg-panel-2 disabled:opacity-60"
+              className="btn btn-primary mb-1.5 h-11 shrink-0 px-4"
             >
               {status === "sending" ? "Saving…" : me?.name ? "Save" : "Join"}
             </button>
           </div>
           {me?.name ? null : (
             <label className="mt-3 flex items-start gap-2 text-sm text-ink">
-              <input ref={remindRef} type="checkbox" className="mt-0.5 size-4 shrink-0 accent-amber-500" />
+              <input ref={remindRef} type="checkbox" className="mt-0.5 size-4 shrink-0 accent-primary" />
               <span>
                 Email me when a new daily challenge is up, so I can defend my spot on the leaderboard.{" "}
                 <span className="text-muted">Optional. Unsubscribe any time with one click.</span>
@@ -186,7 +186,7 @@ export function AccountJoin({ date, choices }: Props) {
           <p className="mt-2 text-ink">
             <strong>{me?.name}</strong>, you&apos;re <strong className="text-lg">#{result.rank}</strong> of {result.total} today
             {result.duplicate ? " (your first score of the day counts)" : ""}.{" "}
-            <button type="button" onClick={() => setEditing(true)} className="text-sm font-semibold text-link hover:underline">
+            <button type="button" onClick={() => setEditing(true)} className="text-sm font-semibold text-primary hover:underline">
               Change nickname
             </button>
           </p>
@@ -197,7 +197,7 @@ export function AccountJoin({ date, choices }: Props) {
               type="checkbox"
               checked={me.reminders}
               onChange={(e) => saveReminders(e.target.checked)}
-              className="mt-0.5 size-4 shrink-0 accent-amber-500"
+              className="mt-0.5 size-4 shrink-0 accent-primary"
             />
             <span>Email me when a new daily challenge is up</span>
           </label>
@@ -208,7 +208,7 @@ export function AccountJoin({ date, choices }: Props) {
       {top?.rows.length ? (
         <ol className="mt-3 space-y-1 text-sm">
           {top.rows.map((r) => (
-            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-amber-200/70 font-bold" : ""}`}>
+            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-[#FFF1C7] font-bold" : ""}`}>
               <span className="w-6 text-right text-muted">{r.rank}</span>
               <span className="min-w-0 flex-1 truncate">{r.name}{r.me ? <span className="font-normal text-muted"> (you)</span> : null}</span>
               <span className="font-mono">{r.score}/5</span>
@@ -221,7 +221,7 @@ export function AccountJoin({ date, choices }: Props) {
         <p className="mt-3 text-xs text-muted">
           Signed in.{" "}
           <SignOutButton redirectUrl="/daily">
-            <button type="button" className="font-semibold text-link hover:underline">
+            <button type="button" className="font-semibold text-primary hover:underline">
               Sign out
             </button>
           </SignOutButton>

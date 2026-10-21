@@ -79,7 +79,7 @@ Players sign up with an email (kept private, one player per inbox) and a nicknam
 
 Processed map files ship in `public/data/`, so you don't need to do anything. To rebuild them (for example after adding a fix to `src/content/data-corrections.json`), run `npm run data`. It downloads the historical source files automatically.
 
-- 2000 BCE → 2010: [historical-basemaps](https://github.com/aourednik/historical-basemaps) by André Ourednik, **GPL-3.0** (non-commercial/educational use is fine; if you redistribute the data you must keep it GPL).
+- 2000 BCE → 2010: [historical-basemaps](https://github.com/aourednik/historical-basemaps) by André Ourednik, **GPL-3.0**. The GPL allows any use, commercial included. If we redistribute the data (and we do: the processed files in `public/data/eras/` are downloaded by every visitor), those files must stay under GPL-3.0 with the credit kept, and their source must be available (it is: this public repo, the build scripts and `public/data/LICENSE.txt`).
 - Present: Natural Earth 1:50m (public domain) via world-atlas; US states via us-atlas (US Census, public domain).
 - Population: World Bank via datasets/population (ODC-PDDL). Flags: country-flag-icons (MIT).
 

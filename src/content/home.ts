@@ -5,6 +5,8 @@
 export const home = {
   eyebrow: "Free to play · No sign-up needed",
   title: "Your map has been lying to you.",
+  /** the word in the title shown in red */
+  titleAccent: "lying",
   lead: "On most maps, Russia looks far bigger than Africa. In reality, Africa is nearly twice its size. Drag any country or empire to see its true size, travel through 4,000 years of borders, and put your eye to the test in today's challenge.",
   playCta: "Take today's challenge",
   mapCta: "Explore the real-size map",
@@ -42,4 +44,43 @@ export const home = {
   },
 
   stickyCta: "Explore the real-size map",
+
+  // the game-first hero: play card, map card and today's leaderboard over a floating globe
+  hub: {
+    mission:
+      "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Border Drift shows every country and empire at its real size, across 4,000 years of history.",
+    playEyebrow: "Today's game",
+    playTitle: "Which is bigger?",
+    playLead: "Five matchups, about two minutes. The map will try to fool you.",
+    playCta: "Play today's game",
+    playDone: (score: number) => `You scored ${score}/5 today.`,
+    playDay: "Daily challenge",
+    playDoneCta: "See today's answers",
+    mapEyebrow: "The real-size map",
+    mapTitle: "Drag any country anywhere",
+    mapLead: "Watch shapes shrink and grow as they move, across 4,000 years of borders.",
+    mapCta: "Open the map",
+    boardTitle: "Today's leaderboard",
+    boardEmpty: "No scores yet today. Be the first on the board!",
+    // when today's board is empty, the card shows these instead of an empty box
+    boardEmptyShort: "No scores yet today. Be the first!",
+    boardYesterday: "Yesterday's top players",
+    boardAllTime: "All-time top players",
+    boardPoints: (n: number) => `${n} pts`,
+    boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
+    boardCta: "Full leaderboard",
+    nextIn: (h: number, m: number) => `Next game in ${h}h ${m}m`,
+    nextReady: "A new game is ready",
+    challengeCta: "Challenge a friend",
+    spotWaiting: "Your spot is waiting",
+    spotPlay: "Play now",
+    beatMe: "Challenge a friend to beat you",
+    howTitle: "How to play",
+    steps: [
+      ["See two shapes", "Both are drawn the way a normal web map shows them, stretched toward the poles."],
+      ["Tap the bigger one", "Pick the one you think is really bigger. Trust your eyes at your own risk."],
+      ["See the truth", "Watch both shrink or grow to their real sizes, with the areas and why the map lied."],
+    ] as [string, string][],
+    howFacts: ["Five matchups a day", "Same puzzle for everyone", "Keep your streak going"],
+  },
 };

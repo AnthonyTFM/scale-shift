@@ -1,4 +1,4 @@
-import { cacheLife } from "next/cache";
+import { connection } from "next/server";
 import Link from "next/link";
 import { presets, type Preset } from "@/content/presets";
 import { mapUrl } from "@/lib/share";
@@ -12,10 +12,9 @@ function rotate<T>(list: T[], n: number, week: number) {
   return Array.from({ length: Math.min(n, list.length) }, (_, i) => list[(week * n + i) % list.length]);
 }
 
-/** Weeks since 1970 (Monday to Monday, UTC). Cached and refreshed every few hours, so a new week shows up soon after it starts. */
+/** Weeks since 1970 (Monday to Monday, UTC), read when the page is requested (see currentDay in DailyFact for why). */
 async function currentWeek() {
-  "use cache";
-  cacheLife("hours");
+  await connection();
   return Math.floor((Date.now() - MONDAY_EPOCH) / (7 * DAY));
 }
 
@@ -47,11 +46,9 @@ export async function WeeklyPicks() {
           <li key={p.id}>
             <Link
               href={mapUrl({ era: p.baseEra, shapes: p.shapes.map((s, i) => ({ ...s, color: i })), at: p.at })}
-              className={`block h-full rounded-xl p-4 ring-1 transition hover:ring-2 ${
-                p.category === "controversial" ? "bg-rose-50 ring-rose-200 hover:ring-rose-400" : "bg-amber-50 ring-amber-200 hover:ring-amber-400"
-              }`}
+              className={`press-card block h-full rounded-card p-4 ${p.category === "controversial" ? "hover:border-red" : "hover:border-primary"}`}
             >
-              <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
+              <span className={`text-[11px] font-bold uppercase tracking-wide ${p.category === "controversial" ? "text-danger" : "text-primary"}`}>
                 {p.category === "controversial" ? "Controversial" : "Surprising"}
               </span>
               <span className="mt-0.5 block font-bold text-ink">{p.title}</span>

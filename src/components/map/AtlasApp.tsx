@@ -128,6 +128,15 @@ export default function AtlasApp() {
 
   const addShape = useCallback(
     async (name: string, eraKey: string, opts: { fly?: boolean } = {}) => {
+      // the same shape from the same era is already on the map: select it instead of adding a copy
+      const existing = overlaysRef.current.find((o) => o.name === name && o.era === eraKey);
+      if (existing) {
+        setSelected(existing.id);
+        setPanelOpen(true);
+        if (opts.fly !== false) fitTo([existing]);
+        showToast(`${name} is already on the map.`);
+        return;
+      }
       if (overlaysRef.current.length >= MAX_SHAPES) {
         showToast(`You can compare up to ${MAX_SHAPES} shapes at once.`);
         return;
@@ -466,8 +475,8 @@ export default function AtlasApp() {
       {/* Panel (parity with the reference: title, search, selected shape, units, links) */}
       <aside className="pointer-events-none absolute left-3 top-3 z-20 flex max-h-[calc(100dvh-120px)] w-[calc(100vw-80px)] max-w-[380px] flex-col sm:max-h-[calc(100dvh-130px)]">
         <div className="pointer-events-auto flex min-h-0 flex-col overflow-hidden rounded-2xl bg-panel text-panel-text shadow-float">
-          <div className="flex items-center gap-2 px-4 pb-3 pt-3">
-            <Link href="/" className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+          <div className="flex items-center gap-2 px-3 pb-1 pt-1.5 sm:px-4 sm:pb-3 sm:pt-3">
+            <Link href="/" className="font-display text-lg font-bold tracking-tight sm:text-2xl">
               {site.name}
             </Link>
             <span className="hidden text-xs text-panel-muted sm:inline">2000 BCE → today</span>
@@ -477,14 +486,14 @@ export default function AtlasApp() {
               aria-expanded={panelOpen}
               aria-controls="atlas-panel-body"
               aria-label={panelOpen ? "Collapse panel" : "Expand panel"}
-              className="ml-auto grid size-9 place-items-center rounded-lg bg-white/10 hover:bg-white/15"
+              className="ml-auto grid size-8 place-items-center rounded-lg bg-white/10 hover:bg-white/15 sm:size-9"
             >
               <svg aria-hidden="true" viewBox="0 0 24 24" className={`size-4 transition-transform ${panelOpen ? "" : "rotate-180"}`} fill="none" stroke="currentColor" strokeWidth="2.5">
                 <path d="m6 15 6-6 6 6" />
               </svg>
             </button>
           </div>
-          <div className="px-4 pb-3">
+          <div className="px-3 pb-2 sm:px-4 sm:pb-3">
             <SearchBox index={index} onNeedIndex={needIndex} currentEra={era} unit={unit} onPick={onPick} />
           </div>
           {panelOpen ? (

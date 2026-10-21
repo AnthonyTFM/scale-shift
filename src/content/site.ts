@@ -1,14 +1,14 @@
 // Brand, navigation and shared copy. Change the name or tagline here and it updates everywhere.
 
 export const site = {
-  name: "Scale Shift",
-  tagline: "Drag any nation from any era and see its real size.",
+  name: "Border Drift",
+  tagline: "See the real size of every country and empire, across 4,000 years of borders.",
   description:
     "An interactive map of 4,000 years of borders. Drag countries and empires anywhere on Earth to see their real size, step through history from 2000 BCE to today, and find out who ruled any spot on the planet.",
   // Used for canonical URLs and social previews. Set NEXT_PUBLIC_SITE_URL in production.
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   contactEmail: "hello@scaleshift.example",
-  copyrightHolder: "Scale Shift",
+  copyrightHolder: "Border Drift",
 };
 
 /** Main menu. `from` hides an item in the desktop header below that breakpoint (it stays in the phone menu and footer). */
@@ -28,6 +28,23 @@ export const footerNav = [
   { href: "/contact", label: "Report a border error" },
   { href: "/privacy", label: "Privacy" },
 ];
+
+/** The phone menu: the three main places first, then history pages, then the small print. */
+export const menu = {
+  main: [
+    { href: "/map", label: "Map", blurb: "Drag any country to its real size", icon: "🗺️" },
+    { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "🎯" },
+    { href: "/leaderboard", label: "Leaderboard", blurb: "Today, this week and all time", icon: "🏆" },
+  ],
+  historyTitle: "History",
+  history: [
+    { href: "/eras", label: "Eras" },
+    { href: "/timeline", label: "Timeline" },
+    { href: "/disputes", label: "Disputed borders" },
+  ],
+  more: footerNav,
+  backToMap: "Back to the map",
+};
 
 export const appCopy = {
   searchPlaceholder: "Try Roman Empire, Texas, Brazil",

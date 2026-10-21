@@ -94,7 +94,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
             <p>{summary(key)}</p>
             <Link
               href={mapLink(key)}
-              className="mt-6 inline-flex h-12 items-center rounded-lg bg-accent px-5 text-base font-bold text-panel hover:bg-accent-strong"
+              className="btn btn-primary btn-lg mt-6"
             >
               Explore {e.key === "present" ? "today's borders" : e.label} on the map
             </Link>

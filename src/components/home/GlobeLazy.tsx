@@ -7,7 +7,7 @@ import dynamic from "next/dynamic";
 // (public/globe-still.svg, made by scripts/build-globe.mjs) sits in its place, so the globe never shows up empty.
 const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
   ssr: false,
-  loading: () => <div aria-hidden="true" className="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_38%_32%,#b9def0,#4f8fbf_70%)] p-2" />,
+  loading: () => <div aria-hidden="true" className="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_38%_32%,#f1f8ff,#a9d3f0_78%)] p-2" />,
 });
 
 export function GlobeLazy({ label }: { label: string }) {

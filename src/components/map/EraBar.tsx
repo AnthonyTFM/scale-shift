@@ -26,7 +26,7 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
 
   if (!editing) {
     return (
-      <p className="flex items-center gap-1.5 font-display text-xl leading-none sm:text-2xl" aria-live="polite">
+      <p className="flex items-center gap-1.5 font-display text-lg leading-none sm:text-2xl" aria-live="polite">
         <button
           type="button"
           onClick={() => {
@@ -112,14 +112,14 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
     onEra(eras[n].key);
   };
   return (
-    <div className="pointer-events-auto rounded-2xl bg-panel/95 px-3 py-2 text-panel-text shadow-float backdrop-blur sm:px-4">
+    <div className="pointer-events-auto rounded-2xl bg-panel/95 px-2.5 py-1.5 text-panel-text shadow-float backdrop-blur sm:px-4 sm:py-2">
       <div className="flex items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={() => onTogglePlay(-1)}
           aria-label={playing === -1 ? "Pause timeline" : "Play timeline backward"}
           title={playing === -1 ? "Pause" : "Play back in time"}
-          className={`grid size-9 shrink-0 place-items-center rounded-full ${
+          className={`grid size-8 shrink-0 place-items-center rounded-full sm:size-9 ${
             playing === -1 ? "bg-accent text-panel hover:bg-accent-strong" : "bg-white/10 hover:bg-white/15"
           }`}
         >
@@ -136,7 +136,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => onTogglePlay(1)}
           aria-label={playing === 1 ? "Pause timeline" : "Play timeline"}
           title={playing === 1 ? "Pause" : "Play forward in time"}
-          className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-panel hover:bg-accent-strong"
+          className="grid size-9 shrink-0 place-items-center rounded-full bg-accent sm:size-10 text-panel hover:bg-accent-strong"
         >
           {playing === 1 ? (
             <PauseIcon />
@@ -182,7 +182,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
             aria-valuetext={meta?.label}
             onChange={(e) => onEra(eras[Number(e.target.value)].key)}
           />
-          <div className="-mt-1 flex justify-between text-[10px] text-panel-muted">
+          <div className="-mt-1 hidden justify-between text-[10px] text-panel-muted sm:flex">
             <span>{eras[0].label}</span>
             <span className="hidden sm:inline">1 CE</span>
             <span className="hidden sm:inline">1500</span>
@@ -204,7 +204,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           type="button"
           onClick={onChanges}
           aria-expanded={changesOpen}
-          className="shrink-0 rounded-lg bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/15 sm:text-sm"
+          className="shrink-0 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/15 sm:px-3 sm:py-2 sm:text-sm"
         >
           What changed?
         </button>

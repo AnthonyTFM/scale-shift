@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import { Fraunces } from "next/font/google";
+import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { site } from "@/content/site";
 import "./globals.css";
 
-// preload: false keeps the heading font from competing with first paint; text renders in the fallback serif first
-const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], display: "swap", weight: ["600", "700"], preload: false });
+// Inter for body text (variable, 400–800); Bricolage Grotesque ExtraBold for headings, numbers and the wordmark
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
+const bricolage = Bricolage_Grotesque({ variable: "--font-bricolage", subsets: ["latin"], display: "swap", weight: "800" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#0e2a47",
+  themeColor: "#fff8ec",
   width: "device-width",
   initialScale: 1,
 };
@@ -27,7 +28,7 @@ const GA_ID = process.env.NEXT_PUBLIC_GA4_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${fraunces.variable} antialiased`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${bricolage.variable} antialiased`} suppressHydrationWarning>
       <head>
         {/* Runs before first paint: returning visitors and shared map links skip the map's intro card.
             Kept in the root layout (rendered once, on the server) because React won't run scripts it renders in the browser. */}

@@ -11,7 +11,7 @@ export default function NotFound() {
         <h1 className="mt-2 font-display text-4xl text-ink md:text-5xl">This page has been lost to history.</h1>
         <p className="mt-4 text-lg text-ink-soft">The link may be old, or the page may have moved. The map is still here.</p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/map" className="inline-flex h-12 items-center rounded-lg bg-accent px-5 font-bold text-panel hover:bg-accent-strong">
+          <Link href="/map" className="btn btn-primary btn-lg">
             Open the map
           </Link>
           <Link href="/eras" className="inline-flex h-12 items-center rounded-lg border border-line bg-white px-5 font-semibold hover:bg-paper">
