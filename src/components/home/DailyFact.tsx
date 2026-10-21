@@ -107,7 +107,7 @@ export async function DailyFact() {
   return (
     <Link
       href={href}
-      className="grid items-center gap-x-8 gap-y-1 rounded-card bg-white p-5 text-ink shadow-sm ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-amber-300 md:grid-cols-[1fr_1.3fr] md:px-7"
+      className="grid items-center gap-x-8 gap-y-1 rounded-card bg-white p-5 text-ink shadow-sm ring-1 ring-line transition hover:-translate-y-0.5 hover:ring-primary md:grid-cols-[1fr_1.3fr] md:px-7"
     >
       <span className="block">
         <span className="block text-xs font-bold uppercase tracking-wide text-link">{home.fact.eyebrow}</span>

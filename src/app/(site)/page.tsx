@@ -88,13 +88,10 @@ export default function HomePage() {
       />
 
       {/* Hero: today's game first, the map under it, today's leaderboard on the right, all over a floating globe */}
-      <section
-        data-hero
-        className="relative isolate overflow-hidden bg-panel bg-[radial-gradient(ellipse_at_75%_40%,rgba(84,160,214,0.35),transparent_60%),linear-gradient(180deg,#0e2a47,#0a1f36)] text-panel-text"
-      >
+      <section data-hero className="relative isolate overflow-hidden bg-paper text-ink">
         <div className="pointer-events-none absolute inset-0 -z-10">
           {/* positioned with left/top, not translate: Chrome counted the translate-centred float as a layout shift */}
-          <div className="globe-float absolute left-[calc(50%-min(60vw,310px))] top-[-4%] w-[120vw] max-w-[620px] opacity-35 lg:left-auto lg:right-[-6%] lg:top-[calc(48%-min(31vw,440px))] lg:w-[min(62vw,880px)] lg:max-w-none lg:opacity-60">
+          <div className="globe-float absolute left-[calc(50%-min(60vw,310px))] top-[-4%] w-[120vw] max-w-[620px] opacity-30 lg:left-auto lg:right-[-6%] lg:top-[calc(48%-min(31vw,440px))] lg:w-[min(62vw,880px)] lg:max-w-none lg:opacity-70">
             {/* the same "world" as the map page: opening the map grows this globe into it */}
             <ViewTransition name="world" share="morph" default="none">
               <div>
@@ -102,14 +99,20 @@ export default function HomePage() {
               </div>
             </ViewTransition>
           </div>
-          {/* keep the headline and cards readable where they sit over the globe */}
-          <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#0b2036_0%,rgba(11,32,54,0.85)_38%,rgba(11,32,54,0)_62%)] lg:block" />
+          {/* keep the headline and cards readable where they sit over the globe: the cream page fades over it */}
+          <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#fff8ec_0%,rgba(255,248,236,0.88)_38%,rgba(255,248,236,0)_62%)] lg:block" />
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-12 pt-7 md:pb-14 md:pt-9">
-          <p className="text-xs font-bold uppercase tracking-wide text-accent">{home.eyebrow}</p>
-          <h1 className="mt-2 font-display text-4xl leading-[1.05] text-white md:text-5xl lg:text-6xl">{home.title}</h1>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-panel-muted md:text-lg">{home.hub.mission}</p>
-          <dl className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-panel-muted sm:gap-x-4 sm:text-sm">
+          <p className="inline-block rounded-full bg-card px-3 py-1 text-xs font-bold uppercase tracking-wide text-primary ring-1 ring-line">
+            {home.eyebrow}
+          </p>
+          <h1 className="mt-3 font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
+            {home.title.split(home.titleAccent).flatMap((part, i) =>
+              i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
+            )}
+          </h1>
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">{home.hub.mission}</p>
+          <dl className="mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted sm:gap-x-4 sm:text-sm">
             {[
               ["4,000", "years"],
               [String(eras.length), "map snapshots"],
@@ -120,7 +123,7 @@ export default function HomePage() {
               <div key={label} className={`items-baseline gap-1.5 ${label === "years" ? "hidden sm:flex" : "flex"}`}>
                 <dt className="sr-only">{label}</dt>
                 <dd>
-                  <span className="font-display text-base font-bold text-white sm:text-lg">{n}</span> {label}
+                  <span className="font-display text-base text-ink sm:text-lg">{n}</span> {label}
                 </dd>
               </div>
             ))}
@@ -131,7 +134,7 @@ export default function HomePage() {
               <Link
                 href="/map"
                 transitionTypes={["to-map"]}
-                className="group flex items-center gap-4 rounded-card bg-panel/85 px-5 py-4 text-white ring-1 ring-white/20 backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-panel-2"
+                className="press-card group flex items-center gap-4 rounded-card px-5 py-4 text-ink hover:border-primary"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- our own small decorative globe picture */}
                 <img
@@ -139,14 +142,14 @@ export default function HomePage() {
                   alt=""
                   width={56}
                   height={56}
-                  className="size-12 shrink-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#b9def0,#4f8fbf_75%)] shadow-[0_0_24px_rgba(120,190,240,0.45)] transition-transform duration-700 group-hover:rotate-12"
+                  className="size-12 shrink-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#eaf5ff,#9ccbec_75%)] ring-1 ring-line transition-transform duration-700 group-hover:rotate-12"
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-xs font-bold uppercase tracking-wide text-accent">{home.hub.mapEyebrow}</span>
+                  <span className="block text-xs font-bold uppercase tracking-wide text-primary">{home.hub.mapEyebrow}</span>
                   <span className="mt-0.5 block font-display text-xl leading-tight md:text-2xl">{home.hub.mapTitle}</span>
-                  <span className="mt-1 block text-sm text-panel-muted">{home.hub.mapLead}</span>
+                  <span className="mt-1 block text-sm text-muted">{home.hub.mapLead}</span>
                 </span>
-                <span className="hidden shrink-0 font-bold text-accent sm:inline">
+                <span className="hidden shrink-0 font-bold text-primary sm:inline">
                   {home.hub.mapCta} <span aria-hidden="true" className="inline-block transition group-hover:translate-x-1">→</span>
                 </span>
               </Link>
@@ -166,7 +169,7 @@ export default function HomePage() {
             <ol className="mt-4 space-y-4">
               {home.hub.steps.map(([title, body], i) => (
                 <li key={title} className="flex gap-3">
-                  <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-panel font-bold text-accent">
+                  <span aria-hidden="true" className="grid size-8 shrink-0 place-items-center rounded-full bg-primary font-display text-white">
                     {i + 1}
                   </span>
                   <span>
@@ -205,7 +208,7 @@ export default function HomePage() {
           <li className="sm:col-span-2 lg:col-span-1 lg:row-span-2">
             <Link
               href="/daily"
-              className="flex h-full flex-col rounded-card bg-gradient-to-br from-amber-300 to-orange-400 p-6 text-panel shadow-sm transition hover:-translate-y-0.5 hover:shadow-float"
+              className="flex h-full flex-col rounded-card bg-primary p-6 text-white shadow-[0_6px_0_0_var(--color-primary-shadow)] transition hover:bg-[#1d55d6] active:translate-y-1 active:shadow-[0_2px_0_0_var(--color-primary-shadow)]"
             >
               <span aria-hidden="true" className="text-4xl">
                 🎯
@@ -223,13 +226,13 @@ export default function HomePage() {
             <li key={d.href}>
               <Link
                 href={d.href}
-                className="flex h-full flex-col rounded-card border border-line bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-300 hover:shadow-float"
+                className="press-card flex h-full flex-col rounded-card p-5 hover:border-primary"
               >
                 <span aria-hidden="true" className="text-3xl">
                   {d.icon}
                 </span>
                 <span className="mt-2 font-display text-xl text-ink">{d.title}</span>
-                <span className="mt-1 text-sm leading-relaxed text-ink-soft">{d.body}</span>
+                <span className="mt-1 text-sm leading-relaxed text-muted">{d.body}</span>
                 <span className="mt-auto pt-3 text-sm font-semibold text-link">{d.cta} →</span>
               </Link>
             </li>

@@ -48,15 +48,15 @@ export function HeroLeaderboard() {
 
   const meBelow = board?.me && !board.rows.some((r) => r.me) ? board.me : null;
   return (
-    <div className="rounded-card bg-panel/70 p-5 text-panel-text shadow-float ring-1 ring-white/15 backdrop-blur-md md:p-6">
+    <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="font-display text-xl text-white sm:text-2xl">🏆 {t.boardTitle}</h2>
-        {board?.total ? <p className="whitespace-nowrap text-xs text-panel-muted">{t.boardPlayers(board.total)}</p> : null}
+        <h2 className="font-display text-xl text-ink sm:text-2xl">🏆 {t.boardTitle}</h2>
+        {board?.total ? <p className="whitespace-nowrap text-xs text-muted">{t.boardPlayers(board.total)}</p> : null}
       </div>
       {board === undefined ? (
         <ul aria-hidden="true" className="mt-4 space-y-2">
           {[0, 1, 2, 3, 4].map((i) => (
-            <li key={i} className="h-9 animate-pulse rounded-lg bg-white/10" />
+            <li key={i} className="h-9 animate-pulse rounded-lg bg-beige" />
           ))}
         </ul>
       ) : board?.rows.length ? (
@@ -64,9 +64,9 @@ export function HeroLeaderboard() {
           {board.rows.map((r) => (
             <li
               key={r.rank + r.name}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${r.me ? "bg-accent text-panel" : "bg-white/5"}`}
+              className={`flex items-center gap-3 rounded-lg px-3 py-2 ${r.me ? "bg-gold text-ink" : "bg-paper"}`}
             >
-              <span className={`w-6 text-center font-bold ${r.rank <= 3 && !r.me ? "text-accent" : ""}`}>{r.rank}</span>
+              <span className={`w-6 text-center font-bold ${r.rank <= 3 && !r.me ? "text-primary" : ""}`}>{r.rank}</span>
               <span className="min-w-0 flex-1 truncate font-semibold">
                 {r.name}
                 {r.me ? <span className="font-normal"> (you)</span> : null}
@@ -75,7 +75,7 @@ export function HeroLeaderboard() {
             </li>
           ))}
           {meBelow ? (
-            <li className="flex items-center gap-3 rounded-lg bg-accent px-3 py-2 text-panel">
+            <li className="flex items-center gap-3 rounded-lg bg-gold px-3 py-2 text-ink">
               <span className="w-6 text-center font-bold">{meBelow.rank}</span>
               <span className="min-w-0 flex-1 truncate font-semibold">
                 {meBelow.name} <span className="font-normal">(you)</span>
@@ -86,12 +86,12 @@ export function HeroLeaderboard() {
         </ol>
       ) : fallback ? (
         <div className="mt-3">
-          <p className="text-sm font-semibold text-white">{t.boardEmptyShort}</p>
-          <p className="mt-3 text-xs font-bold uppercase tracking-wide text-panel-muted">{fallback.kind === "yesterday" ? t.boardYesterday : t.boardAllTime}</p>
+          <p className="text-sm font-semibold text-ink">{t.boardEmptyShort}</p>
+          <p className="mt-3 text-xs font-bold uppercase tracking-wide text-muted">{fallback.kind === "yesterday" ? t.boardYesterday : t.boardAllTime}</p>
           <ol className="mt-1.5 space-y-1.5" aria-label={fallback.kind === "yesterday" ? t.boardYesterday : t.boardAllTime}>
             {fallback.rows.map((r) => (
-              <li key={r.rank + r.name} className="flex items-center gap-3 rounded-lg bg-white/5 px-3 py-2">
-                <span className="w-6 text-center font-bold text-accent">{r.rank}</span>
+              <li key={r.rank + r.name} className="flex items-center gap-3 rounded-lg bg-paper px-3 py-2">
+                <span className="w-6 text-center font-bold text-primary">{r.rank}</span>
                 <span className="min-w-0 flex-1 truncate font-semibold">{r.name}</span>
                 <span className="font-mono text-sm">{r.score}</span>
               </li>
@@ -99,7 +99,7 @@ export function HeroLeaderboard() {
           </ol>
         </div>
       ) : (
-        <p className="mt-4 rounded-lg bg-white/5 px-3 py-6 text-center text-panel-muted">{t.boardEmpty}</p>
+        <p className="mt-4 rounded-lg bg-paper px-3 py-6 text-center text-muted">{t.boardEmpty}</p>
       )}
       {/* a short board gets an invitation instead of empty space: play, or pull a friend in */}
       {board !== undefined && (board?.rows.length ?? 0) < 5 ? (
@@ -107,28 +107,28 @@ export function HeroLeaderboard() {
           <Link
             href="/daily"
             transitionTypes={["to-daily"]}
-            className="mt-1.5 flex items-center gap-3 rounded-lg border border-dashed border-white/25 px-3 py-2 text-panel-muted hover:border-accent hover:text-white"
+            className="mt-1.5 flex items-center gap-3 rounded-lg border-2 border-dashed border-line px-3 py-2 text-muted hover:border-primary hover:text-ink"
           >
             <span className="w-6 text-center font-bold">?</span>
             <span className="min-w-0 flex-1 truncate font-semibold">{t.spotWaiting}</span>
-            <span className="text-sm font-bold text-accent">{t.spotPlay} →</span>
+            <span className="text-sm font-bold text-primary">{t.spotPlay} →</span>
           </Link>
         ) : (
           <button
             type="button"
             onClick={() => share(challengeMessage(myScore), "home-board")}
-            className="mt-1.5 flex w-full items-center gap-3 rounded-lg border border-dashed border-white/25 px-3 py-2 text-left text-panel-muted hover:border-accent hover:text-white"
+            className="mt-1.5 flex w-full items-center gap-3 rounded-lg border-2 border-dashed border-line px-3 py-2 text-left text-muted hover:border-primary hover:text-ink"
           >
             <span className="w-6 text-center font-bold">+</span>
             <span className="min-w-0 flex-1 truncate font-semibold">{t.beatMe}</span>
-            <span aria-hidden="true" className="text-sm font-bold text-accent">
+            <span aria-hidden="true" className="text-sm font-bold text-primary">
               →
             </span>
           </button>
         )
       ) : null}
       {box}
-      <Link href="/leaderboard" className="mt-4 inline-block text-sm font-semibold text-accent hover:underline">
+      <Link href="/leaderboard" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
         {t.boardCta} →
       </Link>
     </div>
