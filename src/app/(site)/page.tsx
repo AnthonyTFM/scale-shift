@@ -72,6 +72,8 @@ const directory = [
 export default function HomePage() {
   // start downloading the globe's country data with the page, instead of after its script loads
   preload("/data/globe.json", { as: "fetch", crossOrigin: "anonymous" });
+  // the globe's still picture is the largest thing on the first screen: fetch it before the CSS and scripts
+  preload("/globe-still.svg", { as: "image", fetchPriority: "high" });
   return (
     <>
       <LegacyMapRedirect />
@@ -91,7 +93,8 @@ export default function HomePage() {
         className="relative isolate overflow-hidden bg-panel bg-[radial-gradient(ellipse_at_75%_40%,rgba(84,160,214,0.35),transparent_60%),linear-gradient(180deg,#0e2a47,#0a1f36)] text-panel-text"
       >
         <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="globe-float absolute left-1/2 top-[-4%] w-[120vw] max-w-[620px] -translate-x-1/2 opacity-35 lg:left-auto lg:right-[-6%] lg:top-[48%] lg:w-[min(62vw,880px)] lg:max-w-none lg:-translate-y-1/2 lg:translate-x-0 lg:opacity-60">
+          {/* positioned with left/top, not translate: Chrome counted the translate-centred float as a layout shift */}
+          <div className="globe-float absolute left-[calc(50%-min(60vw,310px))] top-[-4%] w-[120vw] max-w-[620px] opacity-35 lg:left-auto lg:right-[-6%] lg:top-[calc(48%-min(31vw,440px))] lg:w-[min(62vw,880px)] lg:max-w-none lg:opacity-60">
             {/* the same "world" as the map page: opening the map grows this globe into it */}
             <ViewTransition name="world" share="morph" default="none">
               <div>
