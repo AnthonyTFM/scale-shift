@@ -27,7 +27,7 @@ export default function DailyPage() {
           </p>
         }
       />
-      <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 sm:pt-8 md:py-10">
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-8 md:py-10">
         <div className="mx-auto max-w-2xl">
           {/* the homepage's play card grows into the game */}
           <ViewTransition name="daily-card" share="morph" default="none">

@@ -23,7 +23,7 @@ export function PageHero({
 }) {
   return (
     <section className="ocean-band text-panel-text">
-      <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-5 pt-4" : "pb-10 pt-8"} md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>
+      <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3" : "pb-10 pt-8"} md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>
         {crumbs ? (
           <nav aria-label="Breadcrumb" className="mb-4 text-sm text-panel-muted">
             <ol className="flex flex-wrap gap-1">

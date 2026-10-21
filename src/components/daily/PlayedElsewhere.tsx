@@ -8,7 +8,7 @@ export function PlayedElsewhere() {
   const { isLoaded, isSignedIn } = useAuth();
   if (!isLoaded || isSignedIn) return null;
   return (
-    <p className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-white px-3 py-2 text-sm text-ink-soft ring-1 ring-line">
+    <p className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-white px-3 py-1.5 sm:mb-3 sm:py-2 text-sm text-ink-soft ring-1 ring-line">
       <span>
         <span className="sm:hidden">{t.playedElsewhereShort}</span>
         <span className="hidden sm:inline">{t.playedElsewhere}</span>
