@@ -1,6 +1,7 @@
 "use client";
 
 import { SignInButton, useAuth } from "@clerk/nextjs";
+import { dailyCopy as t } from "@/content/daily";
 
 /** Before playing, for signed-out players: sign in to bring today's result over from another device instead of replaying. */
 export function PlayedElsewhere() {
@@ -8,10 +9,14 @@ export function PlayedElsewhere() {
   if (!isLoaded || isSignedIn) return null;
   return (
     <p className="mb-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-xl bg-white px-3 py-2 text-sm text-ink-soft ring-1 ring-line">
-      <span>Played today on another device?</span>
+      <span>
+        <span className="sm:hidden">{t.playedElsewhereShort}</span>
+        <span className="hidden sm:inline">{t.playedElsewhere}</span>
+      </span>
       <SignInButton mode="modal" withSignUp forceRedirectUrl="/daily" signUpForceRedirectUrl="/daily">
         <button type="button" className="font-semibold text-link hover:underline">
-          Sign in to see your result →
+          <span className="sm:hidden">{t.signInToSeeShort}</span>
+          <span className="hidden sm:inline">{t.signInToSee}</span> →
         </button>
       </SignInButton>
     </p>

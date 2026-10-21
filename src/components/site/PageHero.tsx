@@ -2,23 +2,28 @@ import Link from "next/link";
 
 type Crumb = { href: string; label: string };
 
-/** `center` lines the heading up with a centered column below it (the daily challenge). */
+/**
+ * `center` lines the heading up with a centered column below it (the daily challenge).
+ * `compact` keeps the hero short on phones so what's below it (a game) starts on the first screen.
+ */
 export function PageHero({
   eyebrow,
   title,
   lead,
   crumbs,
   center,
+  compact,
 }: {
   eyebrow?: string;
   title: string;
   lead?: React.ReactNode;
   crumbs?: Crumb[];
   center?: boolean;
+  compact?: boolean;
 }) {
   return (
     <section className="ocean-band text-panel-text">
-      <div className={`mx-auto max-w-6xl px-4 pb-10 pt-8 md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>
+      <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-5 pt-4" : "pb-10 pt-8"} md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>
         {crumbs ? (
           <nav aria-label="Breadcrumb" className="mb-4 text-sm text-panel-muted">
             <ol className="flex flex-wrap gap-1">
@@ -38,8 +43,10 @@ export function PageHero({
           </nav>
         ) : null}
         {eyebrow ? <p className="text-sm font-semibold uppercase tracking-wide text-accent">{eyebrow}</p> : null}
-        <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} text-4xl leading-tight text-white md:text-5xl`}>{title}</h1>
-        {lead ? <div className={`mt-4 max-w-2xl text-lg leading-relaxed text-panel-muted ${center ? "mx-auto" : ""}`}>{lead}</div> : null}
+        <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} ${compact ? "text-3xl" : "text-4xl"} leading-tight text-white md:text-5xl`}>{title}</h1>
+        {lead ? (
+          <div className={`max-w-2xl leading-relaxed text-panel-muted ${compact ? "mt-1.5 text-base md:mt-4 md:text-lg" : "mt-4 text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
+        ) : null}
       </div>
     </section>
   );
