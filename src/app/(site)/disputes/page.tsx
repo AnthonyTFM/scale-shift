@@ -26,7 +26,7 @@ export default function DisputesPage() {
         }
       />
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="mb-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+        <p className="mb-6 rounded-card bg-[#fff3cc] p-4 text-sm text-ink ring-1 ring-gold">
           Status can change quickly. These summaries were reviewed when this site was built. Check current news before citing them, and{" "}
           <Link href="/contact?topic=border" className="font-semibold underline">
             tell us

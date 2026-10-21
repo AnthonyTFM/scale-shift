@@ -14,9 +14,9 @@ export function EventCard({ ev, headingLevel = 3 }: { ev: TerritoryEvent; headin
   const H = headingLevel === 2 ? "h2" : "h3";
   const era = eraForYear(ev.taken);
   return (
-    <article className="rounded-card border border-line bg-white p-5 shadow-sm">
+    <article className="rounded-card bg-card p-5 ring-1 ring-line">
       <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold">
-        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-slate-700">{eventTypeLabels[ev.type]}</span>
+        <span className="rounded-full bg-beige px-2.5 py-1 text-ink">{eventTypeLabels[ev.type]}</span>
         <span className={`rounded-full px-2.5 py-1 ring-1 ${statusStyle[ev.status]}`}>{statusLabels[ev.status]}</span>
         <span className="text-muted">{ev.region}</span>
       </div>

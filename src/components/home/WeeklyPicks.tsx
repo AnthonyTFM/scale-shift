@@ -46,11 +46,9 @@ export async function WeeklyPicks() {
           <li key={p.id}>
             <Link
               href={mapUrl({ era: p.baseEra, shapes: p.shapes.map((s, i) => ({ ...s, color: i })), at: p.at })}
-              className={`block h-full rounded-xl p-4 ring-1 transition hover:ring-2 ${
-                p.category === "controversial" ? "bg-rose-50 ring-rose-200 hover:ring-rose-400" : "bg-amber-50 ring-amber-200 hover:ring-amber-400"
-              }`}
+              className={`press-card block h-full rounded-card p-4 ${p.category === "controversial" ? "hover:border-red" : "hover:border-primary"}`}
             >
-              <span className="text-[11px] font-bold uppercase tracking-wide text-muted">
+              <span className={`text-[11px] font-bold uppercase tracking-wide ${p.category === "controversial" ? "text-danger" : "text-primary"}`}>
                 {p.category === "controversial" ? "Controversial" : "Surprising"}
               </span>
               <span className="mt-0.5 block font-bold text-ink">{p.title}</span>

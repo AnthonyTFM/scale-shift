@@ -72,11 +72,11 @@ export function FeedbackForm() {
 
   if (status === "sent") {
     return (
-      <div ref={statusRef} tabIndex={-1} role="status" className="rounded-card border border-emerald-200 bg-emerald-50 p-6">
+      <div ref={statusRef} tabIndex={-1} role="status" className="rounded-card bg-[#e7f7ee] p-6 ring-1 ring-green">
         <h2 className="font-display text-2xl text-ink">Thanks! Your report is in.</h2>
         <p className="mt-2 text-ink-soft">We read every message. Fixes are listed on the About page. If you left an email, we may follow up.</p>
         <div className="mt-4 flex flex-wrap gap-3">
-          <Link href="/map" className="inline-flex h-11 items-center rounded-lg bg-accent px-4 font-bold text-panel hover:bg-accent-strong">
+          <Link href="/map" className="btn btn-primary">
             Back to the map
           </Link>
           <button type="button" onClick={() => setStatus("idle")} className="h-11 rounded-lg border border-line bg-white px-4 font-semibold hover:bg-paper">
@@ -186,11 +186,11 @@ export function FeedbackForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-accent px-6 text-base font-bold text-panel hover:bg-accent-strong disabled:opacity-60 sm:w-auto"
+        className="btn btn-primary btn-lg w-full gap-2 sm:w-auto"
       >
         {status === "sending" ? (
           <>
-            <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-panel border-t-transparent" />
+            <span aria-hidden="true" className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
             Sending…
           </>
         ) : (

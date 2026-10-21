@@ -619,7 +619,7 @@ function Results({
     track("daily_share_image", { score });
     const blob = await resultImage({ day: dayNumber(round.date), score, marks, title: R.title(score, total), verdict, streak: s.streak });
     if (!blob) return setCopied(R.pictureFailed);
-    const file = new File([blob], `size-of-empires-daily-${dayNumber(round.date)}.png`, { type: "image/png" });
+    const file = new File([blob], `border-drift-daily-${dayNumber(round.date)}.png`, { type: "image/png" });
     try {
       if (navigator.canShare?.({ files: [file] }) && matchMedia("(pointer: coarse)").matches) {
         await navigator.share({ files: [file], text: `${location.origin}/daily` });

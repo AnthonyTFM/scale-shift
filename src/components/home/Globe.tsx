@@ -59,7 +59,7 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
       proj.scale(r).translate([size / 2, size / 2]).rotate([lon, TILT]);
       ctx.beginPath();
       path(graticule);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
       ctx.lineWidth = 0.6;
       ctx.stroke();
       // one path per colour (8 fills instead of ~200), then all borders in one stroke
@@ -70,7 +70,7 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
         ctx.fillStyle = POLITICAL[i];
         ctx.fill(g);
       });
-      ctx.strokeStyle = "rgba(88, 60, 46, 0.45)";
+      ctx.strokeStyle = "rgba(88, 60, 46, 0.35)";
       ctx.lineWidth = 0.5;
       for (const g of groups) ctx.stroke(g);
     }
@@ -167,16 +167,16 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
 
   return (
     <div ref={wrap} className="relative aspect-square w-full">
-      {/* sea lit from the top left, with a soft glow */}
+      {/* a light, daylight sea lit from the top left, with a soft glow */}
       <div
         aria-hidden="true"
-        className="absolute inset-2 rounded-full bg-[radial-gradient(circle_at_38%_32%,#b9def0,#4f8fbf_75%)] shadow-[0_0_40px_6px_rgba(120,190,240,0.35)]"
+        className="absolute inset-2 rounded-full bg-[radial-gradient(circle_at_38%_32%,#f1f8ff,#a9d3f0_78%)] shadow-[0_0_44px_8px_rgba(37,99,235,0.12)]"
       />
       <canvas ref={canvas} role="img" aria-label={label} className="relative block cursor-grab touch-pan-y" />
       {/* shade the far edge so it reads as a sphere */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-2 rounded-full bg-[radial-gradient(circle_at_38%_32%,transparent_55%,rgba(14,42,71,0.4)_100%)]"
+        className="pointer-events-none absolute inset-2 rounded-full bg-[radial-gradient(circle_at_38%_32%,transparent_58%,rgba(29,33,64,0.16)_100%)]"
       />
     </div>
   );

@@ -38,8 +38,8 @@ export default function HowItWorksPage() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((s, i) => (
-            <li key={s.title} className="rounded-card border border-line bg-white p-5">
-              <span className="grid size-9 place-items-center rounded-full bg-panel font-bold text-accent">{i + 1}</span>
+            <li key={s.title} className="rounded-card bg-card p-5 ring-1 ring-line">
+              <span className="grid size-9 place-items-center rounded-full bg-primary font-display text-white">{i + 1}</span>
               <h2 className="mt-3 text-lg font-bold text-ink">{s.title}</h2>
               <p className="mt-1 text-sm leading-relaxed text-ink-soft">{s.body}</p>
             </li>

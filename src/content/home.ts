@@ -5,6 +5,8 @@
 export const home = {
   eyebrow: "Free to play · No sign-up needed",
   title: "Your map has been lying to you.",
+  /** the word in the title shown in red */
+  titleAccent: "lying",
   lead: "On most maps, Russia looks far bigger than Africa. In reality, Africa is nearly twice its size. Drag any country or empire to see its true size, travel through 4,000 years of borders, and put your eye to the test in today's challenge.",
   playCta: "Take today's challenge",
   mapCta: "Explore the real-size map",
@@ -46,7 +48,7 @@ export const home = {
   // the game-first hero: play card, map card and today's leaderboard over a floating globe
   hub: {
     mission:
-      "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Size of Empires shows every country and empire at its real size, across 4,000 years of history.",
+      "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Border Drift shows every country and empire at its real size, across 4,000 years of history.",
     playEyebrow: "Today's game",
     playTitle: "Which is bigger?",
     playLead: "Five matchups, about two minutes. The map will try to fool you.",

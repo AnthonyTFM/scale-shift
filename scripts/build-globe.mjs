@@ -71,7 +71,7 @@ const TILT = -18;
       .replace(/M[^M]*?Z/g, (ring) => (ring.length > 24 ? ring : ""));
     return d ? `<path d="${d}" fill="${color}"/>` : "";
   }).join("");
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="${p(geoGraticule10())}" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.15"/><g stroke="rgba(88,60,46,0.45)" stroke-width="0.12" stroke-linejoin="round">${fills}</g></svg>\n`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="${p(geoGraticule10())}" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="0.15"/><g stroke="rgba(88,60,46,0.35)" stroke-width="0.12" stroke-linejoin="round">${fills}</g></svg>\n`;
   writeFileSync("public/globe-still.svg", svg);
   console.log(`globe-still.svg ${(svg.length / 1024).toFixed(0)} KB`);
 }

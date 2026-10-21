@@ -4,11 +4,12 @@ import type { GeometryCollection, Topology } from "topojson-specification";
 import globe from "../../../public/data/globe.json";
 import pool from "@/data/daily-pool.json";
 import { home } from "@/content/home";
-import { PALETTE } from "@/lib/palette";
 
 // The classic trick: Greenland looks far bigger on a normal map, but DR Congo is bigger.
 const PAIR = ["DR Congo", "Greenland"] as const;
 const W = 240; // drawing size of one panel
+/** the daily game's shape colours (fills only, never text) */
+const SHAPE_COLORS = ["#2F6BFF", "#FF5B4A"];
 const H = 130;
 const SLOT = W / 2;
 
@@ -37,7 +38,7 @@ function layout(make: (s: Shape) => GeoProjection) {
     proj.scale(proj.scale() * k).translate([0, 0]);
     const path = geoPath(proj);
     const [[x0], [x1, y1]] = path.bounds(s.geom);
-    return { name: s.name, d: path(s.geom) ?? "", color: PALETTE[i], dx: SLOT * i + SLOT / 2 - (x0 + x1) / 2, dy: H - 2 - y1 };
+    return { name: s.name, d: path(s.geom) ?? "", color: SHAPE_COLORS[i], dx: SLOT * i + SLOT / 2 - (x0 + x1) / 2, dy: H - 2 - y1 };
   });
 }
 
@@ -64,7 +65,7 @@ function Panel({ label, drawn, note, win }: { label: string; drawn: typeof onMap
       </svg>
       <div className="mt-1 grid grid-cols-2 gap-1 text-center text-[11px] font-semibold leading-tight sm:text-xs">
         {drawn.map((s) => (
-          <span key={s.name} className={win === s.name ? "text-emerald-700" : undefined}>
+          <span key={s.name} className={win === s.name ? "text-green-text" : undefined}>
             {s.name}
           </span>
         ))}
@@ -78,8 +79,8 @@ function Panel({ label, drawn, note, win }: { label: string; drawn: typeof onMap
 export function ExampleMatchup() {
   const times = Math.round(mapBigger.mapArea / mapSmaller.mapArea);
   return (
-    <div className="rounded-xl bg-gradient-to-br from-amber-50 to-orange-100/70 p-3 sm:p-4">
-      <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-wide text-amber-900/80">
+    <div className="rounded-[22px] bg-tile p-3 sm:p-4">
+      <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-wide text-primary">
         {home.example.caption}: {a.name} vs {b.name}
       </p>
       <div className="grid grid-cols-2 gap-2 sm:gap-3">

@@ -2,7 +2,7 @@
 
 export const teachers = {
   eyebrow: "For teachers",
-  title: "Everything on Size of Empires, in one place",
+  title: "Everything on Border Drift, in one place",
   lead: "A quick reference for the classroom: why world maps get sizes wrong, real areas for every country, 4,000 years of borders and today's disputes. Free, no sign-up, no ads.",
   jump: [
     { id: "why", label: "Why maps distort" },
@@ -76,7 +76,7 @@ export const teachers = {
       "Historical borders are approximate, especially before 1500: many states had no fixed frontier. Each era page says how precise its borders are.",
     ],
     citeLabel: "Suggested citation",
-    citation: (url: string) => `Size of Empires. "Real size of countries and empires." ${url}. Accessed [date].`,
+    citation: (url: string) => `Border Drift. "Real size of countries and empires." ${url}. Accessed [date].`,
     sourcesCta: "Full sources and licences",
   },
 };
