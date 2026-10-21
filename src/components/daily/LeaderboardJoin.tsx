@@ -53,27 +53,28 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
       </div>
     );
   }
+  // compact: "Get on the leaderboard · Join"; the full sign-up only opens after Join
   return (
-    <button
-      type="button"
-      aria-expanded={false}
-      onClick={() => {
-        track("leaderboard_join_open");
-        setOpen(true);
-      }}
-      className="press mt-5 flex w-full items-center gap-3 rounded-xl bg-amber-50 p-4 text-left ring-1 ring-amber-200 [--press-shadow:#f2d79b] hover:bg-amber-100"
-    >
+    <div className="mt-5 flex items-center gap-3 rounded-[20px] border-2 border-line bg-paper py-2.5 pl-4 pr-2.5">
       <span aria-hidden="true" className="text-2xl">
         🏆
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block font-bold text-ink">{t.joinCta}</span>
-        <span className="block text-sm text-ink-soft">{t.joinHint}</span>
+        <span className="block font-bold leading-tight text-ink">{t.joinCta}</span>
+        <span className="block text-sm text-muted">{t.joinHint}</span>
       </span>
-      <span aria-hidden="true" className="font-bold text-link">
-        →
-      </span>
-    </button>
+      <button
+        type="button"
+        aria-expanded={false}
+        onClick={() => {
+          track("leaderboard_join_open");
+          setOpen(true);
+        }}
+        className="btn btn-primary mb-1.5 h-11 shrink-0 px-5 text-sm"
+      >
+        {t.joinButton}
+      </button>
+    </div>
   );
 }
 
@@ -160,7 +161,7 @@ function EmailJoin({ date, choices }: Props) {
   const showForm = !player || editing;
 
   return (
-    <div className="mt-5 rounded-xl bg-amber-50 p-4 ring-1 ring-amber-200">
+    <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       <div className="flex items-baseline justify-between gap-2">
         <h3 className="font-bold text-ink">🏆 Today&apos;s leaderboard</h3>
         <Link href="/leaderboard" className="text-sm font-semibold text-link hover:underline">
@@ -206,7 +207,7 @@ function EmailJoin({ date, choices }: Props) {
             placeholder="you@example.com"
             aria-invalid={errorField === "email"}
             aria-describedby="lb-help"
-            className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-3 text-ink"
+            className="mt-1 h-11 w-full rounded-xl border-2 border-line bg-white px-3 text-ink"
           />
           <label htmlFor="lb-name" className="mt-2 block text-sm font-semibold text-ink">
             Nickname <span className="font-normal text-muted">(shown publicly)</span>
@@ -221,18 +222,18 @@ function EmailJoin({ date, choices }: Props) {
               placeholder="e.g. MapWizard"
               aria-invalid={errorField === "name"}
               aria-describedby="lb-help"
-              className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 text-ink"
+              className="h-11 min-w-0 flex-1 rounded-xl border-2 border-line bg-white px-3 text-ink"
             />
             <button
               type="submit"
               disabled={status === "sending"}
-              className="h-11 shrink-0 rounded-lg bg-panel px-4 font-bold text-panel-text hover:bg-panel-2 disabled:opacity-60"
+              className="btn btn-primary mb-1.5 h-11 shrink-0 px-4"
             >
               {status === "sending" ? "Saving…" : player ? "Save" : "Join"}
             </button>
           </div>
           <label className="mt-3 flex items-start gap-2 text-sm text-ink">
-            <input ref={remindRef} type="checkbox" defaultChecked={player?.reminders ?? false} className="mt-0.5 size-4 shrink-0 accent-amber-500" />
+            <input ref={remindRef} type="checkbox" defaultChecked={player?.reminders ?? false} className="mt-0.5 size-4 shrink-0 accent-primary" />
             <span>
               Email me when a new daily challenge is up, so I can defend my spot on the leaderboard.{" "}
               <span className="text-muted">Optional. Unsubscribe any time with one click.</span>
@@ -267,7 +268,7 @@ function EmailJoin({ date, choices }: Props) {
               type="checkbox"
               checked={player.reminders ?? false}
               onChange={(e) => saveReminders(player, e.target.checked)}
-              className="mt-0.5 size-4 shrink-0 accent-amber-500"
+              className="mt-0.5 size-4 shrink-0 accent-primary"
             />
             <span>Email me when a new daily challenge is up</span>
           </label>
@@ -278,7 +279,7 @@ function EmailJoin({ date, choices }: Props) {
       {top?.rows.length ? (
         <ol className="mt-3 space-y-1 text-sm">
           {top.rows.map((r) => (
-            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-amber-200/70 font-bold" : ""}`}>
+            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-[#FFF1C7] font-bold" : ""}`}>
               <span className="w-6 text-right text-muted">{r.rank}</span>
               <span className="min-w-0 flex-1 truncate">{r.name}{r.me ? <span className="font-normal text-muted"> (you)</span> : null}</span>
               <span className="font-mono">{r.score}/5</span>

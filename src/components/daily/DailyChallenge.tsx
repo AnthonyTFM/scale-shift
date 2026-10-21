@@ -23,7 +23,7 @@ import { LeaderboardJoin } from "./LeaderboardJoin";
 import { formatBoth } from "@/lib/format";
 import { mapUrl } from "@/lib/share";
 import { readChallenge, type Challenge } from "@/lib/challenge";
-import { rememberPlayer } from "@/lib/player";
+import { playerId, rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
@@ -31,6 +31,12 @@ import { buzz, confetti } from "@/lib/celebrate";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
+import type { DayBoard } from "@/lib/leaderboard-types";
+import { dailyCopy } from "@/content/daily";
+
+const reveal = dailyCopy.reveal;
+const R = dailyCopy.results;
+const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -42,7 +48,8 @@ type Round = {
   shapes: Record<string, ShapeFile>;
 };
 
-const COLORS = ["#E8366B", "#2F6FDE"];
+// the two shapes on the game tiles: bright fills (they are drawings, not text)
+const COLORS = ["#FF5B4A", "#2F6BFF"];
 const V = `?v=${dataVersion.v}`;
 
 let poolPromise: Promise<PoolEntry[]> | null = null;
@@ -160,9 +167,9 @@ export function DailyChallenge() {
 
   if (failed) {
     return (
-      <div role="alert" className="rounded-card border border-line bg-white p-6 text-center">
+      <div role="alert" className="rounded-[22px] border-2 border-line bg-white p-6 text-center">
         <p className="font-semibold">We couldn&apos;t load the challenge.</p>
-        <button type="button" onClick={() => start(false)} className="mt-3 h-11 rounded-lg bg-panel px-5 font-bold text-panel-text">
+        <button type="button" onClick={() => start(false)} className="btn btn-primary mt-3 h-12">
           Try again
         </button>
       </div>
@@ -186,7 +193,7 @@ export function DailyChallenge() {
     buzz(q.answer !== choice ? [30, 50, 30] : 12);
     if (perfect) {
       buzz([20, 40, 20, 40, 80]);
-      setTimeout(confetti, 350);
+      setTimeout(confetti, 1050);
     }
     let updated = save;
     if (round.date) {
@@ -204,7 +211,7 @@ export function DailyChallenge() {
   return (
     <div>
       {challenge && todayNo && !finished ? (
-        <p className="mb-3 rounded-xl bg-amber-100 p-3 text-sm font-semibold text-amber-950 ring-1 ring-amber-300">
+        <p className="mb-3 rounded-2xl border-2 border-gold bg-[#FFF4D1] p-3 text-sm font-semibold text-ink">
           🎯{" "}
           {challenge.day === todayNo
             ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
@@ -231,6 +238,7 @@ export function DailyChallenge() {
           q={round.questions[step]}
           shapes={round.shapes}
           picked={choices[step]}
+          perfect={choices.length === round.questions.length && scoreOf(round, choices) === round.questions.length}
           practice={!round.date}
           onPick={answer}
           onNext={() => {
@@ -249,12 +257,12 @@ export function DailyChallenge() {
 function Skeleton() {
   return (
     <div aria-busy="true" aria-label="Loading today's challenge">
-      <div aria-hidden="true" className="mb-3 h-7 sm:mb-4 sm:h-8" />
-      <div className="min-h-[calc(50vw+190px)] rounded-card border border-line bg-white px-4 pb-4 pt-3 sm:min-h-[519px] sm:p-6">
-        <div className="h-5 w-1/2 animate-pulse rounded bg-line" />
+      <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
+      <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6">
+        <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="aspect-square animate-pulse rounded-xl bg-paper" />
-          <div className="aspect-square animate-pulse rounded-xl bg-paper" />
+          <div className="aspect-square animate-pulse rounded-2xl bg-tile" />
+          <div className="aspect-square animate-pulse rounded-2xl bg-tile" />
         </div>
       </div>
     </div>
@@ -263,30 +271,20 @@ function Skeleton() {
 
 function Progress({ round, choices, step }: { round: Round; choices: number[]; step: number }) {
   return (
-    <ol className="mb-3 flex items-center gap-1.5 sm:mb-4" aria-label="Progress">
+    <ol className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Progress">
       {round.questions.map((q, i) => {
         const done = i < choices.length;
         const right = done && choices[i] === q.answer;
         const current = !done && i === step;
         return (
-          <li
-            key={i}
-            aria-label={`Question ${i + 1}: ${done ? (right ? "correct" : "wrong") : current ? "current" : "not answered"}`}
-            className="flex flex-1 items-center gap-1.5"
-          >
+          <li key={i}>
             <span
               aria-hidden="true"
-              className={`grid size-7 shrink-0 place-items-center rounded-full text-sm font-bold sm:size-8 ${
-                done
-                  ? `pop-in text-white ${right ? "bg-formal" : "bg-danger"}`
-                  : current
-                    ? "bg-accent text-panel ring-4 ring-accent/30"
-                    : "bg-white text-muted ring-1 ring-line"
-              }`}
-            >
-              {done ? (right ? "✓" : "✗") : i + 1}
+              className={`block h-3 rounded-full ${done ? `pop-in ${right ? "bg-green" : "bg-red"}` : current ? "bg-primary" : "bg-beige"}`}
+            />
+            <span className="sr-only">
+              Question {i + 1}: {done ? (right ? "correct" : "wrong") : current ? "current" : "not answered"}
             </span>
-            {i < round.questions.length - 1 ? <span aria-hidden="true" className={`h-1 flex-1 rounded-full ${done ? "bg-ink-soft/30" : "bg-line"}`} /> : null}
           </li>
         );
       })}
@@ -306,7 +304,7 @@ function SoundToggle() {
         setSound(!on);
         setOn(!on);
       }}
-      className="inline-flex h-8 items-center gap-1 rounded-full px-2.5 text-xs font-semibold text-muted ring-1 ring-line hover:text-ink"
+      className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-xs font-bold text-ink-soft hover:text-ink"
     >
       <span aria-hidden="true">{on ? "🔊" : "🔇"}</span> Sound {on ? "on" : "off"}
     </button>
@@ -319,6 +317,7 @@ function QuestionCard({
   q,
   shapes,
   picked,
+  perfect,
   practice,
   onPick,
   onNext,
@@ -328,6 +327,8 @@ function QuestionCard({
   q: Question;
   shapes: Record<string, ShapeFile>;
   picked: number | undefined;
+  /** this was the last question and every answer was right */
+  perfect: boolean;
   practice: boolean;
   onPick: (i: number) => void;
   onNext: () => void;
@@ -339,37 +340,50 @@ function QuestionCard({
   const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
   const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
 
+  const lines = explain(q);
+
   useEffect(() => {
+    if (!answered) return;
     // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
-    if (answered) nextRef.current?.focus({ preventScroll: true });
+    nextRef.current?.focus({ preventScroll: true });
+    // once the shapes have settled, bring the explanation and "Next" into view on short screens
+    const id = setTimeout(
+      () => nextRef.current?.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }),
+      reducedMotion() ? 0 : 1400,
+    );
+    return () => clearTimeout(id);
   }, [answered]);
 
   return (
-    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white px-4 pb-4 pt-3 shadow-float sm:p-6">
+    <section
+      aria-labelledby="daily-q"
+      className="rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:p-6"
+    >
       <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-muted">
-          {practice ? "Practice · " : ""}Question {n + 1} of {total}
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">
+          {practice ? `${reveal.practice} · ` : ""}
+          {reveal.round(n + 1, total)}
         </p>
         <SoundToggle />
       </div>
-      <h2 id="daily-q" className="mt-0.5 text-center font-display text-2xl leading-tight text-ink sm:mt-1 sm:text-3xl">
+      <h2 id="daily-q" className="mt-1 text-center font-display text-[1.7rem] leading-[1.1] text-ink sm:text-4xl">
         {q.prompt}
       </h2>
-      <p className="mt-1 text-center text-sm text-muted">
-        {answered ? "Watch them shrink or grow to their true size." : "Drawn the way a normal web map shows them. Tap the bigger one."}
-      </p>
+      <p className="mt-1.5 text-center text-sm text-muted">{answered ? reveal.legend : reveal.ask}</p>
 
-      <div className="relative mt-3 grid grid-cols-2 gap-3 sm:mt-4 sm:gap-4">
+      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
         {q.options.map((o, i) => {
           const isAnswer = i === q.answer;
           const look = !answered
-            ? "border-line hover:border-accent [--press-shadow:#e3d6c3] hover:[--press-shadow:#f29e1f]"
+            ? "hover:border-primary"
             : isAnswer
-              ? "border-formal [--press-shadow:#0f7a55]"
+              ? "reveal-win border-green [--press-shadow:var(--color-green-shadow)]"
               : picked === i
-                ? "border-danger [--press-shadow:#b4235a]"
-                : "border-line opacity-70 [--press-shadow:#e3d6c3]";
+                ? "reveal-shake border-red [--press-shadow:var(--color-red-shadow)]"
+                : "opacity-70";
           const inflate = o.m / o.a;
+          const x = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
+          const mapNote = inflate >= 1.15 ? reveal.mapTooBig(x(inflate)) : inflate <= 0.87 ? reveal.mapTooSmall(x(1 / inflate)) : reveal.mapAboutRight;
           return (
             <button
               key={o.id}
@@ -377,43 +391,58 @@ function QuestionCard({
               disabled={answered}
               onClick={() => onPick(i)}
               aria-label={answered ? undefined : `${o.n}, ${o.sub}`}
-              className={`press relative flex min-w-0 flex-col rounded-2xl border-2 bg-white p-2 text-left disabled:cursor-default sm:p-3 ${look}`}
+              className={`press-card relative flex min-w-0 flex-col rounded-[20px] p-2 text-left disabled:cursor-default sm:p-3 ${look}`}
             >
               {answered && (isAnswer || picked === i) ? (
                 <span
-                  className={`pop-in absolute -top-3 right-2 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white shadow ${isAnswer ? "bg-formal" : "bg-danger"}`}
+                  className={`pop-in absolute -top-3.5 right-2 z-10 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-white ${isAnswer ? "reveal-late bg-green-text" : "bg-red"}`}
                 >
-                  {isAnswer ? "✓ Bigger" : "✗ Your pick"}
+                  {isAnswer ? reveal.bigger : reveal.yourPick}
                 </span>
               ) : null}
               <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
-              <span className="mt-2 block truncate text-base font-bold text-ink sm:text-lg">{o.n}</span>
-              <span className="block truncate text-xs text-muted">{o.sub}</span>
+              <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
+              <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
               {answered ? (
-                <span className="mt-1 block text-xs font-semibold text-ink-soft">
-                  {formatBoth(o.a)}
-                  {inflate >= 1.3 ? <span className="block font-normal text-muted">Maps show it {inflate >= 10 ? Math.round(inflate) : inflate.toFixed(1)}× too big</span> : null}
-                </span>
+                <>
+                  <TrueArea from={o.m} to={o.a} />
+                  <span
+                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight text-ink ${inflate >= 1.15 ? "bg-[#FFF1C7]" : "bg-beige"}`}
+                  >
+                    {mapNote}
+                  </span>
+                </>
               ) : null}
             </button>
           );
         })}
+        {/* the gold VS coin between the cards */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-10 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-panel text-xs font-black text-white ring-4 ring-white"
+          className="pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-gold font-display text-sm text-ink shadow-[0_4px_0_0_var(--color-gold-shadow)]"
         >
-          VS
+          {reveal.vs}
         </span>
       </div>
 
       <WhoIsWho options={q.options} />
 
+      {/* the verdict: a dark reveal panel, read out by screen readers */}
       <div aria-live="polite">
         {answered ? (
-          <div className={`pop-in mt-4 rounded-xl p-4 ${correct ? "bg-emerald-50 text-emerald-950" : "bg-rose-50 text-rose-950"}`}>
-            <p className="text-lg font-bold">{correct ? "✓ Correct!" : "✗ Not quite."}</p>
-            {explain(q).map((line) => (
-              <p key={line} className="mt-1 text-sm leading-relaxed">
+          <div className="pop-in reveal-late mt-5 rounded-[22px] bg-ink p-4 text-white sm:p-5">
+            <p className="flex items-center gap-2.5 font-display text-2xl leading-tight">
+              <span
+                aria-hidden="true"
+                className={`grid size-8 shrink-0 place-items-center rounded-full text-base ${correct ? "bg-green text-ink" : "bg-red text-white"}`}
+              >
+                {correct ? "✓" : "✗"}
+              </span>
+              {perfect ? reveal.perfect : correct ? reveal.right : reveal.wrong}
+            </p>
+            <p className="mt-2 font-semibold leading-snug">{lines[0]}</p>
+            {lines.slice(1).map((line) => (
+              <p key={line} className="mt-1.5 text-sm leading-relaxed text-[#C9CDE6]">
                 {line}
               </p>
             ))}
@@ -421,13 +450,8 @@ function QuestionCard({
         ) : null}
       </div>
       {answered ? (
-        <button
-          ref={nextRef}
-          type="button"
-          onClick={onNext}
-          className="press mt-4 h-12 w-full rounded-xl bg-panel font-bold text-panel-text [--press-shadow:#071a2e] hover:bg-panel-2"
-        >
-          {n + 1 < total ? "Next question" : "See my results"}
+        <button ref={nextRef} type="button" onClick={onNext} className="btn btn-primary btn-lg mt-4 w-full">
+          {n + 1 < total ? reveal.next : reveal.seeResults} <span aria-hidden="true">→</span>
         </button>
       ) : null}
     </section>
@@ -439,7 +463,7 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
   const notes = options.filter((o) => o.kind === "history" && dailyContext[o.src]);
   if (!notes.length) return null;
   return (
-    <div className="mt-3 space-y-2 rounded-xl bg-paper p-3 text-sm">
+    <div className="mt-4 space-y-2 rounded-2xl bg-paper p-3 text-sm ring-1 ring-line">
       {notes.map((o) => {
         const c = dailyContext[o.src];
         return (
@@ -456,7 +480,7 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
 const size = (o: Outline) => Math.max(o.b[2] - o.b[0], o.b[3] - o.b[1]);
 
 /** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
-function Shape({ outline, span, color }: { outline: Outline; span: number; color: string }) {
+function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
   const [x0, y0, x1, y1] = outline.b;
   const k = 100 / span;
   const tiny = size(outline) < span * 0.06;
@@ -465,22 +489,24 @@ function Shape({ outline, span, color }: { outline: Outline; span: number; color
       <path
         d={outline.d}
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
-        fill={color}
+        fill={ghost ? "none" : color}
         fillOpacity={0.88}
         stroke={color}
-        strokeWidth={1}
+        strokeWidth={ghost ? 1.5 : 1}
+        strokeDasharray={ghost ? "4 3" : undefined}
         vectorEffect="non-scaling-stroke"
         fillRule="evenodd"
         strokeLinejoin="round"
       />
-      {tiny ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
+      {tiny && !ghost ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
     </>
   );
 }
 
 /**
  * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
- * it really is next to the other shape, then the true outline fades in.
+ * it really is next to the other shape, then the true outline fades in, with a dashed trace of the map's version left behind
+ * so the difference stays visible.
  */
 function RevealTile({
   map,
@@ -498,14 +524,45 @@ function RevealTile({
   const area = (o: Outline, span: number) => ((o.b[2] - o.b[0]) * (o.b[3] - o.b[1])) / (span * span);
   const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
   return (
-    <svg viewBox="0 0 100 100" className="aspect-square w-full rounded-xl bg-[radial-gradient(circle_at_35%_30%,#dff0f8,#bcdcec)]" aria-hidden="true">
+    <svg viewBox="0 0 100 100" className="aspect-square w-full rounded-2xl bg-tile" aria-hidden="true">
       <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
         <Shape outline={map} span={spans.merc} color={color} />
+      </g>
+      <g className="reveal-true" style={{ opacity: revealed ? 0.55 : 0 }}>
+        <Shape outline={map} span={spans.merc} color={color} ghost />
       </g>
       <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
         <Shape outline={real} span={spans.ea} color={color} />
       </g>
     </svg>
+  );
+}
+
+/** The real area, counting down (or up) from the size the map makes it look, as the shapes change size. */
+function TrueArea({ from, to }: { from: number; to: number }) {
+  const [v, setV] = useState(from);
+  useEffect(() => {
+    if (reducedMotion()) {
+      const id = requestAnimationFrame(() => setV(to));
+      return () => cancelAnimationFrame(id);
+    }
+    const start = performance.now() + 150;
+    let id = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / 1000));
+      const ease = 1 - Math.pow(1 - t, 3);
+      setV(from + (to - from) * ease);
+      if (t < 1) id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [from, to]);
+  const [km, mi] = formatBoth(v).replace(")", "").split(" (");
+  return (
+    <span className="mt-1.5 block tabular-nums">
+      <span className="block font-display text-base text-ink">{km}</span>
+      <span className="block text-xs text-muted">{mi}</span>
+    </span>
   );
 }
 
@@ -533,17 +590,25 @@ function Results({
   const score = scoreOf(round, choices);
   const total = round.questions.length;
   const s = stats(save, today);
-  const grid = round.questions.map((q, i) => (choices[i] === q.answer ? "🟩" : "🟥")).join("");
+  const marks = round.questions.map((q, i) => choices[i] === q.answer);
+  const grid = marks.map((m) => (m ? "🟩" : "🟥")).join("");
   const [copied, setCopied] = useState("");
   const shareBox = useShareBox();
-  const verdict =
-    score === total
-      ? "Perfect. Mercator can't fool you."
-      : score >= total - 1
-        ? "Sharp eye. One got past you."
-        : score >= 3
-          ? "Not bad. The map tricked you twice."
-          : "The map fooled you today. New questions tomorrow.";
+  const verdict = R.verdict(score, total);
+  // where today's score sits on today's public board (your own row if you're on it, otherwise where you'd land)
+  const [rank, setRank] = useState<{ rank: number; of: number } | null>(null);
+  useEffect(() => {
+    if (!round.date) return;
+    const id = playerId();
+    fetch(`/api/leaderboard?scope=day&date=${round.date}&limit=100${id ? `&player=${id}` : ""}`)
+      .then((r) => (r.ok ? (r.json() as Promise<DayBoard>) : null))
+      .then((b) => {
+        if (!b) return;
+        const mine = b.rows.find((r) => r.me) ?? b.me;
+        setRank(mine ? { rank: mine.rank, of: b.total } : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1 });
+      })
+      .catch(() => {});
+  }, [round.date, score]);
 
   const challengeFriend = () => {
     if (round.date) shareBox.share(challengeMessage(score, total, round.date), "results");
@@ -552,9 +617,9 @@ function Results({
   const shareImage = async () => {
     if (!round.date) return;
     track("daily_share_image", { score });
-    const blob = await resultImage({ day: dayNumber(round.date), score, marks: round.questions.map((q, i) => choices[i] === q.answer), verdict, streak: s.streak });
-    if (!blob) return setCopied("Couldn't make the picture. Try Share my score instead.");
-    const file = new File([blob], `scale-shift-daily-${dayNumber(round.date)}.png`, { type: "image/png" });
+    const blob = await resultImage({ day: dayNumber(round.date), score, marks, title: R.title(score, total), verdict, streak: s.streak });
+    if (!blob) return setCopied(R.pictureFailed);
+    const file = new File([blob], `size-of-empires-daily-${dayNumber(round.date)}.png`, { type: "image/png" });
     try {
       if (navigator.canShare?.({ files: [file] }) && matchMedia("(pointer: coarse)").matches) {
         await navigator.share({ files: [file], text: `${location.origin}/daily` });
@@ -568,7 +633,7 @@ function Results({
     a.download = file.name;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
-    setCopied("Picture saved. Post it anywhere.");
+    setCopied(R.pictureSaved);
   };
 
   const share = () => {
@@ -577,24 +642,25 @@ function Results({
   };
 
   return (
-    <section aria-labelledby="daily-done" className="rounded-card border border-line bg-white p-4 shadow-float sm:p-6">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted">{round.date ? `Daily #${dayNumber(round.date)}` : "Practice round"}</p>
-      <div className="mt-2 flex items-center gap-4">
-        <p
-          className={`pop-in grid size-20 shrink-0 place-items-center rounded-full font-display text-3xl text-white ${score >= total - 1 ? "bg-formal" : score >= 3 ? "bg-panel" : "bg-danger"}`}
-          aria-hidden="true"
-        >
-          {score}/{total}
+    <section
+      aria-labelledby="daily-done"
+      className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7"
+    >
+      <div className="text-center">
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">{round.date ? `Daily #${dayNumber(round.date)}` : R.practiceRound}</p>
+        <p aria-hidden="true" className="pop-in mt-1 font-display text-[5.5rem] leading-none text-ink sm:text-8xl">
+          {score}
+          <span className="text-primary">/</span>
+          {total}
         </p>
-        <div>
-          <h2 id="daily-done" className="font-display text-3xl leading-tight text-ink">
-            You got {score} out of {total}
-          </h2>
-          <p className="mt-1 text-ink-soft">{verdict}</p>
-        </div>
+        <h2 id="daily-done" className="mt-2 font-display text-3xl leading-tight text-ink">
+          <span className="sr-only">{R.scoreSr(score, total)} </span>
+          {R.title(score, total)}
+        </h2>
+        <p className="mt-1 text-muted">{verdict}</p>
       </div>
       {challenge ? (
-        <p className="mt-2 rounded-lg bg-amber-100 px-3 py-2 text-sm font-bold text-amber-950">
+        <p className="mt-3 rounded-2xl border-2 border-gold bg-[#FFF4D1] px-3 py-2 text-center text-sm font-bold text-ink">
           {score > challenge.score
             ? `🏆 You beat ${challenge.name} (${challenge.score}/5)! Send them a rematch.`
             : score === challenge.score
@@ -602,56 +668,69 @@ function Results({
               : `${challenge.name} wins this one with ${challenge.score}/5. Get them back tomorrow.`}
         </p>
       ) : null}
-      <p className="mt-3 text-2xl tracking-[0.2em]" aria-label={`${score} correct, ${total - score} wrong`}>
-        {grid}
-      </p>
+      {/* one pressed tile per question */}
+      <ol className="mt-5 flex justify-center gap-2 sm:gap-3">
+        {marks.map((right, i) => (
+          <li
+            key={i}
+            className={`grid size-12 place-items-center rounded-2xl font-display text-xl sm:size-14 ${
+              right ? "bg-green text-ink shadow-[0_5px_0_0_var(--color-green-shadow)]" : "bg-red text-white shadow-[0_5px_0_0_var(--color-red-shadow)]"
+            }`}
+          >
+            <span aria-hidden="true">{right ? "✓" : "✗"}</span>
+            <span className="sr-only">
+              Question {i + 1}: {right ? "correct" : "wrong"}
+            </span>
+          </li>
+        ))}
+      </ol>
 
       {round.date ? (
         <>
-          <dl className="mt-5 grid grid-cols-4 gap-2 text-center">
+          <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
             {[
-              ["Streak", s.streak],
-              ["Best", s.best],
-              ["Played", s.played],
-              ["Avg", s.average.toFixed(1)],
-            ].map(([k, v]) => (
-              <div key={k} className="rounded-lg bg-paper p-2">
-                <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">{k}</dt>
-                <dd className="font-display text-2xl text-ink">{v}</dd>
+              [R.streak, `${s.streak}🔥`, R.best(s.best)],
+              [R.rank, rank ? `#${rank.rank}` : "—", rank ? R.rankOf(rank.of) : R.rankNone],
+              [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
+            ].map(([k, v, sub]) => (
+              <div key={k} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
+                <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
+                <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
+                <dd className="order-3 text-xs text-muted">{sub}</dd>
               </div>
             ))}
           </dl>
-          <div className="mt-5 grid gap-2 sm:grid-cols-2">
-            <button type="button" onClick={share} className="press h-12 rounded-xl bg-accent font-bold text-panel [--press-shadow:#c47a10] hover:bg-accent-strong">
-              Share my score
+          <div className="mt-6 grid gap-2">
+            <button type="button" onClick={share} className="btn btn-primary btn-lg w-full">
+              {R.share}
             </button>
-            <button type="button" onClick={shareImage} className="press h-12 rounded-xl bg-accent font-bold text-panel [--press-shadow:#c47a10] hover:bg-accent-strong">
-              📸 Share as a picture
-            </button>
-            <button type="button" onClick={challengeFriend} className="press h-12 rounded-xl bg-panel font-bold text-panel-text [--press-shadow:#071a2e] hover:bg-panel-2">
-              Challenge a friend
-            </button>
-            <button type="button" onClick={onPractice} className="press h-12 rounded-xl border-2 border-line bg-white font-bold text-ink hover:bg-paper">
-              Play a practice round
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button type="button" onClick={shareImage} className="btn btn-white btn-lg px-3 text-[15px] leading-tight sm:text-[1.0625rem]">
+                <span aria-hidden="true" className="hidden sm:inline">📸</span> {R.picture}
+              </button>
+              <button type="button" onClick={challengeFriend} className="btn btn-red btn-lg px-3 text-[15px] leading-tight sm:text-[1.0625rem]">
+                {R.challenge}
+              </button>
+            </div>
           </div>
-          <p aria-live="polite" className="mt-2 whitespace-pre-line text-sm text-formal">
+          <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
             {copied}
           </p>
           {shareBox.box}
+          <LeaderboardJoin date={round.date} choices={choices} />
         </>
       ) : (
-        <div className="mt-5 flex flex-col gap-2 sm:flex-row">
-          <button type="button" onClick={onPractice} className="h-12 flex-1 rounded-lg bg-accent font-bold text-panel hover:bg-accent-strong">
-            Another practice round
+        <div className="mt-6 grid gap-2 sm:grid-cols-2">
+          <button type="button" onClick={onPractice} className="btn btn-primary btn-lg">
+            {R.anotherPractice}
           </button>
-          <button type="button" onClick={onToday} className="h-12 flex-1 rounded-lg border border-line font-bold text-ink hover:bg-paper">
-            Back to today&apos;s results
+          <button type="button" onClick={onToday} className="btn btn-white btn-lg">
+            {R.backToToday}
           </button>
         </div>
       )}
 
-      <h3 className="mt-6 font-bold text-ink">The answers</h3>
+      <h3 className="mt-7 font-display text-xl text-ink">{R.answers}</h3>
       <ol className="mt-2 divide-y divide-line">
         {round.questions.map((q, i) => {
           const big = q.options[q.answer];
@@ -663,8 +742,8 @@ function Results({
                 <strong>{big.n}</strong> <span className="text-muted">({big.sub})</span> is {(big.a / small.a).toFixed(1)}× the size of <strong>{small.n}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} aria-label={`Drag ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-link hover:underline">
-                Drag them on the map →
+              <Link href={mapHref(q)} aria-label={`Drag ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
+                {R.dragOnMap} →
               </Link>
             </li>
           );
@@ -672,10 +751,12 @@ function Results({
       </ol>
 
       {round.date ? (
-        <>
-          <LeaderboardJoin date={round.date} choices={choices} />
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
           <Countdown />
-        </>
+          <button type="button" onClick={onPractice} className="inline-flex min-h-11 items-center font-bold text-primary hover:underline">
+            {R.practice} →
+          </button>
+        </div>
       ) : null}
     </section>
   );
@@ -696,7 +777,7 @@ function Countdown() {
   if (left === null) return null;
   if (left === 0) {
     return (
-      <button type="button" onClick={() => location.reload()} className="mt-4 font-semibold text-link hover:underline">
+      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
         A new challenge is ready. Load it →
       </button>
     );
@@ -704,7 +785,7 @@ function Countdown() {
   const t = Math.floor(left / 1000);
   const p = (n: number) => String(n).padStart(2, "0");
   return (
-    <p className="mt-4 text-sm text-muted">
+    <p className="text-sm text-muted">
       Next challenge in{" "}
       <span className="font-mono font-semibold text-ink" suppressHydrationWarning>
         {p(Math.floor(t / 3600))}:{p(Math.floor((t % 3600) / 60))}:{p(t % 60)}

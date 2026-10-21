@@ -2,7 +2,7 @@
 
 import { site } from "@/content/site";
 
-type Result = { day: number; score: number; marks: boolean[]; verdict: string; streak: number };
+type Result = { day: number; score: number; marks: boolean[]; title: string; verdict: string; streak: number };
 
 const W = 1080;
 const H = 1350;
@@ -47,71 +47,119 @@ export async function resultImage(r: Result): Promise<Blob | null> {
   const body = getComputedStyle(document.body).fontFamily || "system-ui, sans-serif";
   await document.fonts?.ready;
 
-  // deep ocean background with our globe rising in the corner
-  const bg = ctx.createLinearGradient(0, 0, 0, H);
-  bg.addColorStop(0, "#0e2a47");
-  bg.addColorStop(1, "#0a1f36");
-  ctx.fillStyle = bg;
+  // Daylight Arcade: cream page, our globe rising in the corner, a white card with the score
+  ctx.fillStyle = "#FFF8EC";
   ctx.fillRect(0, 0, W, H);
-  const glow = ctx.createRadialGradient(W * 0.8, H * 0.3, 0, W * 0.8, H * 0.3, W * 0.7);
-  glow.addColorStop(0, "rgba(84,160,214,0.35)");
-  glow.addColorStop(1, "rgba(84,160,214,0)");
+  const glow = ctx.createRadialGradient(W * 0.85, H * 0.08, 0, W * 0.85, H * 0.08, W * 0.8);
+  glow.addColorStop(0, "rgba(37,99,235,0.16)");
+  glow.addColorStop(1, "rgba(37,99,235,0)");
   ctx.fillStyle = glow;
   ctx.fillRect(0, 0, W, H);
   const globe = await loadImage("/globe-still.svg");
   if (globe) {
-    ctx.globalAlpha = 0.35;
-    ctx.drawImage(globe, W * 0.42, -H * 0.06, W * 0.85, W * 0.85);
+    ctx.globalAlpha = 0.5;
+    ctx.drawImage(globe, W * 0.5, -H * 0.08, W * 0.7, W * 0.7);
     ctx.globalAlpha = 1;
   }
 
   const left = 96;
-  ctx.fillStyle = "#FFB547";
-  ctx.font = `700 40px ${display}`;
-  ctx.fillText(site.name, left, 150);
-  ctx.fillStyle = "rgba(255,255,255,0.75)";
-  ctx.font = `600 34px ${body}`;
-  ctx.fillText(`Daily challenge #${r.day} · Which is bigger?`, left, 210);
+  // the logo mark: blue rounded square with two white bracket corners
+  roundRect(ctx, left, 96, 72, 72, 20);
+  ctx.fillStyle = "#2563EB";
+  ctx.fill();
+  ctx.strokeStyle = "#ffffff";
+  ctx.lineWidth = 7;
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.beginPath();
+  ctx.moveTo(left + 19, 96 + 34);
+  ctx.lineTo(left + 19, 96 + 19);
+  ctx.lineTo(left + 34, 96 + 19);
+  ctx.moveTo(left + 53, 96 + 38);
+  ctx.lineTo(left + 53, 96 + 53);
+  ctx.lineTo(left + 38, 96 + 53);
+  ctx.stroke();
+  ctx.fillStyle = "#1D2140";
+  ctx.font = `800 46px ${display}`;
+  ctx.fillText(site.name, left + 92, 148);
 
-  // the score, big
+  // the card
+  const cardY = 250;
+  const cardH = 820;
+  roundRect(ctx, left - 24, cardY + 14, W - (left - 24) * 2, cardH, 44);
+  ctx.fillStyle = "#E8DFCF";
+  ctx.fill();
+  roundRect(ctx, left - 24, cardY, W - (left - 24) * 2, cardH, 44);
   ctx.fillStyle = "#ffffff";
-  ctx.font = `700 260px ${display}`;
-  ctx.fillText(`${r.score}/${r.marks.length}`, left - 8, 520);
+  ctx.fill();
+  ctx.strokeStyle = "#E8DFCF";
+  ctx.lineWidth = 4;
+  ctx.stroke();
 
-  // one tile per question
-  const size = 132;
-  const gap = 26;
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#2563EB";
+  ctx.font = `800 34px ${body}`;
+  ctx.fillText(`DAILY #${r.day} · WHICH IS BIGGER?`, W / 2, cardY + 90);
+  // the score, big, with a blue slash
+  ctx.font = `800 250px ${display}`;
+  const a = String(r.score);
+  const slash = "/";
+  const b = String(r.marks.length);
+  const wa = ctx.measureText(a).width;
+  const ws = ctx.measureText(slash).width;
+  const wb = ctx.measureText(b).width;
+  let x = W / 2 - (wa + ws + wb) / 2;
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#1D2140";
+  ctx.fillText(a, x, cardY + 330);
+  x += wa;
+  ctx.fillStyle = "#2563EB";
+  ctx.fillText(slash, x, cardY + 330);
+  x += ws;
+  ctx.fillStyle = "#1D2140";
+  ctx.fillText(b, x, cardY + 330);
+  ctx.textAlign = "center";
+  ctx.font = `800 64px ${display}`;
+  ctx.fillText(r.title, W / 2, cardY + 430);
+
+  // one pressed tile per question
+  const size = 128;
+  const gap = 24;
+  const startX = W / 2 - (r.marks.length * size + (r.marks.length - 1) * gap) / 2;
   r.marks.forEach((right, i) => {
-    const x = left + i * (size + gap);
-    roundRect(ctx, x, 590, size, size, 26);
-    ctx.fillStyle = right ? "#1FA37A" : "#E8366B";
+    const tx = startX + i * (size + gap);
+    const ty = cardY + 490;
+    roundRect(ctx, tx, ty + 10, size, size, 30);
+    ctx.fillStyle = right ? "#16804C" : "#A82A1E";
     ctx.fill();
-    ctx.fillStyle = "#ffffff";
-    ctx.font = `700 72px ${body}`;
-    ctx.textAlign = "center";
-    ctx.fillText(right ? "✓" : "✕", x + size / 2, 590 + size / 2 + 26);
-    ctx.textAlign = "left";
+    roundRect(ctx, tx, ty, size, size, 30);
+    ctx.fillStyle = right ? "#21B26B" : "#D93A2B";
+    ctx.fill();
+    ctx.fillStyle = right ? "#1D2140" : "#ffffff";
+    ctx.font = `800 70px ${body}`;
+    ctx.fillText(right ? "✓" : "✕", tx + size / 2, ty + size / 2 + 25);
   });
 
-  // verdict and streak
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `600 52px ${display}`;
-  wrap(ctx, r.verdict, W - left * 2).forEach((line, i) => ctx.fillText(line, left, 850 + i * 66));
+  ctx.fillStyle = "#5D6280";
+  ctx.font = `500 38px ${body}`;
+  wrap(ctx, r.verdict, W - left * 2 - 40).forEach((line, i) => ctx.fillText(line, W / 2, cardY + 720 + i * 50));
   if (r.streak > 1) {
-    ctx.fillStyle = "#FFB547";
-    ctx.font = `700 40px ${body}`;
-    ctx.fillText(`🔥 ${r.streak}-day streak`, left, 1010);
+    ctx.fillStyle = "#1D2140";
+    ctx.font = `800 36px ${body}`;
+    ctx.fillText(`🔥 ${r.streak}-day streak`, W / 2, cardY + 790);
   }
 
-  // call to action
-  roundRect(ctx, left, 1110, W - left * 2, 140, 32);
-  ctx.fillStyle = "#FFB547";
+  // call to action: a blue pressable button
+  roundRect(ctx, left, 1150 + 12, W - left * 2, 120, 32);
+  ctx.fillStyle = "#1A47B0";
   ctx.fill();
-  ctx.fillStyle = "#0e2a47";
-  ctx.font = `700 46px ${body}`;
-  ctx.fillText("Can you beat me?", left + 48, 1172);
-  ctx.font = `500 34px ${body}`;
-  ctx.fillText(`${location.host}/daily`, left + 48, 1222);
+  roundRect(ctx, left, 1150, W - left * 2, 120, 32);
+  ctx.fillStyle = "#2563EB";
+  ctx.fill();
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `800 44px ${display}`;
+  ctx.fillText(`Can you beat me? ${location.host}/daily`, W / 2, 1226);
+  ctx.textAlign = "left";
 
   return new Promise((resolve) => canvas.toBlob((b) => resolve(b), "image/png"));
 }
