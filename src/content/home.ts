@@ -48,7 +48,7 @@ export const home = {
   // the game-first hero: play card, map card and today's leaderboard over a floating globe
   hub: {
     mission:
-      "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Size of Empires shows every country and empire at its real size, across 4,000 years of history.",
+      "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Border Drift shows every country and empire at its real size, across 4,000 years of history.",
     playEyebrow: "Today's game",
     playTitle: "Which is bigger?",
     playLead: "Five matchups, about two minutes. The map will try to fool you.",
