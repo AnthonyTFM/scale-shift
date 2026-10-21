@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ViewTransition } from "react";
 import { DailyChallenge } from "@/components/daily/DailyChallenge";
 import { SignInProvider } from "@/components/daily/SignInProvider";
+import { dailyCopy as t } from "@/content/daily";
 
 export const metadata: Metadata = {
   title: "Daily challenge: which is bigger?",
@@ -16,16 +17,17 @@ export default function DailyPage() {
     <>
       <PageHero
         center
-        eyebrow="Daily challenge"
-        title="Which is bigger?"
+        compact
+        eyebrow={t.eyebrow}
+        title={t.title}
         lead={
           <p>
-            Five matchups a day, the same for everyone. Normal maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the
-            leaderboard. New matchups at midnight your time.
+            <span className="sm:hidden">{t.leadShort}</span>
+            <span className="hidden sm:inline">{t.lead}</span>
           </p>
         }
       />
-      <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-8 md:py-10">
         <div className="mx-auto max-w-2xl">
           {/* the homepage's play card grows into the game */}
           <ViewTransition name="daily-card" share="morph" default="none">

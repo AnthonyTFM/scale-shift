@@ -240,7 +240,7 @@ function Skeleton() {
 
 function Progress({ round, choices, step }: { round: Round; choices: number[]; step: number }) {
   return (
-    <ol className="mb-4 flex items-center gap-1.5" aria-label="Progress">
+    <ol className="mb-3 flex items-center gap-1.5 sm:mb-4" aria-label="Progress">
       {round.questions.map((q, i) => {
         const done = i < choices.length;
         const right = done && choices[i] === q.answer;
@@ -253,7 +253,7 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
           >
             <span
               aria-hidden="true"
-              className={`grid size-8 shrink-0 place-items-center rounded-full text-sm font-bold ${
+              className={`grid size-7 shrink-0 place-items-center rounded-full text-sm font-bold sm:size-8 ${
                 done
                   ? `pop-in text-white ${right ? "bg-formal" : "bg-danger"}`
                   : current
@@ -322,21 +322,21 @@ function QuestionCard({
   }, [answered]);
 
   return (
-    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white p-4 shadow-float sm:p-6">
+    <section aria-labelledby="daily-q" className="rounded-card border border-line bg-white px-4 pb-4 pt-3 shadow-float sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <p className="text-xs font-bold uppercase tracking-wide text-muted">
           {practice ? "Practice · " : ""}Question {n + 1} of {total}
         </p>
         <SoundToggle />
       </div>
-      <h2 id="daily-q" className="mt-1 text-center font-display text-2xl text-ink sm:text-3xl">
+      <h2 id="daily-q" className="mt-0.5 text-center font-display text-2xl leading-tight text-ink sm:mt-1 sm:text-3xl">
         {q.prompt}
       </h2>
       <p className="mt-1 text-center text-sm text-muted">
         {answered ? "Watch them shrink or grow to their true size." : "Drawn the way a normal web map shows them. Tap the bigger one."}
       </p>
 
-      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-4">
+      <div className="relative mt-3 grid grid-cols-2 gap-3 sm:mt-4 sm:gap-4">
         {q.options.map((o, i) => {
           const isAnswer = i === q.answer;
           const look = !answered
