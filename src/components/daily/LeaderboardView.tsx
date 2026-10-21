@@ -153,17 +153,17 @@ function DayTable({ board }: { board: DayBoard }) {
   if (!board.rows.length) return <Empty text="No scores yet for this day." />;
   const meOutside = board.me && !board.rows.some((r) => r.me);
   return (
-    <table className="w-full text-left text-sm">
+    <table className="w-full table-fixed text-left text-sm">
       <caption className="sr-only">Scores for {board.date}</caption>
       <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
         <tr>
-          <th scope="col" className="w-16 px-4 py-2.5">
+          <th scope="col" className="w-12 px-3 py-2.5 sm:w-16 sm:px-4">
             Rank
           </th>
           <th scope="col" className="px-2 py-2.5">
             Player
           </th>
-          <th scope="col" className="px-4 py-2.5 text-right">
+          <th scope="col" className="w-20 px-3 py-2.5 text-right sm:w-24 sm:px-4">
             Score
           </th>
         </tr>
@@ -171,15 +171,17 @@ function DayTable({ board }: { board: DayBoard }) {
       <tbody className="divide-y divide-line">
         {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
           <tr key={`${i}-${r.name}`} className={r.me ? "bg-amber-100 font-bold" : undefined}>
-            <td className="px-4 py-2.5 text-ink">
+            <td className="px-3 py-2.5 text-ink sm:px-4">
               {medal(r.rank) ?? r.rank}
               <span className="sr-only">{medal(r.rank) ? ` (rank ${r.rank})` : ""}</span>
             </td>
-            <td className="max-w-0 truncate px-2 py-2.5 text-ink">
-              {r.name}
-              {r.me ? <span className="ml-1.5 rounded bg-panel px-1.5 py-0.5 text-[10px] uppercase text-white">You</span> : null}
+            <td className="max-w-0 px-2 py-2.5 text-ink">
+              <span className="flex min-w-0 items-center gap-1.5">
+                <span className="truncate">{r.name}</span>
+                {r.me ? <span className="shrink-0 rounded bg-panel px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
+              </span>
             </td>
-            <td className="px-4 py-2.5 text-right font-mono text-ink">{r.score}/5</td>
+            <td className="px-3 py-2.5 text-right font-mono text-ink sm:px-4">{r.score}/5</td>
           </tr>
         ))}
       </tbody>
@@ -208,48 +210,49 @@ function AllTable({
   if (!board.rows.length) return <Empty text={empty} />;
   const meOutside = board.me && !board.rows.some((r) => r.me);
   return (
-    <table className="w-full text-left text-sm">
-      <caption className="px-4 pt-3 text-left text-xs font-semibold text-muted">{caption}</caption>
-      <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
-        <tr>
-          <th scope="col" className="w-16 px-4 py-2.5">
-            Rank
-          </th>
-          <th scope="col" className="px-2 py-2.5">
-            Player
-          </th>
-          <th scope="col" className="px-2 py-2.5 text-right">
-            Points
-          </th>
-          <th scope="col" className="hidden px-2 py-2.5 text-right sm:table-cell">
-            Days
-          </th>
-          <th scope="col" className="px-4 py-2.5 text-right">
-            Avg
-          </th>
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-line">
-        {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
-          <tr key={`${i}-${r.name}`} className={r.me ? "bg-amber-100 font-bold" : undefined}>
-            <td className="px-4 py-2.5 text-ink">{medal(r.rank) ?? r.rank}</td>
-            <td className="max-w-0 truncate px-2 py-2.5 text-ink">
-              {r.name}
-              {r.me ? <span className="ml-1.5 rounded bg-panel px-1.5 py-0.5 text-[10px] uppercase text-white">You</span> : null}
-            </td>
-            <td className="px-2 py-2.5 text-right font-mono text-ink">{r.points}</td>
-            <td className="hidden px-2 py-2.5 text-right font-mono text-ink sm:table-cell">{r.days}</td>
-            <td className="px-4 py-2.5 text-right font-mono text-ink">{r.average.toFixed(1)}</td>
+    <>
+      <table className="w-full table-fixed text-left text-sm">
+        <caption className="px-4 pt-3 text-left text-xs font-semibold text-muted">{caption}</caption>
+        <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
+          <tr>
+            <th scope="col" className="w-12 px-3 py-2.5 sm:w-16 sm:px-4">
+              Rank
+            </th>
+            <th scope="col" className="px-2 py-2.5">
+              Player
+            </th>
+            <th scope="col" className="w-[4.5rem] px-2 py-2.5 text-right sm:w-24">
+              Points
+            </th>
+            <th scope="col" className="hidden px-2 py-2.5 text-right sm:table-cell sm:w-20">
+              Days
+            </th>
+            <th scope="col" className="w-16 px-3 py-2.5 text-right sm:w-20 sm:px-4">
+              Avg
+            </th>
           </tr>
-        ))}
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={5} className="border-t border-line px-4 py-2 text-xs text-muted">
-            {board.total} {board.total === 1 ? "player" : "players"}. {note}
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+        </thead>
+        <tbody className="divide-y divide-line">
+          {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
+            <tr key={`${i}-${r.name}`} className={r.me ? "bg-amber-100 font-bold" : undefined}>
+              <td className="px-3 py-2.5 text-ink sm:px-4">{medal(r.rank) ?? r.rank}</td>
+              <td className="max-w-0 px-2 py-2.5 text-ink">
+                <span className="flex min-w-0 items-center gap-1.5">
+                  <span className="truncate">{r.name}</span>
+                  {r.me ? <span className="shrink-0 rounded bg-panel px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
+                </span>
+              </td>
+              <td className="px-2 py-2.5 text-right font-mono text-ink">{r.points}</td>
+              <td className="hidden px-2 py-2.5 text-right font-mono text-ink sm:table-cell">{r.days}</td>
+              <td className="px-3 py-2.5 text-right font-mono text-ink sm:px-4">{r.average.toFixed(1)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {/* outside the table: a footer cell spanning 5 columns would keep a hidden Days column taking room on phones */}
+      <p className="border-t border-line px-4 py-2 text-xs text-muted">
+        {board.total} {board.total === 1 ? "player" : "players"}. {note}
+      </p>
+    </>
   );
 }

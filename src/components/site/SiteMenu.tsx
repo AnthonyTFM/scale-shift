@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { footerNav, nav, site } from "@/content/site";
+import { menu, site } from "@/content/site";
 
 /**
  * The "three lines" menu. variant="map" is the floating button on the map page (always visible);
@@ -55,7 +55,7 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
   }, [open]);
 
   const close = () => setOpen(false);
-  const links = [...nav, ...footerNav.filter((f) => !nav.some((n) => n.href === f.href))];
+  const here = (href: string) => (pathname === href ? "page" : undefined);
 
   return (
     <div className={variant === "header" ? "ml-auto md:hidden" : ""}>
@@ -96,15 +96,38 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                 </svg>
               </button>
             </div>
-            <nav aria-label="Site" className="mt-6">
-              <ul className="space-y-1">
-                {links.map((item) => (
+            <nav aria-label="Site" className="mt-5">
+              <ul className="space-y-2">
+                {menu.main.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
                       onClick={close}
-                      aria-current={pathname === item.href ? "page" : undefined}
-                      className="block rounded-lg px-3 py-3 text-lg font-semibold hover:bg-white/10 aria-[current=page]:bg-white/10 aria-[current=page]:text-accent"
+                      aria-current={here(item.href)}
+                      className="flex items-center gap-3 rounded-xl bg-white/5 px-3 py-3 ring-1 ring-white/10 hover:bg-white/10 aria-[current=page]:ring-accent/70"
+                    >
+                      <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-lg bg-white/10 text-xl">
+                        {item.icon}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block text-lg font-bold leading-tight">
+                          {item.href === "/map" && pathname === "/map" ? menu.backToMap : item.label}
+                        </span>
+                        <span className="block text-sm text-panel-muted">{item.blurb}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-6 px-1 text-xs font-bold uppercase tracking-wide text-panel-muted">{menu.historyTitle}</p>
+              <ul className="mt-2 grid grid-cols-3 gap-2">
+                {menu.history.map((item) => (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={close}
+                      aria-current={here(item.href)}
+                      className="flex h-full min-h-11 items-center justify-center rounded-lg bg-white/5 px-2 py-2 text-center text-sm font-semibold leading-tight hover:bg-white/10 aria-[current=page]:text-accent"
                     >
                       {item.label}
                     </Link>
@@ -112,13 +135,17 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                 ))}
               </ul>
             </nav>
-            <Link
-              href="/map"
-              onClick={close}
-              className="mt-auto flex h-12 items-center justify-center rounded-lg bg-accent font-bold text-panel hover:bg-accent-strong"
-            >
-              {pathname === "/map" ? "Back to the map" : "Open the map"}
-            </Link>
+            <nav aria-label="About" className="mt-auto border-t border-white/10 pt-4">
+              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-panel-muted">
+                {menu.more.map((item) => (
+                  <li key={item.href}>
+                    <Link href={item.href} onClick={close} aria-current={here(item.href)} className="hover:text-white hover:underline aria-[current=page]:text-accent">
+                      {item.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
         </div>,
             document.body,

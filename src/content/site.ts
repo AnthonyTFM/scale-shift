@@ -29,6 +29,23 @@ export const footerNav = [
   { href: "/privacy", label: "Privacy" },
 ];
 
+/** The phone menu: the three main places first, then history pages, then the small print. */
+export const menu = {
+  main: [
+    { href: "/map", label: "Map", blurb: "Drag any country to its real size", icon: "🗺️" },
+    { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "🎯" },
+    { href: "/leaderboard", label: "Leaderboard", blurb: "Today, this week and all time", icon: "🏆" },
+  ],
+  historyTitle: "History",
+  history: [
+    { href: "/eras", label: "Eras" },
+    { href: "/timeline", label: "Timeline" },
+    { href: "/disputes", label: "Disputed borders" },
+  ],
+  more: footerNav,
+  backToMap: "Back to the map",
+};
+
 export const appCopy = {
   searchPlaceholder: "Try Roman Empire, Texas, Brazil",
   introTitle: "Maps lie about size.",

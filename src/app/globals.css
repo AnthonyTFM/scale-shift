@@ -204,8 +204,10 @@ body {
   animation-duration: 260ms;
 }
 /* the map page sits on deep ocean, so zooming into it never flashes the light page colour */
-html:has(.atlas-page),
-html:has(.atlas-page) body {
+/* Next keeps a visited page alive but hidden (display: none), so only a visible map page may darken the page:
+   otherwise every page after the map turns dark navy */
+html:has(.atlas-page:not([style*="display: none"])),
+html:has(.atlas-page:not([style*="display: none"])) body {
   background: #0a1f36;
 }
 /* the homepage globe drifts gently */
