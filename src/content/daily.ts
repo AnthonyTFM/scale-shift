@@ -13,4 +13,16 @@ export const dailyCopy = {
   // results screen: the leaderboard sign-up waits behind one button
   joinCta: "Join the leaderboard",
   joinHint: "Put today's score on the public board and see where you rank.",
+  // the reveal after each answer
+  reveal: {
+    ask: "Drawn the way a normal web map shows them. Tap the bigger one.",
+    right: "✓ Correct!",
+    wrong: "✗ Not quite.",
+    perfect: "🎉 5 for 5! Perfect round.",
+    mapTooBig: (x: string) => `Map: ${x}× too big`,
+    mapTooSmall: (x: string) => `Map: ${x}× too small`,
+    mapAboutRight: "Map: about right",
+    bigger: "✓ Bigger",
+    yourPick: "✗ Your pick",
+  },
 };
