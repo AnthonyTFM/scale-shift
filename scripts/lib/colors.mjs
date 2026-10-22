@@ -250,6 +250,74 @@ export function colorAllEras(topos) {
   return clashes;
 }
 
+/**
+ * After shapes have grown (the coastal gap fill), two owners can border each other with the same colour. Each owner
+ * that `region` accepts (by its shapes' properties) and is its own owner (not a colony, whose colour is its ruler's)
+ * that shares a colour with a neighbour gets one none of its neighbours use, in every era. Every other colour stays as
+ * it is. Returns how many owners changed colour.
+ */
+export function settleColors(topos, region) {
+  const { canon, rulers } = eraContext(topos);
+  const adj = new Map();
+  const color = new Map();
+  const candidates = new Set();
+  for (const topo of topos) {
+    const geoms = topo.objects.p.geometries;
+    const ownerOf = ownersOf(geoms, canon, rulers);
+    const nb = client.neighbors(geoms);
+    geoms.forEach((g, i) => {
+      const o = ownerOf(g.properties);
+      if (!o) return;
+      if (!color.has(o)) color.set(o, g.properties.k);
+      if (!adj.has(o)) adj.set(o, new Set());
+      for (const j of nb[i]) {
+        const q = ownerOf(geoms[j].properties);
+        if (!q || q === o) continue;
+        adj.get(o).add(q);
+        if (!adj.has(q)) adj.set(q, new Set());
+        adj.get(q).add(o);
+      }
+      if (o === g.properties.n && region(g.properties)) candidates.add(o);
+    });
+  }
+  let changed = 0;
+  for (const o of [...candidates].sort()) {
+    const used = new Set([...adj.get(o)].map((q) => color.get(q)));
+    if (!used.has(color.get(o))) continue;
+    const start = hashString(o) % PALETTE_SIZE;
+    for (let t = 0; t < PALETTE_SIZE; t++) {
+      const c = (start + t) % PALETTE_SIZE;
+      if (used.has(c)) continue;
+      color.set(o, c);
+      changed++;
+      break;
+    }
+  }
+  if (!changed) return 0;
+  for (const topo of topos) {
+    const ownerOf = ownersOf(topo.objects.p.geometries, canon, rulers);
+    for (const g of topo.objects.p.geometries) {
+      const o = ownerOf(g.properties);
+      if (o && candidates.has(o)) g.properties.k = color.get(o);
+    }
+  }
+  return changed;
+}
+
+/** settleColors on the era files on disk; rewrites only the files whose colours changed. */
+export function settleEraFiles(root, region) {
+  const eras = JSON.parse(fs.readFileSync(path.join(root, "src/data/eras.json"), "utf8"));
+  const files = eras.map((e) => path.join(root, "public/data/eras", `${e.key}.json`));
+  const texts = files.map((f) => fs.readFileSync(f, "utf8"));
+  const topos = texts.map((t) => JSON.parse(t));
+  const changed = settleColors(topos, region);
+  topos.forEach((t, i) => {
+    const text = JSON.stringify(t);
+    if (text !== texts[i]) fs.writeFileSync(files[i], text);
+  });
+  return changed;
+}
+
 /** Re-colours the era files on disk (public/data/eras, in src/data/eras.json order) and bumps the data version. */
 export function recolorEraFiles(root) {
   const eras = JSON.parse(fs.readFileSync(path.join(root, "src/data/eras.json"), "utf8"));

@@ -16,8 +16,9 @@ import * as simplifyLib from "topojson-simplify";
 import * as client from "topojson-client";
 import iso from "i18n-iso-countries";
 import polygonClipping from "polygon-clipping";
-import { recolorEraFiles } from "./lib/colors.mjs";
+import { recolorEraFiles, settleEraFiles } from "./lib/colors.mjs";
 import { separateEraFiles } from "./lib/overlaps.mjs";
+import { fillGapEraFiles } from "./lib/gaps.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const CACHE = path.join(ROOT, ".cache");
@@ -639,6 +640,16 @@ async function main() {
   // one colour per owner across every era (rewrites the era files and the version stamp)
   const { clashes } = recolorEraFiles(ROOT);
   console.log(`  colours: one per owner across all eras (${clashes} neighbouring pairs share one)`);
+  // Australia: the source's coastline there is coarse, so strips of land between its shapes and the sea came out blank.
+  // Filled after colouring, so colours elsewhere stay as they are; peoples there that now border a same-coloured
+  // neighbour get a free colour.
+  const inAustralia = (c) => presentOwnerAt(c) === "Australia";
+  const gaps = fillGapEraFiles(ROOT, inAustralia);
+  const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
+  const recoloured = settleEraFiles(ROOT, (props) => !!props.l && inAustralia(props.l));
+  console.log(
+    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips in Australia given to the shapes beside them, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
+  );
   writeJson(path.join(OUT_SRC, "era-stats.json"), stats);
   writeJson(path.join(OUT_PUBLIC, "era-stats.json"), stats);
   console.log("Done.");
