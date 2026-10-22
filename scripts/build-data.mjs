@@ -298,6 +298,10 @@ function ownerForIsland(patch, features) {
 // lying in that country today get the country's name back (joining its shape, for islands); the outline is the source's own.
 // `replace`: the source also draws the country under its name, with an older outline that the unnamed piece repeats
 // (Taiwan in 1994); the unnamed outline, the one later snapshots use, takes its place.
+// `today` + `box`: the piece lies in a different country today (Tasmania, in Australia), inside this lon/lat box.
+// `s`: who ruled it, as for the source's own colonies (colonies take their ruler's colour).
+const TASMANIA = [143.5, -44, 149, -39.5];
+const TASMANIA_NOTE = "The source leaves Tasmania unnamed in this snapshot. It was the British colony of Tasmania until federation in 1901, so it is named like the mainland colonies.";
 const UNNAMED = [
   { n: "Switzerland", years: [1994, 2000, 2010] },
   { n: "Sweden", years: [1994, 2000, 2010] }, // Gotland
@@ -308,6 +312,9 @@ const UNNAMED = [
     replace: true,
     note: "The source draws Taiwan twice in this snapshot: an older outline with its name and one without. The map uses the unnamed one, as the 2000 and 2010 snapshots do.",
   },
+  // like the mainland colonies: their own rulers in 1878 and 1880, ruled by the United Kingdom in 1900
+  { n: "Tasmania (UK)", years: [1878, 1880], today: "Australia", box: TASMANIA, note: TASMANIA_NOTE },
+  { n: "Tasmania (UK)", years: [1900], today: "Australia", box: TASMANIA, s: "United Kingdom of Great Britain and Ireland", note: TASMANIA_NOTE },
 ];
 
 /** Splits the pieces of an unnamed source shape that belong to a country in UNNAMED into shapes of their own. */
@@ -316,15 +323,19 @@ function nameUnnamed(geometry, b, year, features, found) {
   if (!rules.length) return geometry;
   const keep = [];
   for (const rings of geometry.coordinates) {
-    const today = presentOwnerAt(geoCentroid({ type: "Polygon", coordinates: rings }));
-    const rule = rules.find((r) => r.n === today);
+    const c = geoCentroid({ type: "Polygon", coordinates: rings });
+    const today = presentOwnerAt(c);
+    const inBox = (box) => !box || (c[0] >= box[0] && c[1] >= box[1] && c[0] <= box[2] && c[1] <= box[3]);
+    const rule = rules.find((r) => (r.today ?? r.n) === today && inBox(r.box));
     if (!rule) {
       keep.push(rings);
       continue;
     }
     found.set(rule.n, [...(found.get(rule.n) ?? []), rings]);
     const w = rule.note ?? `The source draws ${rule.n} in this snapshot but leaves its name blank; the name is put back here.`;
-    features.push({ type: "Feature", properties: { n: rule.n, b, w }, geometry: { type: "MultiPolygon", coordinates: [rings] } });
+    const props = { n: rule.n, b, w };
+    if (rule.s) props.s = rule.s;
+    features.push({ type: "Feature", properties: props, geometry: { type: "MultiPolygon", coordinates: [rings] } });
   }
   return keep.length ? { type: "MultiPolygon", coordinates: keep } : null;
 }
