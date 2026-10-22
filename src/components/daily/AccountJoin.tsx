@@ -17,7 +17,9 @@ type Me = { id: string; name: string | null; reminders: boolean } | null;
  * nickname once, and your score posts as the same player on every device.
  */
 export function AccountJoin({ date, choices }: Props) {
-  const { isLoaded, isSignedIn, openSignIn, signOut, opening } = useAccount();
+  const { isLoaded, isSignedIn, openSignIn, signOut, opening, prepare } = useAccount();
+  // this panel opens when a player taps Join: fetch sign-in now, so its window opens without a wait
+  useEffect(prepare, [prepare]);
   const [me, setMe] = useState<Me | undefined>(undefined);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");

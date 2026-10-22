@@ -11,12 +11,14 @@ export type Account = {
   /** opens the sign-in window; `back` is the page to return to afterwards */
   openSignIn: (back: string) => void;
   signOut: (back: string) => void;
+  /** start downloading Clerk ahead of a likely sign-in (no window opens) */
+  prepare: () => void;
   /** true between a tap on "Sign in" and Clerk's window opening */
   opening: boolean;
 };
 
 const noop = () => {};
-const AccountContext = createContext<Account>({ isLoaded: true, isSignedIn: false, openSignIn: noop, signOut: noop, opening: false });
+const AccountContext = createContext<Account>({ isLoaded: true, isSignedIn: false, openSignIn: noop, signOut: noop, prepare: noop, opening: false });
 
 /** Sign-in state for the daily game and the leaderboard. */
 export const useAccount = () => useContext(AccountContext);
@@ -36,6 +38,7 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
   const [load, setLoad] = useState<"session" | "tap" | null>(null);
   const [account, setAccount] = useState<Account | null>(null);
   const [checked, setChecked] = useState(false);
+  const [opening, setOpening] = useState(false);
   // a sign-in tapped before Clerk arrived, opened as soon as it's ready
   const pending = useRef<string | null>(null);
   const takePending = useCallback(() => {
@@ -56,12 +59,14 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
     // a likely signed-in player waits for Clerk; everyone else is signed out until they tap "Sign in"
     isLoaded: checked && load !== "session",
     isSignedIn: false,
-    opening: load === "tap",
+    opening,
     openSignIn: (back) => {
       pending.current = back;
+      setOpening(true);
       setLoad((l) => l ?? "tap");
     },
     signOut: noop,
+    prepare: () => setLoad((l) => l ?? "tap"),
   };
 
   if (!signInOn) return <>{children}</>;

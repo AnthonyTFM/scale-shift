@@ -28,6 +28,7 @@ function Report({ onChange, takePending }: Props) {
       opening: false,
       openSignIn,
       signOut: (back) => void clerk.signOut({ redirectUrl: back }),
+      prepare: () => {},
     });
     // the player tapped "Sign in" while Clerk was still downloading
     const back = takePending();
