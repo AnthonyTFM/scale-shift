@@ -219,7 +219,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Central Türkiye",
   },
   "Ptolemaic Kingdom": {
-    what: "Egypt ruled from Alexandria by the Greek-speaking Ptolemy dynasty after Alexander's death. It ended with Cleopatra in 30 BCE.",
+    what: "Egypt ruled from Alexandria by the Greek-speaking Ptolemaic dynasty after Alexander's death. It ended with Cleopatra in 30 BCE.",
     today: "Mainly Egypt",
   },
   "Kushan Empire": {
@@ -232,14 +232,14 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Hunnic Empire": {
     what: "Nomadic Huns from the steppe who swept into Europe in the late 300s. Under Attila (434–453) they threatened both halves of the Roman Empire.",
-    today: "Ukraine, southern Russia and neighbouring lands",
+    today: "Ukraine, southern Russia and neighboring lands",
   },
   "Khazars": {
     what: "A Turkic khaganate between the Black and Caspian Seas, whose rulers adopted Judaism. It fell in the 960s.",
     today: "Southern Russia, Ukraine and western Kazakhstan",
   },
   "Ilkhanate": {
-    what: "The Mongol khanate founded by Hülegü, a grandson of Genghis Khan, who sacked Baghdad in 1258.",
+    what: "The Mongol khanate founded by Genghis Khan's grandson Hülegü, who sacked Baghdad in 1258.",
     today: "Iran, Iraq, Azerbaijan, eastern Türkiye, Turkmenistan and Afghanistan",
   },
   "Chagatai Khanate": {
@@ -267,7 +267,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Egypt, Syria, Israel, Palestine, Jordan, Lebanon, Yemen and western Saudi Arabia",
   },
   "Mamluke Sultanate": {
-    what: "Ruled from Cairo by former slave soldiers (mamluks) who took power in 1250 and stopped the Mongols in 1260. The Ottomans conquered it in 1517.",
+    what: "A sultanate ruled from Cairo by former slave soldiers (mamluks), who took power in 1250 and stopped the Mongols in 1260. The Ottomans conquered it in 1517.",
     today: "Egypt, Syria, Israel, Palestine, Lebanon, Jordan, western Saudi Arabia, eastern Libya and southeastern Türkiye",
   },
   "Almohad Caliphate": {
@@ -291,7 +291,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Chad, northeast Nigeria, Niger and northern Cameroon",
   },
   "Toltec Empire": {
-    what: "A people of central Mexico centred on the city of Tula, later remembered by the Aztecs as great ancestors.",
+    what: "A people of central Mexico centered on the city of Tula, later remembered by the Aztecs as great ancestors.",
     today: "Central Mexico",
   },
   "Tsardom of Muscovy": {
@@ -311,7 +311,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Northern China and Mongolia",
   },
   "Republic of China": {
-    what: "China after its last emperor stepped down in 1912, before the civil war that ended in 1949.",
+    what: "China as a republic, after its last emperor stepped down in 1912. Its government lost the civil war in 1949 and moved to Taiwan.",
     today: "Most of today's China",
   },
   "Viceroyalty of Brazil": {
@@ -344,7 +344,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Viceroyalty of New Granada": {
     what: "Spain's colony in northern South America, ruled from Bogotá.",
-    today: "Colombia, Ecuador and Panama",
+    today: "Colombia, Ecuador and Panama, plus Venezuela (run as a separate captaincy general from 1777)",
   },
   "Grand Duchy of Moscow": {
     what: "The Russian state ruled from Moscow. Ivan III threw off Mongol rule in 1480 and gathered the other Russian lands.",
@@ -383,7 +383,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Mainly Iran, plus Armenia and Azerbaijan's Nakhchivan",
   },
   "Union of South Africa": {
-    what: "A British dominion formed in 1910 from four colonies, which also ran neighbouring South West Africa from 1915. It became a republic in 1961.",
+    what: "A British dominion formed in 1910 from four colonies, which also ran neighboring South West Africa from 1915. It became a republic in 1961.",
     today: "South Africa and Namibia",
   },
   "Karkhanids": {
@@ -403,7 +403,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Northern and central India",
   },
   "Bactria": {
-    what: "A Greek kingdom in Central Asia's Oxus (Amu Darya) valley, founded around 250 BCE when its Greek governor broke away from the Seleucid Empire.",
+    what: "A Greek kingdom in Central Asia's Oxus (Amu Darya) valley, founded around 250 BCE when its governor, Diodotus, broke away from the Seleucid Empire.",
     today: "Afghanistan, Uzbekistan, Tajikistan and Turkmenistan",
   },
   "Dutch East Indies": {
@@ -443,7 +443,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Zimbabwe and Zambia",
   },
   "Abyssinia": {
-    what: "The Ethiopian Empire. It beat Italy at Adwa in 1896 and, with Liberia, was one of only two African states never colonised in this era.",
+    what: "The Ethiopian Empire. It beat Italy at Adwa in 1896 and, with Liberia, was one of only two African states never colonized in this era.",
     today: "Ethiopia",
   },
   "Sokoto Caliphate": {
@@ -456,7 +456,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Ayutthaya": {
     what: "A Thai kingdom (1351–1767) whose island capital, Ayutthaya, was a major trading city.",
-    today: "Thailand and parts of its neighbours",
+    today: "Thailand, plus parts of Laos, Malaysia, Cambodia and Myanmar",
   },
   "Rattanakosin Kingdom": {
     what: "Siam under the Chakri dynasty, which moved the capital to Bangkok in 1782 and still reigns today.",
@@ -467,7 +467,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Namibia",
   },
   "Kamerun": {
-    what: "Germany's colony in Central Africa (1884–1916), split between Britain and France after World War I.",
+    what: "Germany's colony in Central Africa (1884–1916), split between Britain and France after the First World War.",
     today: "Cameroon, plus parts of Nigeria, Chad, the Central African Republic, Gabon and the Republic of the Congo",
   },
   "French Indochina": {
@@ -483,7 +483,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Myanmar",
   },
   "Caliphate of Córdoba": {
-    what: "Muslim Spain (al-Andalus) under the Umayyad caliphs of Córdoba, then one of Europe's largest and richest cities.",
+    what: "Muslim Spain (al-Andalus) under the Umayyad caliphs (929–1031). Their capital, Córdoba, was one of Europe's largest and richest cities.",
     today: "Spain, Portugal, northern Morocco and western Algeria",
   },
 };
