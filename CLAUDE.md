@@ -1,4 +1,4 @@
-# Scale Shift: notes for Claude Code
+# Border Drift: notes for Claude Code
 
 Real-size world map with 4,000 years of borders (2000 BCE to today), a daily "which is bigger?" game with a public leaderboard, and history pages. Next.js 16 (App Router, Cache Components on), TypeScript, Tailwind 4, d3-geo on canvas. No map tiles or API keys.
 

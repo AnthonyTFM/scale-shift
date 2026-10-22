@@ -1,11 +1,11 @@
-# Scale Shift: project brief
+# Border Drift: project brief
 
 The single source of truth for what we're building and why. Both owners and both Claudes read this before starting work. Update it in the same PR whenever a decision changes.
 
 ## The goal
 **Make the best true-size map on the internet, with history and games built in.** Quality comes first. A portfolio piece and a possible business are welcome side effects, not the main objective, so we don't cut corners for speed or monetisation.
 
-- **Working name:** "Scale Shift". Not final; renaming is a one-line change in `src/content/site.ts`.
+- **Name:** Border Drift (Oct 21, chosen by Anthony and Evan; "Scale Shift" until then). The name lives in `src/content/site.ts`. The repo, the Vercel project and the URL stay `scale-shift` until the domain is bought (borderdrift.com, see the launch checklist in issue #40).
 - **Owners:** Anthony (Mac) and Evan (Windows). Shared ownership of everything.
 - **Repo:** https://github.com/AnthonyTFM/scale-shift (public). Hosting: Vercel, auto-deploys `main`.
 - **Inspiration:** thetruesize.com. We rebuilt the idea with original code, copy, name and design, and added 4,000 years of history and a daily game. Never copy its text, branding or layout.
@@ -17,7 +17,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 |---|---|
 | Home `/` | A directory, not a map: today's daily challenge with your streak and the top players, links to every section and famous comparisons |
 | Map `/map` | Drag countries, US states and historical states at real size; rotate; 49 border snapshots from 2000 BCE to today; type any year; click land for "who ruled here?" through every era; map key; Antarctic claims; disputed territories; edge-scrolling while dragging; share links and PNG download |
-| Daily challenge `/daily` | 5 "which is bigger?" puzzles a day, the same for everyone; true-size reveal; context for every empire; streaks; practice rounds; shareable score grid |
+| Daily challenge `/daily` | 5 "which is bigger?" puzzles a day, the same for everyone; true-size reveal; context for every empire; streaks; practice rounds; results with leaderboard sign-up first, share text, share picture and challenge links |
 | Leaderboard `/leaderboard` | Daily and all-time rankings; joining needs an email (private, one player per inbox) and a nickname; disguised slurs blocked; scores re-marked on the server; first try of the day counts |
 | Eras, timeline, disputes | 49 era pages, 104 events (when land was taken vs. made official), 19 present-day disputes |
 | About, how it works, contact, privacy | Sources, every data correction, the border-error form |
@@ -31,6 +31,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **Borders sweep into each new era (Oct 22):** changing era (Play, ◀ ▶, the slider, typing a year) moves borders to their new place over 2 seconds (`src/components/map/sweep.ts`). A country that gains land spreads into it from its old border; a new country sweeps in from one side (its border with whoever carries on the country it takes most land from, else its longest border), never from every edge at once. **Only the border moves:** the frame is the new era's normal tiles with the old era's picture clipped to the land the border hasn't reached, plus the moving border line in the map's own style, so colours, solid/dashed lines and lakes never change, and the end is exactly the new era's map. Who carries on whom uses the colours from `scripts/lib/colors.mjs` (decided on the whole world, not the view). Names stay on, follow their country and switch halfway when it is renamed; new countries are named from halfway. Moving the map mid-sweep or "reduce motion" shows the new era straight away; Play waits for each sweep. (A first slide, #47–#51, was removed in #54 because colours, dotted lines and names changed during it; this version keeps all of them.) **Lakes are the same on every era:** big lakes (`scripts/build-lakes.mjs` → `public/data/lakes.json`, natural lakes of 1,000 km² or more from Natural Earth) are drawn as water on top of every era's tiles, since the sources disagree about which lakes they cut out.
 - **The map lives only on `/map`.** The homepage leads to games, the map and information pages: a game-first hero (today's game card, a map card and today's leaderboard over a light, slowly turning globe), then how to play, the daily fact, a directory of the site and this week's picks. Kept as Anthony built it when the Daylight Arcade look arrived (Oct 21, Evan's call); only its colours changed.
 - **Daily puzzles** are picked by a seeded shuffle of the date, so everyone gets the same five. The leaderboard re-marks answers on the server.
+- **Daily game screens (Oct 21–22, Anthony's calls):** a 5-pill progress bar and, for players with a streak, a "N day streak" pill above it. Each round reveals the web-map size as a dashed outline and the true size as a solid shape, then shows a dark verdict panel and "Next round". **Results order:** score with a fun title (5 "Emperor!", 4 "Empire builder!", 3 "Regional power", 0–2 "The map fooled you"), the five result tiles, then **"Get on the leaderboard" first** (the full sign-up opens only after Join), then the streak / today's rank / all-time cards, one compact share row (Share · Picture · Challenge), the answers ("Compare sizes on the map") and a big gold "Play more rounds for fun". Signing in from /daily pulls today's result from the account straight away, so a player who already played lands on their results without a refresh or a replay. Drawn icons (`src/components/site/Icons.tsx`) are used instead of emoji where they carry meaning.
 - **Growing the puzzle pool (Oct 20):** new shapes are added in `scripts/build-daily.mjs` and get a `since` date two days after the build; a dated puzzle only uses shapes in the pool that day, so past puzzles (and today's in every time zone) never change and the server keeps marking them correctly. Never edit or remove a shape whose `since` date has passed (or that has none). Leave out states the map data shows outside the years they existed. Pool: 337 shapes (Oct 20).
 - **Weekly review (Mondays 8:47 ET, scheduled task):** checks the news for border and dispute changes (two reliable sources before editing), new historical findings, upstream map-data releases, and adds ~20 more puzzle shapes. Pool growth merges after CI; history corrections and map-data rebuilds wait for Anthony's OK.
 - **Leaderboard sign-up (Oct 19):** an email and a nickname are required to join. Emails are stored privately in Redis (`lb2:emails`), never returned by the API, and each inbox gets one player. Emails are not verified yet: that needs a real domain plus Resend (see roadmap).
@@ -64,22 +65,25 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - Leaderboard emails aren't verified, so someone could sign up with an address that isn't theirs. One player per inbox and the 5-new-players-per-network daily cap limit the damage.
 - Vercel's Hobby plan is for non-commercial use. Keep the repo public, or move to Pro, if either owner's merges stop deploying.
 
-## Roadmap (best-site-first order)
-**Now**
-1. Bring back the best of v1: `/history/[empire]` timeline pages and `/compare/[slug]` share pages, the email-updates signup, and provinces/continents in search.
-2. Form delivery on Vercel (Resend). With a real domain, also send a code to verify leaderboard emails.
-3. Choose the final name and domain.
+## Roadmap (agreed Oct 22; each item its own PR, Anthony confirms before merging)
+**Now: fix everything else first**
+1. Docs on the new name and decisions (this file, README, CLAUDE.md).
+2. Site-wide accessibility and speed audit after the rebrand.
+3. Load sign-in (Clerk) only when someone taps Join or Sign in.
+4. Evan (issue #89): close Antarctica to the South Pole (#38); faster `/map` on phones.
 
-**Next**
-4. More snapshots at famous peaks (Rome AD 117, Ottomans 1683, British Empire 1922).
-5. A weekly leaderboard; a "who ruled this spot?" puzzle type.
-6. Side-by-side mode.
+**Next: the game**
+5. **Endless streak mode:** unlimited matchups, harder each round (big tricks first, then pairs within ~10%), ending on the first miss. Best streaks go on a leaderboard joined the same way as the daily; the server re-checks every answer.
+6. **More places:** islands and territories, more empires and peoples. Real data only; past daily puzzles never change.
+7. **Sounds:** copyright-safe (CC0) meme-style win and fail clips; no real meme or TikTok audio.
+8. **Explainer:** in each reveal, a short animation slides the shape from its latitude to the equator and shrinks it, with one plain sentence.
 
 **Later**
-7. Globe view, historical populations, translations.
+9. Launch checklist before any money (issue #40): domain, Clerk production, analytics, Resend, LLC, a licence check before selling anything made from GPL map data.
+10. Provinces and continents in search, more snapshots at famous peaks (Rome AD 117, Ottomans 1683, British Empire 1922), a "who ruled this spot?" puzzle, side-by-side mode, globe view, historical populations, translations.
 
 ## Open decisions
-- Name and domain
+- Domain: buy borderdrift.com (check it is still free), then connect it and switch Clerk to production
 - Analytics (GA4 ID in Vercel) and form delivery (webhook vs Resend)
 - Slack with @Claude for both owners (after both have shipped from their laptops)
 

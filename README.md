@@ -1,4 +1,4 @@
-# Scale Shift
+# Border Drift
 
 Drag any country or empire across a world map and see its **real size**, travel through **4,000 years of borders** (2000 BCE → today), click any land to see **who ruled it in every era**, and play a **daily "which is bigger?" challenge** with a public leaderboard.
 
