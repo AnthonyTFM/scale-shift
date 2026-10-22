@@ -10,6 +10,7 @@ import { signInOn } from "@/lib/sign-in";
 import { useAuth } from "@clerk/nextjs";
 import { AccountJoin } from "./AccountJoin";
 import { dailyCopy as t } from "@/content/daily";
+import { TrophyIcon } from "@/components/site/Icons";
 
 type Props = { date: string; choices: number[] };
 
@@ -45,7 +46,7 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
     // keyboard and screen-reader users land in the sign-up they just opened
     if (open) panel.current?.focus();
   }, [open]);
-  if (joined === undefined) return <div className="mt-5 h-[76px]" aria-hidden="true" />;
+  if (joined === undefined) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
   if (joined || open) {
     return (
       <div ref={panel} tabIndex={-1} className="outline-none">
@@ -55,12 +56,10 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
   }
   // compact: "Get on the leaderboard · Join"; the full sign-up only opens after Join
   return (
-    <div className="mt-5 flex items-center gap-3 rounded-[20px] border-2 border-line bg-paper py-2.5 pl-4 pr-2.5">
-      <span aria-hidden="true" className="text-2xl">
-        🏆
-      </span>
+    <div className="mt-5 flex items-center gap-3 rounded-[22px] border-2 border-primary bg-primary-soft py-3 pl-4 pr-3 shadow-[0_6px_0_0_var(--color-primary-shadow)]">
+      <TrophyIcon className="size-9" />
       <span className="min-w-0 flex-1">
-        <span className="block font-bold leading-tight text-ink">{t.joinCta}</span>
+        <span className="block font-display text-lg leading-tight text-ink">{t.joinCta}</span>
         <span className="block text-sm text-muted">{t.joinHint}</span>
       </span>
       <button
@@ -70,7 +69,7 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
           track("leaderboard_join_open");
           setOpen(true);
         }}
-        className="btn btn-primary mb-1.5 h-11 shrink-0 px-5 text-sm"
+        className="btn btn-primary mb-1.5 h-12 shrink-0 px-6"
       >
         {t.joinButton}
       </button>
@@ -163,8 +162,8 @@ function EmailJoin({ date, choices }: Props) {
   return (
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="font-bold text-ink">🏆 Today&apos;s leaderboard</h3>
-        <Link href="/leaderboard" className="text-sm font-semibold text-link hover:underline">
+        <h3 className="flex items-center gap-2 font-display text-lg text-ink sm:text-xl"><TrophyIcon className="size-7" /> Today&apos;s leaderboard</h3>
+        <Link href="/leaderboard" className="whitespace-nowrap text-sm font-semibold text-link hover:underline">
           See all →
         </Link>
       </div>
@@ -257,7 +256,7 @@ function EmailJoin({ date, choices }: Props) {
           <p className="mt-2 text-ink">
             <strong>{player?.name}</strong>, you&apos;re <strong className="text-lg">#{result.rank}</strong> of {result.total} today
             {result.duplicate ? " (your first score of the day counts)" : ""}.{" "}
-            <button type="button" onClick={() => setEditing(true)} className="text-sm font-semibold text-link hover:underline">
+            <button type="button" onClick={() => setEditing(true)} className="whitespace-nowrap text-sm font-semibold text-link hover:underline">
               Change nickname
             </button>
           </p>

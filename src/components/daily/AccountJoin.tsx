@@ -7,6 +7,7 @@ import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, rememberPlayer } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
+import { TrophyIcon } from "@/components/site/Icons";
 
 type Props = { date: string; choices: number[] };
 type Me = { id: string; name: string | null; reminders: boolean } | null;
@@ -104,8 +105,8 @@ export function AccountJoin({ date, choices }: Props) {
   return (
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       <div className="flex items-baseline justify-between gap-2">
-        <h3 className="font-bold text-ink">🏆 Today&apos;s leaderboard</h3>
-        <Link href="/leaderboard" className="text-sm font-semibold text-primary hover:underline">
+        <h3 className="flex items-center gap-2 font-display text-lg text-ink sm:text-xl"><TrophyIcon className="size-7" /> Today&apos;s leaderboard</h3>
+        <Link href="/leaderboard" className="whitespace-nowrap text-sm font-semibold text-primary hover:underline">
           See all →
         </Link>
       </div>

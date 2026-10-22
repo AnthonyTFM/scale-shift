@@ -8,6 +8,7 @@ import { useShareBox } from "@/components/site/ShareBox";
 import { playerId } from "@/lib/player";
 import { home } from "@/content/home";
 import type { AllTimeBoard, DayBoard } from "@/lib/leaderboard-types";
+import { TrophyIcon } from "@/components/site/Icons";
 
 /** Shown when today has no scores yet: yesterday's top three, or the all-time top three. */
 type Fallback = { kind: "yesterday" | "all"; rows: { rank: number; name: string; score: string }[] };
@@ -50,7 +51,7 @@ export function HeroLeaderboard() {
   return (
     <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="font-display text-xl text-ink sm:text-2xl">🏆 {t.boardTitle}</h2>
+        <h2 className="flex items-center gap-2 font-display text-2xl text-ink sm:text-[1.7rem]"><TrophyIcon className="size-8" /> {t.boardTitle}</h2>
         {board?.total ? <p className="whitespace-nowrap text-xs text-muted">{t.boardPlayers(board.total)}</p> : null}
       </div>
       {board === undefined ? (
