@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return Response.json({ ok: false, error: "Invalid request." }, { status: 400 });
+    return Response.json({ ok: false, error: "Something went wrong. Reload the page and try again." }, { status: 400 });
   }
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";

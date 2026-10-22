@@ -5,9 +5,10 @@ import { home } from "@/content/home";
 import { presets, type Preset } from "@/content/presets";
 import { mapUrl } from "@/lib/share";
 import { PALETTE } from "@/lib/palette";
+import { nameInSentence } from "@/lib/daily";
 
 const DAY = 86_400_000;
-type PoolRow = { n: string; src: string; era: string; kind: string; a: number; m: number };
+type PoolRow = { n: string; src: string; era: string; kind: "country" | "state" | "history"; a: number; m: number };
 type Fact = { preset: Pick<Preset, "title" | "hook" | "baseEra" | "shapes" | "at">; rows: PoolRow[] };
 
 /** Two-shape "surprising" comparisons we have both areas for: real (a) and how big a normal map draws it (m). */
@@ -49,7 +50,9 @@ const generated: Fact[] = (() => {
     .map(({ a, b }) => ({
       preset: {
         title: `${a.n} vs ${b.n}`,
-        hook: `On a normal map, ${a.n} looks ${times(a.m / b.m)}× bigger. In reality, ${b.n} is ${b.a / a.a < 1.2 ? "slightly bigger" : `${times(b.a / a.a)}× the size`}.`,
+        hook: `On a normal map, ${nameInSentence(a)} looks ${times(a.m / b.m)}× bigger than ${nameInSentence(b)}. In reality, ${nameInSentence(b)} is ${
+          b.a / a.a < 1.2 ? `${Math.round((b.a / a.a - 1) * 100)}% bigger` : `${times(b.a / a.a)}× the size of ${nameInSentence(a)}`
+        }.`,
         baseEra: "present",
         shapes: [
           { era: a.era, name: a.src },

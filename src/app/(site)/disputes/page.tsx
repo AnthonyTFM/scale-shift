@@ -8,7 +8,7 @@ import { PageHero } from "@/components/site/PageHero";
 export const metadata: Metadata = {
   title: "Disputed borders today: who controls them vs. who claims them",
   description:
-    "Crimea, Kashmir, Taiwan, Western Sahara, Golan Heights and more: who controls each territory, since when, who claims it, and whether that control has ever been formally recognized.",
+    "Crimea, Kashmir, Taiwan, Western Sahara, Golan Heights and more: who controls each territory, since when, who claims it and whether that control has ever been formally recognized.",
   alternates: { canonical: "/disputes" },
 };
 
@@ -21,7 +21,7 @@ export default function DisputesPage() {
         lead={
           <p>
             Maps have to choose a line. Ours draws who actually controls the land (from Natural Earth). Click any country on today&apos;s map and
-            its disputes appear first: who controls the land, since when, who claims it, and whether that control was ever made official.
+            its disputes appear first: who controls the land, since when, who claims it and whether that control was ever made official.
           </p>
         }
       />

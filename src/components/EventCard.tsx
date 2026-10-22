@@ -46,14 +46,19 @@ export function TakenFormalized({ ev, dark = false }: { ev: TerritoryEvent; dark
         <div>
           <dt className={`text-[11px] font-semibold uppercase tracking-wide ${label}`}>Made official</dt>
           <dd className={`font-semibold ${value}`}>
-            {ev.formalized === null ? (ev.status === "disputed" ? "Not recognized" : "Never") : formatYear(ev.formalized, ev.approx)}
+            {ev.formalized === null ? (ev.status === "disputed" ? "Never settled" : "Never") : formatYear(ev.formalized, ev.approx)}
           </dd>
         </div>
       </dl>
-      <p className={`mt-2 text-xs ${label}`}>
-        {settleTime(ev)}
-        {ev.formalizedBy ? ` · ${ev.formalizedBy}` : ""}
-      </p>
+      {/* "Never" above already says it was never made official, so only a real gap gets a line */}
+      {ev.formalized !== null ? (
+        <p className={`mt-2 text-xs ${label}`}>
+          {settleTime(ev)}
+          {ev.formalizedBy ? ` · ${ev.formalizedBy}` : ""}
+        </p>
+      ) : ev.formalizedBy ? (
+        <p className={`mt-2 text-xs ${label}`}>{ev.formalizedBy}</p>
+      ) : null}
     </div>
   );
 }

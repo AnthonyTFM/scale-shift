@@ -10,6 +10,8 @@ import {
   dayNumber,
   mergeDays,
   explain,
+  nameInSentence,
+  sizeParts,
   loadSave,
   localDateKey,
   stats,
@@ -337,7 +339,7 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
   );
 }
 
-/** "6 day streak" while playing: days in a row up to yesterday (today counts once it's finished). Hidden with no streak. */
+/** "6-day streak" while playing: days in a row up to yesterday (today counts once it's finished). Hidden with no streak. */
 function StreakPill({ save, today }: { save: DailySave; today: string }) {
   const { streak } = stats(save, today);
   if (!streak) return null;
@@ -798,14 +800,15 @@ function Results({
         {round.questions.map((q, i) => {
           const big = q.options[q.answer];
           const small = q.options[1 - q.answer];
+          const line = sizeParts(big, small);
           return (
             <li key={i} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
               <MarkIcon right={choices[i] === q.answer} className="size-5 translate-y-1" />
               <span className="min-w-0 flex-1 text-ink">
-                <strong>{big.n}</strong> <span className="text-muted">({big.sub})</span> is {(big.a / small.a).toFixed(1)}× the size of <strong>{small.n}</strong>{" "}
+                <strong>{line.big}</strong> <span className="text-muted">({big.sub})</span> {line.link} <strong>{line.small}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} aria-label={`Compare the sizes of ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
+              <Link href={mapHref(q)} aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
                 {R.dragOnMap} →
               </Link>
             </li>

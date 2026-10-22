@@ -35,7 +35,7 @@ const directory = [
     href: "/leaderboard",
     icon: "🏆",
     title: "Leaderboard",
-    body: "See who scored best today and who has the most points of all time. Sign up with your email and a nickname to join in.",
+    body: "See who scored best today and who has the most points of all time. Sign in with your email and pick a nickname to join in.",
     cta: "See the rankings",
   },
   {
@@ -117,7 +117,7 @@ export default function HomePage() {
               ["4,000", "years"],
               [String(eras.length), "map snapshots"],
               [String(events.length), "border events"],
-              [String(pool.length), "daily puzzles"],
+              [String(pool.length), "places to compare"],
             ].map(([n, label]) => (
               // the mission already says "4,000 years", so phones skip that one to keep the row on one line
               <div key={label} className={`items-baseline gap-1.5 ${label === "years" ? "hidden sm:flex" : "flex"}`}>

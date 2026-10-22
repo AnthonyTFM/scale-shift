@@ -48,7 +48,7 @@ export const dailyCopy = {
             : "Tricky round. New questions tomorrow.",
     scoreSr: (score: number, total: number) => `You got ${score} out of ${total}.`,
     // above the progress bar while playing, for players with a streak going
-    streakPill: (n: number) => `${n} day streak`,
+    streakPill: (n: number) => `${n}-day streak`,
     practiceRound: "Practice round",
     streak: "Streak",
     best: (n: number) => `Best ${n}`,

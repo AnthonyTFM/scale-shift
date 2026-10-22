@@ -165,7 +165,7 @@ export const events: TerritoryEvent[] = [
     lon: 14.0,
     lat: 37.5,
     polities: ["Roman Republic", "Carthage"],
-    summary: "The First Punic War (264–241 BCE) is fought over Sicily. When it ends, Carthage hands the island to Rome, and it becomes Rome's first overseas province.",
+    summary: "The First Punic War (264–241 BCE) is fought over Sicily. When it ends, Carthage hands the island to Rome, and Sicily becomes Rome's first overseas province.",
   },
   {
     id: "qin-unifies-china",
@@ -820,7 +820,7 @@ export const events: TerritoryEvent[] = [
     title: "Gadsden Purchase",
     taken: 1854,
     formalized: 1854,
-    formalizedBy: "Gadsden Purchase Treaty (signed Dec 1853)",
+    formalizedBy: "Gadsden Purchase Treaty (signed December 1853)",
     status: "formal",
     type: "purchase",
     region: "Arizona & New Mexico",
@@ -1179,7 +1179,7 @@ export const events: TerritoryEvent[] = [
     lat: 32.08,
     polities: ["Israel"],
     summary:
-      "The 1949 armistice lines (the 'Green Line') were ceasefire lines, not agreed borders. Most of Israel's final borders remain unsettled.",
+      "The 1949 armistice lines (the 'Green Line') were ceasefire lines, not agreed borders. Several of Israel's borders remain unsettled.",
   },
   {
     id: "prc-founded",
@@ -1370,7 +1370,7 @@ export const events: TerritoryEvent[] = [
     formalizedBy: "Constitutional Act on the dissolution (November 1992)",
     status: "formal",
     type: "dissolution",
-    region: "Czech Republic & Slovakia",
+    region: "Czechia & Slovakia",
     lon: 17.1,
     lat: 48.15,
     polities: ["Czechia", "Slovakia", "Czechoslovakia"],
@@ -1528,7 +1528,7 @@ export const events: TerritoryEvent[] = [
     formalizedBy: "Treaties of London and Bucharest",
     status: "formal",
     type: "conquest",
-    region: "The Balkans",
+    region: "Balkans",
     lon: 22.0,
     lat: 41.5,
     polities: ["Ottoman Empire",  "Bulgaria",  "Serbia",  "Greece",  "Montenegro",  "Albania"],
@@ -1710,7 +1710,7 @@ export const events: TerritoryEvent[] = [
     lat: 80.83,
     polities: ["Canada",  "Denmark",  "Greenland"],
     summary:
-      "Ending the good-humored 'Whisky War', in which each side left bottles of whisky or schnapps on the island, a 2022 agreement splits the 1.3 km² rock between Canada and Greenland, giving the two countries a land border.",
+      "Ending the good-humored 'Whisky War', in which each side left bottles of whisky or schnapps on the island, a 2022 agreement splits the 1.3 km² rock between Canada and Greenland (part of the Kingdom of Denmark), giving Canada and Denmark a land border.",
   },
 ];
 

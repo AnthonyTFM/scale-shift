@@ -10,7 +10,7 @@ import { JsonLd, PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
   title: "About, sources and accuracy",
-  description: `How ${site.name} works, where every border comes from, how accurate it is, and the data errors we have corrected.`,
+  description: `How ${site.name} works, where every border comes from, how accurate it is and the data errors we have corrected.`,
   alternates: { canonical: "/about" },
 };
 
@@ -29,7 +29,7 @@ const faqs = [
   },
   {
     q: "How do you draw disputed territories?",
-    a: "The present-day map shows who actually controls the land. Places where control and international recognition differ are marked separately with who controls them, since when, who claims them, and their formal status.",
+    a: "The present-day map shows who actually controls the land. Places where control and international recognition differ are marked separately with who controls them, since when, who claims them and their formal status.",
   },
 ];
 

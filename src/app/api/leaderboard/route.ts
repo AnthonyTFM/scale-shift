@@ -28,7 +28,7 @@ const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split
  */
 export async function GET(request: Request) {
   await connection();
-  if (rateLimited(`lb-get:${ipOf(request)}`, 240, 60_000)) return Response.json({ error: "Too many requests." }, { status: 429 });
+  if (rateLimited(`lb-get:${ipOf(request)}`, 240, 60_000)) return Response.json({ error: "Too many requests. Please wait a minute and try again." }, { status: 429 });
   const q = new URL(request.url).searchParams;
   const limit = Math.max(1, Math.min(100, Number(q.get("limit")) || 50));
   const player = q.get("player");
@@ -59,11 +59,11 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return fail("Invalid request.", 400);
+    return fail("Something went wrong. Reload the page and try again.", 400);
   }
-  if (body.website) return fail("Invalid request.", 400); // honeypot
+  if (body.website) return fail("Something went wrong. Reload the page and try again.", 400); // honeypot
   const accounts = signInEnabled();
-  if (!accounts && !isPlayerId(body.player)) return fail("Invalid player.", 400);
+  if (!accounts && !isPlayerId(body.player)) return fail("Something went wrong. Reload the page and try again.", 400);
   const { name, error } = checkName(body.name);
   if (error) return fail(error, 422, "name");
   if (!isDateKey(body.date) || !isPlayableDate(body.date)) return fail("Only today's challenge can go on the leaderboard.", 422);

@@ -43,9 +43,10 @@ export function validateFeedback(raw: Partial<Record<keyof FeedbackInput, unknow
     startedAt: typeof raw.startedAt === "number" ? raw.startedAt : Number(raw.startedAt) || 0,
   };
   const errors: FieldErrors = {};
-  if (data.message.length < 10) errors.message = "Please write at least a sentence (10+ characters).";
-  if (data.email && !EMAIL.test(data.email)) errors.email = "That email doesn't look right.";
+  // checked in the order the fields appear, so focus goes to the first problem on the form
   if ((topic === "border" || topic === "missing") && !data.region) errors.region = "Which place is it about?";
+  if (data.message.length < 10) errors.message = "Please write at least a sentence (10+ characters).";
   if (data.source && !/^https?:\/\//i.test(data.source)) errors.source = "Use a full link starting with http:// or https://";
+  if (data.email && !EMAIL.test(data.email)) errors.email = "That email doesn't look right.";
   return { data, errors };
 }

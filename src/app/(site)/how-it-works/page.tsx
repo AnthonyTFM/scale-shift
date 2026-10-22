@@ -7,7 +7,7 @@ import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
   title: "How it works: drag, rotate, time-travel, share",
-  description: "A two-minute guide to the map: search, drag shapes to see their real size, rotate them, step through 4,000 years of borders, and share what you find.",
+  description: "A two-minute guide to the map: search, drag shapes to see their real size, rotate them, step through 4,000 years of borders and share what you find.",
   alternates: { canonical: "/how-it-works" },
 };
 
@@ -78,7 +78,7 @@ export default function HowItWorksPage() {
                     [30, "Cairo, New Orleans"],
                     [45, "Milan, Minneapolis"],
                     [60, "Oslo, Anchorage"],
-                    [72, "central Greenland"],
+                    [72, "Central Greenland"],
                     [80, "Svalbard"],
                   ] as const
                 ).map(([lat, ex]) => (

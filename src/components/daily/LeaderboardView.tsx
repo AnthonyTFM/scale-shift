@@ -7,6 +7,11 @@ import type { AllTimeBoard, DayBoard, WeekBoard } from "@/lib/leaderboard-types"
 import { loadPlayer, playerId } from "@/lib/player";
 
 type Tab = "day" | "week" | "all";
+const TABS = [
+  ["day", "Daily"],
+  ["week", "This week"],
+  ["all", "All time"],
+] as const satisfies readonly (readonly [Tab, string])[];
 type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | null; failed: boolean };
 
 const medal = (rank: number) => (rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null);
@@ -54,19 +59,33 @@ export function LeaderboardView() {
 
   return (
     <div>
-      <div role="tablist" aria-label="Leaderboard" className="inline-grid grid-cols-3 rounded-xl bg-white p-1 text-sm font-semibold ring-1 ring-line">
-        {(
-          [
-            ["day", "Daily"],
-            ["week", "This week"],
-            ["all", "All time"],
-          ] as const
-        ).map(([id, label]) => (
+      <div
+        role="tablist"
+        aria-label="Leaderboard"
+        onKeyDown={(e) => {
+          // arrow keys move between tabs, as screen-reader users expect from a tab list
+          if (e.altKey || e.ctrlKey || e.metaKey) return; // leave browser shortcuts such as Alt+← alone
+          const ids = TABS.map(([id]) => id);
+          const i = ids.indexOf(tab);
+          const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: ids.length - 1 }[e.key];
+          if (next === undefined) return;
+          e.preventDefault();
+          const id = ids[(next + ids.length) % ids.length];
+          setTab(id);
+          e.currentTarget.querySelector<HTMLElement>(`[data-tab="${id}"]`)?.focus();
+        }}
+        className="inline-grid grid-cols-3 rounded-xl bg-white p-1 text-sm font-semibold ring-1 ring-line"
+      >
+        {TABS.map(([id, label]) => (
           <button
             key={id}
             type="button"
             role="tab"
+            data-tab={id}
+            id={`lb-tab-${id}`}
+            aria-controls="lb-panel"
             aria-selected={tab === id}
+            tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
             className="min-h-11 rounded-xl px-3 py-2 font-bold aria-selected:bg-primary aria-selected:text-white sm:px-5"
           >
@@ -112,7 +131,14 @@ export function LeaderboardView() {
         </Link>
       ) : null}
 
-      <div className="mt-4 overflow-hidden rounded-card border border-line bg-white" aria-live="polite" aria-busy={!current}>
+      <div
+        id="lb-panel"
+        role="tabpanel"
+        aria-labelledby={`lb-tab-${tab}`}
+        className="mt-4 overflow-hidden rounded-card border border-line bg-white"
+        aria-live="polite"
+        aria-busy={!current}
+      >
         {!current ? (
           <div className="space-y-2 p-4">
             {[0, 1, 2, 3].map((i) => (
