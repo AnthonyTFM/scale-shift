@@ -312,7 +312,16 @@ const UNNAMED = [
     replace: true,
     note: "The source draws Taiwan twice in this snapshot: an older outline with its name and one without. The map uses the unnamed one, as the 2000 and 2010 snapshots do.",
   },
-  // like the mainland colonies: their own rulers in 1878 and 1880, ruled by the United Kingdom in 1900
+  // like the mainland colonies: ruled by the United Kingdom in 1815 (as New South Wales), their own rulers in 1878 and
+  // 1880, ruled by the United Kingdom again in 1900
+  {
+    n: "Van Diemen's Land",
+    years: [1815],
+    today: "Australia",
+    box: TASMANIA,
+    s: "United Kingdom of Great Britain and Ireland",
+    note: "The source leaves Tasmania unnamed in this snapshot. It was the British colony of Van Diemen's Land, settled in 1803, governed from New South Wales until 1825 and renamed Tasmania in 1856.",
+  },
   { n: "Tasmania (UK)", years: [1878, 1880], today: "Australia", box: TASMANIA, note: TASMANIA_NOTE },
   { n: "Tasmania (UK)", years: [1900], today: "Australia", box: TASMANIA, s: "United Kingdom of Great Britain and Ireland", note: TASMANIA_NOTE },
 ];
