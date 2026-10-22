@@ -170,7 +170,11 @@ export function explain(q: Question) {
   } else {
     // same 15% line as the "Map: 1.2× too big" chip on the cards, so the sentence never contradicts them
     const more = stretch(big) > stretch(small) ? big : small;
-    if (stretch(more) >= 1.15) lines.push(`Web maps still draw ${nameInSentence(more)} ${times(stretch(more))}× too big.`);
+    const other = more === big ? small : big;
+    if (stretch(other) >= 1.15)
+      lines.push(`Web maps draw both too big (${nameInSentence(more)} ${times(stretch(more))}×, ${nameInSentence(other)} ${times(stretch(other))}×).`);
+    else if (stretch(more) >= 1.15)
+      lines.push(`Web maps draw ${nameInSentence(more)} ${times(stretch(more))}× too big, so the gap looks ${more === big ? "bigger" : "smaller"} than it really is.`);
     else lines.push("Both sit close to the equator, so web maps get these two roughly right.");
   }
   return lines;
