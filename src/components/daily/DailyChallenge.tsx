@@ -339,7 +339,7 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
   );
 }
 
-/** "6 day streak" while playing: days in a row up to yesterday (today counts once it's finished). Hidden with no streak. */
+/** "6-day streak" while playing: days in a row up to yesterday (today counts once it's finished). Hidden with no streak. */
 function StreakPill({ save, today }: { save: DailySave; today: string }) {
   const { streak } = stats(save, today);
   if (!streak) return null;

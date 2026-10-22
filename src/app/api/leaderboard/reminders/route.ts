@@ -12,9 +12,9 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return fail("Invalid request.", 400);
+    return fail("Something went wrong. Reload the page and try again.", 400);
   }
-  if (typeof body.on !== "boolean") return fail("Invalid request.", 400);
+  if (typeof body.on !== "boolean") return fail("Something went wrong. Reload the page and try again.", 400);
   try {
     const store = getStore();
     let player: string | null;
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
       player = user ? await existingPlayer(user) : null;
       if (!player) return fail("Sign in and post a score first.", 401);
     } else {
-      if (!isPlayerId(body.player)) return fail("Invalid request.", 400);
+      if (!isPlayerId(body.player)) return fail("Something went wrong. Reload the page and try again.", 400);
       player = body.player;
       if (!(await store.emailOf(player))) return fail("Join the leaderboard with your email first.", 422);
     }

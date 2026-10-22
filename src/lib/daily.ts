@@ -146,7 +146,7 @@ export const stretch = (e: PoolEntry) => e.m / e.a;
 
 // historical places named like countries or regions, which read without "the"
 const NO_ARTICLE =
-  /^(Alexander|Austria-Hungary|British North America|Kievan Rus|Assyria|Babylonia|Bactria|Magadha|Qajar Persia|Ptolemaic Egypt|Rhodesia|Denmark-Norway|Sweden–Norway|French (West|Equatorial) Africa|French Indochina|German (Kamerun|South-West Africa)|Rupert's Land)/;
+  /^(Alexander|Austria-Hungary|British North America|Kievan Rus)|^(Assyria|Babylonia|Bactria|Magadha|Qajar Persia|Ptolemaic Egypt|Rhodesia|Denmark-Norway|Sweden–Norway|French (West|Equatorial) Africa|French Indochina|German (Kamerun|South-West Africa)|Rupert's Land)(?=$| \()/;
 const NEEDS_ARTICLE = /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon)/;
 
 /** Name as it reads mid-sentence: "the Roman Empire", "the United States", "the contiguous United States", "Brazil". */

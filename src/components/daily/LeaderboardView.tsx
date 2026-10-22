@@ -64,6 +64,7 @@ export function LeaderboardView() {
         aria-label="Leaderboard"
         onKeyDown={(e) => {
           // arrow keys move between tabs, as screen-reader users expect from a tab list
+          if (e.altKey || e.ctrlKey || e.metaKey) return; // leave browser shortcuts such as Alt+← alone
           const ids = TABS.map(([id]) => id);
           const i = ids.indexOf(tab);
           const next = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: ids.length - 1 }[e.key];
@@ -81,6 +82,8 @@ export function LeaderboardView() {
             type="button"
             role="tab"
             data-tab={id}
+            id={`lb-tab-${id}`}
+            aria-controls="lb-panel"
             aria-selected={tab === id}
             tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
@@ -128,7 +131,14 @@ export function LeaderboardView() {
         </Link>
       ) : null}
 
-      <div className="mt-4 overflow-hidden rounded-card border border-line bg-white" aria-live="polite" aria-busy={!current}>
+      <div
+        id="lb-panel"
+        role="tabpanel"
+        aria-labelledby={`lb-tab-${tab}`}
+        className="mt-4 overflow-hidden rounded-card border border-line bg-white"
+        aria-live="polite"
+        aria-busy={!current}
+      >
         {!current ? (
           <div className="space-y-2 p-4">
             {[0, 1, 2, 3].map((i) => (

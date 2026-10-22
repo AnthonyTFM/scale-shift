@@ -142,11 +142,12 @@ export async function resultImage(r: Result): Promise<Blob | null> {
 
   ctx.fillStyle = "#5D6280";
   ctx.font = `500 38px ${body}`;
-  wrap(ctx, r.verdict, W - left * 2 - 40).forEach((line, i) => ctx.fillText(line, W / 2, cardY + 720 + i * 50));
+  const verdict = wrap(ctx, r.verdict, W - left * 2 - 40);
+  verdict.forEach((line, i) => ctx.fillText(line, W / 2, cardY + 720 + i * 50));
   if (r.streak > 1) {
     ctx.fillStyle = "#1D2140";
     ctx.font = `800 36px ${body}`;
-    ctx.fillText(`🔥 ${r.streak}-day streak`, W / 2, cardY + 790);
+    ctx.fillText(`🔥 ${r.streak}-day streak`, W / 2, cardY + 720 + verdict.length * 50 + 20);
   }
 
   // call to action: a blue pressable button
