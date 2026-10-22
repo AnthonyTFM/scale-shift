@@ -39,6 +39,8 @@ import { useAuth } from "@clerk/nextjs";
 const reveal = dailyCopy.reveal;
 const R = dailyCopy.results;
 const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+// where a new round lines up: just under the sticky site header
+const ROUND_TOP = 88;
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -129,17 +131,28 @@ export function DailyChallenge() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   // set when the player moves on, so the next question (or the results) takes focus; not on first load
   const advanced = useRef(false);
+  // the top of the game (progress bar), where a new round starts
+  const gameTop = useRef<HTMLDivElement>(null);
+  const restarted = useRef(false);
 
   useEffect(() => {
     if (!advanced.current) return;
-    advanced.current = false;
     // "Next" has gone, so focus would fall back to the page: move it to the new heading instead, which screen readers
     // announce and from which Tab reaches the answers; and bring the card back into view if it scrolled off the top
     const heading = document.getElementById("daily-q") ?? document.getElementById("daily-done");
     const card = heading?.closest("section");
+    // a new round is still loading: keep waiting for its first question
     if (!heading || !card) return;
-    const top = card.getBoundingClientRect().top;
-    if (top < 72) scrollTo({ top: top + scrollY - 80, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    advanced.current = false;
+    const behavior = reducedMotion() ? "auto" : "smooth";
+    if (restarted.current && gameTop.current) {
+      // a new round: line up the progress bar under the header (the page changed height while it loaded)
+      restarted.current = false;
+      scrollTo({ top: Math.max(0, gameTop.current.getBoundingClientRect().top + scrollY - ROUND_TOP), behavior });
+    } else {
+      const top = card.getBoundingClientRect().top;
+      if (top < 72) scrollTo({ top: top + scrollY - 80, behavior });
+    }
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
   }, [game?.step]);
@@ -163,6 +176,13 @@ export function DailyChallenge() {
   }, []);
 
   const start = (practice: boolean) => {
+    // a new round starts at the top of the game, not down where the results' buttons were
+    if (gameTop.current) {
+      const y = gameTop.current.getBoundingClientRect().top + scrollY - ROUND_TOP;
+      scrollTo({ top: Math.max(0, y), behavior: reducedMotion() ? "auto" : "smooth" });
+    }
+    advanced.current = true;
+    restarted.current = true;
     setFailed(false);
     setGame(null);
     if (practice) track("daily_practice_start");
@@ -215,7 +235,7 @@ export function DailyChallenge() {
   const finished = step >= round.questions.length;
   const todayNo = round.date ? dayNumber(round.date) : null;
   return (
-    <div>
+    <div ref={gameTop}>
       {challenge && todayNo && !finished ? (
         <p className="mb-3 rounded-2xl border-2 border-gold bg-[#FFF4D1] p-3 text-sm font-semibold text-ink">
           🎯{" "}
@@ -330,9 +350,10 @@ function StreakPill({ save, today }: { save: DailySave; today: string }) {
   );
 }
 
-/** Sound effects on or off (off by default). */
+/** Sound effects on or off (on by default). */
 function SoundToggle() {
-  const [on, setOn] = useState(false);
+  // on by default, so the first paint already says "Sound on" for almost everyone
+  const [on, setOn] = useState(true);
   useEffect(() => queueMicrotask(() => setOn(soundOn())), []);
   return (
     <button

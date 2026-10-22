@@ -1,5 +1,6 @@
 // Little game sounds for the daily challenge, made in the browser (no audio files to download).
-// Off unless the player turns them on; the choice is remembered in this browser.
+// On by default (Anthony, Oct 22); a player who turns them off stays off. The choice is remembered in this browser.
+// Browsers only allow sound after a tap, so the first sound plays on the first answer.
 
 const KEY = "ss-sound";
 type Cue = "tap" | "right" | "wrong" | "perfect";
@@ -23,20 +24,24 @@ const NOTES: Record<Cue, [number, number, number][]> = {
 };
 
 let ctx: AudioContext | null = null;
+// this visit's choice, so turning sound off works even where storage is blocked
+let chosen: boolean | null = null;
 
 export function soundOn() {
+  if (chosen !== null) return chosen;
   try {
-    return localStorage.getItem(KEY) === "1";
+    return localStorage.getItem(KEY) !== "0";
   } catch {
-    return false;
+    return true;
   }
 }
 
 export function setSound(on: boolean) {
+  chosen = on;
   try {
     localStorage.setItem(KEY, on ? "1" : "0");
   } catch {
-    /* storage blocked: sound stays off next visit */
+    /* storage blocked: the choice lasts until the page is closed */
   }
   if (on) play("tap", true);
 }
@@ -45,6 +50,8 @@ export function play(cue: Cue, force = false) {
   if (!force && !soundOn()) return;
   try {
     ctx ??= new AudioContext();
+    // iPhones pause audio after a call or a trip to another app; wake it on the next tap
+    if (ctx.state !== "running") void ctx.resume();
     const t0 = ctx.currentTime;
     const loud = cue === "wrong" ? 0.07 : 0.12;
     for (const [freq, start, len] of NOTES[cue]) {
