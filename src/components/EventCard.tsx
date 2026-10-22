@@ -50,10 +50,15 @@ export function TakenFormalized({ ev, dark = false }: { ev: TerritoryEvent; dark
           </dd>
         </div>
       </dl>
-      <p className={`mt-2 text-xs ${label}`}>
-        {settleTime(ev)}
-        {ev.formalizedBy ? ` · ${ev.formalizedBy}` : ""}
-      </p>
+      {/* "Never" above already says it was never made official, so only a real gap gets a line */}
+      {ev.formalized !== null ? (
+        <p className={`mt-2 text-xs ${label}`}>
+          {settleTime(ev)}
+          {ev.formalizedBy ? ` · ${ev.formalizedBy}` : ""}
+        </p>
+      ) : ev.formalizedBy ? (
+        <p className={`mt-2 text-xs ${label}`}>{ev.formalizedBy}</p>
+      ) : null}
     </div>
   );
 }

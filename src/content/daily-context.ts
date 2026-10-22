@@ -312,14 +312,14 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Republic of China": {
     what: "China as a republic, after its last emperor stepped down in 1912. Its government lost the civil war in 1949 and moved to Taiwan.",
-    today: "Most of today's China",
+    today: "Most of China",
   },
   "Viceroyalty of Brazil": {
     what: "Portugal's colony in South America. It became independent as the Empire of Brazil in 1822.",
     today: "Brazil",
   },
   "Rupert's Land": {
-    what: "The huge area draining into Hudson Bay, owned by the Hudson's Bay Company fur traders from 1670 until it passed to Canada in 1870.",
+    what: "The huge area draining into Hudson Bay, owned by the Hudson's Bay Company, a fur-trading firm, from 1670 until it passed to Canada in 1870.",
     today: "Canada (much of Manitoba, Saskatchewan, Alberta, Ontario, Quebec and Nunavut), plus small parts of Minnesota and North Dakota",
   },
   "Northern Yuan": {
@@ -451,7 +451,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Northern Nigeria, plus parts of Niger, Burkina Faso and Cameroon",
   },
   "Khiva Khanate": {
-    what: "A Central Asian khanate around the oasis city of Khiva on the lower Amu Darya river.",
+    what: "A Central Asian khanate around the oasis city of Khiva on the lower Amu Darya.",
     today: "Uzbekistan and Turkmenistan, plus edges of Kazakhstan",
   },
   "Ayutthaya": {

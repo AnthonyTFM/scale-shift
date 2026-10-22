@@ -39,7 +39,7 @@ export default function DailyPage() {
           </ViewTransition>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few
-            percent. Your scores and streak are saved in this browser only.
+            percent. Your scores and streak are saved in this browser, and on your account if you sign in.
           </p>
         </div>
       </div>

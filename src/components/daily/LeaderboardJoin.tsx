@@ -161,8 +161,11 @@ function EmailJoin({ date, choices }: Props) {
 
   return (
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="flex items-center gap-2 font-display text-lg text-ink sm:text-xl"><TrophyIcon className="size-7" /> Today&apos;s leaderboard</h3>
+      {/* on the narrowest phones "See all" drops to its own line rather than crowd the heading */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
+          <TrophyIcon className="size-5 min-[400px]:size-6 sm:size-7" /> Today&apos;s leaderboard
+        </h3>
         <Link href="/leaderboard" className="whitespace-nowrap text-sm font-semibold text-link hover:underline">
           See all →
         </Link>

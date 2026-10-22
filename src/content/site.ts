@@ -4,7 +4,7 @@ export const site = {
   name: "Border Drift",
   tagline: "See the real size of every country and empire, across 4,000 years of borders.",
   description:
-    "An interactive map of 4,000 years of borders. Drag countries and empires anywhere on Earth to see their real size, step through history from 2000 BCE to today, and find out who ruled any spot on the planet.",
+    "An interactive map of 4,000 years of borders. Drag countries and empires anywhere on Earth to see their real size, step through history from 2000 BCE to today and find out who ruled any spot on the planet.",
   // Used for canonical URLs and social previews. Set NEXT_PUBLIC_SITE_URL in production.
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
   contactEmail: "hello@scaleshift.example",
@@ -50,7 +50,7 @@ export const appCopy = {
   searchPlaceholder: "Try Roman Empire, Texas, Brazil",
   introTitle: "Maps lie about size.",
   introBody:
-    "Most web maps stretch land more and more as it nears the poles. Search for any country or empire, drag it across the map, and watch it shrink or grow to its real size. Use the timeline to travel from 2000 BCE to today.",
+    "Most web maps stretch land more and more as it nears the poles. Search for any country or empire, drag it across the map and watch it shrink or grow to its real size. Use the timeline to travel from 2000 BCE to today.",
   introCta: "Start exploring",
   whoRuledTitle: "Who ruled here?",
   whoRuledHint: "Click anywhere on land to see who controlled it in every era.",

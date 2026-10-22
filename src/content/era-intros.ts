@@ -2,7 +2,7 @@
 
 export const eraIntros: Record<string, string> = {
   "2000bce":
-    "Most of the world is home to hunter-gatherers and farming cultures without fixed borders. States exist only in a few river valleys: Egypt along the Nile, the city-states of Mesopotamia, the Indus Valley, and early dynasties on China's Yellow River.",
+    "Most of the world is home to hunter-gatherers and farming cultures without fixed borders. States exist only in a few river valleys: Egypt along the Nile, the city-states of Mesopotamia, the Indus Valley and early dynasties on China's Yellow River.",
   "1000bce":
     "The Late Bronze Age collapse has swept away the Hittites and weakened Egypt. Assyria is rebuilding, and the Zhou dynasty rules northern China.",
   "500bce":

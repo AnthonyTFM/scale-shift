@@ -77,6 +77,6 @@ export const teachers = {
     ],
     citeLabel: "Suggested citation",
     citation: (url: string) => `Border Drift. "Real size of countries and empires." ${url}. Accessed [date].`,
-    sourcesCta: "Full sources and licences",
+    sourcesCta: "Full sources and licenses",
   },
 };

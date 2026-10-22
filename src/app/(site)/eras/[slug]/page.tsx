@@ -29,7 +29,7 @@ function summary(key: string) {
   const top = s?.top.filter((t) => t.n !== "Antarctica").slice(0, 3).map((t) => t.n) ?? [];
   return (
     eraIntros[key] ??
-    `${e.count} states, peoples and territories are mapped in ${eraPhrase(e)}. The largest are ${top.join(", ")}.`
+    `${e.count} states, peoples and territories are mapped in ${eraPhrase(e)}. The largest are ${top.length > 1 ? `${top.slice(0, -1).join(", ")} and ${top.at(-1)}` : top[0]}.`
   );
 }
 
@@ -173,7 +173,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
 
         <section aria-labelledby="events" className="mt-12">
           <h2 id="events" className="font-display text-3xl text-ink">
-            {prev ? `Land that changed hands, ${prev.label} – ${e.label}` : `Key events up to ${e.label}`}
+            {prev ? `Land that changed hands, ${prev.label}${/\s/.test(prev.label + e.label) ? " – " : "–"}${e.label}` : `Key events up to ${e.label}`}
           </h2>
           {evs.length ? (
             <div className="mt-4 grid gap-4 md:grid-cols-2">

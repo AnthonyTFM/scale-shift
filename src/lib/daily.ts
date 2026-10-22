@@ -144,28 +144,42 @@ const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
 /** How many times too big a shape is drawn on a web map. */
 export const stretch = (e: PoolEntry) => e.m / e.a;
 
-const NO_ARTICLE = /^(Alexander|Austria-Hungary|British North America|Kievan Rus)/;
-const NEEDS_ARTICLE = /^(United |Central African|Dominican|Czech|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon)/;
+// historical places named like countries or regions, which read without "the"
+const NO_ARTICLE =
+  /^(Alexander|Austria-Hungary|British North America|Kievan Rus|Assyria|Babylonia|Bactria|Magadha|Qajar Persia|Ptolemaic Egypt|Rhodesia|Denmark-Norway|Sweden–Norway|French (West|Equatorial) Africa|French Indochina|German (Kamerun|South-West Africa)|Rupert's Land)/;
+const NEEDS_ARTICLE = /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon)/;
 
-/** Name as it reads mid-sentence: "the Roman Empire", "the United States", "Brazil". */
-export function nameInSentence(e: PoolEntry) {
+/** Name as it reads mid-sentence: "the Roman Empire", "the United States", "the contiguous United States", "Brazil". */
+export function nameInSentence(e: Pick<PoolEntry, "n" | "kind">) {
+  if (e.n.startsWith("Contiguous ")) return `the contiguous ${e.n.slice(11)}`;
   const the = e.kind === "history" ? !NO_ARTICLE.test(e.n) : NEEDS_ARTICLE.test(e.n);
   return the ? `the ${e.n}` : e.n;
 }
 
-const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** The pieces of "The Roman Empire was 1.8× the size of Brazil." / "Brazil is 12% bigger than Peru." */
+export function sizeParts(big: PoolEntry, small: PoolEntry) {
+  const r = big.a / small.a;
+  const verb = big.kind === "history" ? "was" : "is";
+  const gap = r < 1.2 ? `${Math.round((r - 1) * 100)}% bigger than` : `${times(r)}× the size of`;
+  return { big: capitalize(nameInSentence(big)), link: `${verb} ${gap}`, small: nameInSentence(small) };
+}
+
+export function sizeLine(big: PoolEntry, small: PoolEntry) {
+  const p = sizeParts(big, small);
+  return `${p.big} ${p.link} ${p.small}.`;
+}
 
 export function explain(q: Question) {
   const big = q.options[q.answer];
   const small = q.options[1 - q.answer];
-  const B = nameInSentence(big);
   const S = nameInSentence(small);
-  const r = big.a / small.a;
-  const lines = [r < 1.2 ? `${capitalize(B)} is bigger, by ${Math.round((r - 1) * 100)}%.` : `${capitalize(B)} is ${times(r)}× the size of ${S}.`];
+  const lines = [sizeLine(big, small)];
   const looks = small.m / big.m;
   if (looks > 1.05) {
     lines.push(
-      `On a normal web map ${S} looks ${times(looks)}× bigger, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
+      `On a normal web map, ${S} looks ${times(looks)}× bigger, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
     );
   } else {
     // same 15% line as the "Map: 1.2× too big" chip on the cards, so the sentence never contradicts them
