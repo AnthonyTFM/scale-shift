@@ -18,6 +18,7 @@ import {
   mercatorInflation,
   EARTH_RADIUS_KM,
 } from "@/lib/geo";
+import { SWEEP_CELLS, SWEEP_MS, type Owner, type SweepPlan, fillRings, planSweep, projectRing, shownSums, sweepFrame } from "./sweep";
 
 
 export type Overlay = {
@@ -75,6 +76,7 @@ const TILE_PAD = 2;
 
 /** Everything needed to draw the world at one zoom level: shape boxes, outlines made on demand and bitmap tiles. */
 type BaseCache = {
+  /** the era it draws */ layer: Layer | null;
   /** zoom (scale) the cache is for */ k: number;
   dpr: number;
   proj: ReturnType<typeof geoMercator>;
@@ -89,10 +91,62 @@ type BaseCache = {
   /** how many tiles to keep */ keep: number;
 };
 
+/** A name on the map: where it goes and how it is drawn, plus the shape it names and how big that is on screen. */
+type LabelItem = { text: string; p: [number, number]; size: number; weight: number; tw: number; f?: PolityFeature; sizePx?: number };
+
+/** An era change in progress (see sweep.ts), worked out for one view: moving the map shows the new era straight away. */
+type Sweep = {
+  start: number;
+  plan: SweepPlan;
+  /** grid cell size, CSS pixels */ cs: number;
+  /** the old era's land, borders and lakes as they were on screen (no names) */ old: HTMLCanvasElement;
+  from: Layer;
+  /** the shape behind each owner number on the grid, old and new (0: sea) */ ownersA: (PolityFeature | null)[];
+  ownersB: (PolityFeature | null)[];
+  /** the old era's highlighted country, shown until halfway */ fromHighlight: PolityFeature | null;
+  /** names moving with their countries, worked out on the first frame */ labels: SweepLabels | null;
+};
+
+/** A name that follows its country through a sweep, in one copy of the world. */
+type SweepLabel = {
+  /** what it follows (see shownSums) */ code: number;
+  /** for a new country taking an old one's name (Egypt changing hands): the old one's code, followed until halfway */
+  from?: number;
+  copy: number;
+  /** the name as placed on the old and the new map */ old?: LabelItem;
+  neu?: LabelItem;
+  /** the middle of what it follows at the start and the end, and how many cells that was */ c0?: [number, number];
+  c1?: [number, number];
+  n0: number;
+  n1: number;
+};
+type SweepLabels = {
+  tracks: SweepLabel[];
+  /** codes followed, and the copy of the world each grid column is in */ wanted: Uint8Array;
+  copyOf: Uint8Array;
+  /** names with no shape on the grid (US states), the old map's until halfway and the new map's after */ staticOld: LabelItem[];
+  staticNew: LabelItem[];
+};
+/** Copies of the world a sweep's names keep apart (only a few are ever on screen), and the slot of the main one. */
+const COPIES = 16;
+const COPY0 = 8;
+
 function hashIndex(s: string) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return h % POLITICAL.length;
+}
+
+/** A shape's fill on the base map. */
+function fillFor(f: PolityFeature) {
+  return f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land;
+}
+
+/** How a shape looks to the border sweep: land that keeps its look keeps its place. */
+function ownerOf(f: PolityFeature | null): Owner {
+  if (!f) return { look: "", name: "", line: 0 };
+  const line = f.props.m || f.sliced ? 0 : !f.props.n ? 1 : f.props.b >= 2 ? 3 : 2;
+  return { look: fillFor(f) + (f.props.d ? "/hatched" : ""), name: f.props.n, line };
 }
 
 function hexToRgba(hex: string, a: number) {
@@ -130,6 +184,10 @@ export class MapEngine {
   // Converting ~250 shapes to screen points every frame made phones stutter while panning. They are converted once per
   // zoom level instead (see BaseCache); panning only moves them, so every frame is a complete, exact drawing.
   private cache: BaseCache | null = null;
+  /** the border sweep into the era just shown, while it runs */
+  private sweep: Sweep | null = null;
+  /** reused for the old era's picture in each sweep */
+  private sweepCanvas: HTMLCanvasElement | null = null;
   private tilePool: HTMLCanvasElement[] = [];
   private prefetchTimer = 0;
   private lastViewChange = 0;
@@ -205,10 +263,23 @@ export class MapEngine {
 
   // ---------- public setters ----------
 
+  /** Shows an era. From another era the borders sweep into place (see sweep.ts) unless the reader prefers less motion. */
   setLayer(layer: Layer | null) {
+    const prev = this.layer;
+    const prevCache = this.cache;
+    // a new era while a sweep still runs (clicking quickly through the timeline) shows straight away
+    const busy = !!this.sweep;
+    this.sweep = null;
     this.layer = layer;
     this.cache = null;
+    if (prev && layer && prev !== layer && !busy && !this.gesture) this.sweep = this.startSweep(prev, prevCache, layer);
+    if (prevCache) this.recycle(...prevCache.tiles.values());
     this.markBase();
+  }
+
+  /** How long the border sweep now running has left, in ms (0 when none). */
+  sweepLeft() {
+    return this.sweep ? Math.max(0, SWEEP_MS - (performance.now() - this.sweep.start)) : 0;
   }
   setStates(states: Layer | null) {
     this.states = states;
@@ -331,6 +402,8 @@ export class MapEngine {
     this.schedule();
   }
   private viewChanged() {
+    // a sweep is worked out for one view: moving the map shows the new era straight away
+    this.sweep = null;
     this.lastViewChange = performance.now();
     this.baseDirty = true;
     this.topDirty = true;
@@ -362,13 +435,14 @@ export class MapEngine {
 
   private drawNow() {
     const projs = this.copyShifts().map((shift) => projectionFor(this.view, this.w, this.h, shift));
+    // cleared first: a sweep frame asks for the next one while it draws
     if (this.baseDirty) {
-      this.drawBase(projs);
       this.baseDirty = false;
+      this.drawBase(projs);
     }
     if (this.topDirty) {
-      this.drawTop(projs);
       this.topDirty = false;
+      this.drawTop(projs);
     }
   }
 
@@ -414,23 +488,31 @@ export class MapEngine {
     ctx.rect(world.x, world.y, world.w, world.h);
     ctx.clip();
     const cache = this.freshCache();
-    this.drawTiles(cache);
-    this.drawHighlight(cache);
-    this.drawLines();
-    if (this.labels) {
-      const vb = this.visibleBox();
-      const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
-      const feats = cache.shapes
-        .filter((s) => s.f.bbox[2] - s.f.bbox[0] + (s.f.bbox[3] - s.f.bbox[1]) > minDeg && this.isVisible(s.f.bbox, vb))
-        .map((s) => s.f);
-      const states = this.showStates() ? this.states : null;
-      for (const proj of projs) {
-        this.drawLabels(ctx, proj, feats, states);
-        this.drawClaimLabels(ctx, proj);
+    if (this.sweep) this.drawSweep(this.sweep, cache, projs);
+    else {
+      this.drawTiles(cache);
+      this.drawHighlight(cache);
+      this.drawLines();
+      if (this.labels) {
+        const feats = this.labelFeats(cache);
+        const states = this.showStates() ? this.states : null;
+        for (const proj of projs) {
+          this.paintLabels(ctx, this.planLabels(proj, feats, states));
+          this.drawClaimLabels(ctx, proj);
+        }
       }
     }
     if (this.pin) for (const proj of projs) this.drawPin(ctx, proj, this.pin);
     ctx.restore();
+  }
+
+  /** The shapes big enough on screen to be named. */
+  private labelFeats(cache: BaseCache) {
+    const vb = this.visibleBox();
+    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+    return cache.shapes
+      .filter((s) => s.f.bbox[2] - s.f.bbox[0] + (s.f.bbox[3] - s.f.bbox[1]) > minDeg && this.isVisible(s.f.bbox, vb))
+      .map((s) => s.f);
   }
 
   /**
@@ -454,7 +536,7 @@ export class MapEngine {
   }
 
   /** Works out each shape's box at this zoom. Outlines are converted to screen units later, the first time a tile needs them. */
-  private buildCache(): BaseCache {
+  private buildCache(layer = this.layer): BaseCache {
     const k = this.view.k;
     const proj = geoMercator()
       .rotate([-CUT_CENTER, 0])
@@ -463,13 +545,9 @@ export class MapEngine {
       .precision(k > minScale(this.w, this.h) * 4 ? 0.5 : 0);
     // skip shapes smaller than ~1px on screen
     const minDeg = (1.2 / k) * (180 / Math.PI);
-    const shapes = (this.layer?.features ?? [])
+    const shapes = (layer?.features ?? [])
       .filter((f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg)
-      .map((f) => ({
-        f,
-        fill: f.props.n ? POLITICAL[f.props.k ?? hashIndex(f.props.s || f.props.n)] : COLORS.land,
-        box: this.cacheBox(f.bbox, k),
-      }));
+      .map((f) => ({ f, fill: fillFor(f), box: this.cacheBox(f.bbox, k) }));
     const claims = this.claims.map((c) => {
       let [w, s, e, n] = [180, 90, -180, -90];
       for (const poly of c.geom.coordinates)
@@ -479,7 +557,7 @@ export class MapEngine {
     // big screens get bigger tiles, so a desktop window needs fewer of them
     const size = this.w * this.h > 900_000 ? 512 : 256;
     const lakes = this.lakes.filter((l) => l.bbox[2] - l.bbox[0] + (l.bbox[3] - l.bbox[1]) > minDeg).map((l) => ({ l, box: this.cacheBox(l.bbox, k) }));
-    return { k, dpr: this.dpr, proj, size, shapes, claims, lakes, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
+    return { layer, k, dpr: this.dpr, proj, size, shapes, claims, lakes, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
   }
 
   /** A box in the cache's units (screen pixels at its zoom, the cut meridian at ±π·k), for skipping shapes outside a tile. */
@@ -535,8 +613,7 @@ export class MapEngine {
    * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. A tile that is not ready yet is
    * drawn on the spot, so the map is never shown blank or half drawn; the tiles around the screen are drawn ahead of time.
    */
-  private drawTiles(c: BaseCache) {
-    const ctx = this.bctx;
+  private drawTiles(c: BaseCache, ctx = this.bctx) {
     const s = this.view.k / c.k;
     const pad = TILE_PAD;
     let missing = false;
@@ -662,7 +739,7 @@ export class MapEngine {
     ctx.setLineDash([]);
 
     // US state lines on the present-day map once zoomed in: shared borders only, clipped to the US coastline
-    const states = this.layer?.key === "present" ? this.statePaths(c) : null;
+    const states = c.layer?.key === "present" ? this.statePaths(c) : null;
     if (states) {
       ctx.save();
       ctx.clip(states.clip);
@@ -702,6 +779,224 @@ export class MapEngine {
     }
   }
 
+  // ---------- era changes: the border sweep (see sweep.ts) ----------
+
+  /** Sets up the sweep from `prev` to `next` for the current view, or returns null to show `next` straight away. */
+  private startSweep(prev: Layer, prevCache: BaseCache | null, next: Layer): Sweep | null {
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return null;
+    // the old era as it was on screen, from its tiles (drawn again if they were dropped meanwhile)
+    const oldCache = prevCache?.layer === prev ? prevCache : this.buildCache(prev);
+    const old = this.snapshot(oldCache);
+    if (oldCache !== prevCache) this.recycle(...oldCache.tiles.values());
+    const cs = Math.max(2, Math.sqrt((this.w * this.h) / SWEEP_CELLS));
+    const gw = Math.ceil(this.w / cs);
+    const gh = Math.ceil(this.h / cs);
+    const A = this.ownerGrid(prev, cs, gw, gh);
+    const B = this.ownerGrid(next, cs, gw, gh);
+    const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
+    const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
+    return { start: performance.now(), plan, cs, old, from: prev, ownersA: A.owners, ownersB: B.owners, fromHighlight, labels: null };
+  }
+
+  /** The land, borders and lakes one cache draws, screen-sized, without names. */
+  private snapshot(c: BaseCache) {
+    const canvas = (this.sweepCanvas ??= document.createElement("canvas"));
+    if (canvas.width !== this.base.width || canvas.height !== this.base.height) {
+      canvas.width = this.base.width;
+      canvas.height = this.base.height;
+    }
+    const ctx = canvas.getContext("2d")!;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+    const world = this.worldRect();
+    ctx.fillStyle = COLORS.ocean;
+    ctx.fillRect(world.x, world.y, world.w, world.h);
+    this.drawTiles(c, ctx);
+    return canvas;
+  }
+
+  /** Which shape owns each grid cell on screen (0: sea or lake), and the shape behind each owner number. */
+  private ownerGrid(layer: Layer, cs: number, gw: number, gh: number) {
+    const grid = new Int32Array(gw * gh);
+    const owners: (PolityFeature | null)[] = [null];
+    const v = this.view;
+    const vb = this.visibleBox();
+    const minDeg = (1.2 / v.k) * (180 / Math.PI);
+    const cy = this.h / 2 + v.k * v.y;
+    const copy = (2 * Math.PI * v.k) / cs;
+    const fill = (geom: MultiPolygon, id: number) => {
+      for (const poly of geom.coordinates) {
+        const rings = poly.map((r) => projectRing(r, v.lon, v.k, this.w / 2, cy, cs));
+        const x0 = Math.min(...rings.map((r) => r.minX));
+        const x1 = Math.max(...rings.map((r) => r.maxX));
+        // once for each copy of the world it shows in
+        for (let m = -3; m <= 3; m++)
+          if (x1 + m * copy >= 0 && x0 + m * copy <= gw) fillRings(grid, gw, gh, rings.map((r) => r.pts), id, m * copy);
+      }
+    };
+    for (const f of layer.features) {
+      if (f.props.x || f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) <= minDeg || !this.isVisible(f.bbox, vb)) continue;
+      fill(f.geom, owners.length);
+      owners.push(f);
+    }
+    // big lakes are water in every era
+    for (const l of this.lakes) if (this.isVisible(l.bbox, vb)) fill(l.geom, 0);
+    return { grid, owners };
+  }
+
+  /** One frame of a sweep: the new era, the old one wherever the moving border hasn't reached yet, and the border itself. */
+  private drawSweep(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]) {
+    const ctx = this.bctx;
+    const t = Math.min(1, (performance.now() - s.start) / SWEEP_MS);
+    const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+    this.drawTiles(cache);
+    const area = new Path2D();
+    const front = sweepFrame(s.plan, e, s.cs, area);
+    ctx.save();
+    ctx.clip(area);
+    ctx.drawImage(s.old, 0, 0, this.w, this.h);
+    ctx.restore();
+    // the moving border, drawn like the borders on the tiles
+    ctx.lineWidth = 0.7;
+    ctx.lineJoin = "round";
+    for (const style of [1, 2, 3]) {
+      const lines = front.filter((l) => l.style === style);
+      if (!lines.length) continue;
+      ctx.beginPath();
+      for (const { pts } of lines) {
+        ctx.moveTo(pts[0], pts[1]);
+        for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
+      }
+      ctx.setLineDash(style === 3 ? [] : style === 2 ? [3, 3] : [2, 4]);
+      ctx.strokeStyle = style === 1 ? COLORS.borderSoft : COLORS.border;
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+    if (e < 0.5) this.strokeHighlight(s.fromHighlight, projs);
+    else this.drawHighlight(cache);
+    this.drawLines();
+    if (this.labels) {
+      this.drawSweepLabels(s, cache, projs, e);
+      for (const proj of projs) this.drawClaimLabels(ctx, proj);
+    }
+    // on to the next frame; after the last one the map draws normally again, and looks the same
+    if (t >= 1) this.sweep = null;
+    this.markBase();
+  }
+
+  /** The old era's highlighted country during the first half of a sweep, drawn like drawHighlight. */
+  private strokeHighlight(f: PolityFeature | null, projs: ReturnType<typeof projectionFor>[]) {
+    if (!f) return;
+    const ctx = this.bctx;
+    ctx.beginPath();
+    for (const proj of projs) geoPath(proj, ctx)(f.geom as GeoPermissibleObjects);
+    ctx.strokeStyle = "#2A1A12";
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+  }
+
+  /** Names during a sweep: each follows the middle of its country, and a renamed country switches name halfway. */
+  private drawSweepLabels(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[], e: number) {
+    const L = (s.labels ??= this.sweepLabels(s, cache, projs));
+    const sums = shownSums(s.plan, e, L.wanted, L.copyOf, COPIES);
+    const NB = s.plan.carries.length;
+    const items: LabelItem[] = e < 0.5 ? [...L.staticOld] : [...L.staticNew];
+    for (const tr of L.tracks) {
+      const o = (tr.code * COPIES + tr.copy) * 6;
+      const oo = tr.from ? (tr.from * COPIES + tr.copy) * 6 : o;
+      const n = sums[o + 2];
+      const nOld = sums[oo + 2];
+      let it: LabelItem | undefined;
+      let ref = 0; // a name that comes or goes with its country: shown only while the country is big enough to name
+      let count = n;
+      if (tr.from) [it, ref, count] = e < 0.5 ? [tr.old, tr.n0, nOld] : [tr.neu, tr.n1, n]; // one name, changing hands
+      else if (tr.code > NB) [it, ref] = [tr.old, tr.n0]; // an old country nothing carries on, shrinking away
+      else if (!s.plan.carries[tr.code]) [it, ref] = [e < 0.5 ? undefined : tr.neu, tr.n1]; // a new country: named from halfway
+      else it = e < 0.5 ? tr.old : tr.neu; // a country carrying on, renamed halfway
+      if (!it || !count) continue;
+      if (ref) {
+        const sizePx = (it.sizePx ?? 0) * Math.sqrt(count / ref);
+        if (sizePx < 28 || it.tw > sizePx * 1.6) continue;
+      }
+      // The name starts where it sat on the old map, relative to the middle of everything its country shows, and ends
+      // where it sits on the new map, relative to the middle of the land the country keeps; in between it blends from one
+      // to the other, so a shrinking country's name glides toward what it keeps.
+      const nk = sums[o + 5];
+      const all = nOld ? [(sums[oo] / nOld + 0.5) * s.cs, (sums[oo + 1] / nOld + 0.5) * s.cs] : null;
+      const kept = nk ? [(sums[o + 3] / nk + 0.5) * s.cs, (sums[o + 4] / nk + 0.5) * s.cs] : null;
+      const p0 = all && tr.old && tr.c0 ? [all[0] + tr.old.p[0] - tr.c0[0], all[1] + tr.old.p[1] - tr.c0[1]] : null;
+      const p1 = kept && tr.neu && tr.c1 ? [kept[0] + tr.neu.p[0] - tr.c1[0], kept[1] + tr.neu.p[1] - tr.c1[1]] : null;
+      const p = p0 && p1 ? [p0[0] + (p1[0] - p0[0]) * e, p0[1] + (p1[1] - p0[1]) * e] : (p0 ?? p1);
+      if (p) items.push({ ...it, p: [p[0], p[1]] });
+    }
+    this.paintLabels(this.bctx, items);
+  }
+
+  /** Pairs the names on the old and new maps with what they follow, and finds where that is at the start and the end. */
+  private sweepLabels(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]): SweepLabels {
+    const { plan } = s;
+    const NB = plan.carries.length;
+    const vb = this.visibleBox();
+    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+    const oldFeats = s.from.features.filter(
+      (f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg && this.isVisible(f.bbox, vb),
+    );
+    const newFeats = this.labelFeats(cache);
+    const states = this.showStates() ? this.states : null;
+    const idA = new Map(s.ownersA.map((f, i) => [f, i]));
+    const idB = new Map(s.ownersB.map((f, i) => [f, i]));
+    const size = 2 * Math.PI * this.view.k;
+    const shifts = this.copyShifts();
+    const byKey = new Map<number, SweepLabel>();
+    const track = (code: number, copy: number) => {
+      let tr = byKey.get(code * COPIES + copy);
+      if (!tr) byKey.set(code * COPIES + copy, (tr = { code, copy, n0: 0, n1: 0 }));
+      return tr;
+    };
+    const staticOld: LabelItem[] = [];
+    const staticNew: LabelItem[] = [];
+    projs.forEach((proj, k) => {
+      const copy = Math.round(shifts[k] / size) + COPY0;
+      for (const it of this.planLabels(proj, oldFeats, null)) {
+        const i = it.f ? idA.get(it.f) : undefined;
+        if (!i) staticOld.push(it);
+        else track(plan.carriedBy[i] || NB + i, copy).old = it;
+      }
+      for (const it of this.planLabels(proj, newFeats, states)) {
+        const j = it.f ? idB.get(it.f) : undefined;
+        if (!j) staticNew.push(it);
+        else track(j, copy).neu = it;
+      }
+    });
+    const wanted = new Uint8Array(NB + plan.carriedBy.length);
+    for (const tr of byKey.values()) wanted[tr.code] = 1;
+    const copyOf = new Uint8Array(plan.gw);
+    for (let x = 0; x < plan.gw; x++)
+      copyOf[x] = Math.max(0, Math.min(COPIES - 1, Math.round(((x + 0.5) * s.cs - this.w / 2) / size) + COPY0));
+    const at0 = shownSums(plan, 0, wanted, copyOf, COPIES);
+    const at1 = shownSums(plan, 1, wanted, copyOf, COPIES);
+    const mid = (sums: Float64Array, o: number): [number, number] => [
+      (sums[o] / sums[o + 2] + 0.5) * s.cs,
+      (sums[o + 1] / sums[o + 2] + 0.5) * s.cs,
+    ];
+    for (const tr of byKey.values()) {
+      const o = (tr.code * COPIES + tr.copy) * 6;
+      if ((tr.n0 = at0[o + 2])) tr.c0 = mid(at0, o);
+      if ((tr.n1 = at1[o + 2])) tr.c1 = mid(at1, o);
+    }
+    // an old country nothing carries on and a new one with the same name (Egypt changing hands) share one name
+    const fresh = new Map<string, SweepLabel>();
+    for (const tr of byKey.values()) if (tr.neu && tr.code < NB && !plan.carries[tr.code]) fresh.set(`${tr.copy}|${tr.neu.text}`, tr);
+    for (const [key, tr] of byKey) {
+      const f = tr.old && tr.code > NB ? fresh.get(`${tr.copy}|${tr.old.text}`) : undefined;
+      if (!f || f.old) continue;
+      Object.assign(f, { from: tr.code, old: tr.old, c0: tr.c0, n0: tr.n0 });
+      byKey.delete(key);
+    }
+    return { tracks: [...byKey.values()], wanted, copyOf, staticOld, staticNew };
+  }
+
   private projected(c: BaseCache, g: GeoPermissibleObjects) {
     const p2d = new Path2D();
     geoPath(c.proj, p2d as unknown as CanvasRenderingContext2D)(g);
@@ -721,7 +1016,7 @@ export class MapEngine {
   /** State lines and the US outline that clips them (only zoomed in far enough to show them). */
   private statePaths(c: BaseCache) {
     if (c.states === undefined) {
-      const usa = this.layer?.byName.get("United States");
+      const usa = c.layer?.byName.get("United States");
       const mesh = this.states?.mesh;
       c.states = usa && mesh ? { mesh: this.projected(c, mesh as GeoPermissibleObjects), clip: this.cachedPath(c, usa) } : null;
     }
@@ -772,32 +1067,23 @@ export class MapEngine {
     ctx.fill();
   }
 
-  private drawLabels(
-    ctx: CanvasRenderingContext2D,
-    proj: ReturnType<typeof projectionFor>,
-    feats: PolityFeature[],
-    states: Layer | null,
-  ) {
+  /** Where the names go for one copy of the world: biggest shapes first, none overlapping or running off screen. */
+  private planLabels(proj: ReturnType<typeof projectionFor>, feats: PolityFeature[], states: Layer | null): LabelItem[] {
+    const ctx = this.bctx;
+    const items: LabelItem[] = [];
     const placed: [number, number, number, number][] = [];
     const fits = (x: number, y: number, w: number, h: number) => {
       for (const r of placed) if (x < r[2] && x + w > r[0] && y < r[3] && y + h > r[1]) return false;
       return true;
     };
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.lineJoin = "round";
-    const draw = (text: string, p: [number, number], size: number, weight: number) => {
+    const place = (text: string, p: [number, number], size: number, weight: number, f?: PolityFeature, sizePx?: number) => {
       ctx.font = `${weight} ${size}px system-ui, sans-serif`;
       const tw = ctx.measureText(text).width;
       const box: [number, number, number, number] = [p[0] - tw / 2 - 3, p[1] - size / 2 - 2, p[0] + tw / 2 + 3, p[1] + size / 2 + 2];
       if (box[0] < 0 || box[2] > this.w || box[1] < 0 || box[3] > this.h) return;
       if (!fits(box[0], box[1], box[2] - box[0], box[3] - box[1])) return;
       placed.push(box);
-      ctx.lineWidth = 3;
-      ctx.strokeStyle = COLORS.halo;
-      ctx.strokeText(text, p[0], p[1]);
-      ctx.fillStyle = COLORS.label;
-      ctx.fillText(text, p[0], p[1]);
+      items.push({ text, p, size, weight, tw, f, sizePx });
     };
     const sorted = feats.filter((f) => f.props.n && f.props.l).sort((a, b) => b.props.a - a.props.a);
     let count = 0;
@@ -813,15 +1099,30 @@ export class MapEngine {
       const text = f.props.n.length > 28 && sizePx < 260 ? f.props.n.slice(0, 26) + "…" : f.props.n;
       ctx.font = `600 ${size}px system-ui, sans-serif`;
       if (ctx.measureText(text).width > sizePx * 1.6) continue;
-      draw(text, p as [number, number], size, 600);
+      place(text, p as [number, number], size, 600, f, sizePx);
       count++;
     }
     if (states) {
       for (const f of states.features) {
         if (f.props.x || !f.props.c || !f.props.l) continue;
         const p = proj(f.props.l);
-        if (p) draw(f.props.c, p as [number, number], 10, 500);
+        if (p) place(f.props.c, p as [number, number], 10, 500);
       }
+    }
+    return items;
+  }
+
+  private paintLabels(ctx: CanvasRenderingContext2D, items: LabelItem[]) {
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.lineJoin = "round";
+    for (const it of items) {
+      ctx.font = `${it.weight} ${it.size}px system-ui, sans-serif`;
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = COLORS.halo;
+      ctx.strokeText(it.text, it.p[0], it.p[1]);
+      ctx.fillStyle = COLORS.label;
+      ctx.fillText(it.text, it.p[0], it.p[1]);
     }
     ctx.textAlign = "start";
     ctx.textBaseline = "alphabetic";
