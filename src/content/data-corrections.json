@@ -756,6 +756,11 @@
     },
     {
       "era": "All",
+      "what": "Gave the blank strips along Australia's coast to the peoples, colonies or country beside them; a strip that borders several is shared out, each part going to the nearest.",
+      "why": "The source's outlines stop short of Australia's real coastline, so strips of land showed as 'not mapped' between its shapes and the sea."
+    },
+    {
+      "era": "All",
       "what": "Filled land the source leaves blank (for example Sumbawa in Indonesia) as 'not mapped in the source', so the map has no false sea.",
       "why": "Islands and coasts missing from the historical outlines."
     }
