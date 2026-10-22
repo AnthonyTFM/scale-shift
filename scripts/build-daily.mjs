@@ -14,7 +14,7 @@ import path from "node:path";
 import { geoArea, geoAzimuthalEqualArea, geoCentroid, geoMercator, geoPath } from "d3-geo";
 import * as client from "topojson-client";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const DATA = path.join(ROOT, "public", "data");
 const OUT = path.join(DATA, "daily");
 const R = 6371; // Earth radius, km

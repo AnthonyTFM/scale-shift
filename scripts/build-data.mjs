@@ -19,7 +19,7 @@ import polygonClipping from "polygon-clipping";
 import { recolorEraFiles } from "./lib/colors.mjs";
 import { separateEraFiles } from "./lib/overlaps.mjs";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const CACHE = path.join(ROOT, ".cache");
 const HB_DIR = path.join(CACHE, "historical-basemaps");
 const HB_RAW = "https://raw.githubusercontent.com/aourednik/historical-basemaps/master";
@@ -292,6 +292,30 @@ function ownerForIsland(patch, features) {
   return best && sameName(best.properties.n) === today ? best : null;
 }
 
+// ---------- countries the source leaves unnamed ----------
+// In these snapshots the source draws a country but leaves its name blank, so it showed as "not mapped". The unnamed
+// piece lying in that country today gets the country's name back; the outline is the source's own.
+const UNNAMED = [{ n: "Switzerland", years: [1994, 2000, 2010] }];
+
+/** Splits the pieces of an unnamed source shape that belong to a country in UNNAMED into shapes of their own. */
+function nameUnnamed(geometry, b, year, features, found) {
+  const rules = UNNAMED.filter((r) => r.years.includes(year));
+  if (!rules.length) return geometry;
+  const keep = [];
+  for (const rings of geometry.coordinates) {
+    const today = presentOwnerAt(geoCentroid({ type: "Polygon", coordinates: rings }));
+    const rule = rules.find((r) => r.n === today);
+    if (!rule) {
+      keep.push(rings);
+      continue;
+    }
+    found.add(rule.n);
+    const w = `The source draws ${rule.n} in this snapshot but leaves its name blank; the name is put back here.`;
+    features.push({ type: "Feature", properties: { n: rule.n, b, w }, geometry: { type: "MultiPolygon", coordinates: [rings] } });
+  }
+  return keep.length ? { type: "MultiPolygon", coordinates: keep } : null;
+}
+
 // ---------- geometry fixes ----------
 
 /** Svalbard belonged to no state until the 1920 Svalbard Treaty (in force 1925); the source draws it inside Norway. */
@@ -379,8 +403,9 @@ async function main() {
   for (const entry of index) {
     const raw = JSON.parse(fs.readFileSync(path.join(HB_DIR, entry.filename), "utf8"));
     const features = [];
+    const namedBack = new Set(); // countries in UNNAMED given their name back in this snapshot
     for (const f of raw.features) {
-      const geometry = fixWinding(f.geometry);
+      let geometry = fixWinding(f.geometry);
       if (!geometry) continue;
       const P = f.properties || {};
       const rawName = (P.NAME || "").trim();
@@ -397,8 +422,10 @@ async function main() {
       if (n && s && s !== n) props.s = s;
       if (n && p && p !== n && p !== s) props.p = p;
       if (fix.note) props.w = fix.note;
-      features.push({ type: "Feature", properties: props, geometry });
+      if (!n) geometry = nameUnnamed(geometry, props.b, entry.year, features, namedBack);
+      if (geometry) features.push({ type: "Feature", properties: props, geometry });
     }
+    for (const r of UNNAMED) if (r.years.includes(entry.year) && !namedBack.has(r.n)) console.warn(`  ! ${eraLabel(entry.year)}: no unnamed shape found for ${r.n}`);
     const grouped = groupByName(features);
     splitSvalbard(grouped, entry.year);
     if (entry.year === 1400) splitMing1400(grouped);
