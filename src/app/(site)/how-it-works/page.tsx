@@ -55,7 +55,7 @@ export default function HowItWorksPage() {
               bigger than it is. Greenland, centered near 72° north, looks roughly ten times too big.
             </p>
           </div>
-          <div className="overflow-x-auto rounded-card border border-line bg-white">
+          <div tabIndex={0} role="region" aria-label="How much Mercator inflates area" className="overflow-x-auto rounded-card border border-line bg-white">
             <table className="w-full text-left text-sm">
               <caption className="px-4 pt-4 text-left font-bold text-ink">How much Mercator inflates area</caption>
               <thead className="text-xs uppercase tracking-wide text-muted">

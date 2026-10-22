@@ -38,7 +38,7 @@ function Section({ id, title, lead, children }: { id: string; title: string; lea
 
 function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
   return (
-    <div className="overflow-x-auto rounded-card border border-line bg-white">
+    <div tabIndex={0} role="region" aria-label={`Table: ${caption}`} className="overflow-x-auto rounded-card border border-line bg-white">
       <table className="w-full min-w-[480px] text-left text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-paper text-xs uppercase tracking-wide text-muted">
@@ -166,7 +166,7 @@ export default function TeachersPage() {
           </Section>
 
           <Section id="disputes" title={t.disputes.title} lead={t.disputes.lead}>
-            <div className="overflow-x-auto rounded-card border border-line bg-white">
+            <div tabIndex={0} role="region" aria-label={`Table: ${t.disputes.title}`} className="overflow-x-auto rounded-card border border-line bg-white">
               <table className="w-full min-w-[560px] text-left text-sm">
                 <thead className="bg-paper text-xs uppercase tracking-wide text-muted">
                   <tr>
