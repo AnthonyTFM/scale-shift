@@ -350,9 +350,10 @@ function StreakPill({ save, today }: { save: DailySave; today: string }) {
   );
 }
 
-/** Sound effects on or off (off by default). */
+/** Sound effects on or off (on by default). */
 function SoundToggle() {
-  const [on, setOn] = useState(false);
+  // on by default, so the first paint already says "Sound on" for almost everyone
+  const [on, setOn] = useState(true);
   useEffect(() => queueMicrotask(() => setOn(soundOn())), []);
   return (
     <button
