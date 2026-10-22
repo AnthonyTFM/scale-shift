@@ -243,8 +243,8 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Azerbaijan, eastern Türkiye, Turkmenistan and Afghanistan",
   },
   "Chagatai Khanate": {
-    what: "The Mongol khanate of Genghis Khan's son Chagatai, ruling the steppes and oasis cities of Central Asia.",
-    today: "Kazakhstan, Kyrgyzstan, Uzbekistan and western China (Xinjiang)",
+    what: "The Mongol khanate of Genghis Khan's son Chagatai. By 1492 only its eastern branch, Moghulistan, survived.",
+    today: "Western China (Xinjiang), Kyrgyzstan and southeastern Kazakhstan",
   },
   "Sultanate of Delhi": {
     what: "A Muslim sultanate ruled from Delhi from 1206 to 1526 by five dynasties. Timur sacked Delhi in 1398.",
@@ -260,7 +260,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Srivijaya Empire": {
     what: "A Buddhist trading empire based on Sumatra that controlled the Strait of Malacca, the sea route between India and China.",
-    today: "Indonesia (Sumatra and western Java) and Malaysia",
+    today: "Indonesia (Sumatra and western Java), Malaysia and southern Thailand",
   },
   "Ayyubid Sultanate": {
     what: "The dynasty founded by Saladin, who retook Jerusalem from the Crusaders in 1187.",
@@ -268,7 +268,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Mamluke Sultanate": {
     what: "Ruled from Cairo by former slave soldiers (mamluks) who took power in 1250 and stopped the Mongols in 1260. The Ottomans conquered it in 1517.",
-    today: "Egypt, Syria, Israel, Palestine, Lebanon, Jordan and western Saudi Arabia",
+    today: "Egypt, Syria, Israel, Palestine, Lebanon, Jordan, western Saudi Arabia, eastern Libya and southeastern Türkiye",
   },
   "Almohad Caliphate": {
     what: "A Berber Muslim empire from Morocco that ruled North Africa and southern Spain in the 1100s and 1200s.",
@@ -279,11 +279,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Afghanistan, eastern Iran, Pakistan and Turkmenistan",
   },
   "Khwarazmian dynasty": {
-    what: "A Persian-speaking empire of Central Asia and Iran, destroyed by Genghis Khan's invasion in 1219–1221.",
+    what: "A Turkic-ruled, Persian-cultured empire of Central Asia and Iran, destroyed by Genghis Khan's invasion in 1219–1221.",
     today: "Iran, Turkmenistan and Uzbekistan",
   },
   "Empire of Ghana": {
-    what: "Wagadu, the first great trading empire of West Africa, rich from gold and trade across the Sahara. Not the same place as modern Ghana.",
+    what: "Wagadu, West Africa's first great trading empire, said to date from around 300 CE. Its Saharan gold trade peaked about 800–1050. Not modern Ghana.",
     today: "Southern Mauritania and western Mali",
   },
   "Kanem-Bornu": {
@@ -327,7 +327,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Mongolia, plus parts of northern China and Russia",
   },
   "French West Africa": {
-    what: "A federation of French colonies ruled from Dakar (1895–1958).",
+    what: "A federation of French colonies (1895–1958), ruled from Dakar from 1902.",
     today: "Senegal, Mauritania, Mali, Guinea, Côte d'Ivoire, Burkina Faso, Niger and Benin",
   },
   "Kara Khitai Khaganate": {
@@ -335,16 +335,16 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Kazakhstan, Kyrgyzstan, Uzbekistan, Tajikistan and western China (Xinjiang)",
   },
   "Göktürks": {
-    what: "A Turkic khaganate of the Mongolian steppe. Its Orkhon inscriptions are the oldest known writing in a Turkic language.",
+    what: "A Turkic khaganate of the Mongolian steppe. Its Orkhon inscriptions are among the oldest known writing in a Turkic language.",
     today: "Mongolia, plus parts of Kazakhstan, Russia and northern China",
   },
   "Jin": {
     what: "The Jin dynasty (266–420), which briefly reunited China after the Three Kingdoms period.",
-    today: "China",
+    today: "China, plus northern Vietnam",
   },
   "Viceroyalty of New Granada": {
     what: "Spain's colony in northern South America, ruled from Bogotá.",
-    today: "Colombia, Venezuela, Ecuador and Panama",
+    today: "Colombia, Ecuador and Panama",
   },
   "Grand Duchy of Moscow": {
     what: "The Russian state ruled from Moscow. Ivan III threw off Mongol rule in 1480 and gathered the other Russian lands.",
@@ -376,11 +376,11 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Ghurid Sultanate": {
     what: "A dynasty from the mountains of central Afghanistan that conquered northern India around 1192, opening the way for the Delhi Sultanate.",
-    today: "Afghanistan, Pakistan, northern India and eastern Iran",
+    today: "Afghanistan, Pakistan, northern India, eastern Iran and Turkmenistan",
   },
   "Persia": {
     what: "Iran under the Qajar dynasty (1789–1925), which lost its lands in the Caucasus to Russia in wars between 1804 and 1828.",
-    today: "Mainly Iran, plus Armenia",
+    today: "Mainly Iran, plus Armenia and Azerbaijan's Nakhchivan",
   },
   "Union of South Africa": {
     what: "A British dominion formed in 1910 from four colonies, which also ran neighbouring South West Africa from 1915. It became a republic in 1961.",
@@ -403,7 +403,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Northern and central India",
   },
   "Bactria": {
-    what: "The Greco-Bactrian kingdom, founded by Greek settlers who stayed on after Alexander, in Central Asia's Oxus (Amu Darya) valley.",
+    what: "A Greek kingdom in Central Asia's Oxus (Amu Darya) valley, founded around 250 BCE when its Greek governor broke away from the Seleucid Empire.",
     today: "Afghanistan, Uzbekistan, Tajikistan and Turkmenistan",
   },
   "Dutch East Indies": {
@@ -428,7 +428,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Roman Republic": {
     what: "Rome before the emperors, run by elected consuls and the Senate. By 100 BCE it ruled much of the Mediterranean coast.",
-    today: "Italy, Spain, southern France, Greece, western Türkiye and Tunisia",
+    today: "Italy, Spain, Portugal, southern France, Greece, Albania, North Macedonia, western Türkiye and Tunisia",
   },
   "Shang": {
     what: "China's earliest dynasty known from writing (inscribed oracle bones), in the Yellow River valley.",
@@ -452,7 +452,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Khiva Khanate": {
     what: "A Central Asian khanate around the oasis city of Khiva on the lower Amu Darya river.",
-    today: "Uzbekistan and Turkmenistan",
+    today: "Uzbekistan and Turkmenistan, plus edges of Kazakhstan",
   },
   "Ayutthaya": {
     what: "A Thai kingdom (1351–1767) whose island capital, Ayutthaya, was a major trading city.",
@@ -463,7 +463,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Thailand, Laos and parts of Cambodia, Myanmar and Malaysia",
   },
   "German South-West Africa": {
-    what: "Germany's colony (1884–1915), where German troops killed most of the Herero and Nama peoples in 1904–1908.",
+    what: "Germany's colony (1884–1915), where German troops killed most of the Herero people and about half of the Nama in 1904–1908.",
     today: "Namibia",
   },
   "Kamerun": {
@@ -484,6 +484,6 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Caliphate of Córdoba": {
     what: "Muslim Spain (al-Andalus) under the Umayyad caliphs of Córdoba, then one of Europe's largest and richest cities.",
-    today: "Spain, Portugal and northern Morocco",
+    today: "Spain, Portugal, northern Morocco and western Algeria",
   },
 };
