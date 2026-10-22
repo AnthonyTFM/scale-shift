@@ -368,14 +368,15 @@ export default function AtlasApp() {
     return () => clearTimeout(t);
   }, [era, overlays, ready]);
 
-  // ---- play through eras, forward or back in time (waits for each era to load) ----
+  // ---- play through eras, forward or back in time (waits for each era to load and its borders to sweep in) ----
   useEffect(() => {
     if (!playing || loadingEra) return;
+    const wait = Math.max(1400, (engineRef.current?.sweepLeft() ?? 0) + 1000);
     const t = setTimeout(() => {
       const next = eraIndex(eraRef.current) + playing;
       if (next < 0 || next > eras.length - 1) setPlaying(0);
       else changeEra(eras[next].key);
-    }, 1400);
+    }, wait);
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
 
