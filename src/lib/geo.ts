@@ -28,9 +28,14 @@ export function anchorOf(g: MultiPolygon): LonLat {
   return geoCentroid({ type: "Polygon", coordinates: best }) as LonLat;
 }
 
+/** Far-off places that are full parts of their country, so they always travel with it: Hawaii (a US state). */
+const ALWAYS_KEEP: [number, number, number, number][] = [[-161, 18, -154, 23]];
+const inBox = ([lon, lat]: LonLat, [w, s, e, n]: [number, number, number, number]) => lon >= w && lon <= e && lat >= s && lat <= n;
+
 /**
  * Drops small parts far from the main landmass (e.g. French Guiana when dragging France),
- * so a dragged shape reads as one country. Returns the kept geometry and how many parts were hidden.
+ * so a dragged shape reads as one country. Parts near any big kept part stay too (the Aleutians next to Alaska),
+ * as do the places in ALWAYS_KEEP. Returns the kept geometry and how many parts were hidden.
  */
 export function dropFarParts(g: MultiPolygon, maxDistanceDeg = 40, keepShare = 0.15): { geom: MultiPolygon; hidden: number } {
   if (g.coordinates.length < 2) return { geom: g, hidden: 0 };
@@ -40,8 +45,11 @@ export function dropFarParts(g: MultiPolygon, maxDistanceDeg = 40, keepShare = 0
   });
   const total = parts.reduce((s, p) => s + p.area, 0);
   const main = parts.reduce((a, b) => (b.area > a.area ? b : a));
+  const big = parts.filter((p) => p === main || p.area / total >= keepShare);
   const kept = parts.filter(
-    (p) => p === main || geoDistance(p.c, main.c) / RAD <= maxDistanceDeg || p.area / total >= keepShare,
+    (p) =>
+      big.some((b) => geoDistance(p.c, b.c) / RAD <= (b === main ? maxDistanceDeg : maxDistanceDeg / 2)) ||
+      ALWAYS_KEEP.some((box) => inBox(p.c, box)),
   );
   return { geom: { type: "MultiPolygon", coordinates: kept.map((p) => p.rings) }, hidden: parts.length - kept.length };
 }
