@@ -39,6 +39,8 @@ import { useAuth } from "@clerk/nextjs";
 const reveal = dailyCopy.reveal;
 const R = dailyCopy.results;
 const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+// where a new round lines up: just under the sticky site header
+const ROUND_TOP = 88;
 
 type Outline = { d: string; b: [number, number, number, number] };
 type ShapeFile = { merc: Outline; ea: Outline };
@@ -142,11 +144,11 @@ export function DailyChallenge() {
     // a new round is still loading: keep waiting for its first question
     if (!heading || !card) return;
     advanced.current = false;
-    const behavior = matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+    const behavior = reducedMotion() ? "auto" : "smooth";
     if (restarted.current && gameTop.current) {
       // a new round: line up the progress bar under the header (the page changed height while it loaded)
       restarted.current = false;
-      scrollTo({ top: Math.max(0, gameTop.current.getBoundingClientRect().top + scrollY - 88), behavior });
+      scrollTo({ top: Math.max(0, gameTop.current.getBoundingClientRect().top + scrollY - ROUND_TOP), behavior });
     } else {
       const top = card.getBoundingClientRect().top;
       if (top < 72) scrollTo({ top: top + scrollY - 80, behavior });
@@ -176,8 +178,8 @@ export function DailyChallenge() {
   const start = (practice: boolean) => {
     // a new round starts at the top of the game, not down where the results' buttons were
     if (gameTop.current) {
-      const y = gameTop.current.getBoundingClientRect().top + scrollY - 88;
-      scrollTo({ top: Math.max(0, y), behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+      const y = gameTop.current.getBoundingClientRect().top + scrollY - ROUND_TOP;
+      scrollTo({ top: Math.max(0, y), behavior: reducedMotion() ? "auto" : "smooth" });
     }
     advanced.current = true;
     restarted.current = true;
