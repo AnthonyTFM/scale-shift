@@ -23,11 +23,44 @@ const AccountContext = createContext<Account>({ isLoaded: true, isSignedIn: fals
 /** Sign-in state for the daily game and the leaderboard. */
 export const useAccount = () => useContext(AccountContext);
 
-// Clerk (about 1.2MB of scripts) only downloads for players who are signed in or tap "Sign in"
-const ClerkBridge = lazy(() => import("./ClerkBridge"));
+const RELOADED = "signin-chunk-reload";
+// Clerk (about 1.2MB of scripts) only downloads for players who are signed in or tap "Sign in". If its code can't be
+// fetched (usually a new deploy replaced it), reload once to get the current version rather than crash the page.
+const ClerkBridge = lazy(() =>
+  import("./ClerkBridge").catch(() => {
+    try {
+      if (!sessionStorage.getItem(RELOADED)) {
+        sessionStorage.setItem(RELOADED, "1");
+        location.reload();
+      }
+    } catch {
+      /* storage blocked: stay signed out rather than loop */
+    }
+    return new Promise<never>(() => {});
+  }),
+);
 
 /** Clerk sets this cookie to the time of the last sign-in, and to 0 when signed out. */
 const maybeSignedIn = () => /(?:^|;\s*)__client_uat(?:_[^=]*)?=[1-9]/.test(document.cookie);
+
+/** Set when a sign-in window opens: a sign-in that leaves the page (Google) comes back to a fresh page load. */
+export const SIGNIN_RETURN = "signin-return";
+const returningFromSignIn = () => {
+  try {
+    // Clerk's development token in the address bar, or our own flag
+    if (/[?&]__clerk_/.test(location.search)) return true;
+    if (sessionStorage.getItem(SIGNIN_RETURN)) {
+      sessionStorage.removeItem(SIGNIN_RETURN);
+      return true;
+    }
+  } catch {
+    /* storage blocked */
+  }
+  return false;
+};
+
+/** If the sign-in window hasn't opened after this long (blocked, offline), let the player try again. */
+const OPEN_TIMEOUT = 15_000;
 
 /**
  * Loads sign-in (Clerk) on the pages that post scores, only when it's needed: straight away for a returning signed-in
@@ -46,11 +79,18 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
     pending.current = null;
     return back;
   }, []);
+  const prepare = useCallback(() => setLoad((l) => l ?? "tap"), []);
+
+  useEffect(() => {
+    if (!opening) return;
+    const id = setTimeout(() => setOpening(false), OPEN_TIMEOUT);
+    return () => clearTimeout(id);
+  }, [opening]);
 
   useEffect(() => {
     if (!signInOn) return;
     queueMicrotask(() => {
-      if (maybeSignedIn()) setLoad("session");
+      if (maybeSignedIn() || returningFromSignIn()) setLoad("session");
       setChecked(true);
     });
   }, []);
@@ -66,7 +106,7 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
       setLoad((l) => l ?? "tap");
     },
     signOut: noop,
-    prepare: () => setLoad((l) => l ?? "tap"),
+    prepare,
   };
 
   if (!signInOn) return <>{children}</>;

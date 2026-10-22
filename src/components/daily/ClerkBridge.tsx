@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { ClerkProvider, useAuth, useClerk } from "@clerk/nextjs";
-import type { Account } from "./SignInProvider";
+import { SIGNIN_RETURN, type Account } from "./SignInProvider";
 
 type Props = { onChange: (a: Account) => void; takePending: () => string | null };
 
@@ -21,7 +21,15 @@ function Report({ onChange, takePending }: Props) {
 
   useEffect(() => {
     if (!isLoaded) return;
-    const openSignIn = (back: string) => clerk.openSignIn({ withSignUp: true, forceRedirectUrl: back, signUpForceRedirectUrl: back });
+    const openSignIn = (back: string) => {
+      // Google sign-in leaves the page; this tells the page it comes back to that Clerk is needed straight away
+      try {
+        sessionStorage.setItem(SIGNIN_RETURN, "1");
+      } catch {
+        /* storage blocked: the dev token in the address bar still tells */
+      }
+      clerk.openSignIn({ withSignUp: true, forceRedirectUrl: back, signUpForceRedirectUrl: back });
+    };
     onChange({
       isLoaded: true,
       isSignedIn: !!isSignedIn,
@@ -30,6 +38,14 @@ function Report({ onChange, takePending }: Props) {
       signOut: (back) => void clerk.signOut({ redirectUrl: back }),
       prepare: () => {},
     });
+    // signed in inside the window (no page change): the return flag isn't needed
+    if (isSignedIn) {
+      try {
+        sessionStorage.removeItem(SIGNIN_RETURN);
+      } catch {
+        /* storage blocked */
+      }
+    }
     // the player tapped "Sign in" while Clerk was still downloading
     const back = takePending();
     if (back && !isSignedIn) openSignIn(back);
