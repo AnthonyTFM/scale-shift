@@ -2,11 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { SignInButton, SignOutButton, useAuth } from "@clerk/nextjs";
 import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, rememberPlayer } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
+import { useAccount } from "./SignInProvider";
 import { TrophyIcon } from "@/components/site/Icons";
 
 type Props = { date: string; choices: number[] };
@@ -17,7 +17,7 @@ type Me = { id: string; name: string | null; reminders: boolean } | null;
  * nickname once, and your score posts as the same player on every device.
  */
 export function AccountJoin({ date, choices }: Props) {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, openSignIn, signOut, opening } = useAccount();
   const [me, setMe] = useState<Me | undefined>(undefined);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
@@ -119,11 +119,9 @@ export function AccountJoin({ date, choices }: Props) {
             Sign in to put your score on the public leaderboard. We&apos;ll send a code to your email (or use Google), so nobody else can post as
             you, and you keep the same nickname on every device.
           </p>
-          <SignInButton mode="modal" withSignUp forceRedirectUrl="/daily" signUpForceRedirectUrl="/daily">
-            <button type="button" className="btn btn-primary mt-3 h-12">
-              Sign in to post my score
-            </button>
-          </SignInButton>
+          <button type="button" onClick={() => openSignIn("/daily")} disabled={opening} className="btn btn-primary mt-3 h-12">
+            {opening ? "Opening sign-in…" : "Sign in to post my score"}
+          </button>
         </div>
       ) : null}
 
@@ -221,11 +219,9 @@ export function AccountJoin({ date, choices }: Props) {
       {isSignedIn ? (
         <p className="mt-3 text-xs text-muted">
           Signed in.{" "}
-          <SignOutButton redirectUrl="/daily">
-            <button type="button" className="font-semibold text-primary hover:underline">
-              Sign out
-            </button>
-          </SignOutButton>
+          <button type="button" onClick={() => signOut("/daily")} className="font-semibold text-primary hover:underline">
+            Sign out
+          </button>
         </p>
       ) : null}
     </div>

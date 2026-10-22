@@ -11,6 +11,8 @@ export const dailyCopy = {
   signInToSee: "Sign in to see your result",
   signInToSeeShort: "Sign in",
   // results screen: the leaderboard sign-up waits behind one button
+  // shown on the "Sign in" link while the sign-in window downloads
+  signInOpening: "Opening sign-in…",
   joinCta: "Get on the leaderboard",
   joinHint: "See where you rank.",
   joinButton: "Join",

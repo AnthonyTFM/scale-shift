@@ -34,7 +34,7 @@ import { useShareBox } from "@/components/site/ShareBox";
 import type { DayBoard } from "@/lib/leaderboard-types";
 import { dailyCopy } from "@/content/daily";
 import { FlameIcon, MarkIcon } from "@/components/site/Icons";
-import { useAuth } from "@clerk/nextjs";
+import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
 const R = dailyCopy.results;
@@ -266,12 +266,13 @@ export function DailyChallenge() {
  * account's result for today straight away (no refresh needed), which jumps to their results if they already played.
  */
 function OnSignIn({ run }: { run: () => void }) {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAccount();
   const was = useRef<boolean | undefined>(undefined);
   useEffect(() => {
     if (!isLoaded) return;
-    // the first check is the page load, which the game already handles; only a change to signed in runs again
-    if (was.current === false && isSignedIn) run();
+    // runs whenever the player becomes signed in: after the sign-in window, or once Clerk confirms a returning player
+    // (the page-load check can miss them while their sign-in is still being refreshed); taking the result twice is harmless
+    if (isSignedIn && !was.current) run();
     was.current = !!isSignedIn;
   }, [isLoaded, isSignedIn, run]);
   return null;

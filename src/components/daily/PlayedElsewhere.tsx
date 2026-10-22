@@ -1,11 +1,11 @@
 "use client";
 
-import { SignInButton, useAuth } from "@clerk/nextjs";
+import { useAccount } from "./SignInProvider";
 import { dailyCopy as t } from "@/content/daily";
 
 /** Before playing, for signed-out players: sign in to bring today's result over from another device instead of replaying. */
 export function PlayedElsewhere() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, openSignIn, opening } = useAccount();
   // hold the strip's space while sign-in loads, so the game doesn't jump down when it appears
   if (!isLoaded) return <p aria-hidden="true" className="mb-2 h-8 sm:mb-3 sm:h-9" />;
   if (isSignedIn) return null;
@@ -15,12 +15,16 @@ export function PlayedElsewhere() {
         <span className="sm:hidden">{t.playedElsewhereShort}</span>
         <span className="hidden sm:inline">{t.playedElsewhere}</span>
       </span>
-      <SignInButton mode="modal" withSignUp forceRedirectUrl="/daily" signUpForceRedirectUrl="/daily">
-        <button type="button" className="inline-flex min-h-8 items-center font-bold text-primary hover:underline">
-          <span className="sm:hidden">{t.signInToSeeShort}</span>
-          <span className="hidden sm:inline">{t.signInToSee}</span> →
-        </button>
-      </SignInButton>
+      <button type="button" onClick={() => openSignIn("/daily")} disabled={opening} className="inline-flex min-h-8 items-center font-bold text-primary hover:underline">
+        {opening ? (
+          t.signInOpening
+        ) : (
+          <>
+            <span className="sm:hidden">{t.signInToSeeShort}</span>
+            <span className="hidden sm:inline">{t.signInToSee}</span> →
+          </>
+        )}
+      </button>
     </p>
   );
 }
