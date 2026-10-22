@@ -745,6 +745,11 @@
       "why": "Switzerland has been an independent country throughout; the source's 1994, 2000 and 2010 snapshots leave its name blank."
     },
     {
+      "era": "1994–2010",
+      "what": "Joined Gotland to Sweden and Lewis and Harris to the United Kingdom, which the source draws without a name. In 1994 the source draws Taiwan twice; the map uses its unnamed outline (the one 2000 and 2010 use) instead of the older named one.",
+      "why": "They belonged to those countries throughout; without a name they showed as 'not mapped' (around Taiwan, as a blank rim)."
+    },
+    {
       "era": "Present",
       "what": "Separated Crimea from Russia as its own disputed shape.",
       "why": "Russia has controlled Crimea since 2014, but most UN members recognize it as part of Ukraine."
