@@ -2,11 +2,13 @@
 // the real coastline, so strips between a shape and the sea came out "not mapped" (white on the map). A strip that
 // touches one shape goes to it; a strip that touches several is shared out, each part going to the shape nearest it,
 // so every shape reaches its own stretch of shore. Land that no shape touches (an island off the coast) stays as it is.
+// The same goes for the thin coastal slivers of a "leftover" shape: an older shape the source still draws underneath
+// newer ones, which shows through only where they stop short of the coast. Its other pieces stay as they are.
 // Runs on the era files after the overlaps are separated; `inside` picks the region it works in. Used by build-data.mjs.
 
 import fs from "node:fs";
 import path from "node:path";
-import { geoArea, geoCentroid } from "d3-geo";
+import { geoArea, geoCentroid, geoLength } from "d3-geo";
 import polygonClipping from "polygon-clipping";
 import * as client from "topojson-client";
 import * as server from "topojson-server";
@@ -16,6 +18,8 @@ const OUTPUT_QUANTIZE = 2e4; // as build-data.mjs writes the era files
 const TOUCH = 0.03; // degrees: a shape this close to a strip borders it (about one step of the file's coordinates)
 const CELL = 0.01; // degrees: the grid a strip is shared out on
 const SLIVER_KM2 = 50; // holes this small that nothing covers are slivers between a shape and its strip: filled
+const SEA_SHARE = 0.03; // a leftover piece with this share of its outline on the sea lies along the coast
+const THIN_KM = 10; // ...and counts as a sliver if it is no wider than this (area / perimeter)
 
 const polysOf = (g) => (!g ? [] : g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []);
 const boxOf = (polys) => {
@@ -79,6 +83,19 @@ function segmentsNear(shapes, box, margin) {
         }
   }
   return out;
+}
+
+/** Whether a piece is a thin sliver along the coast: part of its outline borders no other shape, and it is narrow. */
+function coastalSliver(rings, segs) {
+  const ring = rings[0];
+  let free = 0;
+  for (const [x, y] of ring) {
+    let near = false;
+    for (let k = 0; k < segs.length && !near; k += 5) near = dist2(x, y, segs[k], segs[k + 1], segs[k + 2], segs[k + 3]) <= TOUCH * TOUCH;
+    if (!near) free++;
+  }
+  const km2 = geoArea({ type: "Polygon", coordinates: rings }) * EARTH_R ** 2;
+  return free >= ring.length * SEA_SHARE && km2 / (geoLength({ type: "LineString", coordinates: ring }) * EARTH_R) <= THIN_KM;
 }
 
 /** The shapes a strip borders: the ones within TOUCH of at least two of its corners. */
@@ -152,20 +169,39 @@ function shareOut(rings, owners, segs) {
   return pieces;
 }
 
-/** Fills the coastal strips in one era topology. Returns the new topology and how many strips were filled. */
-export function fillGaps(topo, inside) {
+/**
+ * Fills the coastal strips in one era topology; `leftover` picks the shapes whose coastal slivers are given away too.
+ * Returns the new topology and how many strips were filled.
+ */
+export function fillGaps(topo, inside, leftover = () => false) {
   const feats = client.feature(topo, topo.objects.p).features;
-  const shapes = [];
-  const strips = [];
+  const named = [];
+  const shapes = []; // the shapes strips can go to
+  const strips = []; // blank strips, and leftover slivers (with the index of their piece)
   feats.forEach((f, i) => {
     const polys = polysOf(f.geometry);
     if (!polys.length) return;
     const it = { i, polys, box: boxOf(polys) };
-    if (f.properties.n && !f.properties.x) shapes.push(it);
-    else if (f.properties.m && inRegion(polys, inside)) strips.push(it);
+    if (f.properties.n && !f.properties.x) {
+      named.push(it);
+      if (!leftover(f.properties)) shapes.push(it);
+    } else if (f.properties.m && inRegion(polys, inside)) strips.push(it);
   });
+  for (const lo of named) {
+    if (!leftover(feats[lo.i].properties)) continue;
+    const segs = segmentsNear(
+      named.filter((o) => o.i !== lo.i),
+      lo.box,
+      0.1,
+    );
+    // (no region test: slivers lie on the coast itself, often just past the coastline it is judged by)
+    lo.polys.forEach((rings, part) => {
+      if (coastalSliver(rings, segs)) strips.push({ i: lo.i, part, polys: [rings], box: boxOf([rings]) });
+    });
+  }
   const now = new Map(); // shape index -> its polygons so far
   const removed = new Set();
+  const given = new Map(); // leftover index -> the pieces given away
   let filled = 0;
   for (const st of strips) {
     const segs = segmentsNear(shapes, st.box, 0.5);
@@ -190,17 +226,26 @@ export function fillGaps(topo, inside) {
     }
     if (!ok) continue;
     for (const [i, polys] of changes) now.set(i, polys);
-    removed.add(st.i);
+    if (st.part === undefined) removed.add(st.i);
+    else given.set(st.i, (given.get(st.i) ?? new Set()).add(st.part));
     filled++;
   }
   if (!filled) return { topo, filled: 0 };
 
   // holes left between a shape and its new land that nothing covers are slivers: fill them
   const covered = (x, y, self) =>
-    shapes.some((sh) => sh.i !== self && x >= sh.box[0] && x <= sh.box[2] && y >= sh.box[1] && y <= sh.box[3] && sh.polys.some((p) => inPolygon(x, y, p)));
+    named.some((sh) => sh.i !== self && x >= sh.box[0] && x <= sh.box[2] && y >= sh.box[1] && y <= sh.box[3] && sh.polys.some((p) => inPolygon(x, y, p)));
   const out = feats
     .map((f, i) => {
       if (removed.has(i)) return null;
+      if (given.has(i)) {
+        // a leftover shape keeps the pieces it didn't give away
+        const keep = polysOf(f.geometry).filter((_, part) => !given.get(i).has(part));
+        if (!keep.length) return null;
+        const g = { type: "Feature", properties: { ...f.properties }, geometry: { type: "MultiPolygon", coordinates: keep } };
+        g.properties.a = Math.round(geoArea(g) * EARTH_R ** 2);
+        return { f: g, original: f };
+      }
       if (!now.has(i)) return { f, original: f };
       const polys = d3Winding(now.get(i)).map((rings) =>
         rings.filter((r, k) => {
@@ -221,13 +266,26 @@ export function fillGaps(topo, inside) {
   return inverted ? { topo, filled: 0, inverted: true } : { topo: result, filled };
 }
 
-/** Fills the coastal strips inside a region in every era file on disk (public/data/eras, in src/data/eras.json order). */
-export function fillGapEraFiles(root, inside) {
+/**
+ * Fills the coastal strips inside a region in every era file on disk (public/data/eras, in src/data/eras.json order).
+ * `leftover(year, props)` picks the shapes whose coastal slivers go too. Runs a few passes, so a strip that only touched
+ * a sliver goes to the shape that took the sliver.
+ */
+export function fillGapEraFiles(root, inside, leftover = () => false) {
   const eras = JSON.parse(fs.readFileSync(path.join(root, "src/data/eras.json"), "utf8"));
   const report = [];
   for (const e of eras) {
     const file = path.join(root, "public/data/eras", `${e.key}.json`);
-    const { topo, filled, inverted } = fillGaps(JSON.parse(fs.readFileSync(file, "utf8")), inside);
+    let topo = JSON.parse(fs.readFileSync(file, "utf8"));
+    let filled = 0;
+    let inverted = false;
+    for (let pass = 0; pass < 3; pass++) {
+      const r = fillGaps(topo, inside, (props) => leftover(e.year, props));
+      inverted ||= !!r.inverted;
+      if (!r.filled) break;
+      topo = r.topo;
+      filled += r.filled;
+    }
     if (filled) fs.writeFileSync(file, JSON.stringify(topo));
     report.push({ era: e.key, filled, inverted });
   }

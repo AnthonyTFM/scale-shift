@@ -641,10 +641,12 @@ async function main() {
   const { clashes } = recolorEraFiles(ROOT);
   console.log(`  colours: one per owner across all eras (${clashes} neighbouring pairs share one)`);
   // Australia: the source's coastline there is coarse, so strips of land between its shapes and the sea came out blank.
-  // Filled after colouring, so colours elsewhere stay as they are; peoples there that now border a same-coloured
-  // neighbour get a free colour.
+  // In the snapshots that map its Aboriginal nations (1600–1815) the source's older shape for the whole continent also
+  // shows through as thin slivers along the coast; those go to the nations beside them too. Filled after colouring, so
+  // colours elsewhere stay as they are; peoples there that now border a same-coloured neighbour get a free colour.
   const inAustralia = (c) => presentOwnerAt(c) === "Australia";
-  const gaps = fillGapEraFiles(ROOT, inAustralia);
+  const leftover = (year, props) => props.n === "Australian aboriginal hunter-gatherers" && year >= 1600 && year <= 1815;
+  const gaps = fillGapEraFiles(ROOT, inAustralia, leftover);
   const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
   const recoloured = settleEraFiles(ROOT, (props) => !!props.l && inAustralia(props.l));
   console.log(
