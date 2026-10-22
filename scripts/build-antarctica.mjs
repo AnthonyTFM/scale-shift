@@ -9,7 +9,7 @@ import { geoArea } from "d3-geo";
 import * as client from "topojson-client";
 import polygonClipping from "polygon-clipping";
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const R = 6371;
 const content = JSON.parse(fs.readFileSync(path.join(ROOT, "src", "content", "antarctic-claims.json"), "utf8"));
 const topo = JSON.parse(fs.readFileSync(path.join(ROOT, "public", "data", "eras", "present.json"), "utf8"));
