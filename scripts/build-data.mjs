@@ -293,9 +293,21 @@ function ownerForIsland(patch, features) {
 }
 
 // ---------- countries the source leaves unnamed ----------
-// In these snapshots the source draws a country but leaves its name blank, so it showed as "not mapped". The unnamed
-// piece lying in that country today gets the country's name back; the outline is the source's own.
-const UNNAMED = [{ n: "Switzerland", years: [1994, 2000, 2010] }];
+// In these snapshots the source draws land but leaves its name blank, so it showed as "not mapped". The unnamed pieces
+// lying in that country today get the country's name back (joining its shape, for islands); the outline is the source's own.
+// `replace`: the source also draws the country under its name, with an older outline that the unnamed piece repeats
+// (Taiwan in 1994); the unnamed outline, the one later snapshots use, takes its place.
+const UNNAMED = [
+  { n: "Switzerland", years: [1994, 2000, 2010] },
+  { n: "Sweden", years: [1994, 2000, 2010] }, // Gotland
+  { n: "United Kingdom", years: [1994, 2000, 2010] }, // Lewis and Harris
+  {
+    n: "Taiwan",
+    years: [1994],
+    replace: true,
+    note: "The source draws Taiwan twice in this snapshot: an older outline with its name and one without. The map uses the unnamed one, as the 2000 and 2010 snapshots do.",
+  },
+];
 
 /** Splits the pieces of an unnamed source shape that belong to a country in UNNAMED into shapes of their own. */
 function nameUnnamed(geometry, b, year, features, found) {
@@ -309,8 +321,8 @@ function nameUnnamed(geometry, b, year, features, found) {
       keep.push(rings);
       continue;
     }
-    found.add(rule.n);
-    const w = `The source draws ${rule.n} in this snapshot but leaves its name blank; the name is put back here.`;
+    found.set(rule.n, [...(found.get(rule.n) ?? []), rings]);
+    const w = rule.note ?? `The source draws ${rule.n} in this snapshot but leaves its name blank; the name is put back here.`;
     features.push({ type: "Feature", properties: { n: rule.n, b, w }, geometry: { type: "MultiPolygon", coordinates: [rings] } });
   }
   return keep.length ? { type: "MultiPolygon", coordinates: keep } : null;
@@ -403,7 +415,7 @@ async function main() {
   for (const entry of index) {
     const raw = JSON.parse(fs.readFileSync(path.join(HB_DIR, entry.filename), "utf8"));
     const features = [];
-    const namedBack = new Set(); // countries in UNNAMED given their name back in this snapshot
+    const namedBack = new Map(); // countries in UNNAMED given their name back in this snapshot -> the pieces
     for (const f of raw.features) {
       let geometry = fixWinding(f.geometry);
       if (!geometry) continue;
@@ -427,6 +439,10 @@ async function main() {
     }
     for (const r of UNNAMED) if (r.years.includes(entry.year) && !namedBack.has(r.n)) console.warn(`  ! ${eraLabel(entry.year)}: no unnamed shape found for ${r.n}`);
     const grouped = groupByName(features);
+    for (const r of UNNAMED) {
+      const f = r.replace && namedBack.has(r.n) && r.years.includes(entry.year) ? grouped.find((g) => g.properties.n === r.n) : null;
+      if (f) f.geometry = { type: "MultiPolygon", coordinates: namedBack.get(r.n) };
+    }
     splitSvalbard(grouped, entry.year);
     if (entry.year === 1400) splitMing1400(grouped);
     const areas = new Map();
