@@ -50,6 +50,8 @@ export function play(cue: Cue, force = false) {
   if (!force && !soundOn()) return;
   try {
     ctx ??= new AudioContext();
+    // iPhones pause audio after a call or a trip to another app; wake it on the next tap
+    if (ctx.state !== "running") void ctx.resume();
     const t0 = ctx.currentTime;
     const loud = cue === "wrong" ? 0.07 : 0.12;
     for (const [freq, start, len] of NOTES[cue]) {
