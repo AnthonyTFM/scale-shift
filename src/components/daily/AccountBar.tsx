@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { SignInButton, SignOutButton, useAuth } from "@clerk/nextjs";
+import { useAccount } from "./SignInProvider";
 import { rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 
@@ -11,7 +11,7 @@ export function AccountBar() {
 }
 
 function Bar() {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn, openSignIn, signOut, opening } = useAccount();
   const [name, setName] = useState<string | null | undefined>(undefined);
 
   useEffect(() => {
@@ -32,20 +32,16 @@ function Bar() {
       {isSignedIn ? (
         <>
           <span>{name ? <>Signed in as <strong className="text-ink">{name}</strong>.</> : name === null ? "Signed in. Play today's challenge to join the board." : "Signed in."}</span>
-          <SignOutButton redirectUrl="/leaderboard">
-            <button type="button" className="font-semibold text-link hover:underline">
-              Sign out
-            </button>
-          </SignOutButton>
+          <button type="button" onClick={() => signOut("/leaderboard")} className="font-semibold text-link hover:underline">
+            Sign out
+          </button>
         </>
       ) : (
         <>
           <span>Keep your nickname on every device:</span>
-          <SignInButton mode="modal" withSignUp forceRedirectUrl="/leaderboard" signUpForceRedirectUrl="/leaderboard">
-            <button type="button" className="font-semibold text-link hover:underline">
-              Sign in →
-            </button>
-          </SignInButton>
+          <button type="button" onClick={() => openSignIn("/leaderboard")} disabled={opening} className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
+            {opening ? "Opening sign-in…" : "Sign in →"}
+          </button>
         </>
       )}
     </p>

@@ -7,7 +7,7 @@ import { loadPlayer, savePlayer, type Player } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
 import { signInOn } from "@/lib/sign-in";
-import { useAuth } from "@clerk/nextjs";
+import { useAccount } from "./SignInProvider";
 import { AccountJoin } from "./AccountJoin";
 import { dailyCopy as t } from "@/content/daily";
 import { TrophyIcon } from "@/components/site/Icons";
@@ -24,7 +24,7 @@ export function LeaderboardJoin(props: Props) {
 }
 
 function SignedInGate(props: Props) {
-  const { isLoaded, isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAccount();
   return <JoinGate joined={isLoaded ? !!isSignedIn : undefined}>
       <AccountJoin {...props} />
     </JoinGate>;
