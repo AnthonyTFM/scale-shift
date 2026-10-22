@@ -31,7 +31,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **Borders sweep into each new era (Oct 22):** changing era (Play, ◀ ▶, the slider, typing a year) moves borders to their new place over 2 seconds (`src/components/map/sweep.ts`). A country that gains land spreads into it from its old border; a new country sweeps in from one side (its border with whoever carries on the country it takes most land from, else its longest border), never from every edge at once. **Only the border moves:** the frame is the new era's normal tiles with the old era's picture clipped to the land the border hasn't reached, plus the moving border line in the map's own style, so colours, solid/dashed lines and lakes never change, and the end is exactly the new era's map. Who carries on whom uses the colours from `scripts/lib/colors.mjs` (decided on the whole world, not the view). Names stay on, follow their country and switch halfway when it is renamed; new countries are named from halfway. Moving the map mid-sweep or "reduce motion" shows the new era straight away; Play waits for each sweep. (A first slide, #47–#51, was removed in #54 because colours, dotted lines and names changed during it; this version keeps all of them.) **Lakes are the same on every era:** big lakes (`scripts/build-lakes.mjs` → `public/data/lakes.json`, natural lakes of 1,000 km² or more from Natural Earth) are drawn as water on top of every era's tiles, since the sources disagree about which lakes they cut out.
 - **The map lives only on `/map`.** The homepage leads to games, the map and information pages: a game-first hero (today's game card, a map card and today's leaderboard over a light, slowly turning globe), then how to play, the daily fact, a directory of the site and this week's picks. Kept as Anthony built it when the Daylight Arcade look arrived (Oct 21, Evan's call); only its colours changed.
 - **Daily puzzles** are picked by a seeded shuffle of the date, so everyone gets the same five. The leaderboard re-marks answers on the server.
-- **Daily game screens (Oct 21–22, Anthony's calls):** a 5-pill progress bar and, for players with a streak, a "N day streak" pill above it. Each round reveals the web-map size as a dashed outline and the true size as a solid shape, then shows a dark verdict panel and "Next round". **Results order:** score with a fun title (5 "Emperor!", 4 "Empire builder!", 3 "Regional power", 0–2 "The map fooled you"), the five result tiles, then **"Get on the leaderboard" first** (the full sign-up opens only after Join), then the streak / today's rank / all-time cards, one compact share row (Share · Picture · Challenge), the answers ("Compare sizes on the map") and a big gold "Play more rounds for fun". Signing in from /daily pulls today's result from the account straight away, so a player who already played lands on their results without a refresh or a replay. Drawn icons (`src/components/site/Icons.tsx`) are used instead of emoji where they carry meaning.
+- **Daily game screens (Oct 21–22, Anthony's calls):** a 5-pill progress bar and, for players with a streak, a "N day streak" pill above it. Each round reveals the web-map size as a dashed outline and the true size as a solid shape, then shows a dark verdict panel and "Next round". **Results order:** score with a fun title (5 "Emperor!", 4 "Empire builder!", 3 "Regional power", 0–2 "The map fooled you"), the five result tiles, then **"Get on the leaderboard" first** (the full sign-up opens only after Join), then the streak / today's rank / all-time cards, one compact share row (Share · Picture · Challenge), the answers ("Compare sizes on the map") and a big gold "Play more rounds for fun". Signing in from /daily pulls today's result from the account straight away, so a player who already played lands on their results without a refresh or a replay. Drawn icons (`src/components/site/Icons.tsx`) are used instead of emoji where they carry meaning. **Oct 22 follow-ups:** every historical place has a "what it was / today" note (`src/content/daily-context.ts`; new pool shapes need one too); "Play more rounds for fun" scrolls back to the top of the new round; sounds are on by default (players who turn them off stay off); the reveal's second line uses the same 15% threshold as the cards' "Map: 1.2× too big" chips.
 - **Growing the puzzle pool (Oct 20):** new shapes are added in `scripts/build-daily.mjs` and get a `since` date two days after the build; a dated puzzle only uses shapes in the pool that day, so past puzzles (and today's in every time zone) never change and the server keeps marking them correctly. Never edit or remove a shape whose `since` date has passed (or that has none). Leave out states the map data shows outside the years they existed. Pool: 337 shapes (Oct 20).
 - **Weekly review (Mondays 8:47 ET, scheduled task):** checks the news for border and dispute changes (two reliable sources before editing), new historical findings, upstream map-data releases, and adds ~20 more puzzle shapes. Pool growth merges after CI; history corrections and map-data rebuilds wait for Anthony's OK.
 - **Leaderboard sign-up (Oct 19):** an email and a nickname are required to join. Emails are stored privately in Redis (`lb2:emails`), never returned by the API, and each inbox gets one player. Emails are not verified yet: that needs a real domain plus Resend (see roadmap).
@@ -65,22 +65,29 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - Leaderboard emails aren't verified, so someone could sign up with an address that isn't theirs. One player per inbox and the 5-new-players-per-network daily cap limit the damage.
 - Vercel's Hobby plan is for non-commercial use. Keep the repo public, or move to Pro, if either owner's merges stop deploying.
 
+## How we work (agreed Oct 22)
+- **One task at a time.** The queue lives in issue #40. Claude builds one task end to end, then a separate **reviewer agent** checks it independently (bugs, accuracy, Anthony's exact words, a phone-size playthrough). Facts get a second **fact-check agent** with two sources each. Anthony confirms the merge, and only then does the next task start.
+- Map data and the map engine are Evan's area; problems found there go to him as issues (#89, #93).
+
 ## Roadmap (agreed Oct 22; each item its own PR, Anthony confirms before merging)
+**Done Oct 22:** history notes for all 120 historical places (#94), "Play more rounds for fun" starts at the top (#95), sounds on by default (#96), the reveal's map line matches the cards (#97).
+
 **Now: fix everything else first**
 1. Docs on the new name and decisions (this file, README, CLAUDE.md).
-2. Site-wide accessibility and speed audit after the rebrand.
-3. Load sign-in (Clerk) only when someone taps Join or Sign in.
-4. Evan (issue #89): close Antarctica to the South Pole (#38); faster `/map` on phones.
+2. Load sign-in (Clerk) only when someone taps Join or Sign in (#91).
+3. Site-wide accessibility audit after the rebrand (#92).
+4. A full systems check: speed, errors, UI and transitions, spelling and grammar, copyright, design quality; report back with questions.
+5. Evan: close Antarctica to the South Pole (#38) and faster `/map` on phones (#89); 15 daily shapes that don't match their real history (#93).
 
 **Next: the game**
-5. **Endless streak mode:** unlimited matchups, harder each round (big tricks first, then pairs within ~10%), ending on the first miss. Best streaks go on a leaderboard joined the same way as the daily; the server re-checks every answer.
-6. **More places:** islands and territories, more empires and peoples. Real data only; past daily puzzles never change.
-7. **Sounds:** copyright-safe (CC0) meme-style win and fail clips; no real meme or TikTok audio.
-8. **Explainer:** in each reveal, a short animation slides the shape from its latitude to the equator and shrinks it, with one plain sentence.
+6. **Endless streak mode:** unlimited matchups, harder each round (big tricks first, then pairs within ~10%), ending on the first miss. Best streaks go on a leaderboard joined the same way as the daily; the server re-checks every answer.
+7. **More places:** islands and territories, more empires and peoples. Real data only; past daily puzzles never change.
+8. **Sounds:** copyright-safe (CC0) meme-style win and fail clips; no real meme or TikTok audio.
+9. **Explainer:** in each reveal, a short animation slides the shape from its latitude to the equator and shrinks it, with one plain sentence.
 
 **Later**
-9. Launch checklist before any money (issue #40): domain, Clerk production, analytics, Resend, LLC, a licence check before selling anything made from GPL map data.
-10. Provinces and continents in search, more snapshots at famous peaks (Rome AD 117, Ottomans 1683, British Empire 1922), a "who ruled this spot?" puzzle, side-by-side mode, globe view, historical populations, translations.
+10. Launch checklist before any money (issue #40): domain, Clerk production, analytics, Resend, LLC, a licence check before selling anything made from GPL map data.
+11. Provinces and continents in search, more snapshots at famous peaks (Rome AD 117, Ottomans 1683, British Empire 1922), a "who ruled this spot?" puzzle, side-by-side mode, globe view, historical populations, translations.
 
 ## Open decisions
 - Domain: buy borderdrift.com (check it is still free), then connect it and switch Clerk to production
