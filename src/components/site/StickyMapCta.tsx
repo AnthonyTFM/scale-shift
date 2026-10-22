@@ -35,7 +35,8 @@ export function StickyMapCta() {
   if (path === "/daily") return null;
   const shown = pastHero && !scrollingDown;
   return (
-    <div
+    <aside
+      aria-label={home.stickyCta}
       aria-hidden={!shown}
       inert={!shown}
       className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-3 pb-2 pt-3 backdrop-blur transition-transform duration-200 md:hidden ${
@@ -45,6 +46,6 @@ export function StickyMapCta() {
       <Link href="/map" className="btn btn-primary btn-lg mb-1.5 w-full">
         {home.stickyCta}
       </Link>
-    </div>
+    </aside>
   );
 }

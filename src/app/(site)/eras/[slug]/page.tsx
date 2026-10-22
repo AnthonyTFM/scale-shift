@@ -119,7 +119,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
               Largest {e.key === "present" ? "countries today" : `in ${e.label}`}
             </h2>
             <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
-            <div className="mt-4 overflow-x-auto rounded-card border border-line bg-white">
+            <div tabIndex={0} role="region" aria-label={`Table: largest ${e.key === "present" ? "countries today" : `in ${e.label}`}`} className="mt-4 overflow-x-auto rounded-card border border-line bg-white">
               <table className="w-full min-w-[520px] text-left text-sm">
                 <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
                   <tr>
