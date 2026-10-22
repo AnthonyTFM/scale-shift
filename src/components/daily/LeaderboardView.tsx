@@ -68,7 +68,7 @@ export function LeaderboardView() {
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className="rounded-lg px-3 py-2 aria-selected:bg-panel aria-selected:text-panel-text sm:px-5"
+            className="min-h-11 rounded-xl px-3 py-2 font-bold aria-selected:bg-primary aria-selected:text-white sm:px-5"
           >
             {label}
           </button>
@@ -170,7 +170,7 @@ function DayTable({ board }: { board: DayBoard }) {
       </thead>
       <tbody className="divide-y divide-line">
         {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
-          <tr key={`${i}-${r.name}`} className={r.me ? "bg-amber-100 font-bold" : undefined}>
+          <tr key={`${i}-${r.name}`} className={r.me ? "bg-[#FFF1C7] font-bold" : undefined}>
             <td className="px-3 py-2.5 text-ink sm:px-4">
               {medal(r.rank) ?? r.rank}
               <span className="sr-only">{medal(r.rank) ? ` (rank ${r.rank})` : ""}</span>
@@ -178,7 +178,7 @@ function DayTable({ board }: { board: DayBoard }) {
             <td className="max-w-0 px-2 py-2.5 text-ink">
               <span className="flex min-w-0 items-center gap-1.5">
                 <span className="truncate">{r.name}</span>
-                {r.me ? <span className="shrink-0 rounded bg-panel px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
+                {r.me ? <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
               </span>
             </td>
             <td className="px-3 py-2.5 text-right font-mono text-ink sm:px-4">{r.score}/5</td>
@@ -234,12 +234,12 @@ function AllTable({
         </thead>
         <tbody className="divide-y divide-line">
           {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
-            <tr key={`${i}-${r.name}`} className={r.me ? "bg-amber-100 font-bold" : undefined}>
+            <tr key={`${i}-${r.name}`} className={r.me ? "bg-[#FFF1C7] font-bold" : undefined}>
               <td className="px-3 py-2.5 text-ink sm:px-4">{medal(r.rank) ?? r.rank}</td>
               <td className="max-w-0 px-2 py-2.5 text-ink">
                 <span className="flex min-w-0 items-center gap-1.5">
                   <span className="truncate">{r.name}</span>
-                  {r.me ? <span className="shrink-0 rounded bg-panel px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
+                  {r.me ? <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
                 </span>
               </td>
               <td className="px-2 py-2.5 text-right font-mono text-ink">{r.points}</td>

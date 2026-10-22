@@ -33,6 +33,8 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import type { DayBoard } from "@/lib/leaderboard-types";
 import { dailyCopy } from "@/content/daily";
+import { FlameIcon, MarkIcon } from "@/components/site/Icons";
+import { useAuth } from "@clerk/nextjs";
 
 const reveal = dailyCopy.reveal;
 const R = dailyCopy.results;
@@ -77,6 +79,19 @@ async function loadRound(seed: string, date: string | null): Promise<Round> {
 const scoreOf = (round: Round, choices: number[]) => choices.filter((c, i) => round.questions[i]?.answer === c).length;
 
 type Game = { round: Round; today: string; save: DailySave; choices: number[]; step: number };
+
+/** Signed-in players: take today's result from their account (played on another device) and show it here. */
+function syncAccount(setGame: React.Dispatch<React.SetStateAction<Game | null>>) {
+  fetch(`/api/leaderboard/me?today=${localDateKey()}`)
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d: { player?: { id: string; name: string | null } | null; days?: Record<string, { c: number[]; s: number }> } | null) => {
+      if (d?.player?.name) rememberPlayer({ id: d.player.id, name: d.player.name });
+      if (!d?.days || !Object.keys(d.days).length) return;
+      const save = mergeDays(d.days);
+      setGame((g) => (g ? official(g, save) : g));
+    })
+    .catch(() => {});
+}
 
 /** Load today's round (or a fresh practice round) and any saved progress for today. */
 async function prepare(practice: boolean): Promise<Game> {
@@ -138,16 +153,7 @@ export function DailyChallenge() {
     // another tab answered: show its progress here too, so tabs never disagree (or let today be played twice)
     const sync = () => setGame((g) => (g ? catchUp(g) : g));
     // signed in: bring in this player's results from the leaderboard, so every device shows the same (first) score
-    if (signInOn)
-      fetch(`/api/leaderboard/me?today=${localDateKey()}`)
-        .then((r) => (r.ok ? r.json() : null))
-        .then((d: { player?: { id: string; name: string | null } | null; days?: Record<string, { c: number[]; s: number }> } | null) => {
-          if (d?.player?.name) rememberPlayer({ id: d.player.id, name: d.player.name });
-          if (!d?.days || !Object.keys(d.days).length) return;
-          const save = mergeDays(d.days);
-          setGame((g) => (g ? official(g, save) : g));
-        })
-        .catch(() => {});
+    if (signInOn) syncAccount(setGame);
     window.addEventListener("storage", sync);
     window.addEventListener("focus", sync);
     return () => {
@@ -218,6 +224,7 @@ export function DailyChallenge() {
             : `${challenge.name} sent you Daily #${challenge.day}, but this is today's. Play it and send your score back.`}
         </p>
       ) : null}
+      {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
       {signInOn && !finished && round.date ? <PlayedElsewhere /> : null}
       <Progress round={round} choices={choices} step={step} />
       {finished ? (
@@ -252,6 +259,22 @@ export function DailyChallenge() {
 }
 
 // ---------- pieces ----------
+
+/**
+ * Signing in opens in a window over the page, so the page never reloads: when the player becomes signed in, fetch their
+ * account's result for today straight away (no refresh needed), which jumps to their results if they already played.
+ */
+function OnSignIn({ run }: { run: () => void }) {
+  const { isLoaded, isSignedIn } = useAuth();
+  const was = useRef<boolean | undefined>(undefined);
+  useEffect(() => {
+    if (!isLoaded) return;
+    // the first check is the page load, which the game already handles; only a change to signed in runs again
+    if (was.current === false && isSignedIn) run();
+    was.current = !!isSignedIn;
+  }, [isLoaded, isSignedIn, run]);
+  return null;
+}
 
 /** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
 function Skeleton() {
@@ -687,37 +710,40 @@ function Results({
 
       {round.date ? (
         <>
+          {/* getting on the leaderboard is the first thing after the score */}
+          <LeaderboardJoin date={round.date} choices={choices} />
           <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
             {[
-              [R.streak, `${s.streak}🔥`, R.best(s.best)],
+              [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
               [R.rank, rank ? `#${rank.rank}` : "—", rank ? R.rankOf(rank.of) : R.rankNone],
               [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
             ].map(([k, v, sub]) => (
-              <div key={k} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
+              <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
                 <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
                 <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
                 <dd className="order-3 text-xs text-muted">{sub}</dd>
               </div>
             ))}
           </dl>
-          <div className="mt-6 grid gap-2">
-            <button type="button" onClick={share} className="btn btn-primary btn-lg w-full">
-              {R.share}
+          {/* sharing: one compact row, so the leaderboard stays the main call to action */}
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
+              <span className="sm:hidden">{R.shareShort}</span>
+              <span className="hidden sm:inline">{R.share}</span>
             </button>
-            <div className="grid grid-cols-2 gap-2">
-              <button type="button" onClick={shareImage} className="btn btn-white btn-lg px-3 text-[15px] leading-tight sm:text-[1.0625rem]">
-                <span aria-hidden="true" className="hidden sm:inline">📸</span> {R.picture}
-              </button>
-              <button type="button" onClick={challengeFriend} className="btn btn-red btn-lg px-3 text-[15px] leading-tight sm:text-[1.0625rem]">
-                {R.challenge}
-              </button>
-            </div>
+            <button type="button" onClick={shareImage} className="btn btn-white h-12 px-2 text-sm sm:text-base">
+              <span className="sm:hidden">{R.pictureShort}</span>
+              <span className="hidden sm:inline">{R.picture}</span>
+            </button>
+            <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-red h-12 px-2 text-sm sm:text-base">
+              <span className="sm:hidden">{R.challengeShort}</span>
+              <span className="hidden sm:inline">{R.challenge}</span>
+            </button>
           </div>
           <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
             {copied}
           </p>
           {shareBox.box}
-          <LeaderboardJoin date={round.date} choices={choices} />
         </>
       ) : (
         <div className="mt-6 grid gap-2 sm:grid-cols-2">
@@ -737,12 +763,12 @@ function Results({
           const small = q.options[1 - q.answer];
           return (
             <li key={i} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
-              <span aria-hidden="true">{choices[i] === q.answer ? "✅" : "❌"}</span>
+              <MarkIcon right={choices[i] === q.answer} className="size-5 translate-y-1" />
               <span className="min-w-0 flex-1 text-ink">
                 <strong>{big.n}</strong> <span className="text-muted">({big.sub})</span> is {(big.a / small.a).toFixed(1)}× the size of <strong>{small.n}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} aria-label={`Drag ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
+              <Link href={mapHref(q)} aria-label={`Compare the sizes of ${big.n} and ${small.n} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
                 {R.dragOnMap} →
               </Link>
             </li>
@@ -751,11 +777,13 @@ function Results({
       </ol>
 
       {round.date ? (
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-4">
-          <Countdown />
-          <button type="button" onClick={onPractice} className="inline-flex min-h-11 items-center font-bold text-primary hover:underline">
-            {R.practice} →
+        <div className="mt-4 border-t border-line pt-4">
+          <button type="button" onClick={onPractice} className="btn btn-gold btn-lg w-full">
+            {R.practice} <span aria-hidden="true">→</span>
           </button>
+          <div className="mt-2 text-center">
+            <Countdown />
+          </div>
         </div>
       ) : null}
     </section>
