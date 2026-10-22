@@ -35,7 +35,7 @@ export const dailyCopy = {
   // the results screen
   results: {
     title: (score: number, total: number) =>
-      score === total ? "Map master!" : score === total - 1 ? "Empire builder!" : score === total - 2 ? "Rising power!" : score >= 2 ? "Border skirmish!" : "The map got you!",
+      score === total ? "Emperor!" : score === total - 1 ? "Empire builder!" : score === total - 2 ? "Regional power" : "The map fooled you",
     verdict: (score: number, total: number) =>
       score === total
         ? "Perfect. Mercator can't fool you."
@@ -43,8 +43,10 @@ export const dailyCopy = {
           ? "Sharp eye. One got past you."
           : score >= 3
             ? "Not bad. The map tricked you twice."
-            : "The map fooled you today. New questions tomorrow.",
+            : "Tricky round. New questions tomorrow.",
     scoreSr: (score: number, total: number) => `You got ${score} out of ${total}.`,
+    // above the progress bar while playing, for players with a streak going
+    streakPill: (n: number) => `${n} day streak`,
     practiceRound: "Practice round",
     streak: "Streak",
     best: (n: number) => `Best ${n}`,

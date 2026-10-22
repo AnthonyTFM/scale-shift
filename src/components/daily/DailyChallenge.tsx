@@ -226,6 +226,7 @@ export function DailyChallenge() {
       ) : null}
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
       {signInOn && !finished && round.date ? <PlayedElsewhere /> : null}
+      {!finished && round.date ? <StreakPill save={save} today={today} /> : null}
       <Progress round={round} choices={choices} step={step} />
       {finished ? (
         <Results
@@ -312,6 +313,20 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
         );
       })}
     </ol>
+  );
+}
+
+/** "6 day streak" while playing: days in a row up to yesterday (today counts once it's finished). Hidden with no streak. */
+function StreakPill({ save, today }: { save: DailySave; today: string }) {
+  const { streak } = stats(save, today);
+  if (!streak) return null;
+  return (
+    <p className="mb-2 flex justify-end">
+      <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-sm font-bold text-ink shadow-[0_3px_0_0_var(--color-line)]">
+        <FlameIcon className="size-5" />
+        {R.streakPill(streak)}
+      </span>
+    </p>
   );
 }
 
