@@ -21,7 +21,7 @@ const WHOLE_WORD = [
   "dick", "cock", "sex", "sexy", "ass", "arse", "cum", "tit", "tits", "hoe", "thot", "kys", "anal", "anus", "semen", "prick", "crap",
   "piss", "wank", "horny", "nonce", "honky", "slag", "skank", "pedo", "paedo", "nazis", "heil",
   // names that pretend to be the site
-  "admin", "moderator", "mod", "official", "scaleshift", "staff",
+  "admin", "moderator", "mod", "official", "scaleshift", "borderdrift", "borderdriftofficial", "staff",
 ];
 
 // Real words and places that contain a blocked root. Removed before checking.

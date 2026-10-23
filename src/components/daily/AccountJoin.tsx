@@ -8,6 +8,7 @@ import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
 import { useAccount } from "./SignInProvider";
 import { TrophyIcon } from "@/components/site/Icons";
+import { AgeCheck, useAgeOk } from "./AgeCheck";
 
 type Props = { date: string; choices: number[] };
 type Me = { id: string; name: string | null; reminders: boolean } | null;
@@ -30,6 +31,8 @@ export function AccountJoin({ date, choices }: Props) {
   const nameRef = useRef<HTMLInputElement>(null);
   const remindRef = useRef<HTMLInputElement>(null);
   const sent = useRef(false);
+  const [ageOk, setAgeOk] = useAgeOk();
+  const [ageError, setAgeError] = useState(false);
 
   const saveReminders = async (on: boolean) => {
     setRemindNote("");
@@ -106,8 +109,11 @@ export function AccountJoin({ date, choices }: Props) {
 
   return (
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
-      <div className="flex items-baseline justify-between gap-2">
-        <h3 className="flex items-center gap-2 font-display text-lg text-ink sm:text-xl"><TrophyIcon className="size-7" /> Today&apos;s leaderboard</h3>
+      {/* on the narrowest phones "See all" drops to its own line rather than crowd the heading */}
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
+          <TrophyIcon className="size-5 min-[400px]:size-6 sm:size-7" /> Today&apos;s leaderboard
+        </h3>
         <Link href="/leaderboard" className="whitespace-nowrap text-sm font-semibold text-primary hover:underline">
           See all →
         </Link>
@@ -121,7 +127,26 @@ export function AccountJoin({ date, choices }: Props) {
             Sign in to put your score on the public leaderboard. We&apos;ll send a code to your email (or use Google), so nobody else can post as
             you, and you keep the same nickname on every device.
           </p>
-          <button type="button" onClick={() => openSignIn("/daily")} disabled={opening} className="btn btn-primary mt-3 h-12">
+          <AgeCheck
+            ok={ageOk}
+            error={ageError}
+            onChange={(v) => {
+              setAgeOk(v);
+              if (v) setAgeError(false);
+            }}
+          />
+          <button
+            type="button"
+            onClick={() => {
+              if (!ageOk) {
+                setAgeError(true);
+                return document.getElementById("age-ok")?.focus();
+              }
+              openSignIn("/daily");
+            }}
+            disabled={opening}
+            className="btn btn-primary mt-3 h-12"
+          >
             {opening ? "Opening sign-in…" : "Sign in to post my score"}
           </button>
         </div>

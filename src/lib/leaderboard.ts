@@ -14,7 +14,7 @@ import { createHash, createHmac, timingSafeEqual } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import pool from "@/data/daily-pool.json";
-import { buildQuestions, shiftDate, type PoolEntry } from "./daily";
+import { buildQuestions, LAUNCH, shiftDate, type PoolEntry } from "./daily";
 import { isOffensive } from "./name-filter";
 import removed from "@/content/removed-players.json";
 import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow, WeekBoard } from "./leaderboard-types";
@@ -106,6 +106,16 @@ interface Store {
   bumpNetwork(date: string, netKey: string): Promise<number>;
   day(date: string): Promise<{ id: string; name: string; s: number; t: number }[]>;
   allTime(limit: number, me: string | null): Promise<{ total: number; top: { id: string; name: string; points: number; days: number }[]; me: { name: string; points: number; days: number; above: number } | null }>;
+  /** removes everything stored about this player: scores, nickname, email, reminders and the account link */
+  deletePlayer(id: string, accountId: string | null): Promise<void>;
+}
+
+/** Every date a score could have been posted on, from launch to tomorrow (UTC), for wiping one player's scores. */
+function playableDates(now = new Date()) {
+  const out: string[] = [];
+  const end = shiftDate(now.toISOString().slice(0, 10), 1);
+  for (let d = LAUNCH; d <= end; d = shiftDate(d, 1)) out.push(d);
+  return out;
 }
 
 // --- Redis (Upstash REST) ---
@@ -261,6 +271,25 @@ function redisStore(url: string, token: string): Store {
         me: meRow,
       };
     },
+    async deletePlayer(id, accountId) {
+      const [name, email] = await run([
+        ["HGET", "lb2:names", id],
+        ["HGET", "lb2:emails", id],
+      ]);
+      const nk = typeof name === "string" ? nameKey(name) : null;
+      const ek = typeof email === "string" ? checkEmail(email).key : null;
+      const [nameOwner, emailOwner] = await run([
+        ["HGET", "lb2:owners", nk ?? "-"],
+        ["HGET", "lb2:email-owners", ek ?? "-"],
+      ]);
+      const cmds: (string | number)[][] = playableDates().map((d) => ["HDEL", `lb2:day:${d}`, id]);
+      cmds.push(["ZREM", "lb2:points", id], ["HDEL", "lb2:days", id], ["HDEL", "lb2:names", id], ["HDEL", "lb2:emails", id], ["HDEL", "lb2:reminders", id]);
+      // the nickname and email are freed only if they belong to this player
+      if (nk && nameOwner === id) cmds.push(["HDEL", "lb2:owners", nk]);
+      if (ek && emailOwner === id) cmds.push(["HDEL", "lb2:email-owners", ek]);
+      if (accountId) cmds.push(["HDEL", "lb2:accounts", accountId]);
+      await run(cmds);
+    },
   };
 }
 
@@ -399,6 +428,15 @@ function fileStore(file: string): Store {
         me: mine ? { name: mine.name, points: mine.points, days: mine.days, above: all.filter((r) => r.points > mine.points).length } : null,
       };
     },
+    deletePlayer: (id, accountId) =>
+      write((d) => {
+        for (const day of Object.values(d.days)) delete day[id];
+        delete d.names[id];
+        if (d.emails) delete d.emails[id];
+        if (d.reminders) delete d.reminders[id];
+        for (const map of [d.owners, d.emailOwners]) for (const [k, v] of Object.entries(map ?? {})) if (v === id) delete map![k];
+        if (accountId && d.accounts) delete d.accounts[accountId];
+      }),
   };
 }
 

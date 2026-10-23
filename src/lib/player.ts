@@ -40,3 +40,12 @@ export function rememberPlayer(p: { id: string; name: string }) {
 
 /** Player ID for "highlight me" on the leaderboard, without creating one. */
 export const playerId = () => loadPlayer()?.id ?? null;
+
+/** After deleting their data: this browser forgets the player too. */
+export function forgetPlayer() {
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    /* storage blocked */
+  }
+}
