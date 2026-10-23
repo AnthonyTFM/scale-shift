@@ -91,4 +91,5 @@ Processed map files ship in `public/data/`, so you don't need to do anything. To
 | `npm run build` / `npm start` | Production build / serve |
 | `npm run lint` / `npm run typecheck` | Code checks |
 | `npm run data` | Rebuild the map data files and the daily challenge pool |
+| `npm run data:stats` | Rebuild only the era statistics from the era files (no downloads) |
 | `npm run leads` | Print feedback messages (from Redis if the Upstash settings are in `.env.local`, else `data/submissions.json`) |

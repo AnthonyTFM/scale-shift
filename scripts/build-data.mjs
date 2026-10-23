@@ -20,6 +20,7 @@ import { recolorEraFiles, settleEraFiles } from "./lib/colors.mjs";
 import { separateEraFiles } from "./lib/overlaps.mjs";
 import { fillGapEraFiles } from "./lib/gaps.mjs";
 import { writeFileRetrying } from "./lib/files.mjs";
+import { eraStatsFromFiles } from "./lib/era-stats.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const CACHE = path.join(ROOT, ".cache");
@@ -464,7 +465,6 @@ async function main() {
   const index = await ensureSnapshots();
   const eras = [];
   const polities = new Map(); // name -> { y: [], a: [], e: [], s }
-  const eraAreas = []; // per era: Map name -> km2
   const gridSources = []; // per era: named features, used for "Who ruled here?"
 
   for (const entry of index) {
@@ -500,14 +500,9 @@ async function main() {
     }
     splitSvalbard(grouped, entry.year);
     if (entry.year === 1400) splitMing1400(grouped);
-    const areas = new Map();
     for (const f of grouped) {
-      const a = km2(f.geometry);
-      f.properties.a = Math.round(a);
-      if (f.properties.n) {
-        f.properties.l = labelPoint(f.geometry);
-        areas.set(f.properties.n, a);
-      }
+      f.properties.a = Math.round(km2(f.geometry));
+      if (f.properties.n) f.properties.l = labelPoint(f.geometry);
     }
     // empire totals: a polity plus everything listing it as SUBJECTO
     const empire = new Map();
@@ -557,7 +552,6 @@ async function main() {
       named.reduce((sum, f) => sum + f.properties.b, 0) / Math.max(1, named.length),
     );
     eras.push({ key, year: entry.year, label: eraLabel(entry.year), count: named.length, precision, bytes });
-    eraAreas.push(areas);
     console.log(
       `  ${eraLabel(entry.year).padEnd(9)} ${String(named.length).padStart(4)} polities  ${(bytes / 1024).toFixed(0)} KB  ${joined} islands joined to their state, ${patches.length} left as not mapped (${Math.round(patches.reduce((t, f) => t + f.properties.a, 0) / 1000)}k km²)`,
     );
@@ -659,37 +653,7 @@ async function main() {
   const searchBytes = writeJson(path.join(OUT_PUBLIC, "polities.json"), searchIndex);
   console.log(`  ${searchIndex.length} searchable names  ${(searchBytes / 1024).toFixed(0)} KB`);
 
-  console.log("5/6 Era statistics");
-  const stats = eras.map((era, i) => {
-    const areas = eraAreas[i];
-    const out = { key: era.key, top: [], gained: [], lost: [], appeared: [], vanished: [] };
-    if (!areas) {
-      const top = [...present].sort((a, b) => b.properties.a - a.properties.a).slice(0, 12);
-      out.top = top.map((f) => ({ n: f.properties.n, a: f.properties.a }));
-      return out;
-    }
-    out.top = [...areas.entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 12)
-      .map(([n, a]) => ({ n, a: Math.round(a) }));
-    const prev = eraAreas[i - 1];
-    if (!prev) return out;
-    const significant = (before, after) => Math.abs(after - before) > Math.max(20000, 0.08 * Math.max(before, after));
-    const changes = [];
-    for (const [n, a] of areas) {
-      if (prev.has(n)) {
-        const b = prev.get(n);
-        if (significant(b, a)) changes.push({ n, from: Math.round(b), to: Math.round(a) });
-      } else if (a > 20000) out.appeared.push({ n, a: Math.round(a) });
-    }
-    for (const [n, b] of prev) if (!areas.has(n) && b > 20000) out.vanished.push({ n, a: Math.round(b) });
-    out.gained = changes.filter((c) => c.to > c.from).sort((x, y) => y.to - y.from - (x.to - x.from)).slice(0, 8);
-    out.lost = changes.filter((c) => c.to < c.from).sort((x, y) => x.to - x.from - (y.to - y.from)).slice(0, 8);
-    out.appeared = out.appeared.sort((x, y) => y.a - x.a).slice(0, 8);
-    out.vanished = out.vanished.sort((x, y) => y.a - x.a).slice(0, 8);
-    return out;
-  });
-  console.log("6/6 Who-ruled-here grid");
+  console.log("5/6 Who-ruled-here grid");
   const gridBytes = writeJson(path.join(OUT_PUBLIC, "rulers-grid.json"), buildGrid(gridSources));
   console.log(`  ${(gridBytes / 1024).toFixed(0)} KB`);
 
@@ -716,6 +680,9 @@ async function main() {
   console.log(
     `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
   );
+  // read from the finished era files, so the era pages' figures match what the map draws (see lib/era-stats.mjs)
+  console.log("6/6 Era statistics");
+  const stats = eraStatsFromFiles(ROOT, eras);
   writeJson(path.join(OUT_SRC, "era-stats.json"), stats);
   writeJson(path.join(OUT_PUBLIC, "era-stats.json"), stats);
   console.log("Done.");

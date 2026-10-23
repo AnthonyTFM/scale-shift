@@ -13,7 +13,8 @@ import { mapLink } from "@/lib/share";
 import { EventCard } from "@/components/EventCard";
 import { breadcrumbJsonLd, JsonLd, PageHero } from "@/components/site/PageHero";
 
-type Change = { n: string; from: number; to: number };
+// `was`: the name it had in the snapshot before, when the sources renamed it
+type Change = { n: string; was?: string; from: number; to: number };
 type Named = { n: string; a: number };
 type Stats = { key: string; top: Named[]; gained: Change[]; lost: Change[]; appeared: Named[]; vanished: Named[] };
 const stats = statsData as Stats[];
@@ -45,6 +46,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates: { canonical: `/eras/${eraSlug(e.key)}` },
   };
 }
+
+const renamed = (c: Change) => (c.was ? `${c.n} (was ${c.was})` : c.n);
 
 function ChangeList({ title, rows }: { title: string; rows: { n: string; detail: string }[] }) {
   if (!rows.length) return null;
@@ -168,8 +171,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
               Based on the two snapshots. Some differences reflect better mapping rather than real events, especially before 1500.
             </p>
             <div className="mt-4 grid gap-4 md:grid-cols-2">
-              <ChangeList title="Grew the most" rows={s.gained.map((c) => ({ n: c.n, detail: `${km(c.from)} → ${km(c.to)}` }))} />
-              <ChangeList title="Shrank the most" rows={s.lost.map((c) => ({ n: c.n, detail: `${km(c.from)} → ${km(c.to)}` }))} />
+              <ChangeList title="Grew the most" rows={s.gained.map((c) => ({ n: renamed(c), detail: `${km(c.from)} → ${km(c.to)}` }))} />
+              <ChangeList title="Shrank the most" rows={s.lost.map((c) => ({ n: renamed(c), detail: `${km(c.from)} → ${km(c.to)}` }))} />
               <ChangeList title="Appeared" rows={s.appeared.map((c) => ({ n: c.n, detail: km(c.a) }))} />
               <ChangeList title="Disappeared" rows={s.vanished.map((c) => ({ n: c.n, detail: km(c.a) }))} />
             </div>
