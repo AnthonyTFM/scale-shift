@@ -78,7 +78,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       items: [
         ["Vercel", "hosts the site."],
         ["Clerk", "handles sign-in (email codes, or Google if you choose it)."],
-        ["Upstash", "stores the leaderboard database."],
+        ["Upstash", "stores the leaderboard database and the messages you send us through the feedback form."],
         ["Resend", "will send reminder emails once they start, and may deliver feedback messages to us."],
       ],
       paras: ["These companies process data for us under their own privacy and security terms. Your data may be processed in the United States and other countries where they operate."],

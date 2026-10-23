@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: e.key === "present" ? "World map today: borders, disputes and real sizes" : `World map in ${e.label}: borders, empires and real sizes`,
     description: summary(e.key).slice(0, 155),
-    alternates: { canonical: `/eras/${slug}` },
+    alternates: { canonical: `/eras/${eraSlug(e.key)}` },
   };
 }
 

@@ -22,6 +22,7 @@ import {
 } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
 import { LeaderboardJoin } from "./LeaderboardJoin";
+import { POSTED_EVENT, type Posted } from "./useJoin";
 import { formatBoth } from "@/lib/format";
 import { mapUrl } from "@/lib/share";
 import { readChallenge, type Challenge } from "@/lib/challenge";
@@ -674,8 +675,9 @@ function Results({
   const [copied, setCopied] = useState("");
   const shareBox = useShareBox();
   const verdict = R.verdict(score, total);
-  // where today's score sits on today's public board (your own row if you're on it, otherwise where you'd land)
-  const [rank, setRank] = useState<{ rank: number; of: number } | null>(null);
+  // where today's score sits on today's public board: your own row if you're on it, otherwise where you'd land if you
+  // joined (and says so, so nobody thinks they're already ranked)
+  const [rank, setRank] = useState<{ rank: number; of: number; joined: boolean } | null>(null);
   useEffect(() => {
     if (!round.date) return;
     const id = playerId();
@@ -684,9 +686,19 @@ function Results({
       .then((b) => {
         if (!b) return;
         const mine = b.rows.find((r) => r.me) ?? b.me;
-        setRank(mine ? { rank: mine.rank, of: b.total } : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1 });
+        setRank(
+          mine
+            ? { rank: mine.rank, of: b.total, joined: true }
+            : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1, joined: false },
+        );
       })
       .catch(() => {});
+    const posted = (e: Event) => {
+      const d = (e as CustomEvent<Posted>).detail;
+      if (d.date === round.date) setRank({ rank: d.rank, of: d.total, joined: true });
+    };
+    window.addEventListener(POSTED_EVENT, posted);
+    return () => window.removeEventListener(POSTED_EVENT, posted);
   }, [round.date, score]);
 
   const challengeFriend = () => {
@@ -772,7 +784,7 @@ function Results({
           <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
             {[
               [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
-              [R.rank, rank ? `#${rank.rank}` : "—", rank ? R.rankOf(rank.of) : R.rankNone],
+              [rank && !rank.joined ? R.rankIfJoined : R.rank, rank ? `#${rank.rank}` : "—", rank ? R.rankOf(rank.of) : R.rankNone],
               [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
             ].map(([k, v, sub]) => (
               <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">

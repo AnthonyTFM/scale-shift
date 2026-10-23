@@ -112,7 +112,7 @@ _Last updated: October 23, 2026_
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | Set to `https://scale-shift.vercel.app` (all environments). A typo (`ttps://`) was fixed on Oct 18; the live sitemap was checked on Oct 19 and all 69 links are correct. |
 | `NEXT_PUBLIC_GA4_ID` | Not set yet (no analytics) |
-| `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` (+ `NOTIFY_EMAIL_FROM`) | Not set yet, so the live site's forms don't save anything |
+| `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` (+ `NOTIFY_EMAIL_FROM`) | Optional extras. Since Oct 23 form messages are saved in the leaderboard's Upstash Redis (list `fb:inbox`, newest first, last 1,000 kept); read them with `npm run leads` or Upstash's data browser. Each new message logs `[feedback] new message <id>` (no personal details) in Vercel's logs for the hourly check |
 | Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`, added by Vercel → Storage) | Set Oct 19. The live API reports `X-Leaderboard-Store: redis`. |
 | Clerk (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY`, added by Vercel → Marketplace → Clerk) | Set Oct 19 (Production + Preview), Clerk **development** keys (`pk_test_`): email verification code on, password off. Switch to production keys once we own a domain. |
 
@@ -125,7 +125,7 @@ _Last updated: October 23, 2026_
 **Open setup items**
 1. ~~Invite Evan as a collaborator~~ Done Oct 19.
 2. ~~Confirm Evan's test PR deploys~~ Done Oct 19: PR #5 merged and deployed to production under his name.
-3. Connect form delivery: set `SUBMISSIONS_WEBHOOK_URL` or the Resend settings in Vercel. Until then the live site's forms don't save.
+3. Optional: get an email for each form message by setting the Resend settings (or `SUBMISSIONS_WEBHOOK_URL`) in Vercel. Messages are already kept in Redis (`fb:inbox`) without this.
 4. ~~Add Upstash Redis~~ Done Oct 19.
 5. ~~Pick the final name~~ Done Oct 21: Border Drift. Domain: see Open decisions.
 6. Later: Slack with @Claude for both owners.

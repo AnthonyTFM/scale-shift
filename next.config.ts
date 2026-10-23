@@ -25,6 +25,10 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  // era pages live at /eras/2000-bce; the page also accepts /eras/2000bce, so send that to the one address
+  async redirects() {
+    return [{ source: "/eras/:year(\\d+)bce", destination: "/eras/:year-bce", permanent: true }];
+  },
   async headers() {
     return [
       {
