@@ -63,16 +63,16 @@ export function sameSize(c: SizeCountry, count = 5) {
 }
 
 /**
- * The country to draw next to it: about the same size but stretched very differently by a web map, so the picture
- * shows the trick (Greenland next to Mexico). Countries near the equator get a far-north partner, and the other way
+ * The country to draw next to it: close in size but stretched very differently by a web map, so the picture shows
+ * the trick (Greenland next to Algeria). Far-north and far-south countries get one near the equator, and the other way
  * round; failing that, the nearest in size.
  */
 export function partnerFor(c: SizeCountry) {
   const near = sizeCountries
-    .filter((o) => o.slug !== c.slug && o.a / c.a > 0.5 && o.a / c.a < 2)
+    .filter((o) => o.slug !== c.slug && o.a / c.a > 0.75 && o.a / c.a < 1.33)
     .sort((x, y) => Math.abs(Math.log(x.a / c.a)) - Math.abs(Math.log(y.a / c.a)));
   const contrast = c.stretch >= 1.5 ? near.find((o) => o.stretch < 1.3) : near.find((o) => o.stretch >= 2);
-  return contrast ?? near[0] ?? sameSize(c, 1)[0];
+  return contrast ?? sameSize(c, 1)[0];
 }
 
 /** "1.9×" / "16×" */

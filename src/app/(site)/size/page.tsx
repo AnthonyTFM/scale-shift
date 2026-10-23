@@ -7,7 +7,7 @@ import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
   title: "How big is every country, really? Real sizes vs the map",
-  description: t.index.lead.slice(0, 155),
+  description: t.index.description,
   alternates: { canonical: "/size" },
 };
 
