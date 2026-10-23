@@ -50,6 +50,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 - `npm run dev`: local site at http://localhost:3000
 - `npm run lint && npm run typecheck && npm run build && npm run check:data`: must all pass before a PR
 - `npm run data`: rebuild map data, Antarctic claims and the daily puzzle pool
+- `npm run data:stats`: rebuild only the era statistics (era pages' "Largest" and "What changed") from the era files, no downloads
 - `npm run leads`: print form submissions (Redis when the Upstash settings are available, else the local file)
 
 ## Rules

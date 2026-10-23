@@ -7,8 +7,9 @@ import { formatArea, type AreaUnit } from "@/lib/format";
 import { TakenFormalized } from "@/components/EventCard";
 import dataVersion from "@/data/data-version.json";
 
-type Change = { n: string; from: number; to: number };
+type Change = { n: string; after?: string; from: number; to: number };
 type Named = { n: string; a: number };
+const renamed = (c: Change) => (c.after ? `${c.n} (after ${c.after})` : c.n);
 export type EraStats = { key: string; top: Named[]; gained: Change[]; lost: Change[]; appeared: Named[]; vanished: Named[] };
 
 let statsPromise: Promise<EraStats[]> | null = null;
@@ -80,8 +81,8 @@ export function ChangesPanel({ era, unit, onClose, onFocus }: Props) {
       )}
       {stats && era !== "present" ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <List title="Grew most" items={stats.gained.slice(0, 5).map((c) => ({ n: c.n, detail: `+${formatArea(c.to - c.from, unit)}` }))} />
-          <List title="Shrank most" items={stats.lost.slice(0, 5).map((c) => ({ n: c.n, detail: `−${formatArea(c.from - c.to, unit)}` }))} />
+          <List title="Grew most" items={stats.gained.slice(0, 5).map((c) => ({ n: renamed(c), detail: `+${formatArea(c.to - c.from, unit)}` }))} />
+          <List title="Shrank most" items={stats.lost.slice(0, 5).map((c) => ({ n: renamed(c), detail: `−${formatArea(c.from - c.to, unit)}` }))} />
           <List title="Appeared" items={stats.appeared.slice(0, 5).map((c) => ({ n: c.n, detail: formatArea(c.a, unit) }))} />
           <List title="Gone" items={stats.vanished.slice(0, 5).map((c) => ({ n: c.n, detail: formatArea(c.a, unit) }))} />
         </div>
