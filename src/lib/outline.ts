@@ -72,9 +72,10 @@ export const mainBox = (o: Outline): Box => mainPart(o).b;
 
 /**
  * A normal web map can't really draw the poles: Mercator stretches Antarctica into a strip along the bottom edge, which
- * nobody recognises. For a shape that close to a pole, the "normal map" drawing is its true outline blown up to the area
- * the map gives it (Antarctica: about 24× its real area), so it still shrinks to its real size on the reveal. Both
- * drawings are in the same units (km at the same scale), so scaling by √(map area ÷ real area) is exact.
+ * nobody recognises. For a shape centred within 10° of a pole (only Antarctica), the "normal map" drawing is its own true
+ * outline blown up to the area the map gives it (Antarctica: about 24× its real area), so the size is the map's and the
+ * shape stays recognisable. Both drawings are in the same units (km at the same scale), so scaling by
+ * √(map area ÷ real area) is exact.
  */
 export function withMapDrawing(file: ShapeFile, e: { a: number; m: number; lat: number }): ShapeFile {
   if (Math.abs(e.lat) < 80) return file;
