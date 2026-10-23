@@ -1,117 +1,28 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Link from "next/link";
-import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
-import { loadPlayer, rememberPlayer } from "@/lib/player";
-import { track } from "@/lib/analytics";
 import { isOffensive } from "@/lib/name-filter";
 import { useAccount } from "./SignInProvider";
 import { TrophyIcon } from "@/components/site/Icons";
-import { AgeCheck, useAgeOk } from "./AgeCheck";
-
-type Props = { date: string; choices: number[] };
-type Me = { id: string; name: string | null; reminders: boolean } | null;
+import type { Join } from "./useJoin";
 
 /**
- * After the daily round, with sign-in on: sign in (an email code or Google) so nobody else can post as you, pick a
- * nickname once, and your score posts as the same player on every device.
+ * The results card for a player on today's leaderboard (signed in, nickname picked): their rank, today's top five, a
+ * nickname change and the reminder emails. Getting on the board in the first place happens in the join pop-up.
  */
-export function AccountJoin({ date, choices }: Props) {
-  const { isLoaded, isSignedIn, openSignIn, signOut, opening, prepare } = useAccount();
-  // this panel opens when a player taps Join: fetch sign-in now, so its window opens without a wait
-  useEffect(prepare, [prepare]);
-  const [me, setMe] = useState<Me | undefined>(undefined);
-  const [editing, setEditing] = useState(false);
-  const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
-  const [error, setError] = useState("");
-  const [result, setResult] = useState<Extract<SubmitResult, { ok: true }> | null>(null);
-  const [top, setTop] = useState<DayBoard | null>(null);
-  const [remindNote, setRemindNote] = useState("");
+export function AccountJoin({ join }: { join: Join }) {
+  const { isSignedIn, signOut } = useAccount();
+  const { me, editing, setEditing, status, setStatus, error, setError, result, top, remindNote, submit, saveReminders } = join;
   const nameRef = useRef<HTMLInputElement>(null);
-  const remindRef = useRef<HTMLInputElement>(null);
-  const sent = useRef(false);
-  const [ageOk, setAgeOk] = useAgeOk();
-  const [ageError, setAgeError] = useState(false);
 
-  const saveReminders = async (on: boolean) => {
-    setRemindNote("");
-    const before = me;
-    if (me) setMe({ ...me, reminders: on });
-    try {
-      const res = await fetch("/api/leaderboard/reminders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ on }),
-      });
-      const data = (await res.json()) as { ok: boolean; error?: string };
-      if (!data.ok) {
-        setMe(before);
-        return setRemindNote(data.error ?? "Couldn't save that. Please try again.");
-      }
-      setRemindNote(on ? "Done. We'll email you when a new challenge is up." : "Done. No more reminder emails.");
-    } catch {
-      setMe(before);
-      setRemindNote("Couldn't reach the server. Please try again.");
-    }
-  };
-
-  const submit = async (name: string, reminders?: boolean) => {
-    setStatus("sending");
-    setError("");
-    try {
-      const res = await fetch("/api/leaderboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        // `player` only matters for a brand-new player: it keeps the scores this browser already posted
-        body: JSON.stringify({ player: loadPlayer()?.id ?? "", name, date, choices, website: "" }),
-      });
-      const data = (await res.json()) as SubmitResult;
-      if (!data.ok) {
-        setStatus("error");
-        setError(data.error);
-        if (data.field === "name") setEditing(true);
-        return;
-      }
-      if (data.player) rememberPlayer(data.player);
-      setMe((m) => ({ id: data.player?.id ?? m?.id ?? "", name, reminders: m?.reminders ?? false }));
-      setResult(data);
-      setStatus("done");
-      setEditing(false);
-      if (!data.duplicate) track("leaderboard_join", { rank: data.rank });
-      if (reminders) await saveReminders(true);
-      const board = await fetch(`/api/leaderboard?scope=day&date=${date}&limit=5&player=${data.player?.id ?? ""}`).then((r) => (r.ok ? r.json() : null));
-      setTop(board);
-    } catch {
-      setStatus("error");
-      setError("Couldn't reach the leaderboard. Check your connection and try again.");
-    }
-  };
-
-  // signed in: find out who we are; a returning player's score is posted straight away
-  useEffect(() => {
-    if (!isLoaded || !isSignedIn) return;
-    fetch("/api/leaderboard/me")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d: { player?: Me } | null) => {
-        const p = d?.player ?? null;
-        setMe(p);
-        if (p?.name && !sent.current) {
-          sent.current = true;
-          submit(p.name);
-        }
-      })
-      .catch(() => setMe(null));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isLoaded, isSignedIn]);
-
-  const askName = isSignedIn && me !== undefined && (!me?.name || editing);
+  const askName = isSignedIn && me !== undefined && editing;
 
   return (
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       {/* on the narrowest phones "See all" drops to its own line rather than crowd the heading */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h3 className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
+        <h3 id="lb-card-h" tabIndex={-1} className="flex items-center outline-none gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
           <TrophyIcon className="size-5 min-[400px]:size-6 sm:size-7" /> Today&apos;s leaderboard
         </h3>
         <Link href="/leaderboard" className="whitespace-nowrap text-sm font-semibold text-primary hover:underline">
@@ -119,41 +30,6 @@ export function AccountJoin({ date, choices }: Props) {
         </Link>
       </div>
 
-      {!isLoaded ? <p className="mt-2 text-sm text-muted">Loading…</p> : null}
-
-      {isLoaded && !isSignedIn ? (
-        <div className="mt-2">
-          <p className="text-sm text-ink-soft">
-            Sign in to put your score on the public leaderboard. We&apos;ll send a code to your email (or use Google), so nobody else can post as
-            you, and you keep the same nickname on every device.
-          </p>
-          <AgeCheck
-            id="age-ok-join"
-            ok={ageOk}
-            error={ageError}
-            onChange={(v) => {
-              setAgeOk(v);
-              if (v) setAgeError(false);
-            }}
-          />
-          <button
-            type="button"
-            onClick={() => {
-              if (!ageOk) {
-                setAgeError(true);
-                return document.getElementById("age-ok-join")?.focus();
-              }
-              openSignIn("/daily");
-            }}
-            disabled={opening}
-            className="btn btn-primary mt-3 h-12"
-          >
-            {opening ? "Opening sign-in…" : "Sign in to post my score"}
-          </button>
-        </div>
-      ) : null}
-
-      {isSignedIn && me === undefined ? <p className="mt-2 text-sm text-muted">Loading your spot…</p> : null}
 
       {askName ? (
         <form
@@ -163,7 +39,7 @@ export function AccountJoin({ date, choices }: Props) {
             const name = nameRef.current?.value.trim() ?? "";
             if (name.length < 3) return (setStatus("error"), setError("Use 3 to 16 characters."));
             if (isOffensive(name)) return (setStatus("error"), setError("Please pick a different nickname."));
-            submit(name, me?.name ? undefined : (remindRef.current?.checked ?? false));
+            submit(name);
           }}
         >
           <label htmlFor="lb-name" className="block text-sm font-semibold text-ink">
@@ -184,18 +60,9 @@ export function AccountJoin({ date, choices }: Props) {
               disabled={status === "sending"}
               className="btn btn-primary mb-1.5 h-11 shrink-0 px-4"
             >
-              {status === "sending" ? "Saving…" : me?.name ? "Save" : "Join"}
+              {status === "sending" ? "Saving…" : "Save"}
             </button>
           </div>
-          {me?.name ? null : (
-            <label className="mt-3 flex items-start gap-2 text-sm text-ink">
-              <input ref={remindRef} type="checkbox" className="mt-0.5 size-4 shrink-0 accent-primary" />
-              <span>
-                Email me when a new daily challenge is up, so I can defend my spot on the leaderboard.{" "}
-                <span className="text-muted">Optional. Unsubscribe any time with one click.</span>
-              </span>
-            </label>
-          )}
           <p className="mt-1 text-xs text-muted">
             Please don&apos;t use your full real name as a nickname. Only your first try each day counts. Your email is never shown or shared.
           </p>

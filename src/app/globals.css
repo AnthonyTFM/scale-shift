@@ -345,9 +345,31 @@ body {
 .pop-in {
   animation: pop-in 0.35s ease-out both;
 }
+/* the join pop-up: rises from the bottom on phones, fades up in the middle on wider screens */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes sheet-in {
+  from { transform: translateY(12px) scale(0.98); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+.sheet[open] {
+  animation: sheet-up 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@media (min-width: 768px) {
+  .sheet[open] { animation-name: sheet-in; }
+}
+/* the page behind the pop-up doesn't scroll */
+html:has(dialog.sheet[open]) {
+  overflow: hidden;
+}
+.sheet::backdrop {
+  background: rgb(29 33 64 / 0.45);
+}
 @media (prefers-reduced-motion: reduce) {
   .press, .press-card, .btn, .reveal-map, .reveal-true { transition: none; }
-  .pop-in, .reveal-shake, .reveal-win { animation: none; }
+  .pop-in, .reveal-shake, .reveal-win, .sheet[open] { animation: none; }
 }
 
 /* ---------- page transitions (homepage → daily game, homepage globe → map) ---------- */
