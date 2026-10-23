@@ -31,7 +31,7 @@ export function PlayedElsewhere() {
             openSignIn("/daily");
           }}
           disabled={opening}
-          className="inline-flex min-h-8 items-center font-bold text-primary hover:underline"
+          className="inline-flex min-h-11 items-center font-bold text-primary hover:underline"
         >
           {opening ? (
             t.signInOpening

@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-line bg-white pb-24 text-ink md:pb-0">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
         <div>
-          <Link href="/" aria-label={`${site.name} home`} className="inline-block rounded-lg">
+          <Link href="/" aria-label={`${site.name} home`} className="inline-flex min-h-11 items-center rounded-lg">
             <Wordmark />
           </Link>
           <p className="mt-3 max-w-xs text-sm text-muted">{site.tagline}</p>
@@ -17,10 +17,10 @@ export function SiteFooter() {
         </div>
         <nav aria-label="Explore">
           <p className="text-xs font-bold uppercase tracking-wide text-muted">Explore</p>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm md:grid-cols-1">
             {nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="font-medium text-ink-soft hover:text-primary hover:underline">
+                <Link href={item.href} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
                   {item.label}
                 </Link>
               </li>
@@ -29,10 +29,10 @@ export function SiteFooter() {
         </nav>
         <nav aria-label="About">
           <p className="text-xs font-bold uppercase tracking-wide text-muted">About</p>
-          <ul className="mt-3 space-y-2 text-sm">
+          <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm md:grid-cols-1">
             {footerNav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="font-medium text-ink-soft hover:text-primary hover:underline">
+                <Link href={item.href} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
                   {item.label}
                 </Link>
               </li>
