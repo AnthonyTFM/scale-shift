@@ -19,7 +19,7 @@ type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | null; f
 const rankCell = (rank: number) =>
   rank <= 3 ? (
     <>
-      <MedalIcon place={rank as 1 | 2 | 3} />
+      <MedalIcon place={rank as 1 | 2 | 3} className="-my-0.5 size-6" />
       <span className="sr-only">{rank}</span>
     </>
   ) : (

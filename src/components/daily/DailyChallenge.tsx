@@ -35,7 +35,7 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import type { DayBoard } from "@/lib/leaderboard-types";
 import { dailyCopy } from "@/content/daily";
-import { FlameIcon, MarkIcon, SpeakerIcon, TargetIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, MarkIcon, SpeakerIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
 import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
@@ -368,7 +368,7 @@ function SoundToggle() {
       }}
       className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-xs font-bold text-ink-soft hover:text-ink"
     >
-      <SpeakerIcon on={on} /> Sound {on ? "on" : "off"}
+      <SpeakerIcon on={on} /> Sound
     </button>
   );
 }
@@ -498,7 +498,7 @@ function QuestionCard({
                 aria-hidden="true"
                 className={`grid size-8 shrink-0 place-items-center rounded-full text-base ${correct ? "bg-green text-ink" : "bg-red text-white"}`}
               >
-                {correct ? "✓" : "✗"}
+                <TickIcon right={correct} className="size-4" />
               </span>
               {perfect ? reveal.perfect : correct ? reveal.right : reveal.wrong}
             </p>
@@ -740,7 +740,7 @@ function Results({
               right ? "bg-green text-ink shadow-[0_5px_0_0_var(--color-green-shadow)]" : "bg-red text-white shadow-[0_5px_0_0_var(--color-red-shadow)]"
             }`}
           >
-            <span aria-hidden="true">{right ? "✓" : "✗"}</span>
+            <TickIcon right={right} className="size-6" />
             <span className="sr-only">
               Question {i + 1}: {right ? "correct" : "wrong"}
             </span>

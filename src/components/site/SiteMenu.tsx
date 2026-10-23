@@ -158,8 +158,8 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
 }
 
 /** The drawn icon on a main menu row. */
-function MenuIcon({ name }: { name: string }) {
-  const Icon = ICONS[name as keyof typeof ICONS];
+function MenuIcon({ name }: { name: keyof typeof ICONS }) {
+  const Icon = ICONS[name];
   return (
     <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-xl bg-tile">
       <Icon className="size-7" />

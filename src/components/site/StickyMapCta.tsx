@@ -6,26 +6,27 @@ import { usePathname } from "next/navigation";
 import { home } from "@/content/home";
 import { loadSave, localDateKey } from "@/lib/daily";
 
-// pages where the bar would only get in the way: forms and long reading
-const HIDDEN = /^\/(daily|contact|privacy|terms|about|unsubscribed)(\/|$)/;
+// pages where the bar would only get in the way: the game, forms and the small print
+const HIDDEN = /^\/(daily|contact|privacy|terms|unsubscribed)(\/|$)/;
 // pages where today's game is the better next step, until it's played
 const PLAY_FIRST = /^\/(leaderboard|eras)(\/|$)/;
 
 /**
  * Phone-only "open the map" bar. It slides away while you scroll down to read and comes back when you scroll up, so it
  * never sits on top of what you're reading. Hidden on the daily challenge so it never covers the game, on forms and
- * long reading pages, and on the homepage until the hero (with its own map button and the globe) has scrolled fully out
+ * the small print, and on the homepage until the hero (with its own map button and the globe) has scrolled fully out
  * of view. On the leaderboard and era pages it offers today's game instead, until that's played.
  */
 export function StickyMapCta() {
   const path = usePathname();
   const [pastHero, setPastHero] = useState(path !== "/");
   const [scrollingDown, setScrollingDown] = useState(false);
-  const [unplayed, setUnplayed] = useState(false);
+  // null until this browser's saved game has been read (after load). Blocked storage, or a game played on another
+  // device, reads as unplayed: the bar then offers the game, and /daily shows the result straight away.
+  const [unplayed, setUnplayed] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // read after load: the saved game lives in this browser only
-    queueMicrotask(() => setUnplayed(PLAY_FIRST.test(path) && typeof loadSave().days[localDateKey()]?.s !== "number"));
+    queueMicrotask(() => setUnplayed(typeof loadSave().days[localDateKey()]?.s !== "number"));
   }, [path]);
 
   useEffect(() => {
@@ -46,8 +47,11 @@ export function StickyMapCta() {
   }, [path]);
 
   if (HIDDEN.test(path)) return null;
-  const shown = pastHero && !scrollingDown;
-  const label = unplayed ? home.stickyPlay : home.stickyCta;
+  const playFirst = PLAY_FIRST.test(path);
+  const play = playFirst && unplayed === true;
+  // on play-first pages the bar waits for that check, so it slides in once with the right button instead of swapping
+  const shown = pastHero && !scrollingDown && (!playFirst || unplayed !== null);
+  const label = play ? home.stickyPlay : home.stickyCta;
   return (
     <aside
       aria-label={label}
@@ -57,7 +61,7 @@ export function StickyMapCta() {
         shown ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <Link href={unplayed ? "/daily" : "/map"} className={`btn ${unplayed ? "btn-gold" : "btn-primary"} btn-lg mb-1.5 w-full`}>
+      <Link href={play ? "/daily" : "/map"} className={`btn ${play ? "btn-gold" : "btn-primary"} btn-lg mb-1.5 w-full`}>
         {label}
       </Link>
     </aside>
