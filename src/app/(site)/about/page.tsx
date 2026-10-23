@@ -21,7 +21,7 @@ const faqs = [
   },
   {
     q: "How accurate are the historical borders?",
-    a: "Borders after about 1815 are mostly fixed by treaties and are reasonably precise. Before about 1800, the source marks every border as approximate. Many peoples had no fixed borders at all, so those lines are scholarly estimates of zones of control.",
+    a: "Before about 1650 the source marks almost every border as approximate. From 1650 it rates most borders as precise, set by treaties. Many peoples had no fixed borders at all, so those lines are scholarly estimates of zones of control.",
   },
   {
     q: "What do 'taken' and 'made official' mean?",

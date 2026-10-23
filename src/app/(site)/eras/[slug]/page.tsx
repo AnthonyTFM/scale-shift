@@ -89,7 +89,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
       <JsonLd data={breadcrumbJsonLd(site.url, crumbs)} />
       <PageHero
         crumbs={crumbs}
-        eyebrow={appCopy.precision[e.precision]}
+        eyebrow={appCopy.eraPrecision[e.precision]}
         title={eraTitle(e)}
         lead={
           <>

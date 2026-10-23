@@ -3,7 +3,7 @@
 export const teachers = {
   eyebrow: "For teachers",
   title: "Everything on Border Drift, in one place",
-  lead: "A quick reference for the classroom: why world maps get sizes wrong, real areas for every country, 4,000 years of borders and today's disputes. Free, no sign-up, no ads.",
+  lead: "A quick reference for the classroom: why world maps get sizes wrong, real areas for today's countries, 4,000 years of borders and today's disputes. Free, no sign-up, no ads.",
   jump: [
     { id: "why", label: "Why maps distort" },
     { id: "sizes", label: "Real sizes" },
@@ -34,9 +34,11 @@ export const teachers = {
   },
 
   sizes: {
-    title: "Real sizes: every country",
-    lead: "True areas from our map outlines, and how much a normal web map inflates each one. Areas can differ from official figures by a few percent.",
+    title: "Real sizes: today's countries",
+    lead: "True areas from today's map, the same figures as the era pages, and how much a normal web map inflates each one. Very small countries and territories are left out. Areas can differ from official figures by a few percent.",
     mostTitle: "Most exaggerated by a normal map",
+    // under the tables: why a row can differ from 1 ÷ cos² of its listed latitude
+    note: "\"Too big\" is averaged over the whole country, so a country that spans many latitudes doesn't match 1 ÷ cos² of its middle exactly. Web maps stop at about 85° north and south, so for Antarctica it counts only the part a web map shows.",
     allTitle: "All countries, largest first",
   },
 
@@ -73,7 +75,7 @@ export const teachers = {
     title: "Sources and how to cite",
     paras: [
       "Historical borders come from the historical-basemaps project (GPL-3.0); present-day borders from Natural Earth (public domain). Areas are calculated from those outlines.",
-      "Historical borders are approximate, especially before 1500: many states had no fixed frontier. Each era page says how precise its borders are.",
+      "Historical borders are approximate, especially before about 1650: many states had no fixed frontier. Each era page says how precise its borders are.",
     ],
     citeLabel: "Suggested citation",
     citation: (url: string) => `Border Drift. "Real size of countries and empires." ${url}. Accessed [date].`,

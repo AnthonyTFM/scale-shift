@@ -55,12 +55,12 @@ export default function ErasPage() {
                     />
                     <span className="font-display text-2xl text-ink">{e.label}</span>
                     <span className="mt-1 text-sm text-muted">
-                      {e.count} mapped {e.key === "present" ? "countries" : "states & peoples"}
+                      {e.count} mapped {e.key === "present" ? "countries & territories" : "states & peoples"}
                     </span>
                     <span
                       className={`mt-2 self-start rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${e.precision >= 3 ? "bg-green-soft text-green-text ring-green/40" : "bg-gold-soft text-ink ring-gold"}`}
                     >
-                      {appCopy.precision[e.precision]}
+                      {appCopy.eraPrecision[e.precision]}
                     </span>
                     {eraIntros[e.key] ? <span className="mt-2 line-clamp-3 text-sm text-ink-soft">{eraIntros[e.key]}</span> : null}
                   </Link>

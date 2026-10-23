@@ -22,7 +22,7 @@ export const eraIntros: Record<string, string> = {
   "1914":
     "On the eve of the First World War, European empires control most of Africa and much of Asia, and the Russian, Ottoman and Austro-Hungarian empires are still standing.",
   "1920":
-    "Four empires have fallen. New states fill Central and Eastern Europe, and the USSR is emerging from civil war.",
+    "Four empires have fallen. New states fill Central and Eastern Europe, and Soviet Russia is emerging from civil war.",
   "1938":
     "The last full year of peace before the Second World War. Germany has just annexed Austria and the Sudetenland.",
   "1945":
@@ -30,7 +30,7 @@ export const eraIntros: Record<string, string> = {
   "1960":
     "The Year of Africa, when 17 African countries win independence. The Cold War divides Europe.",
   "1994":
-    "The Soviet Union and Yugoslavia have broken up, adding more than 20 countries to the map in three years.",
+    "The Soviet Union, Yugoslavia and Czechoslovakia have broken up into 22 countries in just a few years.",
   present:
     "Today's borders, as drawn by Natural Earth. Hatched areas show where control on the ground and international recognition don't match.",
 };

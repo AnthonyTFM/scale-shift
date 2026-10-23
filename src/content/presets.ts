@@ -108,7 +108,7 @@ export const presets: Preset[] = [
     id: "rome-over-usa",
     category: "surprising",
     title: "Roman Empire on the United States",
-    hook: "Rome at its height (100 CE), dropped onto North America.",
+    hook: "Rome near its peak (the 100 CE map; it was largest in 117), dropped onto North America.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "United States" },

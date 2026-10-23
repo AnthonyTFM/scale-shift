@@ -165,7 +165,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
                 (meta?.precision ?? 1) >= 3 ? "bg-emerald-400/15 text-emerald-200" : "bg-amber-400/15 text-amber-200"
               }`}
             >
-              {appCopy.precision[meta?.precision ?? 1]}
+              {appCopy.eraPrecision[meta?.precision ?? 1]}
             </span>
           </div>
           <label className="sr-only" htmlFor="era-range">

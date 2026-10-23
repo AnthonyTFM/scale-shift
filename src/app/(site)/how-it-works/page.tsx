@@ -52,7 +52,8 @@ export default function HowItWorksPage() {
             <p>
               Almost every web map uses the Mercator projection. It keeps shapes and directions right locally, which is great for navigation.
               The cost is size: the farther from the equator, the more it inflates area. At 60° north (Oslo, Anchorage), land looks four times
-              bigger than it is. Greenland, centered near 72° north, looks roughly ten times too big.
+              bigger than it is. Greenland&apos;s middle sits near 72° north, where the stretch is about 10 times, and its northern half is closer
+              still to the pole, so the whole island is drawn about 16 times too big.
             </p>
           </div>
           <div className="overflow-x-auto card">
