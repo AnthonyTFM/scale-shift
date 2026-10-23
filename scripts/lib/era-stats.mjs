@@ -8,8 +8,8 @@
 //   - src/content/lineages.ts lists them as one state and one clearly takes over from the other between two snapshots:
 //     "British American colonies" → "United States of America";
 // and never when the two are on the map in the same era (Zhou states and Qin, the four zones of Germany), or when one is
-// a colony (it has a ruler) and the other isn't by name alone: the 1783 "India" of the East India Company is not the
-// Mughal Empire.
+// one state carrying on as a colony through lineages.ts: the 1783 "India" of the East India Company is not the Mughal
+// Empire. (Joins are for all eras at once, so two names on the map together in any one era always stay two countries.)
 import fs from "node:fs";
 import path from "node:path";
 
@@ -41,6 +41,19 @@ function sameName(long, short) {
     .slice(s.length + 1)
     .split(/\s+/)
     .every((w) => GENERIC.has(w));
+}
+
+/** Two spellings of one name ("Castile" / "Castilla"): at most two letters apart. */
+function spelling(a, b) {
+  [a, b] = [bare(a).toLowerCase(), bare(b).toLowerCase()];
+  if (Math.abs(a.length - b.length) > 2) return false;
+  let prev = Array.from({ length: b.length + 1 }, (_, k) => k);
+  for (let x = 1; x <= a.length; x++) {
+    const cur = [x];
+    for (let y = 1; y <= b.length; y++) cur[y] = Math.min(prev[y] + 1, cur[y - 1] + 1, prev[y - 1] + (a[x - 1] === b[y - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length] <= 2;
 }
 
 /** First letters of the distinctive words in a name, to tell "Parthia" → "Parthian Empire" from "Seleucid Kingdom". */
@@ -80,26 +93,23 @@ function countryGroups(nodesByEra, lineages) {
     root.set(ra, rb);
     for (const i of wa) wb.add(i);
   };
-  // exactly the same name is the same country, colony or not (1914 lists the Russian Empire under a ruler, 1945 the US)
-  for (const n of all) if (n.startsWith("c:") && when.has(nameOf(n))) join(n, nameOf(n));
-  // same name apart from a bracket, "of" or a generic word: colonies with colonies, states with states. Biggest first,
-  // so when several share a name at once (the four parts of Rome in 300) the biggest carries it on.
-  for (const kind of [(n) => n.startsWith("c:"), (n) => !n.startsWith("c:")]) {
-    const list = all.filter(kind).sort((a, b) => size.get(b) - size.get(a));
-    const byStem = new Map(); // first word → names, to keep this from comparing every pair
-    for (const n of list) {
-      const k = bare(nameOf(n)).toLowerCase().split(/\s+/)[0];
-      if (!byStem.has(k)) byStem.set(k, []);
-      byStem.get(k).push(n);
-    }
-    for (const long of list) {
-      const words = bare(nameOf(long)).toLowerCase().split(/\s+/);
-      // the short name is the start of the long one, or what follows its last "of"
-      const of = words.lastIndexOf("of");
-      for (const k of new Set([words[0], of >= 0 ? words[of + 1] : null].filter(Boolean)))
-        for (const short of byStem.get(k) ?? [])
-          if (short !== long && nameOf(short).length <= nameOf(long).length && sameName(nameOf(long), nameOf(short))) join(long, short);
-    }
+  // same name apart from a bracket, "of" or a generic word, colony or not ("Italy" ruled by Italy in 1914 is the Kingdom
+  // of Italy; "Viceroyalty of Peru" becomes "Peru"). Biggest first, so when several share a name at once (the four parts
+  // of Rome in 300) the biggest carries it on.
+  const list = [...all].sort((a, b) => size.get(b) - size.get(a));
+  const byWord = new Map(); // first word → names, to keep this from comparing every pair
+  for (const n of list) {
+    const k = bare(nameOf(n)).toLowerCase().split(/\s+/)[0];
+    if (!byWord.has(k)) byWord.set(k, []);
+    byWord.get(k).push(n);
+  }
+  for (const long of list) {
+    const words = bare(nameOf(long)).toLowerCase().split(/\s+/);
+    // the short name is the start of the long one, or what follows its last "of"
+    const of = words.lastIndexOf("of");
+    for (const k of new Set([words[0], of >= 0 ? words[of + 1] : null].filter(Boolean)))
+      for (const short of byWord.get(k) ?? [])
+        if (short !== long && bare(nameOf(short)).length <= bare(nameOf(long)).length && sameName(nameOf(long), nameOf(short))) join(long, short);
   }
   // lineages.ts: between two snapshots, a listed name that is new follows on from a listed name that is gone, when
   // that's the only pair or their names share a word (Parthia → Parthian Empire). A colony can become a state (British
@@ -148,8 +158,20 @@ export function eraStatsFromFiles(root, eras) {
     nodes.push(byNode);
   }
   const groupOf = countryGroups(nodes, lineageLists(root));
-  // a group never has two nodes in one era, so each country here is exactly one name on the map
-  const countries = nodes.map((m) => new Map([...m].map(([node, a]) => [groupOf(node), { n: nameOf(node), a }])));
+  // per era: country → its area (all its names; a second one is at most a sliver) and the name it goes by (the biggest)
+  const countries = nodes.map((m) => {
+    const out = new Map();
+    for (const [node, a] of m) {
+      const k = groupOf(node);
+      const cur = out.get(k);
+      if (!cur) out.set(k, { n: nameOf(node), a, best: a });
+      else {
+        cur.a += a;
+        if (a > cur.best) [cur.n, cur.best] = [nameOf(node), a];
+      }
+    }
+    return out;
+  });
   // "(after …)" only for a name gone for good, not one the sources switch back and forth between
   const lastSeen = new Map();
   const firstSeen = new Map();
@@ -180,7 +202,8 @@ export function eraStatsFromFiles(root, eras) {
         if (p.a > MIN_CHANGE) out.vanished.push({ n: p.n, a: r(p.a) });
       } else if (significant(p.a, c.a)) {
         // a real hand-over: the old name is gone for good and the new one is new here (not "Germany (after West Germany)")
-        const renamed = !sameName(p.n, c.n) && !sameName(c.n, p.n) && lastSeen.get(p.n) < i && firstSeen.get(c.n) === i;
+        const renamed =
+          !sameName(p.n, c.n) && !sameName(c.n, p.n) && !spelling(p.n, c.n) && lastSeen.get(p.n) < i && firstSeen.get(c.n) === i;
         changes.push({ n: c.n, ...(renamed ? { after: p.n } : {}), from: r(p.a), to: r(c.a) });
       }
     }
