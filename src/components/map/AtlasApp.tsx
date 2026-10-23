@@ -129,14 +129,23 @@ export default function AtlasApp() {
     return list.length % PALETTE.length;
   };
 
+  // after adding or picking a shape: laptops open the panel on its card; phones keep the panel folded and close any
+  // sheet, so the shape stays in view with the bottom bar
+  const showShape = useCallback(() => {
+    setTab("explore");
+    if (!isPhone()) return setPanelOpen(true);
+    setInfo(null);
+    setKeyOpen(false);
+    setChangesOpen(false);
+  }, []);
+
   const addShape = useCallback(
     async (name: string, eraKey: string, opts: { fly?: boolean } = {}) => {
       // the same shape from the same era is already on the map: select it instead of adding a copy
       const existing = overlaysRef.current.find((o) => o.name === name && o.era === eraKey);
       if (existing) {
         setSelected(existing.id);
-        // phones keep the panel folded so the shape stays in view (the bottom bar shows it)
-        if (!isPhone()) setPanelOpen(true);
+        showShape();
         if (opts.fly !== false) fitTo([existing]);
         showToast(`${name} is already on the map.`);
         return;
@@ -152,12 +161,12 @@ export default function AtlasApp() {
       }
       setOverlays((prev) => [...prev, o]);
       setSelected(o.id);
-      if (!isPhone()) setPanelOpen(true);
+      showShape();
       track("add_shape", { name, era: eraKey });
       if (eraKey !== "us" && eraKey !== eraRef.current) showToast(`Showing ${name} as of ${eraByKey(eraKey)?.label}.`);
       if (opts.fly !== false) fitTo([o]);
     },
-    [fitTo, showToast],
+    [fitTo, showToast, showShape],
   );
 
   const applyShapes = useCallback(async (state: MapState) => {
@@ -478,8 +487,8 @@ export default function AtlasApp() {
       />
 
       {/* Panel (parity with the reference: title, search, selected shape, units, links) */}
-      <aside className="pointer-events-none absolute left-3 top-3 z-20 flex max-h-[calc(100dvh-120px)] w-[calc(100vw-80px)] max-w-[380px] flex-col sm:max-h-[calc(100dvh-130px)]">
-        <div className={`pointer-events-auto flex min-h-0 flex-col rounded-2xl bg-panel text-panel-text shadow-float ${panelOpen ? "overflow-hidden" : ""}`}>
+      <aside className="pointer-events-none absolute left-3 top-3 z-20 flex focus-within:z-40 max-h-[calc(100dvh-120px)] w-[calc(100vw-80px)] max-w-[380px] flex-col sm:max-h-[calc(100dvh-130px)]">
+        <div className="pointer-events-auto flex min-h-0 flex-col rounded-2xl bg-panel text-panel-text shadow-float">
           <div className="flex items-center gap-2 px-3 pb-1 pt-1.5 sm:px-4 sm:pb-3 sm:pt-3">
             <Link href="/" className="font-display text-lg font-bold tracking-tight sm:text-2xl">
               {site.name}
@@ -735,7 +744,14 @@ export default function AtlasApp() {
         >
           <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: PALETTE[phoneBar.color % PALETTE.length] }} />
           <span className="min-w-0 flex-1 truncate text-sm font-bold">{phoneBar.name}</span>
-          <button type="button" onClick={() => setPanelOpen(true)} className="h-10 rounded-lg bg-white/10 px-3 text-sm font-semibold">
+          <button
+            type="button"
+            onClick={() => {
+              setTab("explore");
+              setPanelOpen(true);
+            }}
+            className="h-10 rounded-lg bg-white/10 px-3 text-sm font-semibold"
+          >
             Edit
           </button>
           <button type="button" onClick={() => removeShape(phoneBar.id)} className="h-10 rounded-lg bg-rose-500/20 px-3 text-sm font-semibold text-rose-100">
