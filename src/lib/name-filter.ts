@@ -13,6 +13,8 @@ const ANYWHERE = [
   "fuck", "fuk", "shit", "cunt", "kunt", "bitch", "whore", "slut", "rape", "rapist", "twat", "wanker", "asshole", "arsehole", "porn",
   "biatch", "pussy", "penis", "vagina", "dildo", "jizz", "bastard", "bollock", "pedophil", "paedophil", "molest", "incest", "milf", "titty",
   "boob", "killyourself", "blowjob", "handjob", "cumshot", "orgasm", "masturbat", "erection", "testicle", "scrotum", "clitor",
+  // the site's own name, anywhere in a nickname ("BorderDriftTeam")
+  "borderdrift",
 ];
 
 // Roots blocked only as a whole word (so "Hancock", "Pakistan", "Scrap" and "Analyst" are fine). Plurals are covered.

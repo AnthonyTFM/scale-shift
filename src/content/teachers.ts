@@ -65,7 +65,7 @@ export const teachers = {
       ["Step through history", "Use the timeline under the map, or open an era page, to show how borders changed in a region."],
       ["Who ruled here?", "Click any spot on land to see who controlled it in every era, with disputes shown first on today's map."],
       ["Quick warm-up", "The daily challenge is five 'which is bigger?' questions, the same for everyone that day, and takes about two minutes. No sign-in needed to play."],
-      ["Any device", "Works in any modern browser on laptops, Chromebooks, tablets and phones. Nothing to install and no student accounts."],
+      ["Any device", "Works in any modern browser on laptops, Chromebooks, tablets and phones. Nothing to install and no student accounts. The optional leaderboard is for ages 13 and up."],
     ] as [string, string][],
   },
 

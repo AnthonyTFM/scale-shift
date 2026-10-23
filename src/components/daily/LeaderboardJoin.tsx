@@ -11,6 +11,7 @@ import { useAccount } from "./SignInProvider";
 import { AccountJoin } from "./AccountJoin";
 import { dailyCopy as t } from "@/content/daily";
 import { TrophyIcon } from "@/components/site/Icons";
+import { AgeCheck, useAgeOk } from "./AgeCheck";
 
 type Props = { date: string; choices: number[] };
 
@@ -91,6 +92,8 @@ function EmailJoin({ date, choices }: Props) {
   const remindRef = useRef<HTMLInputElement>(null);
   const sent = useRef(false);
   const [remindNote, setRemindNote] = useState("");
+  const [ageOk, setAgeOk] = useAgeOk();
+  const [ageError, setAgeError] = useState(false);
 
   /** Turn reminder emails on or off on the server, then remember the choice in this browser. */
   const saveReminders = async (p: Player, on: boolean) => {
@@ -184,6 +187,10 @@ function EmailJoin({ date, choices }: Props) {
               setErrorField(field);
               (field === "name" ? inputRef : emailRef).current?.focus();
             };
+            if (!ageOk && !player) {
+              setAgeError(true);
+              return document.getElementById("age-ok")?.focus();
+            }
             if (!/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email)) return invalid("email", "Enter your email to join the leaderboard.");
             if (name.length < 3) return invalid("name", "Use 3 to 16 characters.");
             if (isOffensive(name)) return invalid("name", "Please pick a different nickname.");
@@ -241,6 +248,16 @@ function EmailJoin({ date, choices }: Props) {
               <span className="text-muted">Optional. Unsubscribe any time with one click.</span>
             </span>
           </label>
+          {player ? null : (
+            <AgeCheck
+              ok={ageOk}
+              error={ageError}
+              onChange={(v) => {
+                setAgeOk(v);
+                if (v) setAgeError(false);
+              }}
+            />
+          )}
           <p id="lb-help" className="mt-1 text-xs text-muted">
             One nickname per email. We use your email to keep the leaderboard fair, and for reminders only if you check the box. We never
             show or share it. Please don&apos;t use your full real name as a nickname. Only your first try each day counts.

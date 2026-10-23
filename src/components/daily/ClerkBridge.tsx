@@ -35,7 +35,8 @@ function Report({ onChange, takePending }: Props) {
       isSignedIn: !!isSignedIn,
       opening: false,
       openSignIn,
-      signOut: (back) => void clerk.signOut({ redirectUrl: back }),
+      // after "Delete my data" the session may already be gone: then just go there
+      signOut: (back) => void clerk.signOut({ redirectUrl: back }).catch(() => location.assign(back)),
       prepare: () => {},
     });
     // signed in inside the window (no page change): the return flag isn't needed

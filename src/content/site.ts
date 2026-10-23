@@ -7,7 +7,7 @@ export const site = {
     "An interactive map of 4,000 years of borders. Drag countries and empires anywhere on Earth to see their real size, step through history from 2000 BCE to today and find out who ruled any spot on the planet.",
   // Used for canonical URLs and social previews. Set NEXT_PUBLIC_SITE_URL in production.
   url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
-  contactEmail: "hello@scaleshift.example",
+  contactEmail: "borderdrift.team@gmail.com",
   copyrightHolder: "Border Drift",
 };
 
@@ -27,6 +27,7 @@ export const footerNav = [
   { href: "/how-it-works", label: "How it works" },
   { href: "/contact", label: "Report a border error" },
   { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
 ];
 
 /** The phone menu: the three main places first, then history pages, then the small print. */
