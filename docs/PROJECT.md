@@ -19,7 +19,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 | Map `/map` | Drag countries, US states and historical states at real size; rotate; 49 border snapshots from 2000 BCE to today; type any year; click land for "who ruled here?" through every era; map key; Antarctic claims; disputed territories; edge-scrolling while dragging; share links and PNG download |
 | Daily challenge `/daily` | 5 "which is bigger?" puzzles a day, the same for everyone; true-size reveal; context for every empire; streaks; practice rounds; results with leaderboard sign-up first, share text, share picture and challenge links |
 | Leaderboard `/leaderboard` | Daily and all-time rankings; joining needs an email (private, one player per inbox) and a nickname; disguised slurs blocked; scores re-marked on the server; first try of the day counts |
-| Eras, timeline, disputes | 49 era pages, 104 events (when land was taken vs. made official), 19 present-day disputes |
+| Eras, timeline, disputes | 49 era pages, 119 events (when land was taken vs. made official) in five periods, 23 present-day disputes with locator globes |
 | About, how it works, contact, privacy | Sources, every data correction, the border-error form |
 
 ## How it works (key decisions, don't undo without discussing)
