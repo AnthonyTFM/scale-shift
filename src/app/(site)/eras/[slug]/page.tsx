@@ -13,8 +13,8 @@ import { mapLink } from "@/lib/share";
 import { EventCard } from "@/components/EventCard";
 import { breadcrumbJsonLd, JsonLd, PageHero } from "@/components/site/PageHero";
 
-// `was`: the name it had in the snapshot before, when the sources renamed it
-type Change = { n: string; was?: string; from: number; to: number };
+// `after`: the state it follows on from in the snapshot before (a rename or a successor)
+type Change = { n: string; after?: string; from: number; to: number };
 type Named = { n: string; a: number };
 type Stats = { key: string; top: Named[]; gained: Change[]; lost: Change[]; appeared: Named[]; vanished: Named[] };
 const stats = statsData as Stats[];
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-const renamed = (c: Change) => (c.was ? `${c.n} (was ${c.was})` : c.n);
+const renamed = (c: Change) => (c.after ? `${c.n} (after ${c.after})` : c.n);
 
 function ChangeList({ title, rows }: { title: string; rows: { n: string; detail: string }[] }) {
   if (!rows.length) return null;

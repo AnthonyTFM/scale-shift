@@ -7,9 +7,9 @@ import { formatArea, type AreaUnit } from "@/lib/format";
 import { TakenFormalized } from "@/components/EventCard";
 import dataVersion from "@/data/data-version.json";
 
-type Change = { n: string; was?: string; from: number; to: number };
+type Change = { n: string; after?: string; from: number; to: number };
 type Named = { n: string; a: number };
-const renamed = (c: Change) => (c.was ? `${c.n} (was ${c.was})` : c.n);
+const renamed = (c: Change) => (c.after ? `${c.n} (after ${c.after})` : c.n);
 export type EraStats = { key: string; top: Named[]; gained: Change[]; lost: Change[]; appeared: Named[]; vanished: Named[] };
 
 let statsPromise: Promise<EraStats[]> | null = null;
