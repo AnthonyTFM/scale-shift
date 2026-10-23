@@ -855,7 +855,7 @@ function Countdown() {
   return (
     <p className="text-sm text-muted">
       Next challenge in{" "}
-      <span className="font-mono font-semibold text-ink" suppressHydrationWarning>
+      <span className="font-display tabular-nums font-semibold text-ink" suppressHydrationWarning>
         {p(Math.floor(t / 3600))}:{p(Math.floor((t % 3600) / 60))}:{p(t % 60)}
       </span>
     </p>

@@ -4,9 +4,9 @@ import { eraForYear, formatYear, settleTime } from "@/lib/eras";
 import { mapLink } from "@/lib/share";
 
 const statusStyle = {
-  formal: "bg-emerald-50 text-formal ring-emerald-200",
-  force: "bg-amber-50 text-force ring-amber-200",
-  disputed: "bg-rose-50 text-disputed ring-rose-200",
+  formal: "bg-green-soft text-green-text ring-green/40",
+  force: "bg-gold-soft text-ink ring-gold",
+  disputed: "bg-red-soft text-danger ring-red/40",
 } as const;
 
 /** "Taken → formalized" card used on content pages. */
@@ -14,7 +14,7 @@ export function EventCard({ ev, headingLevel = 3 }: { ev: TerritoryEvent; headin
   const H = headingLevel === 2 ? "h2" : "h3";
   const era = eraForYear(ev.taken);
   return (
-    <article className="rounded-card bg-card p-5 ring-1 ring-line">
+    <article className="card p-5">
       <div className="mb-2 flex flex-wrap items-center gap-2 text-xs font-semibold">
         <span className="rounded-full bg-beige px-2.5 py-1 text-ink">{eventTypeLabels[ev.type]}</span>
         <span className={`rounded-full px-2.5 py-1 ring-1 ${statusStyle[ev.status]}`}>{statusLabels[ev.status]}</span>
@@ -25,7 +25,7 @@ export function EventCard({ ev, headingLevel = 3 }: { ev: TerritoryEvent; headin
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{ev.summary}</p>
       <a
         href={mapLink(era.key, [ev.lon, ev.lat])}
-        className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-link hover:underline"
+        className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-link hover:underline"
       >
         See it on {era.key === "present" ? "today\u2019s" : `the ${era.label}`} map <span aria-hidden="true">→</span>
       </a>

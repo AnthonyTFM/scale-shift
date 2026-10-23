@@ -38,7 +38,7 @@ function Section({ id, title, lead, children }: { id: string; title: string; lea
 
 function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
   return (
-    <div tabIndex={0} role="region" aria-label={`Table: ${caption}`} className="overflow-x-auto rounded-card border border-line bg-white">
+    <div tabIndex={0} role="region" aria-label={`Table: ${caption}`} className="overflow-x-auto card">
       <table className="w-full min-w-[480px] text-left text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-paper text-xs uppercase tracking-wide text-muted">
@@ -65,7 +65,7 @@ function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
               </th>
               <td className="px-3 py-2 text-ink-soft">{formatBoth(r.a)}</td>
               <td className="px-3 py-2 text-ink-soft">{latText(r.lat)}</td>
-              <td className="px-3 py-2 text-right font-mono text-ink">{times(r.m / r.a)}× too big</td>
+              <td className="px-3 py-2 text-right tabular-nums text-ink">{times(r.m / r.a)}× too big</td>
             </tr>
           ))}
         </tbody>
@@ -82,7 +82,7 @@ export default function TeachersPage() {
       <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
         <nav aria-label="On this page" className="mb-10 flex flex-wrap gap-2">
           {t.jump.map((j) => (
-            <a key={j.id} href={`#${j.id}`} className="rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-ink ring-1 ring-line hover:ring-primary">
+            <a key={j.id} href={`#${j.id}`} className="inline-flex min-h-11 items-center rounded-full border-2 border-line bg-white px-4 text-sm font-semibold text-ink hover:border-primary">
               {j.label}
             </a>
           ))}
@@ -101,17 +101,17 @@ export default function TeachersPage() {
                   </Link>
                 </p>
               </div>
-              <div className="overflow-hidden rounded-card border border-line bg-white">
+              <div className="overflow-hidden card">
                 <table className="w-full text-left text-sm">
                   <caption className="bg-paper px-3 py-2 text-left text-xs font-bold uppercase tracking-wide text-muted">{t.why.tableTitle}</caption>
                   <tbody className="divide-y divide-line">
                     {t.why.rows.map(([lat, place]) => (
                       <tr key={lat}>
-                        <th scope="row" className="w-16 px-3 py-2 font-mono text-ink">
+                        <th scope="row" className="w-16 px-3 py-2 tabular-nums text-ink">
                           {lat}°
                         </th>
                         <td className="px-3 py-2 text-ink-soft">{place}</td>
-                        <td className="px-3 py-2 text-right font-mono font-bold text-ink">{times(1 / Math.cos((lat * Math.PI) / 180) ** 2)}×</td>
+                        <td className="px-3 py-2 text-right font-bold tabular-nums text-ink">{times(1 / Math.cos((lat * Math.PI) / 180) ** 2)}×</td>
                       </tr>
                     ))}
                   </tbody>
@@ -139,7 +139,7 @@ export default function TeachersPage() {
                 <li key={e.key}>
                   <Link
                     href={`/eras/${eraSlug(e.key)}`}
-                    className="block rounded-lg bg-white px-3 py-2 text-sm font-semibold text-ink ring-1 ring-line hover:ring-primary"
+                    className="flex min-h-11 items-center rounded-[14px] border-2 border-line bg-white px-3 text-sm font-semibold text-ink hover:border-primary"
                   >
                     {e.key === "present" ? "Today" : e.label}
                   </Link>
@@ -149,10 +149,10 @@ export default function TeachersPage() {
           </Section>
 
           <Section id="changes" title={t.changes.title} lead={t.changes.lead}>
-            <ol className="divide-y divide-line rounded-card border border-line bg-white">
+            <ol className="divide-y divide-line card">
               {recent.map((e) => (
                 <li key={e.id} className="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-4 py-3 text-sm">
-                  <span className="w-12 shrink-0 font-mono font-bold text-ink">{formatYear(e.taken)}</span>
+                  <span className="w-12 shrink-0 font-bold tabular-nums text-ink">{formatYear(e.taken)}</span>
                   <span className="min-w-0 flex-1 font-semibold text-ink">{e.title}</span>
                   <span className="text-muted">{e.formalized === null ? "Never made official" : `Official ${formatYear(e.formalized)}`}</span>
                 </li>
@@ -166,7 +166,7 @@ export default function TeachersPage() {
           </Section>
 
           <Section id="disputes" title={t.disputes.title} lead={t.disputes.lead}>
-            <div tabIndex={0} role="region" aria-label={`Table: ${t.disputes.title}`} className="overflow-x-auto rounded-card border border-line bg-white">
+            <div tabIndex={0} role="region" aria-label={`Table: ${t.disputes.title}`} className="overflow-x-auto card">
               <table className="w-full min-w-[560px] text-left text-sm">
                 <thead className="bg-paper text-xs uppercase tracking-wide text-muted">
                   <tr>
@@ -194,7 +194,7 @@ export default function TeachersPage() {
                       </th>
                       <td className="px-3 py-2 text-ink-soft">{d.controlledBy}</td>
                       <td className="px-3 py-2 text-ink-soft">{d.claimedBy.join(", ") || "None"}</td>
-                      <td className="px-3 py-2 font-mono text-ink-soft">{formatYear(d.taken)}</td>
+                      <td className="px-3 py-2 tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -210,7 +210,7 @@ export default function TeachersPage() {
           <Section id="class" title={t.inClass.title}>
             <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {t.inClass.tips.map(([title, body]) => (
-                <li key={title} className="rounded-card border border-line bg-white p-4">
+                <li key={title} className="card p-4">
                   <p className="font-bold text-ink">{title}</p>
                   <p className="mt-1 text-sm leading-relaxed text-ink-soft">{body}</p>
                 </li>
@@ -220,7 +220,7 @@ export default function TeachersPage() {
               <Link href="/map" className="btn btn-primary">
                 Open the map
               </Link>
-              <Link href="/daily" className="inline-flex h-11 items-center rounded-lg border border-line bg-white px-4 font-bold text-ink hover:bg-paper">
+              <Link href="/daily" className="btn btn-white">
                 Today&apos;s challenge
               </Link>
             </p>
@@ -232,7 +232,7 @@ export default function TeachersPage() {
                 <p key={p}>{p}</p>
               ))}
               <p className="text-xs font-bold uppercase tracking-wide text-muted">{t.cite.citeLabel}</p>
-              <p className="rounded-lg bg-white p-3 font-mono text-sm text-ink ring-1 ring-line">{t.cite.citation(url)}</p>
+              <p className="card p-4 text-sm leading-relaxed text-ink">{t.cite.citation(url)}</p>
               <p>
                 <Link href="/about" className="font-semibold text-link hover:underline">
                   {t.cite.sourcesCta} →

@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 function ChangeList({ title, rows }: { title: string; rows: { n: string; detail: string }[] }) {
   if (!rows.length) return null;
   return (
-    <div className="rounded-card border border-line bg-white p-5">
+    <div className="card p-5">
       <h3 className="font-bold text-ink">{title}</h3>
       <ul className="mt-2 divide-y divide-line text-sm">
         {rows.map((r) => (
@@ -121,7 +121,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
               Largest {e.key === "present" ? "countries today" : `in ${e.label}`}
             </h2>
             <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
-            <div tabIndex={0} role="region" aria-label={`Table: largest ${e.key === "present" ? "countries today" : `in ${e.label}`}`} className="mt-4 overflow-x-auto rounded-card border border-line bg-white">
+            <div tabIndex={0} role="region" aria-label={`Table: largest ${e.key === "present" ? "countries today" : `in ${e.label}`}`} className="mt-4 overflow-x-auto card">
               <table className="w-full min-w-[520px] text-left text-sm">
                 <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
                   <tr>
@@ -196,14 +196,14 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
 
         <nav aria-label="Other eras" className="mt-14 flex flex-wrap justify-between gap-3">
           {prev ? (
-            <Link href={`/eras/${eraSlug(prev.key)}`} className="rounded-lg border border-line bg-white px-4 py-3 font-semibold hover:bg-paper">
+            <Link href={`/eras/${eraSlug(prev.key)}`} className="btn btn-white">
               ← {prev.label}
             </Link>
           ) : (
             <span />
           )}
           {next ? (
-            <Link href={`/eras/${eraSlug(next.key)}`} className="rounded-lg border border-line bg-white px-4 py-3 font-semibold hover:bg-paper">
+            <Link href={`/eras/${eraSlug(next.key)}`} className="btn btn-white">
               {next.label} →
             </Link>
           ) : null}

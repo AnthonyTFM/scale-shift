@@ -43,6 +43,10 @@
   --color-ocean: #9fcbe0;
   --color-force: #9a5b00;
   --color-disputed: #b4235a;
+  /* soft tints for status pills and notices (green: made official, gold: by force, red: disputed or an error) */
+  --color-green-soft: #ebf9f1;
+  --color-gold-soft: #fff4d1;
+  --color-red-soft: #fdeceb;
 
   /* Inter for body text, Bricolage Grotesque ExtraBold for headings, numbers and the wordmark (both via next/font) */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -129,6 +133,29 @@ body {
   }
   .btn-white:hover {
     background: var(--color-paper);
+  }
+  /* a white card on content pages: the same edge and offset shadow as the buttons, without the press */
+  .card {
+    background: #fff;
+    border: 2px solid var(--color-line);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 0 0 var(--color-line);
+  }
+  /* text inputs and dropdowns on content pages */
+  .field {
+    height: 2.75rem;
+    width: 100%;
+    border: 2px solid var(--color-line);
+    border-radius: 14px;
+    background: #fff;
+    padding: 0 0.75rem;
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+  select.field {
+    appearance: none;
+    padding-right: 2.25rem;
+    background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 8l5 5 5-5' fill='none' stroke='%231d2140' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center / 1rem;
   }
   /* a white card that presses like a button (menu rows, game tiles) */
   .press-card {

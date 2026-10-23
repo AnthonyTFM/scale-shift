@@ -79,7 +79,7 @@ export function FeedbackForm() {
           <Link href="/map" className="btn btn-primary">
             Back to the map
           </Link>
-          <button type="button" onClick={() => setStatus("idle")} className="h-11 rounded-lg border border-line bg-white px-4 font-semibold hover:bg-paper">
+          <button type="button" onClick={() => setStatus("idle")} className="btn btn-white">
             Send another
           </button>
         </div>
@@ -87,13 +87,13 @@ export function FeedbackForm() {
     );
   }
 
-  const field = "mt-1 w-full rounded-lg border bg-white px-3 text-base text-ink";
+  const field = "mt-1 w-full rounded-[14px] border-2 bg-white px-3 text-base text-ink";
   const border = (k: keyof FieldErrors) => (errors[k] ? "border-danger" : "border-line");
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-5 rounded-card border border-line bg-white p-5 md:p-6">
+    <form ref={formRef} onSubmit={onSubmit} noValidate className="card space-y-5 p-5 md:p-6">
       {status === "error" ? (
-        <div ref={statusRef} tabIndex={-1} role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-semibold text-danger">
+        <div ref={statusRef} tabIndex={-1} role="alert" className="rounded-xl border-2 border-red/30 bg-red-soft p-3 text-sm font-semibold text-danger">
           {serverError || "Please fix the highlighted fields."}
         </div>
       ) : null}
@@ -102,7 +102,7 @@ export function FeedbackForm() {
         <legend className="text-sm font-semibold text-ink">What is it about?</legend>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {topics.map((t) => (
-            <label key={t.value} className="flex cursor-pointer items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm has-[:checked]:border-ink has-[:checked]:bg-paper">
+            <label key={t.value} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-[14px] border-2 border-line px-3 py-2.5 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
               <input type="radio" name="topic" value={t.value} checked={topic === t.value} onChange={() => setTopic(t.value)} />
               {t.label}
             </label>

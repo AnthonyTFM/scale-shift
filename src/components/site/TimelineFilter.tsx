@@ -37,7 +37,7 @@ export function TimelineFilter() {
 
   return (
     <div>
-      <form role="search" onSubmit={(e) => e.preventDefault()} className="grid gap-3 rounded-card border border-line bg-white p-4 md:grid-cols-4">
+      <form role="search" onSubmit={(e) => e.preventDefault()} className="card grid gap-3 p-4 md:grid-cols-4">
         <label className="text-sm font-semibold text-ink md:col-span-4">
           Search events
           <input
@@ -45,12 +45,12 @@ export function TimelineFilter() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="e.g. Texas, treaty, Poland"
-            className="mt-1 h-11 w-full rounded-lg border border-line px-3 font-normal"
+            className="field mt-1"
           />
         </label>
         <label className="text-sm font-semibold text-ink">
           Period
-          <select value={period} onChange={(e) => setPeriod(e.target.value as typeof period)} className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-2 font-normal">
+          <select value={period} onChange={(e) => setPeriod(e.target.value as typeof period)} className="field mt-1">
             {periods.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.label}
@@ -60,7 +60,7 @@ export function TimelineFilter() {
         </label>
         <label className="text-sm font-semibold text-ink">
           Status
-          <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-2 font-normal">
+          <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className="field mt-1">
             <option value="all">Any status</option>
             {Object.entries(statusLabels).map(([k, v]) => (
               <option key={k} value={k}>
@@ -71,7 +71,7 @@ export function TimelineFilter() {
         </label>
         <label className="text-sm font-semibold text-ink">
           Type
-          <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="mt-1 h-11 w-full rounded-lg border border-line bg-white px-2 font-normal">
+          <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="field mt-1">
             <option value="all">Any type</option>
             {types.map((t) => (
               <option key={t} value={t}>
@@ -89,7 +89,7 @@ export function TimelineFilter() {
               setType("all");
               setQ("");
             }}
-            className="h-11 w-full rounded-lg border border-line font-semibold hover:bg-paper"
+            className="btn btn-white w-full"
           >
             Reset filters
           </button>
@@ -99,7 +99,7 @@ export function TimelineFilter() {
         <p className="text-sm text-muted" aria-live="polite">
           Showing {list.length} of {events.length} events, {order === "oldest" ? "oldest first" : "newest first"}
         </p>
-        <div role="group" aria-label="Order" className="flex rounded-full bg-white p-1 text-sm font-semibold ring-1 ring-line">
+        <div role="group" aria-label="Order" className="flex rounded-2xl border-2 border-line bg-white p-1 text-sm font-semibold">
           {(
             [
               ["oldest", "Oldest first"],
@@ -111,7 +111,7 @@ export function TimelineFilter() {
               type="button"
               aria-pressed={order === id}
               onClick={() => setOrder(id)}
-              className="rounded-full px-3 py-1.5 aria-pressed:bg-primary aria-pressed:text-white"
+              className="min-h-11 rounded-xl px-3 aria-pressed:bg-primary aria-pressed:text-white"
             >
               {label}
             </button>

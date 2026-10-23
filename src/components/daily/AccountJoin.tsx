@@ -238,7 +238,7 @@ export function AccountJoin({ date, choices }: Props) {
             <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-[#FFF1C7] font-bold" : ""}`}>
               <span className="w-6 text-right text-muted">{r.rank}</span>
               <span className="min-w-0 flex-1 truncate">{r.name}{r.me ? <span className="font-normal text-muted"> (you)</span> : null}</span>
-              <span className="font-mono">{r.score}/5</span>
+              <span className="font-display tabular-nums">{r.score}/5</span>
             </li>
           ))}
         </ol>
