@@ -44,6 +44,9 @@ const R = dailyCopy.results;
 const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 // where a new round lines up: just under the sticky site header
 const ROUND_TOP = 88;
+// square tiles, a little flatter on short laptop screens so both shapes fit on the first screen (the drawing stays centred
+// at its own proportions)
+const TILE = "aspect-square [@media(min-width:768px)_and_(max-height:820px)]:aspect-[5/4]";
 
 
 type Round = {
@@ -307,8 +310,8 @@ function Skeleton() {
       <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6">
         <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className="aspect-square animate-pulse rounded-2xl bg-tile" />
-          <div className="aspect-square animate-pulse rounded-2xl bg-tile" />
+          <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
+          <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
         </div>
       </div>
     </div>
@@ -488,14 +491,16 @@ function QuestionCard({
 
       <WhoIsWho options={q.options} />
 
-      {/* the verdict: a dark reveal panel, read out by screen readers */}
+      {/* the verdict, read out by screen readers: soft green when you're right, soft red when the map fooled you */}
       <div aria-live="polite">
         {answered ? (
-          <div className="pop-in reveal-late mt-5 rounded-[22px] bg-ink p-4 text-white sm:p-5">
+          <div
+            className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
+          >
             <p className="flex items-center gap-2.5 font-display text-2xl leading-tight">
               <span
                 aria-hidden="true"
-                className={`grid size-8 shrink-0 place-items-center rounded-full text-base ${correct ? "bg-green text-ink" : "bg-red text-white"}`}
+                className={`grid size-8 shrink-0 place-items-center rounded-full text-base text-white ${correct ? "bg-green-text" : "bg-danger"}`}
               >
                 <TickIcon right={correct} className="size-4" />
               </span>
@@ -503,7 +508,7 @@ function QuestionCard({
             </p>
             <p className="mt-2 font-semibold leading-snug">{lines[0]}</p>
             {lines.slice(1).map((line) => (
-              <p key={line} className="mt-1.5 text-sm leading-relaxed text-[#C9CDE6]">
+              <p key={line} className="mt-1.5 text-sm leading-relaxed text-ink-soft">
                 {line}
               </p>
             ))}
@@ -592,7 +597,7 @@ function RevealTile({
   };
   const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
   return (
-    <svg viewBox="0 0 100 100" className="aspect-square w-full rounded-2xl bg-tile" aria-hidden="true">
+    <svg viewBox="0 0 100 100" className={`${TILE} w-full rounded-2xl bg-tile`} aria-hidden="true">
       <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
         <Shape outline={map} span={spans.merc} color={color} />
       </g>

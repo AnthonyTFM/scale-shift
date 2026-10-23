@@ -4,7 +4,7 @@ type Crumb = { href: string; label: string };
 
 /**
  * `center` lines the heading up with a centered column below it (the daily challenge).
- * `compact` keeps the hero short on phones so what's below it (a game) starts on the first screen.
+ * `compact` keeps the hero short on every screen so what's below it (a game) starts on the first screen, laptops included.
  */
 export function PageHero({
   eyebrow,
@@ -23,7 +23,7 @@ export function PageHero({
 }) {
   return (
     <section className="ocean-band border-b border-line text-ink">
-      <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3" : "pb-10 pt-8"} md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>
+      <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3 md:pb-6 md:pt-6" : "pb-10 pt-8 md:pb-14 md:pt-12"} ${center ? "text-center" : ""}`}>
         {crumbs ? (
           <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
             <ol className="flex flex-wrap gap-1">
@@ -45,7 +45,7 @@ export function PageHero({
         {eyebrow ? <p className="text-sm font-bold uppercase tracking-wide text-primary">{eyebrow}</p> : null}
         <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} text-3xl leading-tight text-ink md:text-[2.5rem]`}>{title}</h1>
         {lead ? (
-          <div className={`max-w-2xl leading-relaxed text-muted ${compact ? "mt-1.5 text-base md:mt-4 md:text-lg" : "mt-4 text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
+          <div className={`leading-relaxed text-muted ${compact ? "mt-1.5 max-w-3xl text-base md:mt-2" : "mt-4 max-w-2xl text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
         ) : null}
       </div>
     </section>
