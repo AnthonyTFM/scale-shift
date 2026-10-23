@@ -8,7 +8,7 @@ import { disputes } from "@/content/disputes";
 import { events } from "@/content/events";
 import { site } from "@/content/site";
 import { eras, eraSlug, formatYear } from "@/lib/eras";
-import { formatBoth } from "@/lib/format";
+import { formatBoth, formatBothShort } from "@/lib/format";
 import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
@@ -51,21 +51,23 @@ function Section({ id, title, lead, children }: { id: string; title: string; lea
 function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
   return (
     <div tabIndex={0} role="region" aria-label={`Table: ${caption}`} className="overflow-x-auto card">
-      <table className="w-full min-w-[480px] text-left text-sm">
+      {/* phones: area and latitude under the name, no sideways scroll */}
+      <table className="w-full text-left text-sm sm:min-w-[480px]">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-paper text-xs uppercase tracking-wide text-muted">
           <tr>
             <th scope="col" className="px-3 py-2">
               Country
             </th>
-            <th scope="col" className="px-3 py-2">
+            <th scope="col" className="hidden px-3 py-2 sm:table-cell">
               Real area
             </th>
-            <th scope="col" className="px-3 py-2">
+            <th scope="col" className="hidden px-3 py-2 sm:table-cell">
               Latitude
             </th>
             <th scope="col" className="px-3 py-2 text-right">
-              Normal map shows it
+              <span className="sm:hidden">Normal map</span>
+              <span className="hidden sm:inline">Normal map shows it</span>
             </th>
           </tr>
         </thead>
@@ -74,10 +76,13 @@ function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
             <tr key={r.n}>
               <th scope="row" className="px-3 py-2 font-semibold text-ink">
                 {r.n}
+                <span className="block text-sm font-normal text-ink-soft sm:hidden">
+                  {formatBothShort(r.a)} · {latText(r.lat)}
+                </span>
               </th>
-              <td className="px-3 py-2 text-ink-soft">{formatBoth(r.a)}</td>
-              <td className="px-3 py-2 text-ink-soft">{latText(r.lat)}</td>
-              <td className="px-3 py-2 text-right tabular-nums text-ink">{times(r.m / r.a)}× too big</td>
+              <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{formatBoth(r.a)}</td>
+              <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{latText(r.lat)}</td>
+              <td className="whitespace-nowrap px-3 py-2 text-right align-top tabular-nums text-ink">{times(r.m / r.a)}× too big</td>
             </tr>
           ))}
         </tbody>
@@ -180,16 +185,17 @@ export default function TeachersPage() {
 
           <Section id="disputes" title={t.disputes.title} lead={t.disputes.lead}>
             <div tabIndex={0} role="region" aria-label={`Table: ${t.disputes.title}`} className="overflow-x-auto card">
-              <table className="w-full min-w-[560px] text-left text-sm">
+              {/* phones: who controls and claims it under the name */}
+              <table className="w-full text-left text-sm sm:min-w-[560px]">
                 <thead className="bg-paper text-xs uppercase tracking-wide text-muted">
                   <tr>
                     <th scope="col" className="px-3 py-2">
                       Place
                     </th>
-                    <th scope="col" className="px-3 py-2">
+                    <th scope="col" className="hidden px-3 py-2 sm:table-cell">
                       Controlled by
                     </th>
-                    <th scope="col" className="px-3 py-2">
+                    <th scope="col" className="hidden px-3 py-2 sm:table-cell">
                       Also claimed by
                     </th>
                     <th scope="col" className="px-3 py-2">
@@ -204,10 +210,14 @@ export default function TeachersPage() {
                         <Link href={`/disputes#${d.id}`} className="hover:underline">
                           {d.name}
                         </Link>
+                        <span className="block text-sm font-normal text-ink-soft sm:hidden">
+                          Controlled by {d.controlledBy}
+                          {d.claimedBy.length ? `; also claimed by ${d.claimedBy.join(", ")}` : ""}
+                        </span>
                       </th>
-                      <td className="px-3 py-2 text-ink-soft">{d.controlledBy}</td>
-                      <td className="px-3 py-2 text-ink-soft">{d.claimedBy.join(", ") || "None"}</td>
-                      <td className="px-3 py-2 tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
+                      <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{d.controlledBy}</td>
+                      <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{d.claimedBy.join(", ") || "None"}</td>
+                      <td className="whitespace-nowrap px-3 py-2 align-top tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
                     </tr>
                   ))}
                 </tbody>

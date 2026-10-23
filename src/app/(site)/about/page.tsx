@@ -123,8 +123,9 @@ export default function AboutPage() {
             <span className="hidden group-open:inline">Hide the fixes</span>
           </summary>
           <div tabIndex={0} role="region" aria-labelledby="name-fixes" className="not-prose overflow-x-auto card">
-            <table className="w-full min-w-[620px] text-left text-sm">
-              <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
+            {/* phones: one block per fix (snapshot, then source → shown, then why); wider screens: four columns */}
+            <table className="w-full text-left text-sm sm:min-w-[620px]">
+              <thead className="hidden border-b border-line bg-paper text-xs uppercase tracking-wide text-muted sm:table-header-group">
                 <tr>
                   <th scope="col" className="px-4 py-3">
                     Snapshot
@@ -143,14 +144,22 @@ export default function AboutPage() {
               <tbody className="divide-y divide-line">
                 {rules.map((r) => (
                   <tr key={r.name + r.years.join()}>
-                    <td className="px-4 py-2.5 align-top font-semibold text-ink">{r.years.map((y) => formatYear(y)).join(", ")}</td>
-                    <td className="px-4 py-2.5 align-top text-ink-soft">{r.name}</td>
-                    <td className="px-4 py-2.5 align-top text-ink">
+                    <td className="px-4 py-2.5 align-top font-semibold text-ink">
+                      {r.years.map((y) => formatYear(y)).join(", ")}
+                      <span className="block font-normal sm:hidden">
+                        <span className="text-ink-soft">{r.name}</span> → <span className="font-semibold text-ink">{r.n ?? r.name}</span>
+                        {"s" in r ? <span className="block text-xs text-muted">{r.s ? `ruled by ${r.s}` : "no outside ruler"}</span> : null}
+                        {r.note ? <span className="mt-1 flex w-fit rounded-full bg-gold-soft px-2 py-0.5 text-xs font-semibold text-ink ring-1 ring-gold">+ data note</span> : null}
+                        <span className="mt-1 block text-ink-soft">{r.why}</span>
+                      </span>
+                    </td>
+                    <td className="hidden px-4 py-2.5 align-top text-ink-soft sm:table-cell">{r.name}</td>
+                    <td className="hidden px-4 py-2.5 align-top text-ink sm:table-cell">
                       {r.n ?? r.name}
                       {"s" in r ? <span className="block text-xs text-muted">{r.s ? `ruled by ${r.s}` : "no outside ruler"}</span> : null}
                       {r.note ? <span className="mt-1 flex w-fit rounded-full bg-gold-soft px-2 py-0.5 text-xs font-semibold text-ink ring-1 ring-gold">+ data note</span> : null}
                     </td>
-                    <td className="px-4 py-2.5 align-top text-ink-soft">{r.why}</td>
+                    <td className="hidden px-4 py-2.5 align-top text-ink-soft sm:table-cell">{r.why}</td>
                   </tr>
                 ))}
               </tbody>

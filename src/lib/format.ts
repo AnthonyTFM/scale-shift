@@ -19,6 +19,11 @@ export function formatBoth(km2: number) {
   return `${Math.round(km2).toLocaleString("en-US")} km² (${Math.round(km2 / KM2_PER_MI2).toLocaleString("en-US")} sq mi)`;
 }
 
+/** "21.6M km² · 8.33M sq mi": both units, short, for phone rows. */
+export function formatBothShort(km2: number) {
+  return `${formatArea(km2, "km2")} · ${formatArea(km2, "mi2")}`;
+}
+
 export function ratioText(a: number, b: number) {
   if (!a || !b) return "";
   const r = a / b;
