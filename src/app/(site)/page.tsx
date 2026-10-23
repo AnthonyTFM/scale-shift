@@ -137,7 +137,8 @@ export default function HomePage() {
                 <img
                   src="/globe-still.svg"
                   alt=""
-                  // lazy: when another page prefetches the homepage, an eager image here was fetched on that page too
+                  // lazy (it's below the fold): an eager image here gets a preload hint that other pages pick up when
+                  // they prefetch the homepage
                   loading="lazy"
                   width={56}
                   height={56}

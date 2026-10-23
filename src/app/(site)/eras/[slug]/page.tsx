@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import statsData from "@/data/era-stats.json";
+import dataVersion from "@/data/data-version.json";
 import { eraIntros } from "@/content/era-intros";
 import { appCopy, site } from "@/content/site";
 import { eraByKey, eraIndex, eraPhrase, eras, eraSlug, eraTitle, eventsForEra, keyFromSlug } from "@/lib/eras";
@@ -103,7 +104,9 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
       />
       <div className="mx-auto max-w-6xl px-4 py-12">
         <Image
-          src={`/era-maps/${slug}`}
+          // versioned so a map data rebuild shows up straight away
+          src={`/era-maps/${slug}?v=${dataVersion.v}`}
+          fetchPriority="high"
           // already a small WebP made at build time; the image service only made it bigger
           unoptimized
           alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}`}

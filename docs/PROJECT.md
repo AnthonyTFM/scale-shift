@@ -69,7 +69,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 ## How we work (agreed Oct 22)
 - **One task at a time.** The queue lives in issue #40. Claude builds one task end to end, then a separate **reviewer agent** checks it independently (bugs, accuracy, Anthony's exact words, a phone-size playthrough). Facts get a second **fact-check agent** with two sources each. Anthony confirms the merge, and only then does the next task start. This applies to the work queue in #40; Evan still ships his own work as CLAUDE.md describes.
 - Map data and the map engine are Evan's area; problems found there go to him as issues (#89, #93).
-- **Speed never costs quality (Anthony, Oct 23).** A faster version must look and work at least as well as before: compare images at full zoom (lossless or visually identical only), keep animations smooth (the home globe never drops below 8 fps) and never trim content to win a score. If a speed-up can't keep quality, skip it and say so.
+- **Speed never costs quality (Anthony, Oct 23).** A faster version must look and work at least as well as before: compare images at full zoom (lossless or visually identical only), keep animations smooth (the home globe aims for at least 8 fps; only a device too slow to draw one frame in time goes lower, as before) and never trim content to win a score. If a speed-up can't keep quality, skip it and say so.
 
 ## Roadmap (agreed Oct 22; each item its own PR, Anthony confirms before merging)
 **Done Oct 22:** history notes for all 120 historical places (#94), "Play more rounds for fun" starts at the top (#95), sounds on by default (#96), the reveal's map line matches the cards (#97).

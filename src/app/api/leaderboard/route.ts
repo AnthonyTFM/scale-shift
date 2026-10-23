@@ -33,11 +33,11 @@ export async function GET(request: Request) {
   const limit = Math.max(1, Math.min(100, Number(q.get("limit")) || 50));
   const player = q.get("player");
   const me = isPlayerId(player) ? player : null;
-  // boards read without a player are the same for everyone: Vercel's CDN may serve them for 10 seconds
+  // boards read without a player are the same for everyone: Vercel's CDN may serve them for up to 20 seconds
   const headers = {
     "Cache-Control": "no-store",
     "X-Leaderboard-Store": storeKind(),
-    ...(me ? {} : { "Vercel-CDN-Cache-Control": "max-age=10, stale-while-revalidate=60" }),
+    ...(me ? {} : { "Vercel-CDN-Cache-Control": "max-age=10, stale-while-revalidate=10" }),
   };
   try {
     if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers });
