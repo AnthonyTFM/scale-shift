@@ -116,8 +116,9 @@ export function TimelineFilter() {
       </div>
       {sections.length > 0 ? (
         <nav aria-label="Jump to a period" className="mt-4">
-          {/* one row you can swipe on phones, wrapping on wider screens; the padding keeps focus rings from being cut off */}
-          <ul className="-mx-4 -my-1.5 flex gap-2 overflow-x-auto px-4 py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+          {/* one row you can swipe on phones, wrapping on wider screens; the padding keeps focus rings from being cut off, and
+              `relative` keeps the hidden screen-reader words inside the row (otherwise they widen the page) */}
+          <ul className="relative -mx-4 -my-1.5 flex gap-2 overflow-x-auto px-4 py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
             {sections.map((p) => (
               <li key={p.id} className="shrink-0">
                 <a
