@@ -1,140 +1,229 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { geoGraticule10, geoOrthographic, geoPath } from "d3-geo";
-import { feature } from "topojson-client";
-import type { Topology, GeometryCollection } from "topojson-specification";
-import { POLITICAL } from "@/lib/palette";
-import { dropSlivers, GLOBE_INSET, GLOBE_START_LON, GLOBE_TILT, type GlobeCountry, type RawGlobeCountry } from "@/lib/globe";
+import { GLOBE_START_LON } from "@/lib/globe";
+import { globeCountries, globeRenderer, type GlobeTopology } from "@/lib/globe-draw";
+import type { GlobeMessage } from "./globe.worker";
 
-type Country = GlobeCountry;
-
-const TILT = GLOBE_TILT;
 const SPEED = 6; // degrees per second
-const FRAME_MS = 50; // 20 frames a second is smooth enough for a slow spin and keeps phones responsive
-const BUDGET = 0.25; // on slow phones, draw less often so the spin takes about a quarter of the main thread
-// but never below 8 frames a second, so the spin still looks smooth (the check lands on the next screen frame: 110 ms
-// waits 7 frames at 60 Hz, 117 ms, about 8.6 fps)
+const FRAME_MS = 50; // 20 frames a second is smooth enough for a slow spin
+// Main-thread fallback only (browsers without OffscreenCanvas): on slow phones, draw less often so the spin takes about
+// a quarter of the main thread, but never below 8 frames a second (110 ms lands on the 7th frame at 60 Hz, ~8.6 fps)
+const BUDGET = 0.25;
 const SLOWEST_MS = 110;
 
+/** A globe drawn by the background worker, or on the main thread where workers can't draw. */
+type Painter = {
+  size(size: number, dpr: number): void;
+  data(topo: GlobeTopology): void;
+  spin(on: boolean): void;
+  drag(start: boolean): void;
+  turn(by: number): void;
+  stop(): void;
+};
+
+/** Draws in a worker, so the spin never holds up taps and scrolling. */
+function workerPainter(canvas: HTMLCanvasElement, drawn: () => void, failed: () => void): Painter | null {
+  if (typeof Worker === "undefined" || !("transferControlToOffscreen" in canvas)) return null;
+  let worker: Worker;
+  try {
+    worker = new Worker(new URL("./globe.worker.ts", import.meta.url), { type: "module" });
+  } catch {
+    return null;
+  }
+  const offscreen = canvas.transferControlToOffscreen();
+  const send = (m: GlobeMessage, transfer: Transferable[] = []) => worker.postMessage(m, transfer);
+  worker.onmessage = (e: MessageEvent<{ type: string }>) => (e.data.type === "drawn" ? drawn() : e.data.type === "failed" && failed());
+  worker.onerror = () => failed();
+  send({ type: "init", canvas: offscreen }, [offscreen]);
+  return {
+    size: (size, dpr) => send({ type: "size", size, dpr }),
+    data: (topo) => send({ type: "data", topo }),
+    spin: (on) => send({ type: "spin", on }),
+    drag: (start) => send({ type: "drag", start }),
+    turn: (by) => send({ type: "turn", by }),
+    stop: () => worker.terminate(),
+  };
+}
+
+/** Draws on the main thread, drawing less often on slow phones to keep the page responsive. */
+function mainPainter(canvas: HTMLCanvasElement, drawn: () => void): Painter {
+  const draw = globeRenderer(canvas.getContext("2d")!);
+  let groups: ReturnType<typeof globeCountries> | null = null;
+  let lon = GLOBE_START_LON;
+  let dragFrom: number | null = null;
+  let size = 0;
+  let dpr = 1;
+  let raf = 0;
+  let last = 0;
+  let lastDraw = 0;
+  let cost = 0; // recent time one frame takes to draw, ms
+  let told = false;
+  const paint = () => {
+    if (!groups || !size) return;
+    const t = performance.now();
+    draw(groups, lon, size, dpr);
+    cost = cost ? cost * 0.8 + (performance.now() - t) * 0.2 : performance.now() - t;
+    if (!told) {
+      told = true;
+      drawn();
+    }
+  };
+  const tick = (now: number) => {
+    if (!last) last = now;
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (dragFrom === null) lon += SPEED * dt;
+    // while dragging, follow the finger at the full rate
+    if (now - lastDraw >= (dragFrom !== null ? FRAME_MS : Math.min(SLOWEST_MS, Math.max(FRAME_MS, cost / BUDGET)))) {
+      lastDraw = now;
+      paint();
+    }
+    raf = requestAnimationFrame(tick);
+  };
+  return {
+    size: (s, d) => {
+      size = s;
+      dpr = d;
+      canvas.width = canvas.height = Math.round(s * d);
+      paint();
+    },
+    data: (topo) => {
+      groups = globeCountries(topo);
+      paint();
+    },
+    spin: (on) => {
+      if (on && !raf) {
+        last = 0;
+        raf = requestAnimationFrame(tick);
+      } else if (!on && raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+    },
+    drag: (start) => {
+      dragFrom = start ? lon : null;
+    },
+    turn: (by) => {
+      if (dragFrom !== null) lon = dragFrom + by;
+      if (!raf) paint();
+    },
+    stop: () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    },
+  };
+}
+
 /** A slowly turning globe drawn from our own borders. Drag to spin it. Decorative: the page works without it. */
-export function Globe({ label, onReady }: { label: string; onReady?: () => void }) {
+export function Globe({ label, onReady, onGone }: { label: string; onReady?: () => void; onGone?: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
-  const canvas = useRef<HTMLCanvasElement>(null);
+  const shade = useRef<HTMLDivElement>(null);
   // the latest onReady, read once the countries are drawn (keeps the set-up effect from re-running)
   const readyCb = useRef(onReady);
+  const goneCb = useRef(onGone);
   useEffect(() => {
     readyCb.current = onReady;
+    goneCb.current = onGone;
   });
 
   useEffect(() => {
-    const el = canvas.current!;
     const box = wrap.current!;
-    const ctx = el.getContext("2d")!;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let countries: Country[] = [];
-    let lon = GLOBE_START_LON;
+    let topo: GlobeTopology | null = null;
     let size = 0;
     let dpr = 1;
     let visible = true;
-    let raf = 0;
-    let last = 0;
-    let drag: { x: number; lon: number } | null = null;
+    let ready = false;
+    let drag: { x: number } | null = null;
     let disposed = false;
 
-    const proj = geoOrthographic().clipAngle(90);
-    const path = geoPath(proj, ctx);
-    let lastDraw = 0;
-    let cost = 0; // recent time one frame takes to draw, ms
-    const graticule = geoGraticule10();
+    // A fresh canvas each time: a canvas handed to a worker can't be handed over again (React runs this twice in dev).
+    let canvas: HTMLCanvasElement;
+    let painter: Painter;
+    const drawn = () => readyCb.current?.();
+    const makeCanvas = () => {
+      const c = document.createElement("canvas");
+      c.setAttribute("role", "img");
+      c.setAttribute("aria-label", label);
+      c.className = "relative block cursor-grab touch-pan-y";
+      box.insertBefore(c, shade.current);
+      return c;
+    };
+    const setUp = (useWorker: boolean) => {
+      canvas = makeCanvas();
+      painter =
+        (useWorker &&
+          workerPainter(canvas, drawn, () => {
+            // the worker couldn't start: draw on the main thread instead, on a new canvas
+            if (disposed) return;
+            painter.stop();
+            canvas.remove();
+            setUp(false);
+            sync();
+          })) ||
+        mainPainter(canvas, drawn);
+      canvas.addEventListener("pointerdown", down);
+      canvas.addEventListener("pointermove", move);
+      canvas.addEventListener("pointerup", up);
+      canvas.addEventListener("pointercancel", up);
+    };
+    // tell a (new) painter everything it needs
+    const sync = () => {
+      canvas.style.width = canvas.style.height = `${size}px`;
+      painter.size(size, dpr);
+      if (topo) painter.data(topo);
+      spin();
+    };
+    // spin only once the page has finished loading and while the globe is on screen
+    const spin = () => {
+      if (!disposed) painter.spin(ready && !still && visible && !document.hidden);
+    };
+
+    const down = (e: PointerEvent) => {
+      drag = { x: e.clientX };
+      painter.drag(true);
+      canvas.setPointerCapture(e.pointerId);
+      canvas.style.cursor = "grabbing";
+    };
+    const move = (e: PointerEvent) => {
+      if (drag) painter.turn(((e.clientX - drag.x) / size) * 180);
+    };
+    const up = () => {
+      if (!drag) return;
+      drag = null;
+      painter.drag(false);
+      canvas.style.cursor = "grab";
+    };
+
+    setUp(true);
 
     const resize = () => {
       size = Math.max(1, Math.round(box.getBoundingClientRect().width));
       dpr = Math.min(1.5, window.devicePixelRatio || 1);
-      el.width = el.height = Math.round(size * dpr);
-      el.style.width = el.style.height = `${size}px`;
-      draw();
+      canvas.style.width = canvas.style.height = `${size}px`;
+      painter.size(size, dpr);
     };
-
-    // Only the turning parts (grid and countries) are drawn here; the sea, glow and edge shading are CSS layers.
-    function draw() {
-      const r = size / 2 - GLOBE_INSET;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, size, size);
-      proj.scale(r).translate([size / 2, size / 2]).rotate([lon, TILT]);
-      ctx.beginPath();
-      path(graticule);
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.55)";
-      ctx.lineWidth = 0.6;
-      ctx.stroke();
-      // one path per colour (8 fills instead of ~200), then all borders in one stroke
-      const groups = POLITICAL.map(() => new Path2D());
-      const pathTo = geoPath(proj);
-      for (const c of countries) pathTo.context(groups[c.properties.k % POLITICAL.length] as unknown as CanvasRenderingContext2D)(c.geometry);
-      groups.forEach((g, i) => {
-        ctx.fillStyle = POLITICAL[i];
-        ctx.fill(g);
-      });
-      ctx.strokeStyle = "rgba(88, 60, 46, 0.35)";
-      ctx.lineWidth = 0.5;
-      for (const g of groups) ctx.stroke(g);
-    }
-
-    const tick = (now: number) => {
-      raf = 0;
-      if (!last) last = now;
-      const dt = Math.min(0.1, (now - last) / 1000);
-      last = now;
-      if (!drag) lon += SPEED * dt;
-      // while dragging, follow the finger at the full rate
-      if (now - lastDraw >= (drag ? FRAME_MS : Math.min(SLOWEST_MS, Math.max(FRAME_MS, cost / BUDGET)))) {
-        lastDraw = now;
-        const t = performance.now();
-        draw();
-        cost = cost ? cost * 0.8 + (performance.now() - t) * 0.2 : performance.now() - t;
-      }
-      if (visible && !still && !document.hidden) raf = requestAnimationFrame(tick);
-    };
-    // spin only once the page has finished loading, so the globe never slows the first paint or first taps
-    let ready = false;
-    const start = () => {
-      if (ready && !raf && !still && visible && !document.hidden) {
-        last = 0;
-        raf = requestAnimationFrame(tick);
-      }
-    };
-
-    const down = (e: PointerEvent) => {
-      drag = { x: e.clientX, lon };
-      el.setPointerCapture(e.pointerId);
-      el.style.cursor = "grabbing";
-    };
-    const move = (e: PointerEvent) => {
-      if (!drag) return;
-      lon = drag.lon + ((e.clientX - drag.x) / size) * 180;
-      if (still || !raf) draw();
-    };
-    const up = () => {
-      drag = null;
-      el.style.cursor = "grab";
-    };
-    el.addEventListener("pointerdown", down);
-    el.addEventListener("pointermove", move);
-    el.addEventListener("pointerup", up);
-    el.addEventListener("pointercancel", up);
-
     const io = new IntersectionObserver(([entry]) => {
       visible = entry.isIntersecting;
-      start();
+      spin();
     });
     io.observe(box);
-    const onVisibility = () => start();
-    document.addEventListener("visibilitychange", onVisibility);
+    document.addEventListener("visibilitychange", spin);
     const ro = new ResizeObserver(resize);
     ro.observe(box);
 
+    // spin only once the page has finished loading, so the globe never slows the first paint or first taps
+    let goTimer = 0;
+    const go = () => {
+      goTimer = window.setTimeout(() => {
+        ready = true;
+        spin();
+      }, 1200);
+    };
+
     // a dropped connection shouldn't leave an empty ocean: try again a couple of times
-    const load = (tries: number): Promise<Topology<{ p: GeometryCollection<{ n: string; k: number }> }>> =>
+    const load = (tries: number): Promise<GlobeTopology> =>
       fetch("/data/globe.json")
         .then((r) => {
           if (!r.ok) throw new Error(`globe ${r.status}`);
@@ -142,16 +231,10 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
         })
         .catch((e) => (tries > 0 ? new Promise((ok) => setTimeout(ok, 800)).then(() => load(tries - 1)) : Promise.reject(e)));
     load(2)
-      .then((topo) => {
+      .then((t) => {
         if (disposed) return;
-        countries = (feature(topo, topo.objects.p) as unknown as { features: RawGlobeCountry[] }).features.map(dropSlivers);
-        draw();
-        readyCb.current?.();
-        const go = () =>
-          window.setTimeout(() => {
-            ready = true;
-            start();
-          }, 1200);
+        topo = t;
+        painter.data(t);
         if (document.readyState === "complete") go();
         else window.addEventListener("load", go, { once: true });
       })
@@ -162,15 +245,18 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
     resize();
     return () => {
       disposed = true;
-      cancelAnimationFrame(raf);
+      window.clearTimeout(goTimer);
+      window.removeEventListener("load", go);
+      painter.stop();
+      canvas.remove();
       io.disconnect();
       ro.disconnect();
-      document.removeEventListener("visibilitychange", onVisibility);
-      el.removeEventListener("pointerdown", down);
-      el.removeEventListener("pointermove", move);
-      el.removeEventListener("pointerup", up);
-      el.removeEventListener("pointercancel", up);
+      // the canvas is gone: show the still picture again until the next one has drawn (coming Back to the page)
+      goneCb.current?.();
+      document.removeEventListener("visibilitychange", spin);
     };
+    // the label is read once: it doesn't change while the page is open
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -180,9 +266,10 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
         aria-hidden="true"
         className="absolute inset-2 rounded-full bg-[radial-gradient(circle_at_38%_32%,#f1f8ff,#a9d3f0_78%)] shadow-[0_0_44px_8px_rgba(37,99,235,0.12)]"
       />
-      <canvas ref={canvas} role="img" aria-label={label} className="relative block cursor-grab touch-pan-y" />
+      {/* the canvas goes here: it's made in the effect above */}
       {/* shade the far edge so it reads as a sphere */}
       <div
+        ref={shade}
         aria-hidden="true"
         className="pointer-events-none absolute inset-2 rounded-full bg-[radial-gradient(circle_at_38%_32%,transparent_58%,rgba(29,33,64,0.16)_100%)]"
       />
