@@ -20,6 +20,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 | Daily challenge `/daily` | 5 "which is bigger?" puzzles a day, the same for everyone; true-size reveal; context for every empire; streaks; practice rounds; results with leaderboard sign-up first, share text, share picture and challenge links |
 | Leaderboard `/leaderboard` | Daily and all-time rankings; joining needs an email (private, one player per inbox) and a nickname; disguised slurs blocked; scores re-marked on the server; first try of the day counts |
 | Eras, timeline, disputes | 49 era pages, 119 events (when land was taken vs. made official) in five periods, 23 present-day disputes with locator globes |
+| Country sizes `/size`, `/size/[country]` | (Oct 23, Anthony picked the layout) One "How big is X really?" page per country (167; Antarctica waits for #89): an answer box (area, rank, how much a web map stretches it), a map-vs-real drawing next to a same-size partner with a very different stretch (Greenland next to Algeria), the countries closest in size, its history on our maps, FAQ (with FAQ structured data). Data in `src/lib/sizes.ts`, words in `src/content/sizes.ts`. Built for search traffic |
 | About, how it works, contact, privacy | Sources, every data correction, the border-error form |
 
 ## How it works (key decisions, don't undo without discussing)

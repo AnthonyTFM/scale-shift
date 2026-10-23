@@ -9,6 +9,7 @@ import { events } from "@/content/events";
 import { site } from "@/content/site";
 import { eras, eraSlug, formatYear } from "@/lib/eras";
 import { formatBoth, formatBothShort } from "@/lib/format";
+import { sizeCountries } from "@/lib/sizes";
 import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
@@ -48,6 +49,9 @@ function Section({ id, title, lead, children }: { id: string; title: string; lea
   );
 }
 
+// each country's own "How big is X really?" page
+const sizeSlug = new Map(sizeCountries.map((c) => [c.n, c.slug] as const));
+
 function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
   return (
     <div tabIndex={0} role="region" aria-label={`Table: ${caption}`} className="overflow-x-auto card">
@@ -75,7 +79,13 @@ function SizeTable({ rows, caption }: { rows: Row[]; caption: string }) {
           {rows.map((r) => (
             <tr key={r.n}>
               <th scope="row" className="px-3 py-2 font-semibold text-ink">
-                {r.n}
+                {sizeSlug.has(r.n) ? (
+                  <Link href={`/size/${sizeSlug.get(r.n)}`} className="hover:underline">
+                    {r.n}
+                  </Link>
+                ) : (
+                  r.n
+                )}
                 <span className="block text-sm font-normal text-ink-soft sm:hidden">
                   {formatBothShort(r.a)} · {latText(r.lat)}
                 </span>
