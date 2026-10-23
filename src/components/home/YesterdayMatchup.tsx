@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import dataVersion from "@/data/data-version.json";
 import { home } from "@/content/home";
-import { mainBox, type Outline, type ShapeFile } from "@/lib/outline";
+import { mainPart, type Outline, type ShapeFile } from "@/lib/outline";
 import {
   buildQuestions,
   capitalize,
@@ -51,39 +51,31 @@ async function pickYesterday(today: string): Promise<Pick | null> {
 const loadShapes = (q: Question) =>
   Promise.all(q.options.map((o) => getJson<ShapeFile>(`/data/daily/shapes/${o.id}.json${V}`))) as Promise<[ShapeFile, ShapeFile]>;
 
-/** Both shapes side by side at one shared scale, standing on a common baseline; far-off islands are cut off. */
+/** Both shapes side by side at one shared scale, standing on a common baseline; far-off islands are left out. */
 function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label: string; note: string }) {
-  const id = useId();
-  const boxes = outlines?.map(mainBox);
-  const k = boxes ? Math.min(...boxes.map(([x0, y0, x1, y1]) => Math.min((W / 2 - 12) / (x1 - x0), (H - 8) / (y1 - y0)))) : 1;
+  const drawn = outlines?.map(mainPart);
+  const k = drawn ? Math.min(...drawn.map(({ b: [x0, y0, x1, y1] }) => Math.min((W / 2 - 12) / (x1 - x0), (H - 8) / (y1 - y0)))) : 1;
   return (
     <figure className="flex flex-col rounded-xl bg-white p-3 ring-1 ring-line">
       <figcaption className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</figcaption>
       <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full" role="img" aria-label={note || label}>
         <line x1="4" x2={W - 4} y1={H - 1} y2={H - 1} className="stroke-line" />
-        {outlines?.map((o, i) => {
-          const [x0, y0, x1, y1] = boxes![i];
+        {drawn?.map(({ d, b: [x0, y0, x1, y1] }, i) => {
           const cx = (W / 2) * i + W / 4;
           const tiny = Math.max(x1 - x0, y1 - y0) * k < 8;
           return (
             <g key={i}>
-              <clipPath id={`${id}-${i}`}>
-                <rect x={(W / 2) * i} y={0} width={W / 2} height={H} />
-              </clipPath>
-              {/* clipped by a wrapper: a clip on the path itself would be scaled along with it */}
-              <g clipPath={`url(#${id}-${i})`}>
-                <path
-                  d={o.d}
-                  transform={`translate(${cx} ${H - 2}) scale(${k}) translate(${-(x0 + x1) / 2} ${-y1})`}
-                  fill={COLORS[i]}
-                  fillOpacity={0.88}
-                  stroke={COLORS[i]}
-                  strokeWidth={1}
-                  vectorEffect="non-scaling-stroke"
-                  fillRule="evenodd"
-                  strokeLinejoin="round"
-                />
-              </g>
+              <path
+                d={d}
+                transform={`translate(${cx} ${H - 2}) scale(${k}) translate(${-(x0 + x1) / 2} ${-y1})`}
+                fill={COLORS[i]}
+                fillOpacity={0.88}
+                stroke={COLORS[i]}
+                strokeWidth={1}
+                vectorEffect="non-scaling-stroke"
+                fillRule="evenodd"
+                strokeLinejoin="round"
+              />
               {/* too small to see at this scale: ring it, like the game does */}
               {tiny ? <circle cx={cx} cy={H - 2 - ((y1 - y0) * k) / 2} r={7} fill="none" stroke={COLORS[i]} strokeWidth={1.2} /> : null}
             </g>

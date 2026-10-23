@@ -30,7 +30,7 @@ import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
-import { mainBox, type Outline, type ShapeFile } from "@/lib/outline";
+import { mainBox, mainPart, type Outline, type ShapeFile } from "@/lib/outline";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
@@ -538,7 +538,7 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
   );
 }
 
-// framed on the main landmass, so far-off islands don't shrink a country to a speck (they fall outside the tile)
+// framed and drawn on the main landmass, so far-off islands don't shrink a country to a speck
 const size = (o: Outline) => {
   const [x0, y0, x1, y1] = mainBox(o);
   return Math.max(x1 - x0, y1 - y0);
@@ -546,13 +546,13 @@ const size = (o: Outline) => {
 
 /** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
 function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
-  const [x0, y0, x1, y1] = mainBox(outline);
+  const { d, b: [x0, y0, x1, y1] } = mainPart(outline);
   const k = 100 / span;
   const tiny = size(outline) < span * 0.06;
   return (
     <>
       <path
-        d={outline.d}
+        d={d}
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
         fill={ghost ? "none" : color}
         fillOpacity={0.88}
