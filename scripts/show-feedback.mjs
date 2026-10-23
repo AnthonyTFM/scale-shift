@@ -4,11 +4,13 @@
 import fs from "node:fs";
 import path from "node:path";
 
+// process.loadEnvFile needs Node 20.12+; on older Node set the Upstash settings in the shell instead
 for (const f of [".env.local", ".env"]) {
+  if (typeof process.loadEnvFile !== "function") break;
   try {
     process.loadEnvFile(f);
-  } catch {
-    /* no such file */
+  } catch (e) {
+    if (e.code !== "ENOENT") throw e;
   }
 }
 

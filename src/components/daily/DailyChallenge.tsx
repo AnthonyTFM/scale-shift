@@ -681,10 +681,12 @@ function Results({
   useEffect(() => {
     if (!round.date) return;
     const id = playerId();
+    // once the score is posted, a slower board fetch must not put "If you join" back
+    let joinedNow = false;
     fetch(`/api/leaderboard?scope=day&date=${round.date}&limit=100${id ? `&player=${id}` : ""}`)
       .then((r) => (r.ok ? (r.json() as Promise<DayBoard>) : null))
       .then((b) => {
-        if (!b) return;
+        if (!b || joinedNow) return;
         const mine = b.rows.find((r) => r.me) ?? b.me;
         setRank(
           mine
@@ -695,7 +697,9 @@ function Results({
       .catch(() => {});
     const posted = (e: Event) => {
       const d = (e as CustomEvent<Posted>).detail;
-      if (d.date === round.date) setRank({ rank: d.rank, of: d.total, joined: true });
+      if (d.date !== round.date) return;
+      joinedNow = true;
+      setRank({ rank: d.rank, of: d.total, joined: true });
     };
     window.addEventListener(POSTED_EVENT, posted);
     return () => window.removeEventListener(POSTED_EVENT, posted);
