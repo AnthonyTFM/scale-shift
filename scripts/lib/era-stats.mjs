@@ -94,8 +94,16 @@ function countryGroups(nodesByEra, lineages) {
     for (const i of wa) wb.add(i);
   };
   // same name apart from a bracket, "of" or a generic word, colony or not ("Italy" ruled by Italy in 1914 is the Kingdom
-  // of Italy; "Viceroyalty of Peru" becomes "Peru"). Biggest first, so when several share a name at once (the four parts
-  // of Rome in 300) the biggest carries it on.
+  // of Italy; "Viceroyalty of Peru" becomes "Peru"). Biggest first.
+  // a name split into several bracketed parts on one map (Germany's four zones in 1945, Rome's tetrarchy, Korea in 1945)
+  // joins nothing by name: no one part is the country
+  const split = new Set();
+  nodesByEra.forEach((nodes) => {
+    const parts = new Map();
+    for (const [n, a] of nodes) if (a >= GONE && bare(nameOf(n)) !== nameOf(n)) parts.set(bare(nameOf(n)), (parts.get(bare(nameOf(n))) || 0) + 1);
+    for (const [b, k] of parts) if (k > 1) split.add(b);
+  });
+  const isPart = (n) => bare(nameOf(n)) !== nameOf(n) && split.has(bare(nameOf(n)));
   const list = [...all].sort((a, b) => size.get(b) - size.get(a));
   const byWord = new Map(); // first word → names, to keep this from comparing every pair
   for (const n of list) {
@@ -109,7 +117,8 @@ function countryGroups(nodesByEra, lineages) {
     const of = words.lastIndexOf("of");
     for (const k of new Set([words[0], of >= 0 ? words[of + 1] : null].filter(Boolean)))
       for (const short of byWord.get(k) ?? [])
-        if (short !== long && bare(nameOf(short)).length <= bare(nameOf(long)).length && sameName(nameOf(long), nameOf(short))) join(long, short);
+        if (short !== long && !isPart(short) && !isPart(long) && bare(nameOf(short)).length <= bare(nameOf(long)).length && sameName(nameOf(long), nameOf(short)))
+          join(long, short);
   }
   // lineages.ts: between two snapshots, a listed name that is new follows on from a listed name that is gone, when
   // that's the only pair or their names share a word (Parthia → Parthian Empire). A colony can become a state (British
