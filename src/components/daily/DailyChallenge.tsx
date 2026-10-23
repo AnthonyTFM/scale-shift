@@ -35,7 +35,7 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import type { DayBoard } from "@/lib/leaderboard-types";
 import { dailyCopy } from "@/content/daily";
-import { FlameIcon, MarkIcon } from "@/components/site/Icons";
+import { FlameIcon, MarkIcon, SpeakerIcon, TargetIcon, TrophyIcon } from "@/components/site/Icons";
 import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
@@ -239,8 +239,8 @@ export function DailyChallenge() {
   return (
     <div ref={gameTop}>
       {challenge && todayNo && !finished ? (
-        <p className="mb-3 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
-          🎯{" "}
+        <p className="mb-3 flex items-start gap-2 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
+          <TargetIcon className="size-5" />
           {challenge.day === todayNo
             ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
             : `${challenge.name} sent you Daily #${challenge.day}, but this is today's. Play it and send your score back.`}
@@ -368,7 +368,7 @@ function SoundToggle() {
       }}
       className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-xs font-bold text-ink-soft hover:text-ink"
     >
-      <span aria-hidden="true">{on ? "🔊" : "🔇"}</span> Sound {on ? "on" : "off"}
+      <SpeakerIcon on={on} /> Sound {on ? "on" : "off"}
     </button>
   );
 }
@@ -722,11 +722,12 @@ function Results({
         <p className="mt-1 text-muted">{verdict}</p>
       </div>
       {challenge ? (
-        <p className="mt-3 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center text-sm font-bold text-ink">
+        <p className="mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center text-sm font-bold text-ink">
+          {score > challenge.score ? <TrophyIcon className="size-5" /> : <TargetIcon className="size-5" />}
           {score > challenge.score
-            ? `🏆 You beat ${challenge.name} (${challenge.score}/5)! Send them a rematch.`
+            ? `You beat ${challenge.name} (${challenge.score}/5)! Send them a rematch.`
             : score === challenge.score
-              ? `🤝 Tied with ${challenge.name} at ${score}/5.`
+              ? `Tied with ${challenge.name} at ${score}/5.`
               : `${challenge.name} wins this one with ${challenge.score}/5. Get them back tomorrow.`}
         </p>
       ) : null}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { MedalIcon } from "@/components/site/Icons";
 import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate } from "@/lib/daily";
 import type { AllTimeBoard, DayBoard, WeekBoard } from "@/lib/leaderboard-types";
 import { loadPlayer, playerId } from "@/lib/player";
@@ -14,7 +15,16 @@ const TABS = [
 ] as const satisfies readonly (readonly [Tab, string])[];
 type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | null; failed: boolean };
 
-const medal = (rank: number) => (rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : null);
+/** A drawn medal for the top three (the rank is read out to screen readers), the plain number below that. */
+const rankCell = (rank: number) =>
+  rank <= 3 ? (
+    <>
+      <MedalIcon place={rank as 1 | 2 | 3} />
+      <span className="sr-only">{rank}</span>
+    </>
+  ) : (
+    rank
+  );
 const shortDate = (key: string) => new Date(`${key}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 const prettyDate = (key: string) =>
   new Date(`${key}T12:00:00`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -198,8 +208,7 @@ function DayTable({ board }: { board: DayBoard }) {
         {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
           <tr key={`${i}-${r.name}`} className={r.me ? "bg-gold-soft font-bold" : undefined}>
             <td className="px-3 py-2.5 text-ink sm:px-4">
-              {medal(r.rank) ?? r.rank}
-              <span className="sr-only">{medal(r.rank) ? ` (rank ${r.rank})` : ""}</span>
+              {rankCell(r.rank)}
             </td>
             <td className="max-w-0 px-2 py-2.5 text-ink">
               <span className="flex min-w-0 items-center gap-1.5">
@@ -261,7 +270,7 @@ function AllTable({
         <tbody className="divide-y divide-line">
           {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
             <tr key={`${i}-${r.name}`} className={r.me ? "bg-gold-soft font-bold" : undefined}>
-              <td className="px-3 py-2.5 text-ink sm:px-4">{medal(r.rank) ?? r.rank}</td>
+              <td className="px-3 py-2.5 text-ink sm:px-4">{rankCell(r.rank)}</td>
               <td className="max-w-0 px-2 py-2.5 text-ink">
                 <span className="flex min-w-0 items-center gap-1.5">
                   <span className="truncate">{r.name}</span>

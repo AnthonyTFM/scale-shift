@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { nav, site } from "@/content/site";
+import { site } from "@/content/site";
+import { HeaderNav } from "./HeaderNav";
 import { SiteMenu } from "./SiteMenu";
 import { Wordmark } from "./Wordmark";
 
@@ -11,15 +12,7 @@ export function SiteHeader() {
           <Wordmark />
         </Link>
         <nav aria-label="Main" className="hidden flex-1 md:block">
-          <ul className="flex gap-1">
-            {nav.slice(1).map((item) => (
-              <li key={item.href} className={item.from === "xl" ? "hidden xl:block" : item.from === "lg" ? "hidden lg:block" : undefined}>
-                <Link href={item.href} className="rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft hover:bg-white hover:text-ink">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <HeaderNav />
         </nav>
         <Link href="/map" className="btn btn-primary ml-auto mb-0 hidden h-11 text-sm md:inline-flex">
           Open the map

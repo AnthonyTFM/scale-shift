@@ -6,6 +6,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menu } from "@/content/site";
 import { Wordmark } from "./Wordmark";
+import { MapIcon, TargetIcon, TrophyIcon } from "./Icons";
+
+const ICONS = { map: MapIcon, target: TargetIcon, trophy: TrophyIcon } as const;
 
 /**
  * The "three lines" menu. variant="map" is the floating button on the map page (always visible);
@@ -107,9 +110,7 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                       aria-current={here(item.href)}
                       className="press-card flex items-center gap-3 rounded-[20px] px-3 py-3 hover:bg-white aria-[current=page]:border-primary aria-[current=page]:[--press-shadow:var(--color-primary)]"
                     >
-                      <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-xl bg-tile text-xl">
-                        {item.icon}
-                      </span>
+                      <MenuIcon name={item.icon} />
                       <span className="min-w-0">
                         <span className="block font-display text-lg leading-tight">
                           {item.href === "/map" && pathname === "/map" ? menu.backToMap : item.label}
@@ -153,5 +154,15 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
           )
         : null}
     </div>
+  );
+}
+
+/** The drawn icon on a main menu row. */
+function MenuIcon({ name }: { name: string }) {
+  const Icon = ICONS[name as keyof typeof ICONS];
+  return (
+    <span aria-hidden="true" className="grid size-11 shrink-0 place-items-center rounded-xl bg-tile">
+      <Icon className="size-7" />
+    </span>
   );
 }

@@ -30,12 +30,12 @@ export const footerNav = [
   { href: "/terms", label: "Terms" },
 ];
 
-/** The phone menu: the three main places first, then history pages, then the small print. */
+/** The phone menu: the three main places first (the game leads), then history pages, then the small print. */
 export const menu = {
   main: [
-    { href: "/map", label: "Map", blurb: "Drag any country to its real size", icon: "🗺️" },
-    { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "🎯" },
-    { href: "/leaderboard", label: "Leaderboard", blurb: "Today, this week and all time", icon: "🏆" },
+    { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "target" },
+    { href: "/leaderboard", label: "Leaderboard", blurb: "Today, this week and all time", icon: "trophy" },
+    { href: "/map", label: "Map", blurb: "Drag any country to its real size", icon: "map" },
   ],
   historyTitle: "History",
   history: [
