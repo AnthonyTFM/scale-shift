@@ -164,6 +164,43 @@ const slug = (s) =>
 
 // ---------- drawing ----------
 
+/**
+ * The size of a shape's main landmass: its biggest ring and the rings near it, link by link (a ring joins when it lies
+ * within 3/4 of the cluster's size). The same rule as mainPart in src/lib/outline.ts, which frames the shapes in the game,
+ * so the detail matches what's on screen. Island chains (Indonesia) stay one cluster; far-off territories don't count.
+ */
+function mainExtent(rings) {
+  const info = rings
+    .map((r) => {
+      let a = 0;
+      let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+      for (let i = 0; i < r.length; i++) {
+        const [x, y] = r[i];
+        const [nx, ny] = r[(i + 1) % r.length];
+        a += x * ny - nx * y;
+        [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
+      }
+      return { area: Math.abs(a) / 2, box: [x0, y0, x1, y1] };
+    })
+    .filter((r) => Number.isFinite(r.box[0]))
+    .sort((a, b) => b.area - a.area);
+  if (!info.length) return 0;
+  let box = info[0].box;
+  let rest = info.slice(1);
+  for (let added = true; added && rest.length; ) {
+    added = false;
+    rest = rest.filter((r) => {
+      const near = (Math.max(box[2] - box[0], box[3] - box[1]) * 3) / 4;
+      const gap = Math.max(r.box[0] - box[2], box[0] - r.box[2], r.box[1] - box[3], box[1] - r.box[3], 0);
+      if (gap > near) return true;
+      box = [Math.min(box[0], r.box[0]), Math.min(box[1], r.box[1]), Math.max(box[2], r.box[2]), Math.max(box[3], r.box[3])];
+      added = true;
+      return false;
+    });
+  }
+  return Math.max(box[2] - box[0], box[3] - box[1]);
+}
+
 /** Project a geometry and return a compact SVG path (integer km) plus its bounding box. */
 function draw(geom, projection) {
   // geoPath with a recording context hands us the projected (and clipped) rings
@@ -190,7 +227,9 @@ function draw(geom, projection) {
       if (x > x1) x1 = x;
       if (y > y1) y1 = y;
     }
-  const extent = Math.max(x1 - x0, y1 - y0);
+  // detail is set by the main landmass, not the whole shape: far-off islands (French Guiana, the Dutch Caribbean) used to
+  // stretch the extent, so France and the Netherlands came out as rough 30-point outlines. Same rule as the game's frame.
+  const extent = mainExtent(rings) || Math.max(x1 - x0, y1 - y0);
   const tol = Math.max(extent / 260, 0.6); // drop points closer than this (km)
   const minArea = (extent / 90) ** 2; // drop specks
 
@@ -227,13 +266,27 @@ function shapeFiles(geom) {
 
 // ---------- pool ----------
 
+// Shapes already in the pool are frozen: their entry (areas, latitude, "since") never changes, because every puzzle already
+// played was built from it and the leaderboard re-marks answers with it. Only their outlines are redrawn, so map-data
+// fixes and drawing improvements still reach the tiles. New shapes are added after the existing ones.
 const pool = [];
+const drawn = new Set();
 const add = (entry, geom) => {
   const id = slug(`${entry.n}-${entry.era}`);
-  if (pool.some((p) => p.id === id)) return;
-  const s = shapeFiles(geom);
+  if (drawn.has(id)) return;
+  drawn.add(id);
   const area = Math.round(geoArea(geom) * R * R);
+  // a frozen shape whose land has changed in the map data since (by more than 2%) keeps its old outline, so the picture
+  // always matches the area the puzzles use
+  const old = previous.get(id);
+  if (old && Math.abs(area / old.a - 1) > 0.02 && oldOutlines.has(id)) {
+    fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), oldOutlines.get(id));
+    console.log(`  daily: "${id}" kept its outline (its land changed ${((area / old.a - 1) * 100).toFixed(1)}% in the map data)`);
+    return;
+  }
+  const s = shapeFiles(geom);
   fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), JSON.stringify({ merc: s.merc, ea: s.ea }));
+  if (old) return;
   pool.push({
     id,
     n: entry.show ?? entry.n,
@@ -248,6 +301,10 @@ const add = (entry, geom) => {
   });
 };
 
+// outlines of frozen shapes the map data no longer has (renamed or removed) are kept as they are
+const oldOutlines = new Map();
+if (fs.existsSync(path.join(OUT, "shapes")))
+  for (const f of fs.readdirSync(path.join(OUT, "shapes"))) oldOutlines.set(f.replace(/\.json$/, ""), fs.readFileSync(path.join(OUT, "shapes", f)));
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
 
@@ -306,6 +363,13 @@ const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10
   }
 }
 
+// the frozen entries first, in their original order (puzzles pick by position), then any new shapes
+for (const [id] of previous)
+  if (!drawn.has(id)) {
+    if (oldOutlines.has(id)) fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), oldOutlines.get(id));
+    else console.warn(`  ! daily: no outline for frozen shape "${id}"`);
+  }
+pool.unshift(...previous.values());
 fs.writeFileSync(path.join(OUT, "index.json"), JSON.stringify(pool));
 // new version stamp, so browsers fetch the new pool instead of a cached one (a stale pool would build different puzzles)
 fs.writeFileSync(path.join(ROOT, "src", "data", "data-version.json"), JSON.stringify({ v: Date.now().toString(36) }));
