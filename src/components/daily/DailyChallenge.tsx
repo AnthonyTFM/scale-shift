@@ -30,7 +30,7 @@ import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
-import { mainBox, mainPart, type Outline, type ShapeFile } from "@/lib/outline";
+import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
@@ -79,7 +79,8 @@ async function loadRound(seed: string, date: string | null): Promise<Round> {
       }),
     ),
   );
-  return { date, questions, shapes: Object.fromEntries(ids.map((id, i) => [id, files[i]])) };
+  const entry = new Map(questions.flatMap((q) => q.options).map((o) => [o.id, o]));
+  return { date, questions, shapes: Object.fromEntries(ids.map((id, i) => [id, withMapDrawing(files[i], entry.get(id)!)])) };
 }
 
 const scoreOf = (round: Round, choices: number[]) => choices.filter((c, i) => round.questions[i]?.answer === c).length;

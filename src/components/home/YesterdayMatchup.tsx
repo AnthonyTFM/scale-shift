@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import dataVersion from "@/data/data-version.json";
 import { home } from "@/content/home";
-import { mainPart, type Outline, type ShapeFile } from "@/lib/outline";
+import { mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
 import {
   buildQuestions,
   capitalize,
@@ -49,7 +49,9 @@ async function pickYesterday(today: string): Promise<Pick | null> {
 }
 
 const loadShapes = (q: Question) =>
-  Promise.all(q.options.map((o) => getJson<ShapeFile>(`/data/daily/shapes/${o.id}.json${V}`))) as Promise<[ShapeFile, ShapeFile]>;
+  Promise.all(q.options.map((o) => getJson<ShapeFile>(`/data/daily/shapes/${o.id}.json${V}`).then((f) => withMapDrawing(f, o)))) as Promise<
+    [ShapeFile, ShapeFile]
+  >;
 
 /** Both shapes side by side at one shared scale, standing on a common baseline; far-off islands are left out. */
 function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label: string; note: string }) {

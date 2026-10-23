@@ -20,8 +20,9 @@ export const dailyCopy = {
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
     practice: "Practice",
-    ask: "Drawn the way a normal web map shows them. Tap the bigger one.",
-    legend: "Dashed: how big a web map draws it. Solid: its real size.",
+    ask: "Sized the way a normal web map shows them. Tap the bigger one.",
+    // the tiles compare the two shapes with each other (one scale per view), so the legend says "compare", not "size"
+    legend: "Dashed: how the two compare on a web map. Solid: how they really compare.",
     right: "You got it!",
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
