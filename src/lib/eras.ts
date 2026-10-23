@@ -51,11 +51,11 @@ export function eventsForPolity(names: string[]): TerritoryEvent[] {
 }
 
 export function settleTime(ev: TerritoryEvent): string {
-  if (ev.formalized === null) return ev.status === "disputed" ? "Never formally settled" : "Never formalized";
+  if (ev.formalized === null) return ev.status === "disputed" ? "Never formally settled" : "Never made official";
   const gap = ev.formalized - ev.taken;
-  if (gap === 0) return "Formalized the same year";
-  if (gap < 0) return `Agreed ${-gap} year${gap === -1 ? "" : "s"} before control changed hands`;
-  return `${gap} year${gap === 1 ? "" : "s"} from control to formal recognition`;
+  if (gap === 0) return "Made official the same year";
+  if (gap < 0) return `Made official ${-gap} year${gap === -1 ? "" : "s"} before control changed hands`;
+  return `${gap} year${gap === 1 ? "" : "s"} from taking control to making it official`;
 }
 
 /** Read a typed year: "1453", "300 BC", "300 BCE", "-300", "AD 79", "79 CE". Returns null if it isn't a year. */

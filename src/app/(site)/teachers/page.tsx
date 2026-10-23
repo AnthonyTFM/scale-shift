@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import pool from "@/data/daily-pool.json";
+// today's areas as the era pages and the map show them (the puzzle pool keeps the outlines it had when frozen)
+import polities from "../../../../public/data/polities.json";
 import { teachers as t } from "@/content/teachers";
 import { disputes } from "@/content/disputes";
 import { events } from "@/content/events";
@@ -12,12 +14,22 @@ import { PageHero } from "@/components/site/PageHero";
 export const metadata: Metadata = {
   title: "For teachers: map projections, real country sizes and historical borders",
   description:
-    "A classroom reference: why the Mercator map distorts size, the real area of every country, 4,000 years of world borders, recent border changes and today's disputed territories.",
+    "A classroom reference: why the Mercator map distorts size, the real area of today's countries, 4,000 years of world borders, recent border changes and today's disputed territories.",
   alternates: { canonical: "/teachers" },
 };
 
 type Row = { n: string; kind: string; era: string; a: number; m: number; lat: number };
-const countries = (pool as Row[]).filter((r) => r.kind === "country" && r.era === "present");
+type Polity = { n: string; y: (number | string)[]; a: number[]; us?: number };
+const todayArea = new Map(
+  (polities as Polity[]).filter((p) => !p.us && p.y.at(-1) === "present").map((p) => [p.n, p.a[p.a.length - 1]] as const),
+);
+// the stretch (m / a) comes from the pool's own outline; only the area shown is today's figure
+const countries = (pool as Row[])
+  .filter((r) => r.kind === "country" && r.era === "present")
+  .map((r) => {
+    const a = todayArea.get(r.n) ?? r.a;
+    return { ...r, a, m: (r.m / r.a) * a };
+  });
 const byArea = [...countries].sort((a, b) => b.a - a.a);
 const mostInflated = [...countries].sort((a, b) => b.m / b.a - a.m / a.a).slice(0, 12);
 const recent = [...events].sort((a, b) => b.taken - a.taken).slice(0, 10);
@@ -123,6 +135,7 @@ export default function TeachersPage() {
           <Section id="sizes" title={t.sizes.title} lead={t.sizes.lead}>
             <h3 className="mb-2 font-bold text-ink">{t.sizes.mostTitle}</h3>
             <SizeTable rows={mostInflated} caption={t.sizes.mostTitle} />
+            <p className="mt-2 max-w-3xl text-sm text-muted">{t.sizes.note}</p>
             <details className="mt-4">
               <summary className="cursor-pointer font-bold text-link">
                 {t.sizes.allTitle} ({byArea.length})

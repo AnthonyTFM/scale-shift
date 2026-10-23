@@ -179,7 +179,7 @@ export function explain(q: Question) {
   const looks = small.m / big.m;
   if (looks > 1.05) {
     lines.push(
-      `On a normal web map, ${S} looks ${times(looks)}× bigger, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
+      `On a normal web map, ${S} looks ${times(looks)}× bigger than ${nameInSentence(big)}, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
     );
   } else {
     // same 15% line as the "Map: 1.2× too big" chip on the cards, so the sentence never contradicts them

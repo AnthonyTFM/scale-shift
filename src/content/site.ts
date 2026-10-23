@@ -61,4 +61,10 @@ export const appCopy = {
     2: "Moderately precise borders",
     3: "Borders fixed by international law",
   } as Record<number, string>,
+  // a whole era's rating is the average of its borders' ratings: from 1650 most, not all, are treaty borders
+  eraPrecision: {
+    1: "Mostly approximate borders",
+    2: "Mix of approximate and precise borders",
+    3: "Mostly precise borders",
+  } as Record<number, string>,
 };

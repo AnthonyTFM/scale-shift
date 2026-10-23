@@ -47,7 +47,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
         <line x1="18" y1="0" x2="18" y2="20" stroke="rgba(88,60,46,0.8)" strokeWidth="1.5" strokeDasharray="3 3" />
       </Swatch>,
       "Approximate border",
-      "A scholarly estimate. Most borders before about 1800 are like this.",
+      "A scholarly estimate. Most borders before about 1650 are like this.",
     ],
     [
       <Swatch key="u">

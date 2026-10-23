@@ -154,7 +154,7 @@ export const terms: { title: string; lead: string; description: string; sections
       id: "accuracy",
       title: "Maps and facts",
       paras: [
-        "Historical borders are approximate, especially before about 1800. Areas are calculated from our map outlines and can differ from official figures by a few percent.",
+        "Historical borders are approximate, especially before about 1650. Areas are calculated from our map outlines and can differ from official figures by a few percent.",
         "Disputed borders are shown to explain who controls and who claims each place, not to take a political side. Don't rely on the site for legal, navigation or official purposes.",
       ],
     },

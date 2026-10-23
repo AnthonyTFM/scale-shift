@@ -136,8 +136,8 @@ export function YesterdayMatchup() {
   const big = q ? q.options[q.answer] : undefined;
   const small = q ? q.options[1 - q.answer] : undefined;
   const looks = big && small ? small.m / big.m : 0;
-  // "Iceland looks 2.7× bigger on a normal map." (only when the map really gets it backwards) and "Guyana is 2.1× the size of Iceland."
-  const mapNote = small && looks > 1.05 ? `${capitalize(nameInSentence(small))} looks ${times(looks)}× bigger on a normal map.` : "";
+  // "Iceland looks 2.7× bigger than Guyana on a normal map." (only when the map really gets it backwards) and "Guyana is 2.1× the size of Iceland."
+  const mapNote = big && small && looks > 1.05 ? `${capitalize(nameInSentence(small))} looks ${times(looks)}× bigger than ${nameInSentence(big)} on a normal map.` : "";
   const realNote = big && small ? sizeLine(big, small) : "";
 
   return (
