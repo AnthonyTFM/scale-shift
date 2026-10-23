@@ -6,6 +6,7 @@ import { dayNumber, loadSave, localDateKey, stats } from "@/lib/daily";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { home } from "@/content/home";
+import { ClockIcon, FlameIcon } from "@/components/site/Icons";
 
 type State = { day: number; done: boolean; score?: number; streak: number };
 
@@ -52,7 +53,11 @@ export function HeroPlay() {
               <span className="hidden sm:inline">{t.playDay} </span>#{s.day}
             </p>
           ) : null}
-          {s?.streak ? <p className="ml-auto rounded-full bg-card px-2.5 py-1 text-xs font-bold ring-1 ring-line">🔥 {s.streak}-day streak</p> : null}
+          {s?.streak ? (
+            <p className="ml-auto inline-flex items-center gap-1 rounded-full bg-card px-2.5 py-1 text-xs font-bold ring-1 ring-line">
+              <FlameIcon className="size-4" /> {s.streak}-day streak
+            </p>
+          ) : null}
         </div>
         <h2 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
           <Link href="/daily" transitionTypes={["to-daily"]} className="hover:underline">
@@ -81,8 +86,8 @@ export function HeroPlay() {
             </button>
           ) : null}
           {s?.done && left ? (
-            <p className="text-sm font-semibold text-muted" aria-live="polite">
-              ⏳ {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}
+            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted" aria-live="polite">
+              <ClockIcon className="size-4" /> {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}
             </p>
           ) : null}
         </div>

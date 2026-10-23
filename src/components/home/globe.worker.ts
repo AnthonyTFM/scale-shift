@@ -6,9 +6,7 @@ export type GlobeMessage =
   | { type: "init"; canvas: OffscreenCanvas }
   | { type: "data"; topo: GlobeTopology }
   | { type: "size"; size: number; dpr: number }
-  | { type: "spin"; on: boolean }
-  | { type: "drag"; start: boolean }
-  | { type: "turn"; by: number };
+  | { type: "spin"; on: boolean };
 
 const SPEED = 6; // degrees per second
 const FRAME_MS = 50; // 20 frames a second is smooth enough for a slow spin
@@ -17,7 +15,6 @@ let canvas: OffscreenCanvas | null = null;
 let draw: ReturnType<typeof globeRenderer> | null = null;
 let groups: ReturnType<typeof globeCountries> | null = null;
 let lon = GLOBE_START_LON;
-let dragFrom: number | null = null;
 let size = 0;
 let dpr = 1;
 let spinning = false;
@@ -25,7 +22,6 @@ let timer = 0;
 let last = 0;
 let told = false;
 let cost = 0; // how long the last frame took to draw, ms
-let pending = 0; // a drag redraw waiting for the next frame
 
 function paint() {
   if (!draw || !groups || !size) return;
@@ -41,7 +37,7 @@ function tick() {
   const now = performance.now();
   const dt = Math.min(0.1, (now - last) / 1000);
   last = now;
-  if (dragFrom === null) lon += SPEED * dt;
+  lon += SPEED * dt;
   paint();
   cost = performance.now() - now;
   // wait for what's left of the frame, so a slow draw doesn't make the spin fall behind; on a very slow phone, rest at
@@ -74,15 +70,5 @@ onmessage = (e: MessageEvent<GlobeMessage>) => {
       clearTimeout(timer);
       timer = 0;
     }
-  } else if (m.type === "drag") {
-    dragFrom = m.start ? lon : null;
-  } else if (m.type === "turn") {
-    if (dragFrom !== null) lon = dragFrom + m.by;
-    // not spinning (reduced motion): one redraw per frame, however fast the drag messages come
-    if (!spinning && !pending)
-      pending = setTimeout(() => {
-        pending = 0;
-        paint();
-      }, 16) as unknown as number;
   }
 };
