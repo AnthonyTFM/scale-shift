@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { disputes } from "@/content/disputes";
+import dataVersion from "@/data/data-version.json";
 import { formatYear } from "@/lib/eras";
 import { mapLink } from "@/lib/share";
 import { PageHero } from "@/components/site/PageHero";
@@ -36,6 +37,17 @@ export default function DisputesPage() {
         <ol className="grid gap-4 md:grid-cols-2">
           {disputes.map((d) => (
             <li key={d.id} id={d.id} className="card scroll-mt-24 p-5">
+              {/* decorative: the name and the map link below say where it is; the facts flow beside it */}
+              {/* eslint-disable-next-line @next/next/no-img-element -- a small prerendered SVG, nothing to optimise */}
+              <img
+                src={`/dispute-maps/${d.id}?v=${dataVersion.v}-${d.lon}-${d.lat}`}
+                alt=""
+                width={160}
+                height={160}
+                loading="lazy"
+                decoding="async"
+                className="float-right mb-2 ml-4 size-20"
+              />
               <h2 className="font-display text-xl text-ink">{d.name}</h2>
               <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>

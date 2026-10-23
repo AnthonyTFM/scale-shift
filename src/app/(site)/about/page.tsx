@@ -115,40 +115,48 @@ export default function AboutPage() {
           ))}
         </ul>
         <h3 id="name-fixes">Name and ruler fixes</h3>
-        <div tabIndex={0} role="region" aria-labelledby="name-fixes" className="not-prose overflow-x-auto card">
-          <table className="w-full min-w-[620px] text-left text-sm">
-            <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
-              <tr>
-                <th scope="col" className="px-4 py-3">
-                  Snapshot
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Source said
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  We show
-                </th>
-                <th scope="col" className="px-4 py-3">
-                  Why
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-line">
-              {rules.map((r) => (
-                <tr key={r.name + r.years.join()}>
-                  <td className="px-4 py-2.5 align-top font-semibold text-ink">{r.years.map((y) => formatYear(y)).join(", ")}</td>
-                  <td className="px-4 py-2.5 align-top text-ink-soft">{r.name}</td>
-                  <td className="px-4 py-2.5 align-top text-ink">
-                    {r.n ?? r.name}
-                    {"s" in r ? <span className="block text-xs text-muted">{r.s ? `ruled by ${r.s}` : "no outside ruler"}</span> : null}
-                    {r.note ? <span className="block text-xs text-force">+ data note</span> : null}
-                  </td>
-                  <td className="px-4 py-2.5 align-top text-ink-soft">{r.why}</td>
+        <p>Every fix, with the snapshot it applies to, what the source said, what the map shows and why.</p>
+        {/* a native fold: works without scripts, and the browser's find-in-page opens it */}
+        <details className="group not-prose">
+          <summary className="btn btn-white mb-4 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            <span className="group-open:hidden">Show all {rules.length} fixes</span>
+            <span className="hidden group-open:inline">Hide the fixes</span>
+          </summary>
+          <div tabIndex={0} role="region" aria-labelledby="name-fixes" className="not-prose overflow-x-auto card">
+            <table className="w-full min-w-[620px] text-left text-sm">
+              <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
+                <tr>
+                  <th scope="col" className="px-4 py-3">
+                    Snapshot
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Source said
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    We show
+                  </th>
+                  <th scope="col" className="px-4 py-3">
+                    Why
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {rules.map((r) => (
+                  <tr key={r.name + r.years.join()}>
+                    <td className="px-4 py-2.5 align-top font-semibold text-ink">{r.years.map((y) => formatYear(y)).join(", ")}</td>
+                    <td className="px-4 py-2.5 align-top text-ink-soft">{r.name}</td>
+                    <td className="px-4 py-2.5 align-top text-ink">
+                      {r.n ?? r.name}
+                      {"s" in r ? <span className="block text-xs text-muted">{r.s ? `ruled by ${r.s}` : "no outside ruler"}</span> : null}
+                      {r.note ? <span className="mt-1 inline-block rounded-full bg-gold-soft px-2 py-0.5 text-xs font-semibold text-ink ring-1 ring-gold">+ data note</span> : null}
+                    </td>
+                    <td className="px-4 py-2.5 align-top text-ink-soft">{r.why}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
 
         <h2>Known limitations</h2>
         <ul>
@@ -158,7 +166,7 @@ export default function AboutPage() {
         </ul>
         <p>
           Found something wrong? <Link href="/contact?topic=border">Report a border error</Link>. We read every report, and fixes go into the
-          corrections table above.
+          list of fixes above.
         </p>
 
         <h2>Questions</h2>
