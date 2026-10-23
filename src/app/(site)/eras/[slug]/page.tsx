@@ -109,6 +109,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
           // versioned so a map data rebuild shows up straight away
           src={`/era-maps/${slug}/map?v=${dataVersion.v}`}
           fetchPriority="high"
+          // next/image loads lazily by default, which would cancel the high priority
+          loading="eager"
           unoptimized
           alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, on an equal-area projection`}
           width={1200}

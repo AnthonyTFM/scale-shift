@@ -51,7 +51,7 @@ export default function ErasPage() {
                       height={THUMB_H}
                       loading="lazy"
                       decoding="async"
-                      className="mb-3 h-auto w-full rounded-xl bg-tile"
+                      className="mb-3 h-auto w-full rounded-xl bg-white"
                     />
                     <span className="font-display text-2xl text-ink">{e.label}</span>
                     <span className="mt-1 text-sm text-muted">

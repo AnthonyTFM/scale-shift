@@ -7,7 +7,7 @@ import { logoMarkUri, og } from "@/lib/og-brand";
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
-/** Era map image used for social previews and as the hero image on /eras/[slug]. */
+/** Era map image used for social previews (the era pages show the equal-area map from /era-maps/[slug]/map). */
 export function eraImage(slug: string) {
   const era = eraByKey(keyFromSlug(slug)) ?? eras[eras.length - 1];
   const map = worldMapDataUri(era.key, OG_SIZE.width, OG_SIZE.height);
