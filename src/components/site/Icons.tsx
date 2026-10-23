@@ -1,4 +1,4 @@
-// Small drawn icons used in place of emoji, so they look the same on every phone and match the brand colours.
+// Small drawn icons used in place of emoji, so they look the same on every phone and match the brand colors.
 
 type IconProps = { className?: string };
 
@@ -33,6 +33,80 @@ export function MarkIcon({ right, className = "size-5" }: IconProps & { right: b
         fill="none"
         stroke="#fff"
         strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Folded map: the map page. */
+export function MapIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20V6.5Z" fill="#9FCBE0" stroke="#1A47B0" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M9 4v13.5M15 6.5V20" fill="none" stroke="#1A47B0" strokeWidth="1.5" />
+      {/* a red location pin in the middle panel */}
+      <path d="M12 15.5s-2.6-2.7-2.6-4.6a2.6 2.6 0 0 1 5.2 0c0 1.9-2.6 4.6-2.6 4.6Z" fill="#FF5B4A" stroke="#D93A2B" strokeWidth="1.1" strokeLinejoin="round" />
+      <circle cx="12" cy="10.9" r="0.95" fill="#fff" />
+    </svg>
+  );
+}
+
+/** Target: the daily challenge. */
+export function TargetIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <circle cx="12" cy="12" r="9.25" fill="#FF5B4A" stroke="#D93A2B" strokeWidth="1.5" />
+      <circle cx="12" cy="12" r="5.75" fill="#fff" />
+      <circle cx="12" cy="12" r="2.75" fill="#FF5B4A" />
+    </svg>
+  );
+}
+
+/** Speaker with sound waves (on) or a cross (off). */
+export function SpeakerIcon({ on, className = "size-5" }: IconProps & { on: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="#2563EB" stroke="#1A47B0" strokeWidth="1.5" strokeLinejoin="round" />
+      {on ? (
+        <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" fill="none" stroke="#1A47B0" strokeWidth="1.8" strokeLinecap="round" />
+      ) : (
+        <path d="M15.5 9.5l5 5M20.5 9.5l-5 5" fill="none" stroke="#D93A2B" strokeWidth="1.8" strokeLinecap="round" />
+      )}
+    </svg>
+  );
+}
+
+const MEDAL = {
+  1: { fill: "#FFC233", edge: "#C48E00" },
+  2: { fill: "#D9DEE8", edge: "#8A93A6" },
+  3: { fill: "#E8A46C", edge: "#A8612A" },
+} as const;
+
+/** Gold, silver and bronze medals for the top three on a leaderboard. */
+export function MedalIcon({ place, className = "size-6" }: IconProps & { place: 1 | 2 | 3 }) {
+  const m = MEDAL[place];
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M7 2h4l2 6H9L7 2Zm6 0h4l-2 6h-2.5Z" fill="#2563EB" stroke="#1A47B0" strokeWidth="1.2" strokeLinejoin="round" />
+      <circle cx="12" cy="15" r="7" fill={m.fill} stroke={m.edge} strokeWidth="1.5" />
+      <text x="12" y="18.8" textAnchor="middle" fontSize="10" fontWeight="800" fill="#1D2140" className="font-display">
+        {place}
+      </text>
+    </svg>
+  );
+}
+
+/** A drawn tick or cross in the current text color, for answer tiles (text symbols vary from phone to phone). */
+export function TickIcon({ right, className = "size-5" }: IconProps & { right: boolean }) {
+  return (
+    <svg viewBox="0 0 20 20" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path
+        d={right ? "M4.5 10.5l3.5 3.5 7.5-8" : "M5.5 5.5l9 9M14.5 5.5l-9 9"}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />

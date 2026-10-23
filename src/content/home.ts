@@ -44,6 +44,8 @@ export const home = {
   },
 
   stickyCta: "Explore the real-size map",
+  // the phone bar on the leaderboard and era pages, before today's game is played
+  stickyPlay: "Play today's game",
 
   // the game-first hero: play card, map card and today's leaderboard over a floating globe
   hub: {

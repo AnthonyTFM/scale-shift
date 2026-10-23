@@ -4,16 +4,30 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { home } from "@/content/home";
+import { loadSave, localDateKey } from "@/lib/daily";
+
+// pages where the bar would only get in the way: the game, forms and the small print
+const HIDDEN = /^\/(daily|contact|privacy|terms|unsubscribed)(\/|$)/;
+// pages where today's game is the better next step, until it's played
+const PLAY_FIRST = /^\/(leaderboard|eras)(\/|$)/;
 
 /**
  * Phone-only "open the map" bar. It slides away while you scroll down to read and comes back when you scroll up, so it
- * never sits on top of what you're reading. Hidden on the daily challenge so it never covers the game, and on the
- * homepage until the hero (with its own map button and the globe) has scrolled fully out of view.
+ * never sits on top of what you're reading. Hidden on the daily challenge so it never covers the game, on forms and
+ * the small print, and on the homepage until the hero (with its own map button and the globe) has scrolled fully out
+ * of view. On the leaderboard and era pages it offers today's game instead, until that's played.
  */
 export function StickyMapCta() {
   const path = usePathname();
   const [pastHero, setPastHero] = useState(path !== "/");
   const [scrollingDown, setScrollingDown] = useState(false);
+  // null until this browser's saved game has been read (after load). Blocked storage, or a game played on another
+  // device, reads as unplayed: the bar then offers the game, and /daily shows the result straight away.
+  const [unplayed, setUnplayed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    queueMicrotask(() => setUnplayed(typeof loadSave().days[localDateKey()]?.s !== "number"));
+  }, [path]);
 
   useEffect(() => {
     let last = window.scrollY;
@@ -32,19 +46,23 @@ export function StickyMapCta() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [path]);
 
-  if (path === "/daily") return null;
-  const shown = pastHero && !scrollingDown;
+  if (HIDDEN.test(path)) return null;
+  const playFirst = PLAY_FIRST.test(path);
+  const play = playFirst && unplayed === true;
+  // on play-first pages the bar waits for that check, so it slides in once with the right button instead of swapping
+  const shown = pastHero && !scrollingDown && (!playFirst || unplayed !== null);
+  const label = play ? home.stickyPlay : home.stickyCta;
   return (
     <aside
-      aria-label={home.stickyCta}
+      aria-label={label}
       aria-hidden={!shown}
       inert={!shown}
       className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-paper/95 px-3 pb-2 pt-3 backdrop-blur transition-transform duration-200 md:hidden ${
         shown ? "translate-y-0" : "translate-y-full"
       }`}
     >
-      <Link href="/map" className="btn btn-primary btn-lg mb-1.5 w-full">
-        {home.stickyCta}
+      <Link href={play ? "/daily" : "/map"} className={`btn ${play ? "btn-gold" : "btn-primary"} btn-lg mb-1.5 w-full`}>
+        {label}
       </Link>
     </aside>
   );

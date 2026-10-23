@@ -147,7 +147,31 @@ export async function resultImage(r: Result): Promise<Blob | null> {
   if (r.streak > 1) {
     ctx.fillStyle = "#1D2140";
     ctx.font = `800 36px ${body}`;
-    ctx.fillText(`🔥 ${r.streak}-day streak`, W / 2, cardY + 720 + verdict.length * 50 + 20);
+    // the site's drawn flame (FlameIcon in Icons.tsx), not an emoji, so it looks the same on every phone
+    const text = `${r.streak}-day streak`;
+    const y = cardY + 720 + verdict.length * 50 + 20;
+    // the flame fills x 6.5–17.5 of its 24-unit box: center the visible flame plus the text, not the empty box
+    const icon = 52;
+    const unit = icon / 24;
+    const gap = 10;
+    const x = W / 2 - (11 * unit + gap + ctx.measureText(text).width) / 2;
+    ctx.save();
+    ctx.translate(x - 6.5 * unit, y - icon + 8);
+    ctx.scale(unit, unit);
+    ctx.lineWidth = 1.4;
+    ctx.lineJoin = "round";
+    const outer = new Path2D("M12 2.5c.6 3.2 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.3 2.6-5.4.2 1.7.9 2.8 2 3.4-.4-3.6.1-6.4.9-9Z");
+    ctx.fillStyle = "#FF8A3D";
+    ctx.fill(outer);
+    ctx.strokeStyle = "#D93A2B";
+    ctx.stroke(outer);
+    ctx.fillStyle = "#FFC233";
+    ctx.fill(new Path2D("M12 21c-1.8 0-3-1.3-3-3 0-1.5 1-2.6 2-3.4.2 1.2.8 1.9 1.6 2.2.2-1.3.4-2.1.8-2.8 1 1 1.6 2.3 1.6 3.9 0 1.8-1.2 3.1-3 3.1Z"));
+    ctx.restore();
+    ctx.fillStyle = "#1D2140";
+    ctx.textAlign = "left";
+    ctx.fillText(text, x + 11 * unit + gap, y);
+    ctx.textAlign = "center";
   }
 
   // call to action: a blue pressable button
