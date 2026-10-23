@@ -6,11 +6,11 @@ export function generateStaticParams() {
   return eras.map((e) => ({ slug: eraSlug(e.key) }));
 }
 
-/** The social image as WebP (about 40 KB instead of a 170 KB PNG). Cached, so it's made once at build time. */
+/** The social image as lossless WebP: the same pixels as the PNG, a third smaller. Cached, so it's made once at build time. */
 async function eraWebp(slug: string) {
   "use cache";
   const png = Buffer.from(await eraImage(slug).arrayBuffer());
-  return new Uint8Array(await sharp(png).webp({ quality: 72 }).toBuffer());
+  return new Uint8Array(await sharp(png).webp({ lossless: true }).toBuffer());
 }
 
 /** The era page's hero map. */
