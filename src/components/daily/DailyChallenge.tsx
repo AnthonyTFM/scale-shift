@@ -239,7 +239,7 @@ export function DailyChallenge() {
   const finished = step >= round.questions.length;
   const todayNo = round.date ? dayNumber(round.date) : null;
   return (
-    <div ref={gameTop}>
+    <div ref={gameTop} className="flex flex-col">
       {challenge && todayNo && !finished ? (
         <p className="mb-3 flex items-start gap-2 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
           <TargetIcon className="size-5" />
@@ -249,7 +249,12 @@ export function DailyChallenge() {
         </p>
       ) : null}
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
-      {signInOn && !finished && round.date ? <PlayedElsewhere /> : null}
+      {/* on phones above the game, where it still fits; on wider screens below it, so both tiles stay on a laptop's first screen */}
+      {signInOn && !finished && round.date ? (
+        <div className="md:order-last md:mt-4">
+          <PlayedElsewhere />
+        </div>
+      ) : null}
       {!finished && round.date ? <StreakPill save={save} today={today} /> : null}
       <Progress round={round} choices={choices} step={step} />
       {finished ? (
