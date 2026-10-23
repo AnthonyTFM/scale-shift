@@ -279,12 +279,14 @@ const add = (entry, geom) => {
   // a frozen shape whose land has changed in the map data since (by more than 2%) keeps its old outline, so the picture
   // always matches the area the puzzles use
   const old = previous.get(id);
-  if (old && Math.abs(area / old.a - 1) > 0.02 && oldOutlines.has(id)) {
+  const s = shapeFiles(geom);
+  const changed = old && (Math.abs(area / old.a - 1) > 0.02 || Math.abs(s.mercArea / old.m - 1) > 0.02);
+  if (changed && oldOutlines.has(id)) {
     fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), oldOutlines.get(id));
     console.log(`  daily: "${id}" kept its outline (its land changed ${((area / old.a - 1) * 100).toFixed(1)}% in the map data)`);
     return;
   }
-  const s = shapeFiles(geom);
+  if (changed) console.warn(`  ! daily: "${id}" changed ${((area / old.a - 1) * 100).toFixed(1)}% and has no old outline: drawn new`);
   fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), JSON.stringify({ merc: s.merc, ea: s.ea }));
   if (old) return;
   pool.push({
@@ -297,9 +299,22 @@ const add = (entry, geom) => {
     a: area,
     m: Math.round(s.mercArea),
     lat: Math.round(s.lat * 10) / 10,
-    ...(previous.size && !previous.has(id) ? { since: firstDay } : previous.get(id)?.since ? { since: previous.get(id).since } : {}),
+    // only new shapes get here; on the very first build (no pool yet) nothing has been played, so no date is needed
+    ...(previous.size ? { since: firstDay } : {}),
   });
 };
+
+// Shapes added after launch only join the daily puzzles from their "since" date, so every day already played keeps
+// exactly the same questions (the leaderboard re-marks answers from this pool). New ids start two days after the build
+// (UTC), a date no time zone has reached yet, so nobody can have played it with the old pool.
+// Only a missing pool (the very first build) starts fresh: an unreadable one (say, a merge conflict in the file) stops the
+// build before anything is deleted, because rebuilding from scratch would silently change every puzzle already played.
+const previous = (() => {
+  const file = path.join(ROOT, "src", "data", "daily-pool.json");
+  if (!fs.existsSync(file)) return new Map();
+  return new Map(JSON.parse(fs.readFileSync(file, "utf8")).map((p) => [p.id, p]));
+})();
+const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10);
 
 // outlines of frozen shapes the map data no longer has (renamed or removed) are kept as they are
 const oldOutlines = new Map();
@@ -307,18 +322,6 @@ if (fs.existsSync(path.join(OUT, "shapes")))
   for (const f of fs.readdirSync(path.join(OUT, "shapes"))) oldOutlines.set(f.replace(/\.json$/, ""), fs.readFileSync(path.join(OUT, "shapes", f)));
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
-
-// Shapes added after launch only join the daily puzzles from their "since" date, so every day already played keeps
-// exactly the same questions (the leaderboard re-marks answers from this pool). New ids start two days after the build
-// (UTC), a date no time zone has reached yet, so nobody can have played it with the old pool.
-const previous = (() => {
-  try {
-    return new Map(JSON.parse(fs.readFileSync(path.join(ROOT, "src", "data", "daily-pool.json"), "utf8")).map((p) => [p.id, p]));
-  } catch {
-    return new Map();
-  }
-})();
-const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10);
 
 // Present-day countries: 5,000 km² and up (30,000 before Oct 21, 10,000 before Oct 22), excluding disputed shapes.
 // Antarctica joins as a continent (from Oct 22): web maps draw it about 24 times too big, so it makes the best trap of all.
@@ -352,8 +355,11 @@ const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10
       console.warn(`  ! daily: "${h.n}" not found in the map data, skipped`);
       continue;
     }
+    // a state already in the pool stays at its snapshot: if a map-data fix moved its largest year, a second entry would
+    // let a puzzle pit the same empire against itself
+    const frozen = [...previous.values()].find((p) => p.kind === "history" && p.src === h.n);
     const year = h.year ?? row.y[row.a.indexOf(Math.max(...row.a))];
-    const key = year === "present" ? "present" : keyForYear.get(year);
+    const key = frozen ? frozen.era : year === "present" ? "present" : keyForYear.get(year);
     if (!key || key === "present") continue;
     const { topo, geoms } = loadTopo(path.join(DATA, "eras", `${key}.json`));
     const parts = geoms.filter((g) => g.properties.n === h.n);
