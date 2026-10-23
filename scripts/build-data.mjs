@@ -19,6 +19,7 @@ import polygonClipping from "polygon-clipping";
 import { recolorEraFiles, settleEraFiles } from "./lib/colors.mjs";
 import { separateEraFiles } from "./lib/overlaps.mjs";
 import { fillGapEraFiles } from "./lib/gaps.mjs";
+import { writeFileRetrying } from "./lib/files.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const CACHE = path.join(ROOT, ".cache");
@@ -39,7 +40,7 @@ const OUTPUT_QUANTIZE = 2e4; // precision written to disk (~2 km at the equator)
 const require = (p) => JSON.parse(fs.readFileSync(path.join(ROOT, "node_modules", p), "utf8"));
 const writeJson = (file, data) => {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(data));
+  writeFileRetrying(file, JSON.stringify(data));
   return fs.statSync(file).size;
 };
 const round = (n, d = 2) => Math.round(n * 10 ** d) / 10 ** d;
@@ -248,7 +249,8 @@ const ALPHA2_FIX = { Kosovo: "XK", "Northern Cyprus": null, Somaliland: null, "S
 
 // ---------- islands the source leaves out ----------
 // A missing island is given to a neighbouring state only when that is safe: the nearest state in this era is
-// within 60 km AND it is the same country that owns the island today. Otherwise it stays "not mapped".
+// within 60 km AND it is the same country that owns the island today. Otherwise it stays "not mapped". (Missing land
+// that touches a shape is a coastal strip, not an island: see touchesShape.)
 const SAME_STATE = { "United States of America": "United States", Turkey: "Türkiye", "Republic of Turkey": "Türkiye", Burma: "Myanmar" };
 const sameName = (n) => SAME_STATE[n] || n;
 let presentLookup = null;
@@ -291,6 +293,38 @@ function ownerForIsland(patch, features) {
     }
   }
   return best && sameName(best.properties.n) === today ? best : null;
+}
+
+// A missing piece that shares an edge with a named shape is a strip along a coast, not an island. Added to its country
+// as an extra piece, it would draw the old coastline through the country and could run one country's colour along its
+// neighbour's coast (Libya's strip ran past the Egyptian border), so it is left to the coast fill (scripts/lib/gaps.mjs),
+// which shares it between the shapes beside it and merges each part in. `j` marks it to be filled whatever its width.
+// `features` are the outlines the missing land was cut from, so a strip shares their corners exactly; an island across
+// a strait, however narrow, does not.
+function touchesShape(patch, features) {
+  const TOUCH = 1e-7; // degrees: the same point
+  const pts = patch.geometry.coordinates.flatMap((rings) => rings[0]);
+  let [w, s, e, n] = [180, 90, -180, -90];
+  for (const [x, y] of pts) [w, s, e, n] = [Math.min(w, x), Math.min(s, y), Math.max(e, x), Math.max(n, y)];
+  const near = new Set();
+  for (const f of features) {
+    if (!f.properties.n) continue;
+    for (const rings of f.geometry.coordinates)
+      for (const r of rings)
+        for (let k = 1; k < r.length; k++) {
+          const [x1, y1] = r[k - 1];
+          const [x2, y2] = r[k];
+          if (Math.max(x1, x2) < w - TOUCH || Math.min(x1, x2) > e + TOUCH || Math.max(y1, y2) < s - TOUCH || Math.min(y1, y2) > n + TOUCH) continue;
+          const dx = x2 - x1;
+          const dy = y2 - y1;
+          pts.forEach(([x, y], i) => {
+            const t = dx || dy ? Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy))) : 0;
+            if (Math.hypot(x1 + t * dx - x, y1 + t * dy - y) <= TOUCH) near.add(i);
+          });
+          if (near.size >= 2) return true;
+        }
+  }
+  return false;
 }
 
 // ---------- countries the source leaves unnamed ----------
@@ -495,18 +529,27 @@ async function main() {
       if (f.properties.s) rec.s = f.properties.s;
     }
     let topo = toTopology(grouped, SIMPLIFY_HISTORICAL);
-    const allPatches = missingLand(client.feature(topo, topo.objects.p).features.map((f) => ({ geometry: { coordinates: f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates } })));
+    const drawn = client
+      .feature(topo, topo.objects.p)
+      .features.map((f) => ({ properties: f.properties, geometry: { coordinates: f.geometry.type === "Polygon" ? [f.geometry.coordinates] : f.geometry.coordinates } }));
+    const allPatches = missingLand(drawn);
     const patches = [];
+    const strips = []; // coastal strips left to the coast fill: still their country's land when the next islands are judged
     let joined = 0;
     for (const patch of allPatches) {
-      const owner = ownerForIsland(patch, grouped);
-      if (owner) {
+      const found = ownerForIsland(patch, [...grouped, ...strips]);
+      const owner = found?.owner ?? found;
+      if (owner && touchesShape(patch, drawn)) {
+        patches.push({ ...patch, properties: { ...patch.properties, j: 1 } });
+        strips.push({ properties: owner.properties, geometry: patch.geometry, owner });
+      } else if (owner) {
         owner.geometry.coordinates.push(...patch.geometry.coordinates);
         joined++;
       } else patches.push(patch);
     }
     if (allPatches.length) topo = toTopology([...grouped, ...patches], SIMPLIFY_HISTORICAL);
-    gridSources.push(grouped.filter((f) => f.properties.n));
+    // the coastal strips count for the country they lie in today, as they did when they were added to it here
+    gridSources.push([...grouped.filter((f) => f.properties.n), ...strips.map((s) => ({ properties: s.properties, geometry: s.geometry }))]);
     const key = eraKey(entry.year);
     const bytes = writeJson(path.join(OUT_PUBLIC, "eras", `${key}.json`), topo);
     const named = grouped.filter((f) => f.properties.n);

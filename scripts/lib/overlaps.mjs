@@ -10,6 +10,7 @@ import { geoArea, geoCentroid, geoContains } from "d3-geo";
 import polygonClipping from "polygon-clipping";
 import * as client from "topojson-client";
 import * as server from "topojson-server";
+import { writeFileRetrying } from "./files.mjs";
 
 const EARTH_R = 6371.0088;
 const OUTPUT_QUANTIZE = 2e4; // as build-data.mjs writes the era files
@@ -117,7 +118,7 @@ export function separateEraFiles(root) {
   for (const e of eras) {
     const file = path.join(root, "public/data/eras", `${e.key}.json`);
     const { topo, cut } = separateOverlaps(JSON.parse(fs.readFileSync(file, "utf8")));
-    if (cut) fs.writeFileSync(file, JSON.stringify(topo));
+    if (cut) writeFileRetrying(file, JSON.stringify(topo));
     report.push({ era: e.key, cut });
   }
   return report;

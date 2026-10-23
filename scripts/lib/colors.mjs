@@ -8,6 +8,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { geoContains } from "d3-geo";
 import * as client from "topojson-client";
+import { writeFileRetrying } from "./files.mjs";
 
 export const PALETTE_SIZE = 8;
 
@@ -313,7 +314,7 @@ export function settleEraFiles(root, region) {
   const changed = settleColors(topos, region);
   topos.forEach((t, i) => {
     const text = JSON.stringify(t);
-    if (text !== texts[i]) fs.writeFileSync(files[i], text);
+    if (text !== texts[i]) writeFileRetrying(files[i], text);
   });
   return changed;
 }
@@ -324,7 +325,7 @@ export function recolorEraFiles(root) {
   const files = eras.map((e) => path.join(root, "public/data/eras", `${e.key}.json`));
   const topos = files.map((f) => JSON.parse(fs.readFileSync(f, "utf8")));
   const clashes = colorAllEras(topos);
-  topos.forEach((t, i) => fs.writeFileSync(files[i], JSON.stringify(t)));
+  topos.forEach((t, i) => writeFileRetrying(files[i], JSON.stringify(t)));
   // new colours mean new files: bump the data version so browsers and the CDN fetch them again
   fs.writeFileSync(path.join(root, "src/data/data-version.json"), JSON.stringify({ v: Date.now().toString(36) }));
   return { eras: eras.length, clashes };
