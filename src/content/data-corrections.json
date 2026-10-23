@@ -766,6 +766,11 @@
     },
     {
       "era": "All",
+      "what": "Gave thin unnamed slivers wedged between two or more neighbours (up to about 30 km wide, with no coast) to the neighbour each shares most border with. For example, a 29,000 km² wedge south of Great Slave Lake in 900.",
+      "why": "Where the source's outlines of neighbours don't quite meet, the gap between them showed as 'not mapped'. Wider unclaimed areas stay as the source draws them."
+    },
+    {
+      "era": "All",
       "what": "Filled land the source leaves blank (for example Sumbawa in Indonesia) as 'not mapped in the source', so the map has no false sea.",
       "why": "Islands and coasts missing from the historical outlines."
     }
