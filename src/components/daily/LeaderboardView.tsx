@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MedalIcon } from "@/components/site/Icons";
-import { dayNumber, LAUNCH, localDateKey, loadSave, QUESTIONS_PER_DAY, shiftDate, type DayRecord } from "@/lib/daily";
+import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate, type DayRecord } from "@/lib/daily";
 import { dailyCopy } from "@/content/daily";
 import { LeaderboardJoin } from "./LeaderboardJoin";
 import { POSTED_EVENT } from "./useJoin";
@@ -152,12 +152,10 @@ export function LeaderboardView() {
       ) : null}
 
       {offered && today && me.round ? (
-        <LeaderboardJoin
-          date={today}
-          choices={me.round.c}
-          score={me.round.s ?? 0}
-          hint={dailyCopy.boardNudge(me.round.s ?? 0, QUESTIONS_PER_DAY)}
-        />
+        // hidden, not removed, on other tabs and days: a pop-up or post in progress carries on
+        <div hidden={!(tab === "day" && date === today)}>
+          <LeaderboardJoin date={today} choices={me.round.c} score={me.round.s ?? 0} hint={dailyCopy.boardNudge(me.round.s ?? 0, me.round.c.length)} />
+        </div>
       ) : null}
 
       {tab === "day" && date === today && !me.playedToday ? (

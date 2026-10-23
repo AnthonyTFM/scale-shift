@@ -85,7 +85,8 @@ function SignedInGate({ date, choices, score, hint }: Props) {
         // failure can't fire again on a retry
         setStep(null);
         requestAnimationFrame(() => {
-          openSignIn("/daily");
+          // come back to the page the player joined from (/daily or /leaderboard); the join carries on there
+          openSignIn(window.location.pathname);
           setAwaiting(true);
         });
       }}
