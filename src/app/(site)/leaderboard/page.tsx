@@ -35,9 +35,9 @@ export default function LeaderboardPage() {
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Scores are checked on our server, and only your first try each day counts. Each email gets one player, and each nickname belongs to the
             first player who uses it. Emails stay private. Nicknames are public; slurs and offensive names are blocked, however they&apos;re spelled.
-            Want yours removed?{" "}
+            Signed in? &ldquo;Delete my data&rdquo; above removes everything. Otherwise,{" "}
             <Link href="/contact?topic=other" className="underline">
-              Contact us
+              contact us
             </Link>
             .
           </p>

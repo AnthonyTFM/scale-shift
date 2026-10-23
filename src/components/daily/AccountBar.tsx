@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAccount } from "./SignInProvider";
 import { forgetPlayer, rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
@@ -20,7 +20,7 @@ function Bar() {
   const [ageOk, setAgeOk] = useAgeOk();
   const [askAge, setAskAge] = useState(false);
   // set just before the sign-out that follows "Delete my data", so the page can confirm it worked
-  const [deleted] = useState(() => {
+  const [deleted, setDeleted] = useState(() => {
     try {
       return typeof window !== "undefined" && sessionStorage.getItem(DELETED) === "1";
     } catch {
@@ -76,8 +76,10 @@ function Bar() {
                 try {
                   sessionStorage.setItem(DELETED, "1");
                 } catch {
-                  /* storage blocked: no confirmation line, the data is still gone */
+                  /* storage blocked: the line below still shows until the page reloads */
                 }
+                // sign-out returns to this same page without remounting it, so show the confirmation now
+                setDeleted(true);
                 signOut("/leaderboard");
               }}
             />
@@ -116,6 +118,15 @@ function Bar() {
 function DeleteData({ onDeleted }: { onDeleted: () => void }) {
   const [step, setStep] = useState<"idle" | "confirm" | "deleting" | "error">("idle");
   const [error, setError] = useState("");
+  const keep = useRef<HTMLButtonElement>(null);
+  const open = useRef<HTMLButtonElement>(null);
+  const moved = useRef(false);
+  // keyboard focus follows the confirmation: onto "Keep my data" when it opens, back to the button when cancelled
+  useEffect(() => {
+    if (step === "confirm") keep.current?.focus();
+    else if (step === "idle" && moved.current) open.current?.focus();
+    if (step !== "idle") moved.current = true;
+  }, [step]);
 
   const run = async () => {
     setStep("deleting");
@@ -137,6 +148,7 @@ function DeleteData({ onDeleted }: { onDeleted: () => void }) {
   if (step === "idle")
     return (
       <button
+        ref={open}
         type="button"
         onClick={() => setStep("confirm")}
         className="inline-flex min-h-11 items-center font-semibold text-muted hover:text-ink hover:underline"
@@ -145,12 +157,15 @@ function DeleteData({ onDeleted }: { onDeleted: () => void }) {
       </button>
     );
   return (
-    <span role="alert" className="flex w-full flex-wrap items-center gap-x-3 rounded-xl bg-white p-3 ring-1 ring-line">
-      <span className="text-ink">{step === "error" ? error : A.deleteConfirm}</span>
+    <span className="flex w-full flex-wrap items-center gap-x-3 rounded-xl bg-white p-3 ring-1 ring-line">
+      <span role="alert" className="text-ink">
+        {step === "error" ? error : A.deleteConfirm}
+      </span>
       <button type="button" onClick={run} disabled={step === "deleting"} className="btn btn-red text-sm">
         {step === "deleting" ? A.deleting : A.deleteYes}
       </button>
       <button
+        ref={keep}
         type="button"
         onClick={() => setStep("idle")}
         disabled={step === "deleting"}

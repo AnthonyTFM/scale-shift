@@ -9,9 +9,9 @@ export const ageCheck = {
   hint: "The leaderboard and emails are for ages 13 and up. Anyone can play without joining.",
   needed: "Please confirm you're 13 or older to join the leaderboard.",
   agree: "By joining you agree to our",
-  terms: "Terms",
+  terms: "terms",
   and: "and",
-  privacy: "Privacy policy",
+  privacy: "privacy policy",
 };
 
 /** The signed-in player's controls on /leaderboard. */
@@ -25,7 +25,16 @@ export const account = {
   deleted: "Your data has been deleted. Thanks for playing.",
 };
 
-type Section = { id: string; title: string; paras?: string[]; items?: [string, string][] };
+export type Section = { id: string; title: string; paras?: string[]; items?: [string, string][] };
+
+/** Words on these pages that become links. */
+export const legalLinks: Record<string, string> = {
+  [site.contactEmail]: `mailto:${site.contactEmail}`,
+  "About page": "/about",
+  "data license file": "/data/LICENSE.txt",
+  "Leaderboard page": "/leaderboard",
+  "privacy policy": "/privacy",
+};
 
 export const privacy: { title: string; lead: string; description: string; sections: Section[] } = {
   title: "Privacy policy",
@@ -44,14 +53,14 @@ export const privacy: { title: string; lead: string; description: string; sectio
       title: "What we collect",
       items: [
         ["Map state", "The shapes you add live in the page address (the part after #). It never reaches our server unless you share the link."],
-        ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, and your daily answers, scores and streak are saved in your browser's local storage. They stay on your device."],
+        ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, your daily answers, scores and streak, your 13+ answer and, if you join, your player ID and nickname are saved in your browser's local storage. They stay on your device."],
         [
           "Leaderboard and sign-in (optional, ages 13+)",
-          "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email. We store that email, the nickname you pick, your daily answers and scores, and a random player ID. Nicknames and scores are public. Your email is private: it keeps one player per person and is never shown, sold or shared.",
+          "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email (with Google, Clerk also receives your name and profile photo). We store that email, the nickname you pick, your daily answers and scores and a random player ID. Nicknames and scores are public. Your email is private: it keeps one player per person, is never shown publicly or sold and only goes to the services below that run the site.",
         ],
-        ["Reminder emails (optional)", "Only if you tick the box. We record when you agreed and send at most one email a day. Every email has a one-click unsubscribe, and you can turn reminders off after any daily round."],
+        ["Reminder emails (optional)", "Only if you tick the box. We record when you agreed. Once reminders start, we'll send at most one email a day, each with a one-click unsubscribe, and you can turn them off after any daily round."],
         ["Feedback form", "What you type, plus your name and email if you give them, and your browser type so we can reproduce map problems."],
-        ["Spam protection", "To stop one person flooding the leaderboard, we keep a one-way scrambled code made from your network address for three days. The address itself isn't stored."],
+        ["Spam protection", "To stop one person flooding the leaderboard, we keep a scrambled code made from your network address with a secret key for three days. The address itself isn't stored."],
         ["Server logs", "Our host records basic request details (such as network address and browser type) to keep the site running and secure, and keeps them only briefly."],
         ["Analytics", "Off. If we ever turn on Google Analytics or ads, we'll update this page first and ask for your consent where the law requires it."],
       ],
@@ -60,7 +69,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       id: "why",
       title: "Why we use it",
       paras: [
-        "To run the leaderboard you asked to join (our agreement with you), to send reminders you opted into (your consent, which you can withdraw any time), and to keep the site safe from spam and abuse (our legitimate interest). We never sell or share your personal information, and we don't use it for advertising.",
+        "We use it to run the leaderboard you asked to join (our agreement with you), to send reminders you opted into (your consent, which you can withdraw any time) and to keep the site safe from spam and abuse (our legitimate interest). We never sell your personal information or use or share it for advertising.",
       ],
     },
     {
@@ -70,7 +79,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
         ["Vercel", "hosts the site."],
         ["Clerk", "handles sign-in (email codes, or Google if you choose it)."],
         ["Upstash", "stores the leaderboard database."],
-        ["Resend", "will send reminder emails once they start."],
+        ["Resend", "will send reminder emails once they start, and may deliver feedback messages to us."],
       ],
       paras: ["These companies process data for us under their own privacy and security terms. Your data may be processed in the United States and other countries where they operate."],
     },
@@ -95,7 +104,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       id: "cookies",
       title: "Cookies",
       paras: [
-        "We don't use advertising or tracking cookies. When you sign in, Clerk sets cookies that keep you signed in. They're needed for sign-in to work, so they don't need a consent banner.",
+        "We don't use advertising or tracking cookies. When you tap Sign in, Clerk loads and sets cookies that keep you signed in. They're needed for sign-in to work, so they don't need a consent banner.",
       ],
     },
     {
@@ -153,7 +162,7 @@ export const terms: { title: string; lead: string; description: string; sections
       id: "content",
       title: "Our content and the map data",
       paras: [
-        `The site's design, text and code belong to its creators. Map data comes from other projects under their own licenses: the historical borders are from historical-basemaps by André Ourednik under GPL-3.0, and today's borders are from Natural Earth (public domain). Full details are on the About page and in the data license file. You may share links and screenshots of the map with credit to ${site.name}.`,
+        `The site's design, text and code belong to its creators, except the scripts that build the map data, which are offered under GPL-3.0. Map data comes from other projects under their own licenses: the historical borders are from historical-basemaps by André Ourednik under GPL-3.0, and today's borders are from Natural Earth (public domain). Full details are on the About page and in the data license file. You may share links and screenshots of the map with credit to ${site.name}.`,
       ],
     },
     {

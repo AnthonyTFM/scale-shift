@@ -46,6 +46,8 @@ export async function DELETE(request: Request) {
     const id = await existingPlayer(user);
     if (id) await getStore().deletePlayer(id, user.accountId);
     await (await clerkClient()).users.deleteUser(user.accountId);
+    // once more, in case another tab posted a score in between (it can't now: the account is gone)
+    if (id) await getStore().deletePlayer(id, user.accountId);
     return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     console.error("[leaderboard] delete failed", e);

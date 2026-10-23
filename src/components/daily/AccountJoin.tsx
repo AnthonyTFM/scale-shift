@@ -128,6 +128,7 @@ export function AccountJoin({ date, choices }: Props) {
             you, and you keep the same nickname on every device.
           </p>
           <AgeCheck
+            id="age-ok-join"
             ok={ageOk}
             error={ageError}
             onChange={(v) => {
@@ -140,7 +141,7 @@ export function AccountJoin({ date, choices }: Props) {
             onClick={() => {
               if (!ageOk) {
                 setAgeError(true);
-                return document.getElementById("age-ok")?.focus();
+                return document.getElementById("age-ok-join")?.focus();
               }
               openSignIn("/daily");
             }}

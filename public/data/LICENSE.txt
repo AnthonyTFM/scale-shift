@@ -10,7 +10,7 @@ and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
 
   Changes made for this site: simplified and quantized outlines, renamed or
   re-assigned rulers where the source was wrong for its year, filled unmapped
-  land, split a few shapes, and cut single places out for the daily challenge.
+  land, split a few shapes and cut single places out for the daily challenge.
   Every change is listed at /about and in src/content/data-corrections.json.
   These derived files are distributed under the same GPL-3.0 license.
 
@@ -19,7 +19,7 @@ and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
   (src/content/data-corrections.json) are published at
   https://github.com/AnthonyTFM/scale-shift and are offered under GPL-3.0.
 
-eras/present.json, us-states.json, lakes.json, globe.json, and the present-day
+eras/present.json, us-states.json, lakes.json, globe.json and the present-day
 shapes in daily/
   Natural Earth (public domain), https://www.naturalearthdata.com/
   US states: US Census Bureau via us-atlas (public domain)
