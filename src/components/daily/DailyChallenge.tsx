@@ -30,6 +30,7 @@ import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play, setSound, soundOn } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
+import { mainBox, mainPart, type Outline, type ShapeFile } from "@/lib/outline";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
@@ -44,8 +45,6 @@ const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(pr
 // where a new round lines up: just under the sticky site header
 const ROUND_TOP = 88;
 
-type Outline = { d: string; b: [number, number, number, number] };
-type ShapeFile = { merc: Outline; ea: Outline };
 
 type Round = {
   /** date key for the daily round, null for practice */
@@ -539,17 +538,21 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
   );
 }
 
-const size = (o: Outline) => Math.max(o.b[2] - o.b[0], o.b[3] - o.b[1]);
+// framed and drawn on the main landmass, so far-off islands don't shrink a country to a speck
+const size = (o: Outline) => {
+  const [x0, y0, x1, y1] = mainBox(o);
+  return Math.max(x1 - x0, y1 - y0);
+};
 
 /** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
 function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
-  const [x0, y0, x1, y1] = outline.b;
+  const { d, b: [x0, y0, x1, y1] } = mainPart(outline);
   const k = 100 / span;
   const tiny = size(outline) < span * 0.06;
   return (
     <>
       <path
-        d={outline.d}
+        d={d}
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
         fill={ghost ? "none" : color}
         fillOpacity={0.88}
@@ -583,7 +586,10 @@ function RevealTile({
   revealed: boolean;
   color: string;
 }) {
-  const area = (o: Outline, span: number) => ((o.b[2] - o.b[0]) * (o.b[3] - o.b[1])) / (span * span);
+  const area = (o: Outline, span: number) => {
+    const [x0, y0, x1, y1] = mainBox(o);
+    return ((x1 - x0) * (y1 - y0)) / (span * span);
+  };
   const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
   return (
     <svg viewBox="0 0 100 100" className="aspect-square w-full rounded-2xl bg-tile" aria-hidden="true">
