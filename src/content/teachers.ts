@@ -38,7 +38,7 @@ export const teachers = {
     lead: "True areas from today's map, the same figures as the era pages, and how much a normal web map inflates each one. Very small countries and territories are left out. Areas can differ from official figures by a few percent.",
     mostTitle: "Most exaggerated by a normal map",
     // under the tables: why a row can differ from 1 ÷ cos² of its listed latitude
-    note: "\"Too big\" is averaged over the whole country, so a country that spans many latitudes doesn't match 1 ÷ cos² of its middle exactly. Web maps stop at about 85° north and south, so for Antarctica it counts only the part a web map shows.",
+    note: "\"Too big\" is averaged over the whole country, so a country that spans many latitudes doesn't match 1 ÷ cos² of its middle exactly. Web maps stop at about 85° north and south, so for Antarctica the drawn area leaves out the land nearest the pole.",
     allTitle: "All countries, largest first",
   },
 

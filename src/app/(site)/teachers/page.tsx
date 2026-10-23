@@ -14,7 +14,7 @@ import { PageHero } from "@/components/site/PageHero";
 export const metadata: Metadata = {
   title: "For teachers: map projections, real country sizes and historical borders",
   description:
-    "A classroom reference: why the Mercator map distorts size, the real area of every country, 4,000 years of world borders, recent border changes and today's disputed territories.",
+    "A classroom reference: why the Mercator map distorts size, the real area of today's countries, 4,000 years of world borders, recent border changes and today's disputed territories.",
   alternates: { canonical: "/teachers" },
 };
 

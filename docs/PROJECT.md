@@ -61,7 +61,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 - **Writing voice:** plain, specific, active. Buttons say what happens. Errors say what to do next.
 
 ## Known issues and limits
-- Borders before about 1800 are approximate; snapshots are 50–200 years apart in ancient times.
+- Borders before about 1650 are approximate (the source rates most borders precise from 1650; era labels say "Mostly precise/approximate" because an era's rating is an average, Oct 23); snapshots are 50–200 years apart in ancient times.
 - Antarctic claim areas exclude the floating ice shelves.
 - Searchable places are countries, US states and historical states. The v1 site also had Canadian and other provinces, continents and "all claims" realms; bringing those back needs data-pipeline work.
 - Forms don't keep anything on Vercel until their settings are added (see below).
