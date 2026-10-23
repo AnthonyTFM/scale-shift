@@ -97,7 +97,7 @@ On Oct 19, 2026 the site was rebuilt from the "Atlas Drift" prototype (the v1 co
 
 ## Open decisions
 - Domain: buy borderdrift.com (check it is still free), then connect it and switch Clerk to production
-- Analytics (GA4 ID in Vercel) and form delivery (webhook vs Resend)
+- Analytics: **decided Oct 23: Vercel Web Analytics** (no cookies, so no consent banner; Anthony enables it in Vercel → scale-shift → Analytics). GA4 stays wired but off: turning it on needs a consent banner for UK/EU visitors first. Form delivery: messages are kept in Redis (`fb:inbox`); Resend email is optional.
 - Slack with @Claude for both owners (after both have shipped from their laptops)
 
 ## Status and setup log
@@ -111,7 +111,7 @@ _Last updated: October 23, 2026_
 | Variable | Status |
 |---|---|
 | `NEXT_PUBLIC_SITE_URL` | Set to `https://scale-shift.vercel.app` (all environments). A typo (`ttps://`) was fixed on Oct 18; the live sitemap was checked on Oct 19 and all 69 links are correct. |
-| `NEXT_PUBLIC_GA4_ID` | Not set yet (no analytics) |
+| `NEXT_PUBLIC_GA4_ID` | Not set, on purpose: visits are counted with Vercel Web Analytics (`<Analytics />` in `src/app/layout.tsx`, no cookies). GA4 would need a consent banner first |
 | `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO` (+ `NOTIFY_EMAIL_FROM`) | Optional extras. Since Oct 23 form messages are saved in the leaderboard's Upstash Redis (list `fb:inbox`, newest first, last 1,000 kept); read them with `npm run leads` or Upstash's data browser. Each new message logs `[feedback] new message <id>` (no personal details) in Vercel's logs for the hourly check |
 | Upstash Redis (`KV_REST_API_URL` + `KV_REST_API_TOKEN`, added by Vercel → Storage) | Set Oct 19. The live API reports `X-Leaderboard-Store: redis`. |
 | Clerk (`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` + `CLERK_SECRET_KEY`, added by Vercel → Marketplace → Clerk) | Set Oct 19 (Production + Preview), Clerk **development** keys (`pk_test_`): email verification code on, password off. Switch to production keys once we own a domain. |

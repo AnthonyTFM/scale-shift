@@ -62,7 +62,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
         ["Feedback form", "What you type, plus your name and email if you give them, and your browser type so we can reproduce map problems."],
         ["Spam protection", "To stop one person flooding the leaderboard, we keep a scrambled code made from your network address with a secret key for three days. The address itself isn't stored."],
         ["Server logs", "Our host records basic request details (such as network address and browser type) to keep the site running and secure, and keeps them only briefly."],
-        ["Analytics", "Off. If we ever turn on Google Analytics or ads, we'll update this page first and ask for your consent where the law requires it."],
+        ["Visit counts", "We count visits with Vercel Web Analytics, which sets no cookies and doesn't follow you to other sites. For each page view it records the page, the site that linked to it, your country and your device and browser type. It doesn't store your network address or anything that names you. If we ever turn on Google Analytics or ads, we'll update this page first and ask for your consent where the law requires it."],
       ],
     },
     {
@@ -76,7 +76,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       id: "providers",
       title: "Who helps us run the site",
       items: [
-        ["Vercel", "hosts the site."],
+        ["Vercel", "hosts the site and counts visits (Web Analytics, no cookies)."],
         ["Clerk", "handles sign-in (email codes, or Google if you choose it)."],
         ["Upstash", "stores the leaderboard database and the messages you send us through the feedback form."],
         ["Resend", "will send reminder emails once they start, and may deliver feedback messages to us."],
