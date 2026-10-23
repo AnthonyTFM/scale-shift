@@ -1,7 +1,7 @@
 // Canvas map engine: draws the era basemap + draggable real-size overlays, handles pan/zoom/drag.
 // Framework-free on purpose so dragging stays at 60fps; React talks to it through a few setters and callbacks.
 import { geoMercator, geoPath, type GeoPermissibleObjects } from "d3-geo";
-import type { MultiPolygon } from "geojson";
+import type { MultiLineString, MultiPolygon, Position } from "geojson";
 import { featureAtIn, type Lake, type Layer, type PolityFeature, type PolityProps } from "@/lib/data";
 import {
   type LonLat,
@@ -85,6 +85,7 @@ type BaseCache = {
   claims: { c: ClaimShape; box: [number, number, number, number]; p2d?: Path2D }[];
   lakes: { l: Lake; box: [number, number, number, number]; p2d?: Path2D }[];
   paths: Map<PolityFeature, Path2D>;
+  /** the outlines to stroke (see seamlessOutline), made on demand */ outlines: Map<PolityFeature, Path2D>;
   /** state lines: undefined until first needed, null when not shown at this zoom */
   states: { mesh: Path2D; clip: Path2D } | null | undefined;
   /** "col,row" → bitmap, least recently used first */ tiles: Map<string, HTMLCanvasElement>;
@@ -135,6 +136,36 @@ function hashIndex(s: string) {
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return h % POLITICAL.length;
+}
+
+/** Whether the edge a–b runs along the 180° meridian. */
+const onSeam = (a: Position, b: Position) => Math.abs(a[0]) > 179.999 && Math.abs(b[0]) > 179.999 && Math.sign(a[0]) === Math.sign(b[0]);
+
+/**
+ * A shape's outline without its cuts along the 180° meridian. The source splits shapes that cross it (Chukotka, Fiji,
+ * Russia), and stroking the cut draws a line through the land. `drawn` is the shape as drawn (moved and turned, for a
+ * dragged one). Null when there is no cut, so the polygon itself can be stroked.
+ */
+function seamlessOutline(source: MultiPolygon, drawn: MultiPolygon = source): MultiLineString | null {
+  const lines: Position[][] = [];
+  let cut = false;
+  source.coordinates.forEach((poly, p) =>
+    poly.forEach((ring, r) => {
+      const pts = drawn.coordinates[p][r];
+      let run: Position[] = [pts[0]];
+      for (let k = 1; k < ring.length; k++) {
+        if (!onSeam(ring[k - 1], ring[k])) {
+          run.push(pts[k]);
+          continue;
+        }
+        cut = true;
+        if (run.length > 1) lines.push(run);
+        run = [pts[k]];
+      }
+      if (run.length > 1) lines.push(run);
+    }),
+  );
+  return cut ? { type: "MultiLineString", coordinates: lines } : null;
 }
 
 /** A shape's fill on the base map. */
@@ -557,7 +588,7 @@ export class MapEngine {
     // big screens get bigger tiles, so a desktop window needs fewer of them
     const size = this.w * this.h > 900_000 ? 512 : 256;
     const lakes = this.lakes.filter((l) => l.bbox[2] - l.bbox[0] + (l.bbox[3] - l.bbox[1]) > minDeg).map((l) => ({ l, box: this.cacheBox(l.bbox, k) }));
-    return { layer, k, dpr: this.dpr, proj, size, shapes, claims, lakes, paths: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
+    return { layer, k, dpr: this.dpr, proj, size, shapes, claims, lakes, paths: new Map(), outlines: new Map(), tiles: new Map(), keep: 24, states: k > minScale(this.w, this.h) * 2.2 ? undefined : null };
   }
 
   /** A box in the cache's units (screen pixels at its zoom, the cut meridian at ±π·k), for skipping shapes outside a tile. */
@@ -707,7 +738,7 @@ export class MapEngine {
     }
     // pass 2: borders: solid where the source says they are precise, dashed where approximate
     ctx.lineWidth = 0.7;
-    for (const { f, p2d } of shapes) {
+    for (const { f } of shapes) {
       if (f.props.m || f.sliced) continue; // filled-in gaps and sliced polar shapes: no outline (it would show the cuts)
       if (f.props.n) {
         ctx.setLineDash(f.props.b >= 2 ? [] : [3, 3]);
@@ -716,7 +747,7 @@ export class MapEngine {
         ctx.setLineDash([2, 4]);
         ctx.strokeStyle = COLORS.borderSoft;
       }
-      ctx.stroke(p2d);
+      ctx.stroke(this.cachedOutline(c, f));
     }
     ctx.setLineDash([]);
 
@@ -768,7 +799,7 @@ export class MapEngine {
     if (!f) return;
     const ctx = this.bctx;
     const s = this.view.k / c.k;
-    const p2d = this.cachedPath(c, f);
+    const p2d = this.cachedOutline(c, f);
     for (const [ox, oy] of this.cacheOrigins(c)) {
       ctx.save();
       ctx.setTransform(this.dpr * s, 0, 0, this.dpr * s, this.dpr * ox, this.dpr * oy);
@@ -1013,6 +1044,17 @@ export class MapEngine {
     return p2d;
   }
 
+  /** The outline to stroke for a shape: its polygon, or its edges without the 180° cut when it has one. */
+  private cachedOutline(c: BaseCache, f: PolityFeature) {
+    let p2d = c.outlines.get(f);
+    if (!p2d) {
+      const lines = seamlessOutline(f.geom);
+      p2d = lines ? this.projected(c, lines) : this.cachedPath(c, f);
+      c.outlines.set(f, p2d);
+    }
+    return p2d;
+  }
+
   /** State lines and the US outline that clips them (only zoomed in far enough to show them). */
   private statePaths(c: BaseCache) {
     if (c.states === undefined) {
@@ -1214,13 +1256,19 @@ export class MapEngine {
       ctx.fillStyle = this.pattern(color, 0.45) ?? "transparent";
       ctx.fill(p2d);
       if (o.sliced) continue;
+      const lines = seamlessOutline(o.geom, this.placed(o));
+      let edge = p2d;
+      if (lines) {
+        edge = new Path2D();
+        for (const proj of projs) geoPath(proj, edge as unknown as CanvasRenderingContext2D)(lines);
+      }
       ctx.lineJoin = "round";
       ctx.lineWidth = sel ? 6 : 4;
       ctx.strokeStyle = "rgba(255, 252, 245, 0.9)";
-      ctx.stroke(p2d);
+      ctx.stroke(edge);
       ctx.lineWidth = sel ? 2.8 : 2.2;
       ctx.strokeStyle = color;
-      ctx.stroke(p2d);
+      ctx.stroke(edge);
     }
     ctx.restore();
     if (!this.labels) return;
