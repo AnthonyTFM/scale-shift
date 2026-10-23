@@ -7,6 +7,8 @@
 // be a real gap in the source).
 // The same goes for the thin coastal slivers of a "leftover" shape: an older shape the source still draws underneath
 // newer ones, which shows through only where they stop short of the coast. Its other pieces stay as they are.
+// Thin unnamed pieces wedged between two or more named neighbours, with no coast, go whole to the one they share most
+// border with.
 // Runs on the era files after the overlaps are separated. Used by build-data.mjs.
 
 import fs from "node:fs";
@@ -23,6 +25,10 @@ const CELL = 0.01; // degrees: the grid a strip is shared out on
 const SLIVER_KM2 = 50; // holes this small that nothing covers are slivers between a shape and its strip: filled
 const SEA_SHARE = 0.03; // a leftover piece with this share of its outline on the sea lies along the coast
 const NOTCH_DEG = 3; // a ring that turns back sharper than this has a notch (a stray line on the map): closed
+const GAP_KM = 15; // an unnamed piece between named neighbours no wider than this (area / perimeter) is a gap: filled
+const ENCLOSED_SHARE = 0.9; // ...if this share of its outline borders them (it has no coast)
+const LOST_KM2 = 10; // a shape that loses more than this when given a strip: the clipping failed, the strip stays
+const HAIRLINE_KM = 1; // ...but not a hairline this thin: invisible, and sharing it out would break up its neighbours
 const THIN_KM = 10; // a blank strip or leftover piece no wider than this (area / perimeter) is a sliver along the coast
 
 const polysOf = (g) => (!g ? [] : g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []);
@@ -36,6 +42,9 @@ const ringKm2 = (ring) => {
   const a = geoArea({ type: "Polygon", coordinates: [ring] });
   return (a > 2 * Math.PI ? 4 * Math.PI - a : a) * EARTH_R ** 2;
 };
+
+/** The area of polygons in km², whichever way their rings run. */
+const km2Of = (polys) => polys.reduce((t, [outer, ...holes]) => t + ringKm2(outer) - holes.reduce((h, r) => h + ringKm2(r), 0), 0);
 
 /** polygon-clipping returns counter-clockwise outer rings; d3 wants them clockwise (else a shape covers the globe). */
 function d3Winding(polys) {
@@ -96,9 +105,25 @@ function inRegion(polys, inside) {
   return yes * 4 >= all;
 }
 
-/** Whether a blank piece is a thin strip: none of its parts is wider than THIN_KM (area / perimeter). */
-function thinStrip(polys) {
-  return polys.every(([outer]) => ringKm2(outer) / (geoLength({ type: "LineString", coordinates: outer }) * EARTH_R) <= THIN_KM);
+/** Whether a piece is a thin strip: none of its parts is wider than `km` (area / perimeter). */
+function thinStrip(polys, km = THIN_KM) {
+  return polys.every(
+    ([outer, ...holes]) =>
+      (ringKm2(outer) - holes.reduce((t, h) => t + ringKm2(h), 0)) / (geoLength({ type: "LineString", coordinates: outer }) * EARTH_R) <= km,
+  );
+}
+
+/** Whether a ring is enclosed by shapes: nearly all its corners lie on one of their outlines (it has no coast). */
+function enclosed(ring, segs) {
+  let on = 0;
+  for (const [x, y] of ring) {
+    for (let k = 0; k < segs.length; k += 5)
+      if (dist2(x, y, segs[k], segs[k + 1], segs[k + 2], segs[k + 3]) <= TOUCH * TOUCH) {
+        on++;
+        break;
+      }
+  }
+  return on >= ring.length * ENCLOSED_SHARE;
 }
 
 /** The boundary segments of `shapes` within `margin` of `box`, as flat [x1, y1, x2, y2, shape index] records. */
@@ -141,7 +166,11 @@ function bordering(rings, segs) {
       for (let k = 0; k < segs.length; k += 5) if (dist2(x, y, segs[k], segs[k + 1], segs[k + 2], segs[k + 3]) <= TOUCH * TOUCH) near.add(segs[k + 4]);
       for (const i of near) hits.set(i, (hits.get(i) ?? 0) + 1);
     }
-  return [...hits.entries()].filter(([, n]) => n >= 2).map(([i]) => i);
+  // most border first
+  return [...hits.entries()]
+    .filter(([, n]) => n >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([i]) => i);
 }
 
 /**
@@ -235,12 +264,23 @@ export function fillGaps(topo, inside, leftover = () => false) {
       if (coastalSliver(rings, segs)) strips.push({ i: lo.i, part, polys: [rings], box: boxOf([rings]) });
     });
   }
+  // thin unnamed pieces wedged between named neighbours, with no coast of their own, go to one of those neighbours
+  const named = shapes.filter((sh) => feats[sh.i].properties.n);
+  for (const un of drawn) {
+    if (feats[un.i].properties.n || leftover(feats[un.i].properties)) continue;
+    un.polys.forEach((rings, part) => {
+      if (!thinStrip([rings], GAP_KM) || thinStrip([rings], HAIRLINE_KM)) return;
+      const box = boxOf([rings]);
+      const segs = segmentsNear(named, box, 0.1);
+      if (enclosed(rings[0], segs) && bordering(rings, segs).length >= 2) strips.push({ i: un.i, part, polys: [rings], box, named: true });
+    });
+  }
   const now = new Map(); // shape index -> its polygons so far
   const removed = new Set();
   const given = new Map(); // leftover index -> the pieces given away
   let filled = 0;
   for (const st of strips) {
-    const segs = segmentsNear(shapes, st.box, 0.5);
+    const segs = segmentsNear(st.named ? named : shapes, st.box, 0.5);
     const changes = new Map();
     let ok = true;
     for (const rings of st.polys) {
@@ -250,10 +290,16 @@ export function fillGaps(topo, inside, leftover = () => false) {
         break;
       }
       try {
-        const pieces = owners.length === 1 ? [[owners[0], [rings]]] : shareOut(rings, owners, segs);
+        // a gap between neighbours goes whole to the one it shares most border with; a strip is shared out
+        const pieces = owners.length === 1 || st.named ? [[owners[0], [rings]]] : shareOut(rings, owners, segs);
         for (const [i, piece] of pieces) {
           const before = changes.get(i) ?? now.get(i) ?? polysOf(feats[i].geometry);
-          changes.set(i, polygonClipping.union(before, piece));
+          const after = polygonClipping.union(before, piece);
+          // outlines that almost coincide can make the clipping lose some of the shape or break it into many pieces:
+          // then it's a failure
+          if (after.length > before.length + 10 || km2Of(polygonClipping.difference(before, after)) > LOST_KM2) throw new Error("bad union");
+          if (st.named && after.length > before.length) throw new Error("gap left apart"); // it would show as a line through the shape
+          changes.set(i, after);
         }
       } catch {
         ok = false; // the clipping failed here: this strip stays as it is
@@ -275,8 +321,16 @@ export function fillGaps(topo, inside, leftover = () => false) {
     .map((f, i) => {
       if (removed.has(i)) return null;
       if (given.has(i)) {
-        // a leftover shape keeps the pieces it didn't give away
-        const keep = polysOf(f.geometry).filter((_, part) => !given.get(i).has(part));
+        // a leftover or unnamed shape keeps the pieces it didn't give away (with any strips it took itself)
+        const parts = polysOf(f.geometry);
+        let keep = parts.filter((_, part) => !given.get(i).has(part));
+        if (now.has(i)) {
+          try {
+            keep = d3Winding(polygonClipping.difference(now.get(i), ...[...given.get(i)].map((part) => parts[part])));
+          } catch {
+            // the clipping failed: it keeps its other pieces without the strips it took
+          }
+        }
         if (!keep.length) return null;
         const g = { type: "Feature", properties: { ...f.properties }, geometry: { type: "MultiPolygon", coordinates: keep } };
         g.properties.a = Math.round(geoArea(g) * EARTH_R ** 2);
@@ -339,8 +393,20 @@ export function fillGapEraFiles(root, inside, leftover = () => false) {
       topo = r.topo;
       filled += r.filled;
     }
-    if (filled) fs.writeFileSync(file, JSON.stringify(topo));
+    if (filled) writeRetrying(file, JSON.stringify(topo));
     report.push({ era: e.key, filled, inverted });
   }
   return report;
+}
+
+/** Writes a file, waiting and trying again a few times if Windows briefly holds it (a virus scan of the last write). */
+function writeRetrying(file, text) {
+  for (let tries = 1; ; tries++) {
+    try {
+      return fs.writeFileSync(file, text);
+    } catch (err) {
+      if (tries >= 10) throw err;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300);
+    }
+  }
 }
