@@ -8,7 +8,7 @@ import { equalAreaHeight } from "@/lib/og-map";
 import { eraIntros } from "@/content/era-intros";
 import { appCopy, site } from "@/content/site";
 import { eraByKey, eraIndex, eraPhrase, eras, eraSlug, eraTitle, eventsForEra, keyFromSlug } from "@/lib/eras";
-import { formatBoth } from "@/lib/format";
+import { formatBoth, formatBothShort } from "@/lib/format";
 import { mapLink } from "@/lib/share";
 import { EventCard } from "@/components/EventCard";
 import { breadcrumbJsonLd, JsonLd, PageHero } from "@/components/site/PageHero";
@@ -128,32 +128,35 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
             </h2>
             <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
             <div tabIndex={0} role="region" aria-label={`Table: largest ${e.key === "present" ? "countries today" : `in ${e.label}`}`} className="mt-4 overflow-x-auto card">
-              <table className="w-full min-w-[520px] text-left text-sm">
+              {/* phones: two-line rows (area under the name), no sideways scroll; wider screens: four columns */}
+              <table className="w-full text-left text-sm sm:min-w-[520px]">
                 <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
                   <tr>
-                    <th scope="col" className="px-4 py-3">
+                    <th scope="col" className="py-3 pl-3 pr-1 sm:px-4">
                       #
                     </th>
-                    <th scope="col" className="px-4 py-3">
+                    <th scope="col" className="px-2 py-3 sm:px-4">
                       State or people
                     </th>
-                    <th scope="col" className="px-4 py-3">
+                    <th scope="col" className="hidden px-4 py-3 sm:table-cell">
                       Area
                     </th>
-                    <th scope="col" className="px-4 py-3 text-right">
-                      Share of land
+                    <th scope="col" className="py-3 pl-1 pr-3 text-right sm:px-4">
+                      <span className="sm:hidden">Land</span>
+                      <span className="hidden sm:inline">Share of land</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-line">
                   {s.top.map((t, n) => (
                     <tr key={t.n}>
-                      <td className="px-4 py-2.5 text-muted">{n + 1}</td>
-                      <th scope="row" className="px-4 py-2.5 font-semibold text-ink">
+                      <td className="py-2.5 pl-3 pr-1 align-top text-muted sm:px-4">{n + 1}</td>
+                      <th scope="row" className="px-2 py-2.5 font-semibold text-ink sm:px-4">
                         {t.n}
+                        <span className="block text-sm font-normal text-ink-soft sm:hidden">{formatBothShort(t.a)}</span>
                       </th>
-                      <td className="px-4 py-2.5 text-ink-soft">{formatBoth(t.a)}</td>
-                      <td className="px-4 py-2.5 text-right text-ink-soft">{((t.a / LAND_KM2) * 100).toFixed(1)}%</td>
+                      <td className="hidden px-4 py-2.5 text-ink-soft sm:table-cell">{formatBoth(t.a)}</td>
+                      <td className="py-2.5 pl-1 pr-3 text-right align-top tabular-nums text-ink-soft sm:px-4">{((t.a / LAND_KM2) * 100).toFixed(1)}%</td>
                     </tr>
                   ))}
                 </tbody>
