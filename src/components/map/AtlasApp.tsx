@@ -48,6 +48,9 @@ function writeStorage(key: string, value: string) {
   }
 }
 
+/** Phone-width screens, where the panel starts folded so the map shows first. */
+const isPhone = () => window.matchMedia("(max-width: 639px)").matches;
+
 export default function AtlasApp() {
   const mapRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<MapEngine | null>(null);
@@ -132,7 +135,8 @@ export default function AtlasApp() {
       const existing = overlaysRef.current.find((o) => o.name === name && o.era === eraKey);
       if (existing) {
         setSelected(existing.id);
-        setPanelOpen(true);
+        // phones keep the panel folded so the shape stays in view (the bottom bar shows it)
+        if (!isPhone()) setPanelOpen(true);
         if (opts.fly !== false) fitTo([existing]);
         showToast(`${name} is already on the map.`);
         return;
@@ -148,7 +152,7 @@ export default function AtlasApp() {
       }
       setOverlays((prev) => [...prev, o]);
       setSelected(o.id);
-      setPanelOpen(true);
+      if (!isPhone()) setPanelOpen(true);
       track("add_shape", { name, era: eraKey });
       if (eraKey !== "us" && eraKey !== eraRef.current) showToast(`Showing ${name} as of ${eraByKey(eraKey)?.label}.`);
       if (opts.fly !== false) fitTo([o]);
@@ -247,7 +251,7 @@ export default function AtlasApp() {
     let alive = true;
     (async () => {
       // phones: start with the panel collapsed so the map is visible first
-      if (window.matchMedia("(max-width: 639px)").matches) setPanelOpen(false);
+      if (isPhone()) setPanelOpen(false);
       const savedUnit = readStorage(UNIT_KEY);
       if (savedUnit === "km2" || savedUnit === "mi2") setUnit(savedUnit);
       const state = decodeState(window.location.hash);
@@ -475,7 +479,7 @@ export default function AtlasApp() {
 
       {/* Panel (parity with the reference: title, search, selected shape, units, links) */}
       <aside className="pointer-events-none absolute left-3 top-3 z-20 flex max-h-[calc(100dvh-120px)] w-[calc(100vw-80px)] max-w-[380px] flex-col sm:max-h-[calc(100dvh-130px)]">
-        <div className="pointer-events-auto flex min-h-0 flex-col overflow-hidden rounded-2xl bg-panel text-panel-text shadow-float">
+        <div className={`pointer-events-auto flex min-h-0 flex-col rounded-2xl bg-panel text-panel-text shadow-float ${panelOpen ? "overflow-hidden" : ""}`}>
           <div className="flex items-center gap-2 px-3 pb-1 pt-1.5 sm:px-4 sm:pb-3 sm:pt-3">
             <Link href="/" className="font-display text-lg font-bold tracking-tight sm:text-2xl">
               {site.name}
@@ -526,7 +530,7 @@ export default function AtlasApp() {
                 activeId={activePreset}
                 onPick={(p) => {
                   applyPreset(p);
-                  if (window.matchMedia("(max-width: 639px)").matches) setPanelOpen(false);
+                  if (isPhone()) setPanelOpen(false);
                 }}
               />
             </div>
