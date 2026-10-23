@@ -4,7 +4,7 @@
 // so every shape reaches its own stretch of shore. Land that no shape touches (an island off the coast) stays as it is.
 // Strips go to unnamed shapes too, so a named shape never runs on along a coast in front of an unnamed one.
 // Everywhere, thin strips are filled; inside the region `inside` picks, wider ones too (wider blank land elsewhere can
-// be a real gap in the source).
+// be a real gap in the source), and so are strips build-data.mjs marks `j`: coastal land of the country there today.
 // The same goes for the thin coastal slivers of a "leftover" shape: an older shape the source still draws underneath
 // newer ones, which shows through only where they stop short of the coast. Its other pieces stay as they are.
 // Thin unnamed pieces wedged between two or more named neighbours, with no coast, go whole to the one they share most
@@ -17,6 +17,7 @@ import { geoArea, geoCentroid, geoLength } from "d3-geo";
 import polygonClipping from "polygon-clipping";
 import * as client from "topojson-client";
 import * as server from "topojson-server";
+import { writeFileRetrying } from "./files.mjs";
 
 const EARTH_R = 6371.0088;
 const OUTPUT_QUANTIZE = 2e4; // as build-data.mjs writes the era files
@@ -246,7 +247,7 @@ export function fillGaps(topo, inside, leftover = () => false) {
     if (!polys.length) return;
     const it = { i, polys, box: boxOf(polys) };
     if (f.properties.m) {
-      if (thinStrip(polys) || inRegion(polys, inside)) strips.push(it);
+      if (thinStrip(polys) || inRegion(polys, inside) || f.properties.j) strips.push(it);
     } else if (!f.properties.x) {
       drawn.push(it);
       if (!leftover(f.properties)) shapes.push(it);
@@ -393,20 +394,9 @@ export function fillGapEraFiles(root, inside, leftover = () => false) {
       topo = r.topo;
       filled += r.filled;
     }
-    if (filled) writeRetrying(file, JSON.stringify(topo));
+    if (filled) writeFileRetrying(file, JSON.stringify(topo));
     report.push({ era: e.key, filled, inverted });
   }
   return report;
 }
 
-/** Writes a file, waiting and trying again a few times if Windows briefly holds it (a virus scan of the last write). */
-function writeRetrying(file, text) {
-  for (let tries = 1; ; tries++) {
-    try {
-      return fs.writeFileSync(file, text);
-    } catch (err) {
-      if (tries >= 10) throw err;
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300);
-    }
-  }
-}
