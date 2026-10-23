@@ -20,13 +20,13 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
 };
 
-// the rest of the site, one line each (the game and the map have their own cards above)
+const x = home.explore;
 const places = [
-  { href: "/leaderboard", Icon: TrophyIcon, title: "Leaderboard", line: "Today's best and all-time points" },
-  { href: "/eras", Icon: ColumnsIcon, title: "Eras", line: `${eras.length} snapshots, 2000 BCE to today` },
-  { href: "/timeline", Icon: TimelineIcon, title: "Timeline", line: `${events.length} times land changed hands` },
-  { href: "/disputes", Icon: DisputeIcon, title: "Disputed borders", line: `${disputes.length} places, from Crimea to Antarctica` },
-  { href: "/teachers", Icon: BookIcon, title: "For teachers", line: "Everything for the classroom" },
+  { href: "/leaderboard", Icon: TrophyIcon, title: "Leaderboard", line: x.leaderboard },
+  { href: "/eras", Icon: ColumnsIcon, title: "Eras", line: x.eras(eras.length) },
+  { href: "/timeline", Icon: TimelineIcon, title: "Timeline", line: x.timeline(events.length) },
+  { href: "/disputes", Icon: DisputeIcon, title: "Disputed borders", line: x.disputes(disputes.length) },
+  { href: "/teachers", Icon: BookIcon, title: "For teachers", line: x.teachers },
 ];
 
 function MapCard() {
@@ -105,7 +105,7 @@ export default function HomePage() {
         <HeroLeaderboard />
         <section aria-labelledby="explore">
           <h2 id="explore" className="font-display text-2xl text-ink md:text-3xl">
-            More to explore
+            {x.title}
           </h2>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
             {places.map(({ href, Icon, title, line }) => (

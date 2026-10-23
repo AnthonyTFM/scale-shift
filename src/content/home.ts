@@ -5,11 +5,24 @@ export const home = {
   title: "Your map has been lying to you.",
   /** the word in the title shown in red */
   titleAccent: "lying",
-  globeLabel: "A slowly turning globe of today's countries.",
+  globeLabel: "A globe of today's countries.",
+
+  // "More to explore": the rest of the site, one line each (the game and the map have their own cards above)
+  explore: {
+    title: "More to explore",
+    leaderboard: "Today's best and all-time points",
+    eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
+    timeline: (n: number) => `${n} times land changed hands`,
+    disputes: (n: number) => `${n} places, from Crimea to Antarctica`,
+    teachers: "Everything for the classroom",
+  },
 
   // the hero's picture: the trickiest pair from yesterday's game (src/components/home/YesterdayMatchup.tsx)
   yesterday: {
-    eyebrow: (day: number) => `Yesterday's matchup · Daily challenge #${day}`,
+    eyebrow: "Yesterday's matchup",
+    loading: "Loading yesterday's matchup",
+    unavailable: "Today's five are waiting",
+    unavailableLine: "Yesterday's shapes couldn't load just now.",
     mapLabel: "On a normal map",
     realLabel: "Real size",
     play: "Try today's five",
