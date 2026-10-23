@@ -31,7 +31,7 @@ export function useAgeOk() {
 export function AgeCheck({ ok, onChange, error, id = "age-ok" }: { ok: boolean; onChange: (v: boolean) => void; error?: boolean; id?: string }) {
   return (
     <div className="mt-1 text-sm">
-      <label htmlFor={id} className="flex min-h-11 items-start gap-2 py-2.5 font-semibold text-ink">
+      <label htmlFor={id} className="flex min-h-11 items-start gap-2 pb-1 pt-2.5 font-semibold text-ink">
         <input
           id={id}
           type="checkbox"
@@ -39,7 +39,7 @@ export function AgeCheck({ ok, onChange, error, id = "age-ok" }: { ok: boolean; 
           onChange={(e) => onChange(e.target.checked)}
           aria-invalid={error || undefined}
           aria-describedby={`${id}-hint`}
-          className="mt-0.5 size-5 shrink-0 accent-primary"
+          className="size-5 shrink-0 accent-primary"
         />
         <span>{T.label}</span>
       </label>

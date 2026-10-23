@@ -142,7 +142,7 @@ export default function TeachersPage() {
             <SizeTable rows={mostInflated} caption={t.sizes.mostTitle} />
             <p className="mt-2 max-w-3xl text-sm text-muted">{t.sizes.note}</p>
             <details className="mt-4">
-              <summary className="flex min-h-11 cursor-pointer items-center font-bold text-link">
+              <summary className="cursor-pointer py-2.5 font-bold text-link">
                 {t.sizes.allTitle} ({byArea.length})
               </summary>
               <div className="mt-3">
@@ -207,7 +207,7 @@ export default function TeachersPage() {
                   {disputes.map((d) => (
                     <tr key={d.id}>
                       <th scope="row" className="px-3 py-2 font-semibold text-ink">
-                        <Link href={`/disputes#${d.id}`} className="-my-3.5 inline-block py-3.5 hover:underline">
+                        <Link href={`/disputes#${d.id}`} className="-my-2 block py-2 hover:underline">
                           {d.name}
                         </Link>
                         <span className="block text-sm font-normal text-ink-soft sm:hidden">
