@@ -113,7 +113,7 @@ export default function TeachersPage() {
                   <p key={p}>{p}</p>
                 ))}
                 <p>
-                  <Link href="/how-it-works" className="font-semibold text-link hover:underline">
+                  <Link href="/how-it-works" className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
                     How {site.name} shows true sizes →
                   </Link>
                 </p>
@@ -142,7 +142,7 @@ export default function TeachersPage() {
             <SizeTable rows={mostInflated} caption={t.sizes.mostTitle} />
             <p className="mt-2 max-w-3xl text-sm text-muted">{t.sizes.note}</p>
             <details className="mt-4">
-              <summary className="cursor-pointer font-bold text-link">
+              <summary className="cursor-pointer py-2.5 font-bold text-link">
                 {t.sizes.allTitle} ({byArea.length})
               </summary>
               <div className="mt-3">
@@ -177,7 +177,7 @@ export default function TeachersPage() {
               ))}
             </ol>
             <p className="mt-3">
-              <Link href="/timeline" className="font-semibold text-link hover:underline">
+              <Link href="/timeline" className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
                 {t.changes.cta} ({events.length} events) →
               </Link>
             </p>
@@ -206,8 +206,8 @@ export default function TeachersPage() {
                 <tbody className="divide-y divide-line">
                   {disputes.map((d) => (
                     <tr key={d.id}>
-                      <th scope="row" className="px-3 py-2 font-semibold text-ink">
-                        <Link href={`/disputes#${d.id}`} className="hover:underline">
+                      <th scope="row" className="px-3 py-3 font-semibold text-ink">
+                        <Link href={`/disputes#${d.id}`} className="-my-3 block py-3 hover:underline">
                           {d.name}
                         </Link>
                         <span className="block text-sm font-normal text-ink-soft sm:hidden">
@@ -215,16 +215,16 @@ export default function TeachersPage() {
                           {d.claimedBy.length ? `; also claimed by ${d.claimedBy.join(", ")}` : ""}
                         </span>
                       </th>
-                      <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{d.controlledBy}</td>
-                      <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{d.claimedBy.join(", ") || "None"}</td>
-                      <td className="whitespace-nowrap px-3 py-2 align-top tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
+                      <td className="hidden px-3 py-3 text-ink-soft sm:table-cell">{d.controlledBy}</td>
+                      <td className="hidden px-3 py-3 text-ink-soft sm:table-cell">{d.claimedBy.join(", ") || "None"}</td>
+                      <td className="whitespace-nowrap px-3 py-3 align-top tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
             <p className="mt-3">
-              <Link href="/disputes" className="font-semibold text-link hover:underline">
+              <Link href="/disputes" className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
                 {t.disputes.cta} →
               </Link>
             </p>
@@ -257,7 +257,7 @@ export default function TeachersPage() {
               <p className="text-xs font-bold uppercase tracking-wide text-muted">{t.cite.citeLabel}</p>
               <p className="card p-4 text-sm leading-relaxed text-ink">{t.cite.citation(url)}</p>
               <p>
-                <Link href="/about" className="font-semibold text-link hover:underline">
+                <Link href="/about" className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
                   {t.cite.sourcesCta} →
                 </Link>
               </p>

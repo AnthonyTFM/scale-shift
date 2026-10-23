@@ -129,7 +129,7 @@ export function HeroLeaderboard() {
         )
       ) : null}
       {box}
-      <Link href="/leaderboard" className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
+      <Link href="/leaderboard" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline">
         {t.boardCta} →
       </Link>
     </div>

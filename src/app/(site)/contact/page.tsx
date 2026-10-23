@@ -34,7 +34,7 @@ export default function ContactPage() {
           <div className="card p-5">
             <h2 className="font-bold text-ink">Prefer email?</h2>
             <p className="mt-1">
-              <a className="font-semibold text-link underline" href={`mailto:${site.contactEmail}`}>
+              <a className="inline-flex min-h-11 items-center font-semibold text-link underline" href={`mailto:${site.contactEmail}`}>
                 {site.contactEmail}
               </a>
             </p>

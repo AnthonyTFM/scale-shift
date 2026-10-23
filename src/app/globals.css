@@ -140,11 +140,12 @@ body {
     background: var(--color-beige);
   }
   /* a white card on content pages: the same edge and offset shadow as the buttons, without the press */
+  /* static panels: a light shade, so only .press-card links and buttons look pressable (6px shade) */
   .card {
     background: #fff;
     border: 2px solid var(--color-line);
     border-radius: var(--radius-card);
-    box-shadow: 0 6px 0 0 var(--color-line);
+    box-shadow: 0 2px 0 0 var(--color-line);
   }
   /* text inputs and dropdowns on content pages */
   .field {

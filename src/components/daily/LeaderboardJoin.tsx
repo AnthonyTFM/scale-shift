@@ -336,7 +336,7 @@ function EmailJoin({ date, choices }: Props) {
             </button>
           </div>
           <label className="mt-3 flex items-start gap-2 text-sm text-ink">
-            <input ref={remindRef} type="checkbox" defaultChecked={player?.reminders ?? false} className="mt-0.5 size-4 shrink-0 accent-primary" />
+            <input ref={remindRef} type="checkbox" defaultChecked={player?.reminders ?? false} className="size-5 shrink-0 accent-primary" />
             <span>
               Email me when a new daily challenge is up, so I can defend my spot on the leaderboard.{" "}
               <span className="text-muted">Optional. Unsubscribe any time with one click.</span>

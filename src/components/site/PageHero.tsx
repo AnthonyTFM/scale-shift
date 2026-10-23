@@ -25,13 +25,13 @@ export function PageHero({
     <section className="ocean-band border-b border-line text-ink">
       <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3 md:pb-6 md:pt-6" : "pb-10 pt-8 md:pb-14 md:pt-12"} ${center ? "text-center" : ""}`}>
         {crumbs ? (
-          <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
+          <nav aria-label="Breadcrumb" className="mb-2 text-sm text-muted">
             <ol className="flex flex-wrap gap-1">
               {crumbs.map((c, i) => (
-                <li key={c.href} className="flex gap-1">
+                <li key={c.href} className="flex items-center gap-1">
                   {i > 0 ? <span aria-hidden="true">/</span> : null}
                   {i < crumbs.length - 1 ? (
-                    <Link href={c.href} className="font-medium text-primary hover:underline">
+                    <Link href={c.href} className="inline-flex min-h-11 items-center font-medium text-primary hover:underline">
                       {c.label}
                     </Link>
                   ) : (

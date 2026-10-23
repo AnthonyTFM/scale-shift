@@ -30,8 +30,8 @@ export function useAgeOk() {
 /** The "I'm 13 or older" box, with links to the terms and privacy policy. */
 export function AgeCheck({ ok, onChange, error, id = "age-ok" }: { ok: boolean; onChange: (v: boolean) => void; error?: boolean; id?: string }) {
   return (
-    <div className="mt-3 text-sm">
-      <label htmlFor={id} className="flex items-start gap-2 font-semibold text-ink">
+    <div className="mt-1 text-sm">
+      <label htmlFor={id} className="flex min-h-11 items-start gap-2 pb-1 pt-2.5 font-semibold text-ink">
         <input
           id={id}
           type="checkbox"
@@ -39,11 +39,11 @@ export function AgeCheck({ ok, onChange, error, id = "age-ok" }: { ok: boolean; 
           onChange={(e) => onChange(e.target.checked)}
           aria-invalid={error || undefined}
           aria-describedby={`${id}-hint`}
-          className="mt-0.5 size-4 shrink-0 accent-primary"
+          className="size-5 shrink-0 accent-primary"
         />
         <span>{T.label}</span>
       </label>
-      <p id={`${id}-hint`} className={`mt-1 text-xs ${error ? "font-semibold text-danger" : "text-muted"}`}>
+      <p id={`${id}-hint`} className={`text-xs ${error ? "font-semibold text-danger" : "text-muted"}`}>
         {error ? T.needed : T.hint}{" "}
         <span className="text-muted">
           {T.agree}{" "}
