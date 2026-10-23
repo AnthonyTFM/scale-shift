@@ -27,7 +27,7 @@ const latText = (lat: number) => `${Math.abs(Math.round(lat))}°${lat >= 0 ? "N"
 function Section({ id, title, lead, children }: { id: string; title: string; lead?: string; children: React.ReactNode }) {
   return (
     <section id={id} aria-labelledby={`${id}-h`} className="scroll-mt-24 border-t border-line pt-10">
-      <h2 id={`${id}-h`} className="font-display text-3xl text-ink">
+      <h2 id={`${id}-h`} className="font-display text-2xl text-ink md:text-3xl">
         {title}
       </h2>
       {lead ? <p className="mt-2 max-w-3xl text-ink-soft">{lead}</p> : null}

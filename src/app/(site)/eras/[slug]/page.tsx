@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import statsData from "@/data/era-stats.json";
 import dataVersion from "@/data/data-version.json";
+import { equalAreaHeight } from "@/lib/og-map";
 import { eraIntros } from "@/content/era-intros";
 import { appCopy, site } from "@/content/site";
 import { eraByKey, eraIndex, eraPhrase, eras, eraSlug, eraTitle, eventsForEra, keyFromSlug } from "@/lib/eras";
@@ -103,21 +104,23 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         }
       />
       <div className="mx-auto max-w-6xl px-4 py-12">
+        {/* vector art on an equal-area map, so it's sharp on any screen and shows every shape at its true size */}
         <Image
           // versioned so a map data rebuild shows up straight away
-          src={`/era-maps/${slug}?v=${dataVersion.v}`}
+          src={`/era-maps/${slug}/map?v=${dataVersion.v}`}
           fetchPriority="high"
-          // already a small WebP made at build time; the image service only made it bigger
+          // next/image loads lazily by default, which would cancel the high priority
+          loading="eager"
           unoptimized
-          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}`}
+          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, on an equal-area projection`}
           width={1200}
-          height={630}
-          className="w-full rounded-card border border-line bg-[#B4C6D2]"
+          height={equalAreaHeight(1200)}
+          className="card w-full bg-white p-3 sm:p-5"
         />
 
         {s?.top.length ? (
           <section aria-labelledby="largest" className="mt-12">
-            <h2 id="largest" className="font-display text-3xl text-ink">
+            <h2 id="largest" className="font-display text-2xl text-ink md:text-3xl">
               Largest {e.key === "present" ? "countries today" : `in ${e.label}`}
             </h2>
             <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
@@ -158,7 +161,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
 
         {s && prev && key !== "present" ? (
           <section aria-labelledby="changes" className="mt-12">
-            <h2 id="changes" className="font-display text-3xl text-ink">
+            <h2 id="changes" className="font-display text-2xl text-ink md:text-3xl">
               What changed since {prev.label}
             </h2>
             <p className="mt-1 text-sm text-muted">
@@ -174,7 +177,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         ) : null}
 
         <section aria-labelledby="events" className="mt-12">
-          <h2 id="events" className="font-display text-3xl text-ink">
+          <h2 id="events" className="font-display text-2xl text-ink md:text-3xl">
             {prev ? `Land that changed hands, ${prev.label}${/\s/.test(prev.label + e.label) ? " – " : "–"}${e.label}` : `Key events up to ${e.label}`}
           </h2>
           {evs.length ? (

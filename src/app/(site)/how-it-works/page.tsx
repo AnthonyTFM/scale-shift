@@ -94,7 +94,7 @@ export default function HowItWorksPage() {
         </section>
 
         <section aria-labelledby="keys" className="mt-14">
-          <h2 id="keys" className="font-display text-3xl text-ink">
+          <h2 id="keys" className="font-display text-2xl text-ink md:text-3xl">
             Keyboard and mouse
           </h2>
           <dl className="mt-4 grid gap-2 sm:grid-cols-2">
@@ -110,7 +110,7 @@ export default function HowItWorksPage() {
         </section>
 
         <section aria-labelledby="try" className="mt-14">
-          <h2 id="try" className="font-display text-3xl text-ink">
+          <h2 id="try" className="font-display text-2xl text-ink md:text-3xl">
             Try these
           </h2>
           <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
