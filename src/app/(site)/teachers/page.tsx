@@ -206,8 +206,8 @@ export default function TeachersPage() {
                 <tbody className="divide-y divide-line">
                   {disputes.map((d) => (
                     <tr key={d.id}>
-                      <th scope="row" className="px-3 py-2 font-semibold text-ink">
-                        <Link href={`/disputes#${d.id}`} className="-my-2 block py-2 hover:underline">
+                      <th scope="row" className="px-3 py-3 font-semibold text-ink">
+                        <Link href={`/disputes#${d.id}`} className="-my-3 block py-3 hover:underline">
                           {d.name}
                         </Link>
                         <span className="block text-sm font-normal text-ink-soft sm:hidden">
@@ -215,9 +215,9 @@ export default function TeachersPage() {
                           {d.claimedBy.length ? `; also claimed by ${d.claimedBy.join(", ")}` : ""}
                         </span>
                       </th>
-                      <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{d.controlledBy}</td>
-                      <td className="hidden px-3 py-2 text-ink-soft sm:table-cell">{d.claimedBy.join(", ") || "None"}</td>
-                      <td className="whitespace-nowrap px-3 py-2 align-top tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
+                      <td className="hidden px-3 py-3 text-ink-soft sm:table-cell">{d.controlledBy}</td>
+                      <td className="hidden px-3 py-3 text-ink-soft sm:table-cell">{d.claimedBy.join(", ") || "None"}</td>
+                      <td className="whitespace-nowrap px-3 py-3 align-top tabular-nums text-ink-soft">{formatYear(d.taken)}</td>
                     </tr>
                   ))}
                 </tbody>
