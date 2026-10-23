@@ -40,6 +40,11 @@ export function TimelineFilter() {
   const filtered = q.trim() !== "" || status !== "all" || type !== "all";
 
   const types = [...new Set(events.map((e) => e.type))];
+  const reset = () => {
+    setStatus("all");
+    setType("all");
+    setQ("");
+  };
 
   return (
     <div>
@@ -79,11 +84,7 @@ export function TimelineFilter() {
         <div className="flex items-end">
           <button
             type="button"
-            onClick={() => {
-              setStatus("all");
-              setType("all");
-              setQ("");
-            }}
+            onClick={reset}
             className="btn btn-white mb-0 w-full"
           >
             Reset filters
@@ -113,18 +114,34 @@ export function TimelineFilter() {
           ))}
         </div>
       </div>
-      <nav aria-label="Jump to a period" className="mt-4">
-        {/* one row you can swipe on phones, wrapping on wider screens */}
-        <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
-          {sections.map((p) => (
-            <li key={p.id} className="shrink-0">
-              <a href={`#${p.id}`} className="inline-flex min-h-11 items-center whitespace-nowrap gap-1.5 rounded-full border-2 border-line bg-white px-3.5 text-sm font-semibold text-ink hover:border-primary hover:text-primary">
-                {p.label} <span className="font-normal text-muted">{p.items.length}</span>
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
+      {sections.length > 0 ? (
+        <nav aria-label="Jump to a period" className="mt-4">
+          {/* one row you can swipe on phones, wrapping on wider screens; the padding keeps focus rings from being cut off */}
+          <ul className="-mx-4 -my-1.5 flex gap-2 overflow-x-auto px-4 py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
+            {sections.map((p) => (
+              <li key={p.id} className="shrink-0">
+                <a
+                  href={`#${p.id}`}
+                  className="inline-flex min-h-11 items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-line bg-white px-3.5 text-sm font-semibold text-ink hover:border-primary hover:text-primary"
+                >
+                  {p.label}{" "}
+                  <span className="font-normal text-muted">
+                    {p.items.length}
+                    <span className="sr-only"> {p.items.length === 1 ? "event" : "events"}</span>
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ) : (
+        <div className="card mt-6 p-6 text-center">
+          <p className="font-semibold text-ink">No events match.</p>
+          <button type="button" onClick={reset} className="btn btn-white mt-3">
+            Reset filters
+          </button>
+        </div>
+      )}
       {sections.map((p) => {
         const fold = !filtered && p.items.length > FOLD_OVER;
         const shown = fold ? p.items.slice(0, FIRST) : p.items;
@@ -149,6 +166,10 @@ export function TimelineFilter() {
                 </summary>
                 <div className="sm:-ml-24">
                   <Events list={rest} />
+                  {/* after a long list, a way back up without scrolling */}
+                  <a href={`#${p.id}`} className="mt-4 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-link hover:underline sm:ml-24">
+                    Back to the start of {p.label} <span aria-hidden="true">↑</span>
+                  </a>
                 </div>
               </details>
             ) : null}

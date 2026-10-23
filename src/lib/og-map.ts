@@ -2,7 +2,7 @@
 // era maps on /eras pages, and the small locator globes on /disputes.
 import fs from "node:fs";
 import path from "node:path";
-import { geoEqualEarth, geoGraticule10, geoMercator, geoOrthographic, geoPath, type GeoPath } from "d3-geo";
+import { geoEqualEarth, geoGraticule, geoGraticule10, geoMercator, geoOrthographic, geoPath, type GeoPath } from "d3-geo";
 import { feature } from "topojson-client";
 import type { Topology, GeometryCollection } from "topojson-specification";
 import type { Feature, Geometry } from "geojson";
@@ -82,26 +82,30 @@ export function worldMapDataUri(eraKey: string | null, width = 1200, height = 63
   return `data:image/svg+xml;base64,${Buffer.from(svg).toString("base64")}`;
 }
 
+/** Bump when the locator drawing changes, so browsers fetch the new picture (it's part of the image address). */
+export const LOCATOR_STYLE = 1;
+
 /**
  * A small globe turned to face one place, with a red pin on it: the locator on each /disputes card. Land is one colour,
  * so the picture doesn't take a side on whose land it is; the outlines are the homepage globe's (Natural Earth 1:110m).
+ * Drawn at 160px and shown at 64–80px, so whole-pixel coordinates are already sharper than the screen.
  */
 export function locatorGlobeSvg(lon: number, lat: number, size = 160) {
-  const r = size / 2 - 2;
-  // tilt the place a little above centre, so the pin's shadow and the globe's lower curve both show
+  const c = size / 2;
+  const r = c - 2;
+  // tilt the place a little above centre, so the globe's lower curve shows below the pin
   const projection = geoOrthographic()
     .scale(r)
-    .translate([size / 2, size / 2])
+    .translate([c, c])
     .rotate([-lon, -lat + 8])
     .clipAngle(90)
-    .precision(0.5);
-  const path_ = geoPath(projection).digits(1);
+    .precision(1);
+  const path_ = geoPath(projection).digits(0);
   const topo = JSON.parse(fs.readFileSync(path.join(DATA, "globe.json"), "utf8")) as Topology;
   let land = "";
   for (const f of feature(topo, topo.objects.p as GeometryCollection).features) land += path_(f) ?? "";
-  const grid = path_(geoGraticule10()) ?? "";
-  const sphere = path_({ type: "Sphere" }) ?? "";
-  const [x, y] = projection([lon, lat])!;
-  const pin = `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(size / 7).toFixed(1)}" fill="#d93a2b" fill-opacity="0.2"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(size / 18).toFixed(1)}" fill="#d93a2b" stroke="#fff" stroke-width="${(size / 64).toFixed(1)}"/>`;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><path d="${sphere}" fill="#9FCBE0"/><path d="${grid}" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="0.6"/><path d="${land}" fill="${LAND}" stroke="rgba(88,60,46,0.45)" stroke-width="0.6"/><path d="${sphere}" fill="none" stroke="#7FAFC7" stroke-width="1.5"/>${pin}</svg>`;
+  const grid = path_(geoGraticule().step([30, 30])()) ?? "";
+  const [x, y] = projection([lon, lat])!.map((v) => v.toFixed(1));
+  const pin = `<circle cx="${x}" cy="${y}" r="${(size / 7).toFixed(1)}" fill="#d93a2b" fill-opacity="0.2"/><circle cx="${x}" cy="${y}" r="${(size / 18).toFixed(1)}" fill="#d93a2b" stroke="#fff" stroke-width="${(size / 64).toFixed(1)}"/>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><circle cx="${c}" cy="${c}" r="${r}" fill="#9FCBE0"/><path d="${grid}" fill="none" stroke="#fff" stroke-opacity="0.5" stroke-width="0.8"/><path d="${land}" fill="${LAND}" stroke="rgba(88,60,46,0.45)" stroke-width="0.8" stroke-linejoin="round"/><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="#7FAFC7" stroke-width="1.5"/>${pin}</svg>`;
 }

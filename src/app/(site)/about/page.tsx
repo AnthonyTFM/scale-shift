@@ -148,7 +148,7 @@ export default function AboutPage() {
                     <td className="px-4 py-2.5 align-top text-ink">
                       {r.n ?? r.name}
                       {"s" in r ? <span className="block text-xs text-muted">{r.s ? `ruled by ${r.s}` : "no outside ruler"}</span> : null}
-                      {r.note ? <span className="mt-1 inline-block rounded-full bg-gold-soft px-2 py-0.5 text-xs font-semibold text-ink ring-1 ring-gold">+ data note</span> : null}
+                      {r.note ? <span className="mt-1 flex w-fit rounded-full bg-gold-soft px-2 py-0.5 text-xs font-semibold text-ink ring-1 ring-gold">+ data note</span> : null}
                     </td>
                     <td className="px-4 py-2.5 align-top text-ink-soft">{r.why}</td>
                   </tr>
