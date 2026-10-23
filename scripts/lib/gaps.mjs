@@ -22,6 +22,7 @@ const TOUCH = 0.03; // degrees: a shape this close to a strip borders it (about 
 const CELL = 0.01; // degrees: the grid a strip is shared out on
 const SLIVER_KM2 = 50; // holes this small that nothing covers are slivers between a shape and its strip: filled
 const SEA_SHARE = 0.03; // a leftover piece with this share of its outline on the sea lies along the coast
+const NOTCH_DEG = 3; // a ring that turns back sharper than this has a notch (a stray line on the map): closed
 const THIN_KM = 10; // a blank strip or leftover piece no wider than this (area / perimeter) is a sliver along the coast
 
 const polysOf = (g) => (!g ? [] : g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []);
@@ -39,6 +40,31 @@ const ringKm2 = (ring) => {
 /** polygon-clipping returns counter-clockwise outer rings; d3 wants them clockwise (else a shape covers the globe). */
 function d3Winding(polys) {
   return polys.map((rings) => (geoArea({ type: "Polygon", coordinates: rings }) > 2 * Math.PI ? rings.map((r) => [...r].reverse()) : rings));
+}
+
+/**
+ * Closes the needle-thin notches a strip can leave between a shape's old coast and its new land: where a ring runs in
+ * and almost straight back out (a turn sharper than NOTCH_DEG), the tip goes, until none is left. Drawn, such a notch
+ * is a stray line through the shape. Only notches into the shape are closed: a thin spit of land sticking out stays.
+ */
+function closeNotches(ring, k0) {
+  const r = ring.slice(0, -1);
+  let twice = 0; // twice the ring's signed area: its sign says which way it runs
+  for (let k = 0; k < r.length; k++) twice += r[k][0] * r[(k + 1) % r.length][1] - r[(k + 1) % r.length][0] * r[k][1];
+  const hole = k0 > 0;
+  for (let k = 0; r.length > 3 && k < r.length; ) {
+    const [a, b, c] = [r[(k - 1 + r.length) % r.length], r[k], r[(k + 1) % r.length]];
+    const [ux, uy, vx, vy] = [a[0] - b[0], a[1] - b[1], c[0] - b[0], c[1] - b[1]];
+    const lu = Math.hypot(ux, uy);
+    const lv = Math.hypot(vx, vy);
+    // the corner's turn runs the ring's way round for a spit sticking out of an outer ring (or into a hole)
+    const outward = Math.sign(vx * uy - vy * ux) === Math.sign(twice);
+    if (lu && lv && outward === hole && (ux * vx + uy * vy) / (lu * lv) > Math.cos((NOTCH_DEG * Math.PI) / 180)) {
+      r.splice(k, 1);
+      k = Math.max(0, k - 1); // the corner before may be a tip now
+    } else k++;
+  }
+  return [...r, r[0]];
 }
 
 /** Squared distance from (x, y) to the segment (x1, y1)–(x2, y2), in degrees². */
@@ -258,11 +284,13 @@ export function fillGaps(topo, inside, leftover = () => false) {
       }
       if (!now.has(i)) return { f, original: f };
       const polys = d3Winding(now.get(i)).map((rings) =>
-        rings.filter((r, k) => {
-          if (k === 0 || ringKm2(r) >= SLIVER_KM2) return true;
-          const c = geoCentroid({ type: "Polygon", coordinates: [[...r].reverse()] });
-          return covered(c[0], c[1], i);
-        }),
+        rings
+          .filter((r, k) => {
+            if (k === 0 || ringKm2(r) >= SLIVER_KM2) return true;
+            const c = geoCentroid({ type: "Polygon", coordinates: [[...r].reverse()] });
+            return covered(c[0], c[1], i);
+          })
+          .map(closeNotches),
       );
       const geometry = polys.length === 1 ? { type: "Polygon", coordinates: polys[0] } : { type: "MultiPolygon", coordinates: polys };
       const g = { type: "Feature", properties: { ...f.properties }, geometry };
