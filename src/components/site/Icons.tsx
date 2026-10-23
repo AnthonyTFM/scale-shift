@@ -113,3 +113,48 @@ export function TickIcon({ right, className = "size-5" }: IconProps & { right: b
     </svg>
   );
 }
+
+/** Temple columns: the eras pages. */
+export function ColumnsIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M3 8.5 12 3l9 5.5H3Z" fill="#FFC233" stroke="#C48E00" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7" stroke="#1A47B0" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M3 20.5h18" stroke="#C48E00" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** A line with dated dots: the timeline. */
+export function TimelineIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M6 3v18" stroke="#C4B79E" strokeWidth="2" strokeLinecap="round" />
+      <circle cx="6" cy="6" r="2.4" fill="#2563EB" stroke="#1A47B0" strokeWidth="1.2" />
+      <circle cx="6" cy="12" r="2.4" fill="#FFC233" stroke="#C48E00" strokeWidth="1.2" />
+      <circle cx="6" cy="18" r="2.4" fill="#FF5B4A" stroke="#D93A2B" strokeWidth="1.2" />
+      <path d="M10.5 6h9M10.5 12h7M10.5 18h8" stroke="#1D2140" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/** A flag with a dashed border line: disputed borders. */
+export function DisputeIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M2.5 20.5c3-1.5 5-4.5 7-8s5-6.5 12-8" fill="none" stroke="#D93A2B" strokeWidth="1.8" strokeDasharray="2.6 2.2" strokeLinecap="round" />
+      <path d="M13 21V7.5" stroke="#1D2140" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M13 7.5h6.5l-1.6 2.4 1.6 2.4H13Z" fill="#2563EB" stroke="#1A47B0" strokeWidth="1.2" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+/** An open book: the teacher hub. */
+export function BookIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M12 6.5C9.5 4.5 6 4.3 3 5v13.5c3-.7 6.5-.5 9 1.5V6.5Z" fill="#EAF3FF" stroke="#1A47B0" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="M12 6.5c2.5-2 6-2.2 9-1.5v13.5c-3-.7-6.5-.5-9 1.5V6.5Z" fill="#FFF4D1" stroke="#C48E00" strokeWidth="1.5" strokeLinejoin="round" />
+    </svg>
+  );
+}
