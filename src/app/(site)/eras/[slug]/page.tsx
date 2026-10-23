@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import statsData from "@/data/era-stats.json";
 import dataVersion from "@/data/data-version.json";
+import { equalAreaHeight } from "@/lib/og-map";
 import { eraIntros } from "@/content/era-intros";
 import { appCopy, site } from "@/content/site";
 import { eraByKey, eraIndex, eraPhrase, eras, eraSlug, eraTitle, eventsForEra, keyFromSlug } from "@/lib/eras";
@@ -103,16 +104,16 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         }
       />
       <div className="mx-auto max-w-6xl px-4 py-12">
+        {/* vector art on an equal-area map, so it's sharp on any screen and shows every shape at its true size */}
         <Image
           // versioned so a map data rebuild shows up straight away
-          src={`/era-maps/${slug}?v=${dataVersion.v}`}
+          src={`/era-maps/${slug}/map?v=${dataVersion.v}`}
           fetchPriority="high"
-          // already a small WebP made at build time; the image service only made it bigger
           unoptimized
-          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}`}
+          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, on an equal-area projection`}
           width={1200}
-          height={630}
-          className="w-full rounded-card border border-line bg-[#B4C6D2]"
+          height={equalAreaHeight(1200)}
+          className="card w-full bg-white p-3 sm:p-5"
         />
 
         {s?.top.length ? (

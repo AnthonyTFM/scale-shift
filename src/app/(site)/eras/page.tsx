@@ -4,6 +4,10 @@ import { eraIntros } from "@/content/era-intros";
 import { appCopy } from "@/content/site";
 import { eras, eraSlug, eraYear, type EraMeta } from "@/lib/eras";
 import { PageHero } from "@/components/site/PageHero";
+import dataVersion from "@/data/data-version.json";
+import { equalAreaHeight } from "@/lib/og-map";
+
+const THUMB_H = equalAreaHeight(600);
 
 export const metadata: Metadata = {
   title: "Every era: world borders from 2000 BCE to today",
@@ -37,8 +41,18 @@ export default function ErasPage() {
                 <li key={e.key}>
                   <Link
                     href={`/eras/${eraSlug(e.key)}`}
-                    className="flex h-full flex-col press-card rounded-card p-4 hover:border-primary"
+                    className="flex h-full flex-col press-card rounded-card p-3 hover:border-primary"
                   >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- a small WebP made at build time */}
+                    <img
+                      src={`/era-maps/${eraSlug(e.key)}/thumb?v=${dataVersion.v}`}
+                      alt=""
+                      width={600}
+                      height={THUMB_H}
+                      loading="lazy"
+                      decoding="async"
+                      className="mb-3 h-auto w-full rounded-xl bg-tile"
+                    />
                     <span className="font-display text-2xl text-ink">{e.label}</span>
                     <span className="mt-1 text-sm text-muted">
                       {e.count} mapped {e.key === "present" ? "countries" : "states & peoples"}
