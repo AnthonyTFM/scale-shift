@@ -38,10 +38,16 @@ const nextConfig: NextConfig = {
       },
       // Preloads as headers, per page: preload() in a page leaks into every other page that prefetches it.
       {
-        // the globe's still picture is the largest thing on the homepage's first screen; its country data loads next
+        // the globe's still picture is the largest thing on the homepage's first screen; its country data loads next, and the
+        // puzzle list for yesterday's matchup (the same file the daily game starts from, so Play finds it ready)
         source: "/",
         ...pageOnly,
-        headers: [{ key: "Link", value: "</globe-still.svg>; rel=preload; as=image; fetchpriority=high, </data/globe.json>; rel=preload; as=fetch; crossorigin=anonymous" }],
+        headers: [
+          {
+            key: "Link",
+            value: `</globe-still.svg>; rel=preload; as=image; fetchpriority=high, </data/globe.json>; rel=preload; as=fetch; crossorigin=anonymous, </data/daily/index.json?v=${dataVersion}>; rel=preload; as=fetch; crossorigin=anonymous`,
+          },
+        ],
       },
       { source: `/:page(${HERO_PAGES})`, ...pageOnly, headers: [worldBand] },
       { source: "/eras/:slug", ...pageOnly, headers: [worldBand] },
