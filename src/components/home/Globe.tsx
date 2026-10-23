@@ -17,8 +17,6 @@ type Painter = {
   size(size: number, dpr: number): void;
   data(topo: GlobeTopology): void;
   spin(on: boolean): void;
-  drag(start: boolean): void;
-  turn(by: number): void;
   stop(): void;
 };
 
@@ -40,8 +38,6 @@ function workerPainter(canvas: HTMLCanvasElement, drawn: () => void, failed: () 
     size: (size, dpr) => send({ type: "size", size, dpr }),
     data: (topo) => send({ type: "data", topo }),
     spin: (on) => send({ type: "spin", on }),
-    drag: (start) => send({ type: "drag", start }),
-    turn: (by) => send({ type: "turn", by }),
     stop: () => worker.terminate(),
   };
 }
@@ -51,7 +47,6 @@ function mainPainter(canvas: HTMLCanvasElement, drawn: () => void): Painter {
   const draw = globeRenderer(canvas.getContext("2d")!);
   let groups: ReturnType<typeof globeCountries> | null = null;
   let lon = GLOBE_START_LON;
-  let dragFrom: number | null = null;
   let size = 0;
   let dpr = 1;
   let raf = 0;
@@ -73,9 +68,8 @@ function mainPainter(canvas: HTMLCanvasElement, drawn: () => void): Painter {
     if (!last) last = now;
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
-    if (dragFrom === null) lon += SPEED * dt;
-    // while dragging, follow the finger at the full rate
-    if (now - lastDraw >= (dragFrom !== null ? FRAME_MS : Math.min(SLOWEST_MS, Math.max(FRAME_MS, cost / BUDGET)))) {
+    lon += SPEED * dt;
+    if (now - lastDraw >= Math.min(SLOWEST_MS, Math.max(FRAME_MS, cost / BUDGET))) {
       lastDraw = now;
       paint();
     }
@@ -101,13 +95,6 @@ function mainPainter(canvas: HTMLCanvasElement, drawn: () => void): Painter {
         raf = 0;
       }
     },
-    drag: (start) => {
-      dragFrom = start ? lon : null;
-    },
-    turn: (by) => {
-      if (dragFrom !== null) lon = dragFrom + by;
-      if (!raf) paint();
-    },
     stop: () => {
       cancelAnimationFrame(raf);
       raf = 0;
@@ -115,7 +102,7 @@ function mainPainter(canvas: HTMLCanvasElement, drawn: () => void): Painter {
   };
 }
 
-/** A slowly turning globe drawn from our own borders. Drag to spin it. Decorative: the page works without it. */
+/** A slowly turning globe drawn from our own borders, behind the homepage hero. Decorative: the page works without it. */
 export function Globe({ label, onReady, onGone }: { label: string; onReady?: () => void; onGone?: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
   const shade = useRef<HTMLDivElement>(null);
@@ -135,7 +122,6 @@ export function Globe({ label, onReady, onGone }: { label: string; onReady?: () 
     let dpr = 1;
     let visible = true;
     let ready = false;
-    let drag: { x: number } | null = null;
     let disposed = false;
 
     // A fresh canvas each time: a canvas handed to a worker can't be handed over again (React runs this twice in dev).
@@ -146,7 +132,7 @@ export function Globe({ label, onReady, onGone }: { label: string; onReady?: () 
       const c = document.createElement("canvas");
       c.setAttribute("role", "img");
       c.setAttribute("aria-label", label);
-      c.className = "relative block cursor-grab touch-pan-y";
+      c.className = "relative block";
       box.insertBefore(c, shade.current);
       return c;
     };
@@ -163,10 +149,6 @@ export function Globe({ label, onReady, onGone }: { label: string; onReady?: () 
             sync();
           })) ||
         mainPainter(canvas, drawn);
-      canvas.addEventListener("pointerdown", down);
-      canvas.addEventListener("pointermove", move);
-      canvas.addEventListener("pointerup", up);
-      canvas.addEventListener("pointercancel", up);
     };
     // tell a (new) painter everything it needs
     const sync = () => {
@@ -178,22 +160,6 @@ export function Globe({ label, onReady, onGone }: { label: string; onReady?: () 
     // spin only once the page has finished loading and while the globe is on screen
     const spin = () => {
       if (!disposed) painter.spin(ready && !still && visible && !document.hidden);
-    };
-
-    const down = (e: PointerEvent) => {
-      drag = { x: e.clientX };
-      painter.drag(true);
-      canvas.setPointerCapture(e.pointerId);
-      canvas.style.cursor = "grabbing";
-    };
-    const move = (e: PointerEvent) => {
-      if (drag) painter.turn(((e.clientX - drag.x) / size) * 180);
-    };
-    const up = () => {
-      if (!drag) return;
-      drag = null;
-      painter.drag(false);
-      canvas.style.cursor = "grab";
     };
 
     setUp(true);

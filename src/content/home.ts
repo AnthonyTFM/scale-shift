@@ -1,53 +1,39 @@
-// Homepage copy. Facts here must stay true: Africa is 30.37M km², Russia 16.85M km² (1.8× smaller), yet a web map draws
-// Russia at about 83M km², more than twice the size of Africa. (Greenland vs Africa is thetruesize.com's signature
-// example, so we lead with our own.)
+// Homepage copy. Facts here must stay true. (Greenland vs Africa is thetruesize.com's signature example, so we never lead
+// with it: the homepage's picture is yesterday's real daily matchup.)
 
 export const home = {
-  eyebrow: "Free to play · No sign-up needed",
   title: "Your map has been lying to you.",
   /** the word in the title shown in red */
   titleAccent: "lying",
-  lead: "On most maps, Russia looks far bigger than Africa. In reality, Africa is nearly twice its size. Drag any country or empire to see its true size, travel through 4,000 years of borders, and put your eye to the test in today's challenge.",
-  playCta: "Take today's challenge",
-  mapCta: "Explore the real-size map",
-  globeLabel: "A slowly turning globe of today's countries. Drag to spin it.",
-  globeHint: "Drag to spin",
+  globeLabel: "A globe of today's countries.",
 
-  teaser: {
-    badge: "Today's game",
-    title: "Which is bigger?",
-    lead: "Five matchups. In each one, a shape looks huge and the other actually is. The map will try to fool you. Can you go 5 for 5?",
-    steps: ["5 quick matchups", "Same puzzle for everyone", "New every midnight"],
-    done: (score: number) => `You scored ${score}/5 today. New matchups arrive at midnight.`,
-    cta: "Take today's 5 →",
-    doneCta: "See today's answers",
-    topPlayers: "Today's top players",
-    noScores: "No scores yet today. Be the first on the board!",
-    fullBoard: "Full leaderboard →",
+  // "More to explore": the rest of the site, one line each (the game and the map have their own cards above)
+  explore: {
+    title: "More to explore",
+    leaderboard: "Today's best and all-time points",
+    eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
+    timeline: (n: number) => `${n} times land changed hands`,
+    disputes: (n: number) => `${n} places, from Crimea to Antarctica`,
+    teachers: "Everything for the classroom",
   },
 
-  // the example picture in the daily challenge card: always this pair, the classic trick
-  example: {
-    caption: "Example matchup",
+  // the hero's picture: the trickiest pair from yesterday's game (src/components/home/YesterdayMatchup.tsx)
+  yesterday: {
+    eyebrow: "Yesterday's matchup",
+    loading: "Loading yesterday's matchup",
+    unavailable: "Today's five are waiting",
+    unavailableLine: "Yesterday's shapes couldn't load just now.",
     mapLabel: "On a normal map",
     realLabel: "Real size",
-    looks: (bigger: string, times: number) => `${bigger} looks ${times}× bigger`,
-    answer: (winner: string) => `${winner} is bigger`,
-  },
-
-  fact: {
-    eyebrow: "See it to believe it",
-    cta: "Line them up →",
-    // the comparison itself rotates daily (src/components/home/DailyFact.tsx); these are the labels
-    mapLabel: "On a normal map",
-    realLabel: "Real size",
+    play: "Try today's five",
+    played: "See today's answers",
   },
 
   stickyCta: "Explore the real-size map",
   // the phone bar on the leaderboard and era pages, before today's game is played
   stickyPlay: "Play today's game",
 
-  // the game-first hero: play card, map card and today's leaderboard over a floating globe
+  // the game-first hero: today's game, yesterday's matchup and the map card over a floating globe, then the leaderboard
   hub: {
     mission:
       "Most world maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Border Drift shows every country and empire at its real size, across 4,000 years of history.",
@@ -77,12 +63,5 @@ export const home = {
     spotWaiting: "Your spot is waiting",
     spotPlay: "Play now",
     beatMe: "Challenge a friend to beat you",
-    howTitle: "How to play",
-    steps: [
-      ["See two shapes", "Both are drawn the way a normal web map shows them, stretched toward the poles."],
-      ["Tap the bigger one", "Pick the one you think is really bigger. Trust your eyes at your own risk."],
-      ["See the truth", "Watch both shrink or grow to their real sizes, with the areas and why the map lied."],
-    ] as [string, string][],
-    howFacts: ["Five matchups a day", "Same puzzle for everyone", "Keep your streak going"],
   },
 };
