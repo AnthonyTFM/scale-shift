@@ -4,6 +4,7 @@ import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import dataVersion from "@/data/data-version.json";
 import { home } from "@/content/home";
+import { mainBox, type Outline, type ShapeFile } from "@/lib/outline";
 import {
   buildQuestions,
   capitalize,
@@ -18,9 +19,6 @@ import {
   type Question,
 } from "@/lib/daily";
 
-type Outline = { d: string; b: [number, number, number, number] };
-type ShapeFile = { merc: Outline; ea: Outline };
-type Box = [number, number, number, number];
 /** Yesterday's pick: the question as soon as the puzzle list is in, the drawings once both shape files are. */
 type Pick = { date: string; day: number; q: Question; shapes?: [ShapeFile, ShapeFile] };
 
@@ -52,42 +50,6 @@ async function pickYesterday(today: string): Promise<Pick | null> {
 
 const loadShapes = (q: Question) =>
   Promise.all(q.options.map((o) => getJson<ShapeFile>(`/data/daily/shapes/${o.id}.json${V}`))) as Promise<[ShapeFile, ShapeFile]>;
-
-/**
- * The part of an outline worth framing: its biggest ring and the rings close to it. Without this, a country with far-off
- * islands (France's overseas departments, the Dutch Caribbean) is framed across half the world and drawn as a speck.
- */
-function mainBox(o: Outline): Box {
-  const rings = o.d
-    .split("M")
-    .filter(Boolean)
-    .map((part) => {
-      const n = part
-        .replace(/Z/gi, "")
-        .trim()
-        .split(/[\s,]+/)
-        .map(Number);
-      let area = 0;
-      let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
-      for (let i = 0; i + 1 < n.length; i += 2) {
-        const [x, y] = [n[i], n[i + 1]];
-        const [nx, ny] = [n[(i + 2) % n.length], n[(i + 3) % n.length]];
-        area += x * ny - nx * y;
-        [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
-      }
-      return { area: Math.abs(area) / 2, box: [x0, y0, x1, y1] as Box };
-    })
-    .filter((r) => Number.isFinite(r.box[0]))
-    .sort((a, b) => b.area - a.area);
-  if (!rings.length) return o.b;
-  let box = rings[0].box;
-  const reach = Math.max(box[2] - box[0], box[3] - box[1]) * 1.6;
-  for (const r of rings.slice(1)) {
-    const next: Box = [Math.min(box[0], r.box[0]), Math.min(box[1], r.box[1]), Math.max(box[2], r.box[2]), Math.max(box[3], r.box[3])];
-    if (next[2] - next[0] <= reach && next[3] - next[1] <= reach) box = next;
-  }
-  return box;
-}
 
 /** Both shapes side by side at one shared scale, standing on a common baseline; far-off islands are cut off. */
 function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label: string; note: string }) {
