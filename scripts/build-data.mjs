@@ -660,17 +660,18 @@ async function main() {
   // one colour per owner across every era (rewrites the era files and the version stamp)
   const { clashes } = recolorEraFiles(ROOT);
   console.log(`  colours: one per owner across all eras (${clashes} neighbouring pairs share one)`);
-  // Australia: the source's coastline there is coarse, so strips of land between its shapes and the sea came out blank.
-  // In the snapshots that map its Aboriginal nations (1600–1815) the source's older shape for the whole continent also
-  // shows through as thin slivers along the coast; those go to the nations beside them too. Filled after colouring, so
-  // colours elsewhere stay as they are; peoples there that now border a same-coloured neighbour get a free colour.
+  // Coasts: the source's outlines often stop short of the real coastline, so strips of land between its shapes and the
+  // sea came out blank. Thin strips go to the shapes beside them everywhere; in Australia, where the source's coastline
+  // is coarse, wider ones too. In the snapshots that map its Aboriginal nations (1600–1815) the source's older shape for
+  // the whole continent also shows through as thin slivers along the coast; those go to the nations beside them too.
+  // Filled after colouring, so colours stay as they are; a shape that now borders a same-coloured neighbour gets a free one.
   const inAustralia = (c) => presentOwnerAt(c) === "Australia";
   const leftover = (year, props) => props.n === "Australian aboriginal hunter-gatherers" && year >= 1600 && year <= 1815;
   const gaps = fillGapEraFiles(ROOT, inAustralia, leftover);
   const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
-  const recoloured = settleEraFiles(ROOT, (props) => !!props.l && inAustralia(props.l));
+  const recoloured = settleEraFiles(ROOT, () => true);
   console.log(
-    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips in Australia given to the shapes beside them, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
+    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
   );
   writeJson(path.join(OUT_SRC, "era-stats.json"), stats);
   writeJson(path.join(OUT_PUBLIC, "era-stats.json"), stats);

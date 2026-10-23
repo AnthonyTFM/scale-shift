@@ -2,9 +2,12 @@
 // the real coastline, so strips between a shape and the sea came out "not mapped" (white on the map). A strip that
 // touches one shape goes to it; a strip that touches several is shared out, each part going to the shape nearest it,
 // so every shape reaches its own stretch of shore. Land that no shape touches (an island off the coast) stays as it is.
+// Strips go to unnamed shapes too, so a named shape never runs on along a coast in front of an unnamed one.
+// Everywhere, thin strips are filled; inside the region `inside` picks, wider ones too (wider blank land elsewhere can
+// be a real gap in the source).
 // The same goes for the thin coastal slivers of a "leftover" shape: an older shape the source still draws underneath
 // newer ones, which shows through only where they stop short of the coast. Its other pieces stay as they are.
-// Runs on the era files after the overlaps are separated; `inside` picks the region it works in. Used by build-data.mjs.
+// Runs on the era files after the overlaps are separated. Used by build-data.mjs.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -19,7 +22,7 @@ const TOUCH = 0.03; // degrees: a shape this close to a strip borders it (about 
 const CELL = 0.01; // degrees: the grid a strip is shared out on
 const SLIVER_KM2 = 50; // holes this small that nothing covers are slivers between a shape and its strip: filled
 const SEA_SHARE = 0.03; // a leftover piece with this share of its outline on the sea lies along the coast
-const THIN_KM = 10; // ...and counts as a sliver if it is no wider than this (area / perimeter)
+const THIN_KM = 10; // a blank strip or leftover piece no wider than this (area / perimeter) is a sliver along the coast
 
 const polysOf = (g) => (!g ? [] : g.type === "Polygon" ? [g.coordinates] : g.type === "MultiPolygon" ? g.coordinates : []);
 const boxOf = (polys) => {
@@ -65,6 +68,11 @@ function inRegion(polys, inside) {
   let all = 0;
   for (let k = 0; k < ring.length; k += step, all++) if (inside(ring[k])) yes++;
   return yes * 4 >= all;
+}
+
+/** Whether a blank piece is a thin strip: none of its parts is wider than THIN_KM (area / perimeter). */
+function thinStrip(polys) {
+  return polys.every(([outer]) => ringKm2(outer) / (geoLength({ type: "LineString", coordinates: outer }) * EARTH_R) <= THIN_KM);
 }
 
 /** The boundary segments of `shapes` within `margin` of `box`, as flat [x1, y1, x2, y2, shape index] records. */
@@ -175,22 +183,24 @@ function shareOut(rings, owners, segs) {
  */
 export function fillGaps(topo, inside, leftover = () => false) {
   const feats = client.feature(topo, topo.objects.p).features;
-  const named = [];
+  const drawn = []; // every shape but the blank land
   const shapes = []; // the shapes strips can go to
   const strips = []; // blank strips, and leftover slivers (with the index of their piece)
   feats.forEach((f, i) => {
     const polys = polysOf(f.geometry);
     if (!polys.length) return;
     const it = { i, polys, box: boxOf(polys) };
-    if (f.properties.n && !f.properties.x) {
-      named.push(it);
+    if (f.properties.m) {
+      if (thinStrip(polys) || inRegion(polys, inside)) strips.push(it);
+    } else if (!f.properties.x) {
+      drawn.push(it);
       if (!leftover(f.properties)) shapes.push(it);
-    } else if (f.properties.m && inRegion(polys, inside)) strips.push(it);
+    }
   });
-  for (const lo of named) {
+  for (const lo of drawn) {
     if (!leftover(feats[lo.i].properties)) continue;
     const segs = segmentsNear(
-      named.filter((o) => o.i !== lo.i),
+      drawn.filter((o) => o.i !== lo.i),
       lo.box,
       0.1,
     );
@@ -234,7 +244,7 @@ export function fillGaps(topo, inside, leftover = () => false) {
 
   // holes left between a shape and its new land that nothing covers are slivers: fill them
   const covered = (x, y, self) =>
-    named.some((sh) => sh.i !== self && x >= sh.box[0] && x <= sh.box[2] && y >= sh.box[1] && y <= sh.box[3] && sh.polys.some((p) => inPolygon(x, y, p)));
+    drawn.some((sh) => sh.i !== self && x >= sh.box[0] && x <= sh.box[2] && y >= sh.box[1] && y <= sh.box[3] && sh.polys.some((p) => inPolygon(x, y, p)));
   const out = feats
     .map((f, i) => {
       if (removed.has(i)) return null;
@@ -261,13 +271,28 @@ export function fillGaps(topo, inside, leftover = () => false) {
     })
     .filter(Boolean);
   const result = client.quantize(server.topology({ p: { type: "FeatureCollection", features: out.map((o) => o.f) } }), OUTPUT_QUANTIZE);
-  // rounding the file's coordinates can turn a shape inside out: then this era keeps its blank strips
-  const inverted = client.feature(result, result.objects.p).features.some((f, i) => f.geometry && out[i].f !== out[i].original && geoArea(f) > 2 * Math.PI);
+  // rounding the file's coordinates can turn a needle-thin piece of a shape inside out (it would cover the globe): wind
+  // it back. A piece with holes is not wound back: then this era keeps its blank strips
+  let inverted = false;
+  client.feature(result, result.objects.p).features.forEach((f, i) => {
+    if (!f.geometry || out[i].f === out[i].original) return;
+    const g = result.objects.p.geometries[i];
+    polysOf(f.geometry).forEach((rings, k) => {
+      if (geoArea({ type: "Polygon", coordinates: rings }) <= 2 * Math.PI) return;
+      if (rings.length > 1) {
+        inverted = true;
+        return;
+      }
+      const arcs = g.type === "Polygon" ? g.arcs : g.arcs[k];
+      arcs[0] = arcs[0].reverse().map((a) => ~a); // the same ring, the other way round
+    });
+  });
   return inverted ? { topo, filled: 0, inverted: true } : { topo: result, filled };
 }
 
 /**
- * Fills the coastal strips inside a region in every era file on disk (public/data/eras, in src/data/eras.json order).
+ * Fills the coastal strips in every era file on disk (public/data/eras, in src/data/eras.json order): the thin ones
+ * everywhere, the wider ones inside the region `inside` picks.
  * `leftover(year, props)` picks the shapes whose coastal slivers go too. Runs a few passes, so a strip that only touched
  * a sliver goes to the shape that took the sliver.
  */
