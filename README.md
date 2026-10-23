@@ -30,7 +30,7 @@ Before every change: `git switch main && git pull`. Windows notes (PowerShell, l
 
 **Settings on Vercel** (Project → Settings → Environment Variables; all are listed in `.env.example`):
 - `NEXT_PUBLIC_SITE_URL`: the live address (set).
-- `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO`: where form messages go. Without one, the live site's forms don't keep anything.
+- `SUBMISSIONS_WEBHOOK_URL`, or `RESEND_API_KEY` + `NOTIFY_EMAIL_TO`: also forward form messages. They're always kept in the Redis list `fb:inbox` when the Upstash settings are set (`npm run leads` prints them).
 - Upstash Redis (Vercel → Storage): keeps leaderboard scores. Without it, scores are wiped every few hours.
 - `NEXT_PUBLIC_GA4_ID`: optional Google Analytics.
 
@@ -91,4 +91,4 @@ Processed map files ship in `public/data/`, so you don't need to do anything. To
 | `npm run build` / `npm start` | Production build / serve |
 | `npm run lint` / `npm run typecheck` | Code checks |
 | `npm run data` | Rebuild the map data files and the daily challenge pool |
-| `npm run leads` | Print saved feedback reports |
+| `npm run leads` | Print feedback messages (from Redis if the Upstash settings are in `.env.local`, else `data/submissions.json`) |

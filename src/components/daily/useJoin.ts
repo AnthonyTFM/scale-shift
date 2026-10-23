@@ -7,6 +7,11 @@ import { track } from "@/lib/analytics";
 import { useAccount } from "./SignInProvider";
 
 export type Me = { id: string; name: string | null; reminders: boolean } | null;
+
+/** Fired on window once today's score is on the board, so the results card can show the real rank. */
+export const POSTED_EVENT = "lb-posted";
+export type Posted = { date: string; rank: number; total: number };
+export const announcePosted = (detail: Posted) => window.dispatchEvent(new CustomEvent<Posted>(POSTED_EVENT, { detail }));
 export type Join = ReturnType<typeof useJoin>;
 
 /**
@@ -71,6 +76,7 @@ export function useJoin(date: string, choices: number[]) {
       setStatus("done");
       setEditing(false);
       if (!data.duplicate) track("leaderboard_join", { rank: data.rank });
+      announcePosted({ date, rank: data.rank, total: data.total });
       if (reminders) await saveReminders(true);
       const board = await fetch(`/api/leaderboard?scope=day&date=${date}&limit=5&player=${data.player?.id ?? ""}`).then((r) => (r.ok ? r.json() : null));
       setTop(board);

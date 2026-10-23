@@ -10,7 +10,7 @@ import { signInOn } from "@/lib/sign-in";
 import { useAccount } from "./SignInProvider";
 import { AccountJoin } from "./AccountJoin";
 import { clearJoinFlow, JoinDialog, startJoinFlow, takeJoinFlow, type JoinStep } from "./JoinDialog";
-import { useJoin } from "./useJoin";
+import { announcePosted, useJoin } from "./useJoin";
 import { dailyCopy as t } from "@/content/daily";
 import { TrophyIcon } from "@/components/site/Icons";
 import { AgeCheck, useAgeOk } from "./AgeCheck";
@@ -234,6 +234,7 @@ function EmailJoin({ date, choices }: Props) {
       setStatus("done");
       setEditing(false);
       if (!data.duplicate) track("leaderboard_join", { rank: data.rank });
+      announcePosted({ date, rank: data.rank, total: data.total });
       if (reminders !== undefined) await saveReminders(p, reminders);
       const board = await fetch(`/api/leaderboard?scope=day&date=${date}&limit=5&player=${p.id}`).then((r) => (r.ok ? r.json() : null));
       setTop(board);

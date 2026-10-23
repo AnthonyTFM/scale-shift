@@ -81,6 +81,8 @@ export const dailyCopy = {
     streak: "Streak",
     best: (n: number) => `Best ${n}`,
     rank: "Today's rank",
+    // before you've joined: where your score would land
+    rankIfJoined: "If you join",
     rankOf: (n: number) => `of ${n} today`,
     rankNone: "Join to rank",
     allTime: "All-time",
