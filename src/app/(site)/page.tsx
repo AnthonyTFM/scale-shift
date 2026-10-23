@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense, ViewTransition } from "react";
 import Link from "next/link";
-import { preload } from "react-dom";
 import pool from "@/data/daily-pool.json";
 import { disputes } from "@/content/disputes";
 import { events } from "@/content/events";
@@ -70,10 +69,8 @@ const directory = [
 
 
 export default function HomePage() {
-  // start downloading the globe's country data with the page, instead of after its script loads
-  preload("/data/globe.json", { as: "fetch", crossOrigin: "anonymous" });
-  // the globe's still picture is the largest thing on the first screen: fetch it before the CSS and scripts
-  preload("/globe-still.svg", { as: "image", fetchPriority: "high" });
+  // globe.json and globe-still.svg are preloaded by a header for "/" only (next.config.ts): preload() here leaked
+  // into every page that prefetches the homepage
   return (
     <>
       <LegacyMapRedirect />
@@ -140,6 +137,9 @@ export default function HomePage() {
                 <img
                   src="/globe-still.svg"
                   alt=""
+                  // lazy (it's below the fold): an eager image here gets a preload hint that other pages pick up when
+                  // they prefetch the homepage
+                  loading="lazy"
                   width={56}
                   height={56}
                   className="size-12 shrink-0 rounded-full bg-[radial-gradient(circle_at_38%_32%,#eaf5ff,#9ccbec_75%)] ring-1 ring-line transition-transform duration-700 group-hover:rotate-12"

@@ -33,13 +33,18 @@ export async function GET(request: Request) {
   const limit = Math.max(1, Math.min(100, Number(q.get("limit")) || 50));
   const player = q.get("player");
   const me = isPlayerId(player) ? player : null;
+  // boards read without a player are the same for everyone: Vercel's CDN may serve them for up to 20 seconds
+  const headers = {
+    "Cache-Control": "no-store",
+    "X-Leaderboard-Store": storeKind(),
+    ...(me ? {} : { "Vercel-CDN-Cache-Control": "max-age=10, stale-while-revalidate=10" }),
+  };
   try {
-    if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
+    if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers });
     const date = q.get("date");
     if (!isDateKey(date)) return Response.json({ error: "Use date=YYYY-MM-DD." }, { status: 400 });
-    if (q.get("scope") === "week")
-      return Response.json(await weekBoard(date, limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
-    return Response.json(await dayBoard(date, limit, me), { headers: { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind() } });
+    if (q.get("scope") === "week") return Response.json(await weekBoard(date, limit, me), { headers });
+    return Response.json(await dayBoard(date, limit, me), { headers });
   } catch (e) {
     console.error("[leaderboard] read failed", e);
     return Response.json({ error: "The leaderboard is unavailable right now." }, { status: 503 });

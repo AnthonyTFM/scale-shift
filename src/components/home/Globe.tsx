@@ -12,6 +12,10 @@ type Country = GlobeCountry;
 const TILT = GLOBE_TILT;
 const SPEED = 6; // degrees per second
 const FRAME_MS = 50; // 20 frames a second is smooth enough for a slow spin and keeps phones responsive
+const BUDGET = 0.25; // on slow phones, draw less often so the spin takes about a quarter of the main thread
+// but never below 8 frames a second, so the spin still looks smooth (the check lands on the next screen frame: 110 ms
+// waits 7 frames at 60 Hz, 117 ms, about 8.6 fps)
+const SLOWEST_MS = 110;
 
 /** A slowly turning globe drawn from our own borders. Drag to spin it. Decorative: the page works without it. */
 export function Globe({ label, onReady }: { label: string; onReady?: () => void }) {
@@ -41,6 +45,7 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
     const proj = geoOrthographic().clipAngle(90);
     const path = geoPath(proj, ctx);
     let lastDraw = 0;
+    let cost = 0; // recent time one frame takes to draw, ms
     const graticule = geoGraticule10();
 
     const resize = () => {
@@ -81,9 +86,12 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
       const dt = Math.min(0.1, (now - last) / 1000);
       last = now;
       if (!drag) lon += SPEED * dt;
-      if (now - lastDraw >= FRAME_MS) {
+      // while dragging, follow the finger at the full rate
+      if (now - lastDraw >= (drag ? FRAME_MS : Math.min(SLOWEST_MS, Math.max(FRAME_MS, cost / BUDGET)))) {
         lastDraw = now;
+        const t = performance.now();
         draw();
+        cost = cost ? cost * 0.8 + (performance.now() - t) * 0.2 : performance.now() - t;
       }
       if (visible && !still && !document.hidden) raf = requestAnimationFrame(tick);
     };
