@@ -20,7 +20,7 @@ export function UnsubscribeResult({ failed }: { failed: boolean }) {
         <Link href="/daily" className="btn btn-primary">
           Play today&apos;s challenge
         </Link>
-        <Link href="/contact?topic=other" className="inline-flex h-11 items-center rounded-lg border border-line px-4 font-bold text-ink hover:bg-white">
+        <Link href="/contact?topic=other" className="btn btn-white">
           Contact us
         </Link>
       </div>

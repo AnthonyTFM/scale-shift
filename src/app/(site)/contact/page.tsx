@@ -23,7 +23,7 @@ export default function ContactPage() {
           <FeedbackForm />
         </Suspense>
         <aside className="space-y-4 text-sm text-ink-soft">
-          <div className="rounded-card border border-line bg-white p-5">
+          <div className="card p-5">
             <h2 className="font-bold text-ink">What makes a great report</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>The place and the year or era</li>
@@ -31,7 +31,7 @@ export default function ContactPage() {
               <li>A source: an encyclopedia, a treaty text, or a scholarly atlas</li>
             </ul>
           </div>
-          <div className="rounded-card border border-line bg-white p-5">
+          <div className="card p-5">
             <h2 className="font-bold text-ink">Prefer email?</h2>
             <p className="mt-1">
               <a className="font-semibold text-link underline" href={`mailto:${site.contactEmail}`}>

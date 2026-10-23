@@ -38,7 +38,7 @@ export default function HowItWorksPage() {
       <div className="mx-auto max-w-6xl px-4 py-10">
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {steps.map((s, i) => (
-            <li key={s.title} className="rounded-card bg-card p-5 ring-1 ring-line">
+            <li key={s.title} className="card p-5">
               <span className="grid size-9 place-items-center rounded-full bg-primary font-display text-white">{i + 1}</span>
               <h2 className="mt-3 text-lg font-bold text-ink">{s.title}</h2>
               <p className="mt-1 text-sm leading-relaxed text-ink-soft">{s.body}</p>
@@ -55,7 +55,7 @@ export default function HowItWorksPage() {
               bigger than it is. Greenland, centered near 72° north, looks roughly ten times too big.
             </p>
           </div>
-          <div className="overflow-x-auto rounded-card border border-line bg-white">
+          <div className="overflow-x-auto card">
             <table className="w-full text-left text-sm">
               <caption className="px-4 pt-4 text-left font-bold text-ink">How much Mercator inflates area</caption>
               <thead className="text-xs uppercase tracking-wide text-muted">
@@ -99,8 +99,10 @@ export default function HowItWorksPage() {
           </h2>
           <dl className="mt-4 grid gap-2 sm:grid-cols-2">
             {keys.map(([k, v]) => (
-              <div key={k} className="flex gap-3 rounded-lg border border-line bg-white p-3 text-sm">
-                <dt className="w-36 shrink-0 font-mono font-semibold text-ink">{k}</dt>
+              <div key={k} className="flex gap-3 rounded-[14px] border-2 border-line bg-white p-3 text-sm">
+                <dt className="w-36 shrink-0 text-ink">
+                  <kbd className="rounded-md border-2 border-b-4 border-line bg-paper px-1.5 py-0.5 font-sans text-xs font-bold">{k}</kbd>
+                </dt>
                 <dd className="text-ink-soft">{v}</dd>
               </div>
             ))}
@@ -116,7 +118,7 @@ export default function HowItWorksPage() {
               <li key={p.id}>
                 <Link
                   href={mapUrl({ era: p.baseEra, shapes: p.shapes.map((s, i) => ({ ...s, color: i })) })}
-                  className="block h-full rounded-card border border-line bg-white p-4 hover:shadow-md"
+                  className="press-card block h-full rounded-card p-4 hover:border-primary"
                 >
                   <span className="font-bold text-ink">{p.title}</span>
                   <span className="mt-1 block text-sm text-ink-soft">{p.hook}</span>

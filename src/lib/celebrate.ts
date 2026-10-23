@@ -12,7 +12,8 @@ export function buzz(pattern: number | number[]) {
   }
 }
 
-const COLORS = ["#FFB547", "#E8366B", "#2F6FDE", "#1FA37A", "#C4ACE5", "#F5D671"];
+// the game palette: primary blue, red, green, gold and the shape blue
+const COLORS = ["#2563EB", "#D93A2B", "#21B26B", "#FFC233", "#2F6BFF", "#FF5B4A"];
 
 /** About 1.5 seconds of confetti falling from the top of the screen. Skipped when the player prefers less motion. */
 export function confetti() {

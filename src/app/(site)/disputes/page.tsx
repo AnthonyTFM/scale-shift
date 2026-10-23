@@ -26,7 +26,7 @@ export default function DisputesPage() {
         }
       />
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <p className="mb-6 rounded-card bg-[#fff3cc] p-4 text-sm text-ink ring-1 ring-gold">
+        <p className="mb-6 rounded-card border-2 border-gold bg-gold-soft p-4 text-sm text-ink">
           Status can change quickly. These summaries were reviewed when this site was built. Check current news before citing them, and{" "}
           <Link href="/contact?topic=border" className="font-semibold underline">
             tell us
@@ -35,7 +35,7 @@ export default function DisputesPage() {
         </p>
         <ol className="grid gap-4 md:grid-cols-2">
           {disputes.map((d) => (
-            <li key={d.id} id={d.id} className="scroll-mt-24 rounded-card border border-line bg-white p-5 shadow-sm">
+            <li key={d.id} id={d.id} className="card scroll-mt-24 p-5">
               <h2 className="font-display text-xl text-ink">{d.name}</h2>
               <dl className="mt-3 grid grid-cols-2 gap-3 text-sm">
                 <div>
@@ -56,7 +56,7 @@ export default function DisputesPage() {
                 </div>
               </dl>
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">{d.summary}</p>
-              <Link href={mapLink("present", [d.lon, d.lat])} className="mt-3 inline-block text-sm font-semibold text-link hover:underline">
+              <Link href={mapLink("present", [d.lon, d.lat])} className="-mb-2 mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-link hover:underline">
                 See it on the map →
               </Link>
             </li>

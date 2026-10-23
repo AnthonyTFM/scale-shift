@@ -72,14 +72,14 @@ export function FeedbackForm() {
 
   if (status === "sent") {
     return (
-      <div ref={statusRef} tabIndex={-1} role="status" className="rounded-card bg-[#e7f7ee] p-6 ring-1 ring-green">
+      <div ref={statusRef} tabIndex={-1} role="status" className="rounded-card border-2 border-green bg-green-soft p-6">
         <h2 className="font-display text-2xl text-ink">Thanks! Your report is in.</h2>
         <p className="mt-2 text-ink-soft">We read every message. Fixes are listed on the About page. If you left an email, we may follow up.</p>
         <div className="mt-4 flex flex-wrap gap-3">
           <Link href="/map" className="btn btn-primary">
             Back to the map
           </Link>
-          <button type="button" onClick={() => setStatus("idle")} className="h-11 rounded-lg border border-line bg-white px-4 font-semibold hover:bg-paper">
+          <button type="button" onClick={() => setStatus("idle")} className="btn btn-white">
             Send another
           </button>
         </div>
@@ -87,13 +87,13 @@ export function FeedbackForm() {
     );
   }
 
-  const field = "mt-1 w-full rounded-lg border bg-white px-3 text-base text-ink";
-  const border = (k: keyof FieldErrors) => (errors[k] ? "border-danger" : "border-line");
+  const field = "field mt-1";
+  const border = (k: keyof FieldErrors) => (errors[k] ? "border-danger" : "");
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} noValidate className="space-y-5 rounded-card border border-line bg-white p-5 md:p-6">
+    <form ref={formRef} onSubmit={onSubmit} noValidate className="card space-y-5 p-5 md:p-6">
       {status === "error" ? (
-        <div ref={statusRef} tabIndex={-1} role="alert" className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm font-semibold text-danger">
+        <div ref={statusRef} tabIndex={-1} role="alert" className="rounded-xl border-2 border-red/30 bg-red-soft p-3 text-sm font-semibold text-danger">
           {serverError || "Please fix the highlighted fields."}
         </div>
       ) : null}
@@ -102,7 +102,7 @@ export function FeedbackForm() {
         <legend className="text-sm font-semibold text-ink">What is it about?</legend>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {topics.map((t) => (
-            <label key={t.value} className="flex cursor-pointer items-center gap-2 rounded-lg border border-line px-3 py-2.5 text-sm has-[:checked]:border-ink has-[:checked]:bg-paper">
+            <label key={t.value} className="flex min-h-11 cursor-pointer items-center gap-2 rounded-[14px] border-2 border-line px-3 py-2.5 text-sm has-[:checked]:border-primary has-[:checked]:bg-primary-soft">
               <input type="radio" name="topic" value={t.value} checked={topic === t.value} onChange={() => setTopic(t.value)} />
               {t.label}
             </label>
@@ -118,14 +118,14 @@ export function FeedbackForm() {
             defaultValue={params.get("region") ?? ""}
             aria-invalid={!!errors.region}
             aria-describedby={errors.region ? "region-error" : undefined}
-            className={`${field} h-11 ${border("region")}`}
+            className={`${field} ${border("region")}`}
             placeholder="e.g. Crimea, Austria-Hungary"
           />
           <FieldError k="region" errors={errors} />
         </label>
         <label className="block text-sm font-semibold text-ink">
           Era or year (optional)
-          <input name="era" defaultValue={params.get("era") ?? ""} className={`${field} h-11 border-line`} placeholder="e.g. 1914" />
+          <input name="era" defaultValue={params.get("era") ?? ""} className={`${field}`} placeholder="e.g. 1914" />
         </label>
       </div>
 
@@ -136,7 +136,7 @@ export function FeedbackForm() {
           rows={5}
           aria-invalid={!!errors.message}
           aria-describedby={errors.message ? "message-error" : undefined}
-          className={`${field} py-2 ${border("message")}`}
+          className={`${field} ${border("message")}`}
           placeholder="What's wrong, and what should it be?"
         />
         <FieldError k="message" errors={errors} />
@@ -150,7 +150,7 @@ export function FeedbackForm() {
           inputMode="url"
           aria-invalid={!!errors.source}
           aria-describedby={errors.source ? "source-error" : undefined}
-          className={`${field} h-11 ${border("source")}`}
+          className={`${field} ${border("source")}`}
           placeholder="https://"
         />
         <FieldError k="source" errors={errors} />
@@ -159,7 +159,7 @@ export function FeedbackForm() {
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm font-semibold text-ink">
           Name (optional)
-          <input name="name" autoComplete="name" className={`${field} h-11 border-line`} />
+          <input name="name" autoComplete="name" className={`${field}`} />
         </label>
         <label className="block text-sm font-semibold text-ink">
           Email (optional, if you&apos;d like a reply)
@@ -169,7 +169,7 @@ export function FeedbackForm() {
             autoComplete="email"
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "email-error" : undefined}
-            className={`${field} h-11 ${border("email")}`}
+            className={`${field} ${border("email")}`}
           />
           <FieldError k="email" errors={errors} />
         </label>

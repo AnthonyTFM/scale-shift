@@ -115,7 +115,7 @@ export default function AboutPage() {
           ))}
         </ul>
         <h3 id="name-fixes">Name and ruler fixes</h3>
-        <div tabIndex={0} role="region" aria-labelledby="name-fixes" className="not-prose overflow-x-auto rounded-card border border-line bg-white">
+        <div tabIndex={0} role="region" aria-labelledby="name-fixes" className="not-prose overflow-x-auto card">
           <table className="w-full min-w-[620px] text-left text-sm">
             <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
               <tr>
