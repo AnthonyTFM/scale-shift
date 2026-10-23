@@ -14,7 +14,7 @@ export function GlobeLazy({ label }: { label: string }) {
   const [ready, setReady] = useState(false);
   return (
     <div className="relative">
-      <Globe label={label} onReady={() => setReady(true)} />
+      <Globe label={label} onReady={() => setReady(true)} onGone={() => setReady(false)} />
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${ready ? "opacity-0" : "opacity-100"}`}

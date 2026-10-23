@@ -24,6 +24,8 @@ let spinning = false;
 let timer = 0;
 let last = 0;
 let told = false;
+let cost = 0; // how long the last frame took to draw, ms
+let pending = 0; // a drag redraw waiting for the next frame
 
 function paint() {
   if (!draw || !groups || !size) return;
@@ -41,8 +43,10 @@ function tick() {
   last = now;
   if (dragFrom === null) lon += SPEED * dt;
   paint();
-  // wait for what's left of the frame, so a slow draw doesn't make the spin fall behind
-  if (spinning) timer = setTimeout(tick, Math.max(0, FRAME_MS - (performance.now() - now))) as unknown as number;
+  cost = performance.now() - now;
+  // wait for what's left of the frame, so a slow draw doesn't make the spin fall behind; on a very slow phone, rest at
+  // least as long as a frame took, so the globe never keeps a whole core busy
+  if (spinning) timer = setTimeout(tick, Math.max(FRAME_MS - cost, cost)) as unknown as number;
 }
 
 onmessage = (e: MessageEvent<GlobeMessage>) => {
@@ -50,7 +54,9 @@ onmessage = (e: MessageEvent<GlobeMessage>) => {
   if (m.type === "init") {
     canvas = m.canvas;
     const ctx = canvas.getContext("2d");
+    // no 2D drawing here: the page draws on the main thread instead
     if (ctx) draw = globeRenderer(ctx);
+    else postMessage({ type: "failed" });
   } else if (m.type === "data") {
     groups = globeCountries(m.topo);
     paint();
@@ -72,6 +78,11 @@ onmessage = (e: MessageEvent<GlobeMessage>) => {
     dragFrom = m.start ? lon : null;
   } else if (m.type === "turn") {
     if (dragFrom !== null) lon = dragFrom + m.by;
-    if (!spinning) paint();
+    // not spinning (reduced motion): one redraw per frame, however fast the drag messages come
+    if (!spinning && !pending)
+      pending = setTimeout(() => {
+        pending = 0;
+        paint();
+      }, 16) as unknown as number;
   }
 };

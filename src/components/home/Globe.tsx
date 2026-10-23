@@ -33,7 +33,7 @@ function workerPainter(canvas: HTMLCanvasElement, drawn: () => void, failed: () 
   }
   const offscreen = canvas.transferControlToOffscreen();
   const send = (m: GlobeMessage, transfer: Transferable[] = []) => worker.postMessage(m, transfer);
-  worker.onmessage = (e: MessageEvent<{ type: string }>) => e.data.type === "drawn" && drawn();
+  worker.onmessage = (e: MessageEvent<{ type: string }>) => (e.data.type === "drawn" ? drawn() : e.data.type === "failed" && failed());
   worker.onerror = () => failed();
   send({ type: "init", canvas: offscreen }, [offscreen]);
   return {
@@ -108,18 +108,23 @@ function mainPainter(canvas: HTMLCanvasElement, drawn: () => void): Painter {
       if (dragFrom !== null) lon = dragFrom + by;
       if (!raf) paint();
     },
-    stop: () => cancelAnimationFrame(raf),
+    stop: () => {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    },
   };
 }
 
 /** A slowly turning globe drawn from our own borders. Drag to spin it. Decorative: the page works without it. */
-export function Globe({ label, onReady }: { label: string; onReady?: () => void }) {
+export function Globe({ label, onReady, onGone }: { label: string; onReady?: () => void; onGone?: () => void }) {
   const wrap = useRef<HTMLDivElement>(null);
   const shade = useRef<HTMLDivElement>(null);
   // the latest onReady, read once the countries are drawn (keeps the set-up effect from re-running)
   const readyCb = useRef(onReady);
+  const goneCb = useRef(onGone);
   useEffect(() => {
     readyCb.current = onReady;
+    goneCb.current = onGone;
   });
 
   useEffect(() => {
@@ -171,7 +176,9 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
       spin();
     };
     // spin only once the page has finished loading and while the globe is on screen
-    const spin = () => painter.spin(ready && !still && visible && !document.hidden);
+    const spin = () => {
+      if (!disposed) painter.spin(ready && !still && visible && !document.hidden);
+    };
 
     const down = (e: PointerEvent) => {
       drag = { x: e.clientX };
@@ -206,6 +213,15 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
     const ro = new ResizeObserver(resize);
     ro.observe(box);
 
+    // spin only once the page has finished loading, so the globe never slows the first paint or first taps
+    let goTimer = 0;
+    const go = () => {
+      goTimer = window.setTimeout(() => {
+        ready = true;
+        spin();
+      }, 1200);
+    };
+
     // a dropped connection shouldn't leave an empty ocean: try again a couple of times
     const load = (tries: number): Promise<GlobeTopology> =>
       fetch("/data/globe.json")
@@ -219,11 +235,6 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
         if (disposed) return;
         topo = t;
         painter.data(t);
-        const go = () =>
-          window.setTimeout(() => {
-            ready = true;
-            spin();
-          }, 1200);
         if (document.readyState === "complete") go();
         else window.addEventListener("load", go, { once: true });
       })
@@ -234,10 +245,14 @@ export function Globe({ label, onReady }: { label: string; onReady?: () => void 
     resize();
     return () => {
       disposed = true;
+      window.clearTimeout(goTimer);
+      window.removeEventListener("load", go);
       painter.stop();
       canvas.remove();
       io.disconnect();
       ro.disconnect();
+      // the canvas is gone: show the still picture again until the next one has drawn (coming Back to the page)
+      goneCb.current?.();
       document.removeEventListener("visibilitychange", spin);
     };
     // the label is read once: it doesn't change while the page is open
