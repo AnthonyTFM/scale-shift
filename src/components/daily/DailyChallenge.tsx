@@ -307,7 +307,7 @@ function Skeleton() {
   return (
     <div aria-busy="true" aria-label="Loading today's challenge">
       <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
-      <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6">
+      <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6 [@media(min-width:768px)_and_(max-height:820px)]:min-h-[476px]">
         <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
         <div className="mt-5 grid grid-cols-2 gap-3">
           <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
