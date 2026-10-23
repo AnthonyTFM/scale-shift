@@ -43,7 +43,7 @@ export function PageHero({
           </nav>
         ) : null}
         {eyebrow ? <p className="text-sm font-bold uppercase tracking-wide text-primary">{eyebrow}</p> : null}
-        <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} ${compact ? "text-3xl" : "text-4xl"} leading-tight text-ink md:text-5xl`}>{title}</h1>
+        <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} text-3xl leading-tight text-ink md:text-[2.5rem]`}>{title}</h1>
         {lead ? (
           <div className={`max-w-2xl leading-relaxed text-muted ${compact ? "mt-1.5 text-base md:mt-4 md:text-lg" : "mt-4 text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
         ) : null}

@@ -120,7 +120,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
 
         {s?.top.length ? (
           <section aria-labelledby="largest" className="mt-12">
-            <h2 id="largest" className="font-display text-3xl text-ink">
+            <h2 id="largest" className="font-display text-2xl text-ink md:text-3xl">
               Largest {e.key === "present" ? "countries today" : `in ${e.label}`}
             </h2>
             <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
@@ -161,7 +161,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
 
         {s && prev && key !== "present" ? (
           <section aria-labelledby="changes" className="mt-12">
-            <h2 id="changes" className="font-display text-3xl text-ink">
+            <h2 id="changes" className="font-display text-2xl text-ink md:text-3xl">
               What changed since {prev.label}
             </h2>
             <p className="mt-1 text-sm text-muted">
@@ -177,7 +177,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         ) : null}
 
         <section aria-labelledby="events" className="mt-12">
-          <h2 id="events" className="font-display text-3xl text-ink">
+          <h2 id="events" className="font-display text-2xl text-ink md:text-3xl">
             {prev ? `Land that changed hands, ${prev.label}${/\s/.test(prev.label + e.label) ? " – " : "–"}${e.label}` : `Key events up to ${e.label}`}
           </h2>
           {evs.length ? (
