@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { preload } from "react-dom";
 
 type Crumb = { href: string; label: string };
 
@@ -22,8 +21,6 @@ export function PageHero({
   center?: boolean;
   compact?: boolean;
 }) {
-  // the band's world map (a CSS background) is the largest thing on the first screen: fetch it before the CSS arrives
-  preload("/world.svg", { as: "image", fetchPriority: "high" });
   return (
     <section className="ocean-band border-b border-line text-ink">
       <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3" : "pb-10 pt-8"} md:pb-14 md:pt-12 ${center ? "text-center" : ""}`}>

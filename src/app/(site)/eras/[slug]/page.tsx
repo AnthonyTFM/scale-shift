@@ -104,9 +104,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
       <div className="mx-auto max-w-6xl px-4 py-12">
         <Image
           src={`/era-maps/${slug}`}
-          priority
-          quality={60}
-          sizes="(min-width: 1152px) 1120px, 100vw"
+          // already a small WebP made at build time; the image service only made it bigger
+          unoptimized
           alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}`}
           width={1200}
           height={630}
