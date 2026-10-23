@@ -24,10 +24,15 @@ export function useJoin(date: string, choices: number[]) {
   const [remindNote, setRemindNote] = useState("");
   const sent = useRef(false);
 
+  // updates go through the latest `me` (a functional update): a first-time player's `me` is set in the same tick as this
+  // runs, and restoring a captured copy would wipe a player whose score is already on the board
   const saveReminders = async (on: boolean) => {
     setRemindNote("");
-    const before = me;
-    if (me) setMe({ ...me, reminders: on });
+    setMe((m) => m && { ...m, reminders: on });
+    const undo = (note: string) => {
+      setMe((m) => m && { ...m, reminders: !on });
+      setRemindNote(note);
+    };
     try {
       const res = await fetch("/api/leaderboard/reminders", {
         method: "POST",
@@ -35,14 +40,10 @@ export function useJoin(date: string, choices: number[]) {
         body: JSON.stringify({ on }),
       });
       const data = (await res.json()) as { ok: boolean; error?: string };
-      if (!data.ok) {
-        setMe(before);
-        return setRemindNote(data.error ?? "Couldn't save that. Please try again.");
-      }
+      if (!data.ok) return undo(data.error ?? "Couldn't save that. Please try again.");
       setRemindNote(on ? "Done. We'll email you when a new challenge is up." : "Done. No more reminder emails.");
     } catch {
-      setMe(before);
-      setRemindNote("Couldn't reach the server. Please try again.");
+      undo("Couldn't reach the server. Please try again.");
     }
   };
 
@@ -80,6 +81,21 @@ export function useJoin(date: string, choices: number[]) {
       return false;
     }
   };
+
+  // signed out (sign-out keeps the page): forget the last account, so the next one starts clean
+  useEffect(() => {
+    if (!isLoaded || isSignedIn) return;
+    sent.current = false;
+    queueMicrotask(() => {
+      setMe(undefined);
+      setResult(null);
+      setTop(null);
+      setEditing(false);
+      setStatus("idle");
+      setError("");
+      setRemindNote("");
+    });
+  }, [isLoaded, isSignedIn]);
 
   // signed in: find out who we are; a returning player's score is posted straight away
   useEffect(() => {

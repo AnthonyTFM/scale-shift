@@ -22,7 +22,7 @@ export function AccountJoin({ join }: { join: Join }) {
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       {/* on the narrowest phones "See all" drops to its own line rather than crowd the heading */}
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h3 className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
+        <h3 id="lb-card-h" tabIndex={-1} className="flex items-center outline-none gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
           <TrophyIcon className="size-5 min-[400px]:size-6 sm:size-7" /> Today&apos;s leaderboard
         </h3>
         <Link href="/leaderboard" className="whitespace-nowrap text-sm font-semibold text-primary hover:underline">
@@ -30,7 +30,6 @@ export function AccountJoin({ join }: { join: Join }) {
         </Link>
       </div>
 
-      {isSignedIn && me === undefined ? <p className="mt-2 text-sm text-muted">Loading your spot…</p> : null}
 
       {askName ? (
         <form

@@ -9,7 +9,7 @@ import { isOffensive } from "@/lib/name-filter";
 import { signInOn } from "@/lib/sign-in";
 import { useAccount } from "./SignInProvider";
 import { AccountJoin } from "./AccountJoin";
-import { JoinDialog, takeJoinFlow, type JoinStep } from "./JoinDialog";
+import { clearJoinFlow, JoinDialog, startJoinFlow, takeJoinFlow, type JoinStep } from "./JoinDialog";
 import { useJoin } from "./useJoin";
 import { dailyCopy as t } from "@/content/daily";
 import { TrophyIcon } from "@/components/site/Icons";
@@ -27,18 +27,72 @@ export function LeaderboardJoin(props: Props) {
 }
 
 function SignedInGate({ date, choices, score }: Props) {
-  const { isLoaded, isSignedIn } = useAccount();
+  const { isLoaded, isSignedIn, openSignIn, opening, openFailed } = useAccount();
   const join = useJoin(date, choices);
   const [step, setStep] = useState<JoinStep | null>(null);
+  // between "Continue" and the sign-in window (this pop-up is closed meanwhile), and whether that window failed to open
+  const [awaiting, setAwaiting] = useState(false);
+  const [failed, setFailed] = useState(false);
   const resumed = useRef(false);
+
   // back from the sign-in window (or from Google, a fresh page load): carry on at step 2, or show where you landed
   useEffect(() => {
+    // signed out (the page stays): the next sign-in can resume again
+    if (isLoaded && !isSignedIn) resumed.current = false;
     if (!isLoaded || !isSignedIn || join.me === undefined || resumed.current) return;
     resumed.current = true;
     if (takeJoinFlow(date)) queueMicrotask(() => setStep(join.me?.name ? 3 : 2));
   }, [isLoaded, isSignedIn, join.me, date]);
 
-  const dialog = <JoinDialog step={step} onStep={setStep} onClose={() => setStep(null)} join={join} date={date} score={score} />;
+  // the sign-in window never opened (blocked or offline): bring the pop-up back with a retry
+  useEffect(() => {
+    if (!awaiting || !openFailed) return;
+    clearJoinFlow();
+    queueMicrotask(() => {
+      setAwaiting(false);
+      setFailed(true);
+      setStep(1);
+    });
+  }, [awaiting, openFailed]);
+
+  const open = () => {
+    join.setStatus("idle");
+    join.setError("");
+    setFailed(false);
+    setAwaiting(false);
+    setStep(isSignedIn ? 2 : 1);
+  };
+  const close = () => {
+    const wasDone = step === 3;
+    if (step === 1) clearJoinFlow();
+    setStep(null);
+    // after "you're on the board", land on the card that now shows it (the Join button that opened this is gone)
+    if (wasDone) requestAnimationFrame(() => document.getElementById("lb-card-h")?.focus());
+  };
+
+  const dialog = (
+    <JoinDialog
+      step={step}
+      // posted after the pop-up was closed (Esc while posting): don't reopen it
+      onPosted={() => setStep((s) => (s ? 3 : s))}
+      onClose={close}
+      onContinue={() => {
+        startJoinFlow(date);
+        setFailed(false);
+        // close first, then open sign-in a frame later: while this modal pop-up is open, Clerk's window couldn't take focus.
+        // "awaiting" is set in the same frame as the request, which also clears any earlier "didn't open", so an old
+        // failure can't fire again on a retry
+        setStep(null);
+        requestAnimationFrame(() => {
+          openSignIn("/daily");
+          setAwaiting(true);
+        });
+      }}
+      failed={failed}
+      join={join}
+      score={score}
+    />
+  );
   // still finding out who's signed in: hold the space
   if (!isLoaded || (isSignedIn && join.me === undefined)) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
   // on the board: your rank and today's top five (behind the pop-up while it says where you landed)
@@ -51,7 +105,7 @@ function SignedInGate({ date, choices, score }: Props) {
     );
   return (
     <>
-      <JoinBar dialog onJoin={() => setStep(isSignedIn ? 2 : 1)} />
+      <JoinBar dialog busy={awaiting && opening} onJoin={open} />
       {dialog}
     </>
   );
@@ -92,7 +146,7 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
 }
 
 /** Compact "Get on the leaderboard · Join": the sign-up only opens after Join (in a pop-up when sign-in is on). */
-function JoinBar({ onJoin, dialog = false }: { onJoin: () => void; dialog?: boolean }) {
+function JoinBar({ onJoin, dialog = false, busy = false }: { onJoin: () => void; dialog?: boolean; busy?: boolean }) {
   return (
     <div className="mt-5 flex items-center gap-3 rounded-[22px] border-2 border-primary bg-primary-soft py-3 pl-4 pr-3 shadow-[0_6px_0_0_var(--color-primary-shadow)]">
       <TrophyIcon className="size-9" />
@@ -108,9 +162,10 @@ function JoinBar({ onJoin, dialog = false }: { onJoin: () => void; dialog?: bool
           if (dialog) track("leaderboard_join_open");
           onJoin();
         }}
+        disabled={busy}
         className="btn btn-primary mb-1.5 h-12 shrink-0 px-6"
       >
-        {t.joinButton}
+        {busy ? t.joinDialog.opening : t.joinButton}
       </button>
     </div>
   );

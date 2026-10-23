@@ -360,6 +360,10 @@ body {
 @media (min-width: 768px) {
   .sheet[open] { animation-name: sheet-in; }
 }
+/* the page behind the pop-up doesn't scroll */
+html:has(dialog.sheet[open]) {
+  overflow: hidden;
+}
 .sheet::backdrop {
   background: rgb(29 33 64 / 0.45);
 }

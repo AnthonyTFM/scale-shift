@@ -15,6 +15,8 @@ export type Account = {
   prepare: () => void;
   /** true between a tap on "Sign in" and Clerk's window opening */
   opening: boolean;
+  /** true when a sign-in window was asked for but never opened (Clerk blocked or offline); cleared by the next try */
+  openFailed?: boolean;
 };
 
 const noop = () => {};
@@ -72,6 +74,7 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
   const [account, setAccount] = useState<Account | null>(null);
   const [checked, setChecked] = useState(false);
   const [opening, setOpening] = useState(false);
+  const [openFailed, setOpenFailed] = useState(false);
   // a sign-in tapped before Clerk arrived, opened as soon as it's ready
   const pending = useRef<string | null>(null);
   const takePending = useCallback(() => {
@@ -83,7 +86,12 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!opening) return;
-    const id = setTimeout(() => setOpening(false), OPEN_TIMEOUT);
+    const id = setTimeout(() => {
+      setOpening(false);
+      setOpenFailed(true);
+      // don't open it later, out of context, if Clerk turns up after all
+      pending.current = null;
+    }, OPEN_TIMEOUT);
     return () => clearTimeout(id);
   }, [opening]);
 
@@ -100,8 +108,10 @@ export function SignInProvider({ children }: { children: React.ReactNode }) {
     isLoaded: checked && load !== "session",
     isSignedIn: false,
     opening,
+    openFailed,
     openSignIn: (back) => {
       pending.current = back;
+      setOpenFailed(false);
       setOpening(true);
       setLoad((l) => l ?? "tap");
     },
