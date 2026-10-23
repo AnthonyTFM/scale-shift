@@ -47,6 +47,8 @@
   --color-green-soft: #ebf9f1;
   --color-gold-soft: #fff4d1;
   --color-red-soft: #fdeceb;
+  /* the edge of text inputs and dropdowns: dark enough to see (3:1 against white) */
+  --color-line-strong: #9c8c70;
 
   /* Inter for body text, Bricolage Grotesque ExtraBold for headings, numbers and the wordmark (both via next/font) */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -125,6 +127,9 @@ body {
     color: var(--color-ink);
     --btn-shadow: var(--color-gold-shadow);
   }
+  .btn-gold:hover {
+    background: var(--color-accent-strong);
+  }
   .btn-white {
     background: #fff;
     color: var(--color-ink);
@@ -132,7 +137,7 @@ body {
     --btn-shadow: var(--color-line);
   }
   .btn-white:hover {
-    background: var(--color-paper);
+    background: var(--color-beige);
   }
   /* a white card on content pages: the same edge and offset shadow as the buttons, without the press */
   .card {
@@ -145,12 +150,18 @@ body {
   .field {
     height: 2.75rem;
     width: 100%;
-    border: 2px solid var(--color-line);
+    border: 2px solid var(--color-line-strong);
     border-radius: 14px;
     background: #fff;
     padding: 0 0.75rem;
+    /* 16px: smaller makes iPhones zoom in on tap */
+    font-size: 1rem;
     font-weight: 400;
     color: var(--color-ink);
+  }
+  textarea.field {
+    height: auto;
+    padding: 0.5rem 0.75rem;
   }
   select.field {
     appearance: none;
@@ -173,6 +184,9 @@ body {
 :focus-visible {
   outline: 3px solid var(--color-focus);
   outline-offset: 2px;
+}
+/* rounded controls keep their own corners; only plain links and text get a softened focus box */
+:focus-visible:not([class*="rounded"], .btn, .field, .card, .press-card) {
   border-radius: 6px;
 }
 

@@ -25,7 +25,7 @@ export function EventCard({ ev, headingLevel = 3 }: { ev: TerritoryEvent; headin
       <p className="mt-3 text-sm leading-relaxed text-ink-soft">{ev.summary}</p>
       <a
         href={mapLink(era.key, [ev.lon, ev.lat])}
-        className="mt-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-link hover:underline"
+        className="-mb-2 mt-1 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-link hover:underline"
       >
         See it on {era.key === "present" ? "today\u2019s" : `the ${era.label}`} map <span aria-hidden="true">→</span>
       </a>

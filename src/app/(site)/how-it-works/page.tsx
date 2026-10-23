@@ -100,7 +100,9 @@ export default function HowItWorksPage() {
           <dl className="mt-4 grid gap-2 sm:grid-cols-2">
             {keys.map(([k, v]) => (
               <div key={k} className="flex gap-3 rounded-[14px] border-2 border-line bg-white p-3 text-sm">
-                <dt className="w-36 shrink-0 font-bold text-ink">{k}</dt>
+                <dt className="w-36 shrink-0 text-ink">
+                  <kbd className="rounded-md border-2 border-b-4 border-line bg-paper px-1.5 py-0.5 font-sans text-xs font-bold">{k}</kbd>
+                </dt>
                 <dd className="text-ink-soft">{v}</dd>
               </div>
             ))}

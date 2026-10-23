@@ -89,7 +89,7 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
             </svg>
           </button>
         </div>
-        <p role="status" className={`mt-3 rounded-xl px-3 py-2 text-sm font-bold ${copied ? "bg-[#E3F7EC] text-green-text" : "bg-[#FFF4D1] text-ink"}`}>
+        <p role="status" className={`mt-3 rounded-xl px-3 py-2 text-sm font-bold ${copied ? "bg-green-soft text-green-text" : "bg-gold-soft text-ink"}`}>
           {copied ? `✓ ${t.copied}` : t.notCopied}
         </p>
         <label htmlFor="share-box-text" className="sr-only">

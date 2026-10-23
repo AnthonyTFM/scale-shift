@@ -298,7 +298,7 @@ function EmailJoin({ date, choices }: Props) {
       {top?.rows.length ? (
         <ol className="mt-3 space-y-1 text-sm">
           {top.rows.map((r) => (
-            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-[#FFF1C7] font-bold" : ""}`}>
+            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-gold-soft font-bold" : ""}`}>
               <span className="w-6 text-right text-muted">{r.rank}</span>
               <span className="min-w-0 flex-1 truncate">{r.name}{r.me ? <span className="font-normal text-muted"> (you)</span> : null}</span>
               <span className="font-display tabular-nums">{r.score}/5</span>

@@ -239,7 +239,7 @@ export function DailyChallenge() {
   return (
     <div ref={gameTop}>
       {challenge && todayNo && !finished ? (
-        <p className="mb-3 rounded-2xl border-2 border-gold bg-[#FFF4D1] p-3 text-sm font-semibold text-ink">
+        <p className="mb-3 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
           🎯{" "}
           {challenge.day === todayNo
             ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
@@ -469,7 +469,7 @@ function QuestionCard({
                 <>
                   <TrueArea from={o.m} to={o.a} />
                   <span
-                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight text-ink ${inflate >= 1.15 ? "bg-[#FFF1C7]" : "bg-beige"}`}
+                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight text-ink ${inflate >= 1.15 ? "bg-gold-soft" : "bg-beige"}`}
                   >
                     {mapNote}
                   </span>
@@ -722,7 +722,7 @@ function Results({
         <p className="mt-1 text-muted">{verdict}</p>
       </div>
       {challenge ? (
-        <p className="mt-3 rounded-2xl border-2 border-gold bg-[#FFF4D1] px-3 py-2 text-center text-sm font-bold text-ink">
+        <p className="mt-3 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center text-sm font-bold text-ink">
           {score > challenge.score
             ? `🏆 You beat ${challenge.name} (${challenge.score}/5)! Send them a rematch.`
             : score === challenge.score

@@ -125,7 +125,7 @@ export function LeaderboardView() {
       ) : null}
 
       {tab === "day" && date === today && !me.playedToday ? (
-        <Link href="/daily" className="btn btn-gold mt-4 w-full justify-between px-4 py-3 text-left">
+        <Link href="/daily" className="btn btn-gold mt-4 w-full justify-between px-4 py-3 text-left leading-snug">
           <span>You haven&apos;t played today yet. Get on the board!</span>
           <span aria-hidden="true">→</span>
         </Link>
@@ -196,7 +196,7 @@ function DayTable({ board }: { board: DayBoard }) {
       </thead>
       <tbody className="divide-y divide-line">
         {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
-          <tr key={`${i}-${r.name}`} className={r.me ? "bg-[#FFF1C7] font-bold" : undefined}>
+          <tr key={`${i}-${r.name}`} className={r.me ? "bg-gold-soft font-bold" : undefined}>
             <td className="px-3 py-2.5 text-ink sm:px-4">
               {medal(r.rank) ?? r.rank}
               <span className="sr-only">{medal(r.rank) ? ` (rank ${r.rank})` : ""}</span>
@@ -260,7 +260,7 @@ function AllTable({
         </thead>
         <tbody className="divide-y divide-line">
           {[...board.rows, ...(meOutside && board.me ? [board.me] : [])].map((r, i) => (
-            <tr key={`${i}-${r.name}`} className={r.me ? "bg-[#FFF1C7] font-bold" : undefined}>
+            <tr key={`${i}-${r.name}`} className={r.me ? "bg-gold-soft font-bold" : undefined}>
               <td className="px-3 py-2.5 text-ink sm:px-4">{medal(r.rank) ?? r.rank}</td>
               <td className="max-w-0 px-2 py-2.5 text-ink">
                 <span className="flex min-w-0 items-center gap-1.5">

@@ -89,7 +89,7 @@ export function TimelineFilter() {
               setType("all");
               setQ("");
             }}
-            className="btn btn-white w-full"
+            className="btn btn-white mb-0 w-full"
           >
             Reset filters
           </button>
