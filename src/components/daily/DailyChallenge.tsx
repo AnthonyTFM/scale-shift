@@ -768,7 +768,7 @@ function Results({
       {round.date ? (
         <>
           {/* getting on the leaderboard is the first thing after the score */}
-          <LeaderboardJoin date={round.date} choices={choices} />
+          <LeaderboardJoin date={round.date} choices={choices} score={score} />
           <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
             {[
               [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],

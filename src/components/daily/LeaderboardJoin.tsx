@@ -9,11 +9,13 @@ import { isOffensive } from "@/lib/name-filter";
 import { signInOn } from "@/lib/sign-in";
 import { useAccount } from "./SignInProvider";
 import { AccountJoin } from "./AccountJoin";
+import { JoinDialog, takeJoinFlow, type JoinStep } from "./JoinDialog";
+import { useJoin } from "./useJoin";
 import { dailyCopy as t } from "@/content/daily";
 import { TrophyIcon } from "@/components/site/Icons";
 import { AgeCheck, useAgeOk } from "./AgeCheck";
 
-type Props = { date: string; choices: number[] };
+type Props = { date: string; choices: number[]; score: number };
 
 /**
  * After the daily round: post the score. With sign-in on, players sign in (verified email); otherwise they type an email.
@@ -24,11 +26,35 @@ export function LeaderboardJoin(props: Props) {
   return signInOn ? <SignedInGate {...props} /> : <SavedPlayerGate {...props} />;
 }
 
-function SignedInGate(props: Props) {
+function SignedInGate({ date, choices, score }: Props) {
   const { isLoaded, isSignedIn } = useAccount();
-  return <JoinGate joined={isLoaded ? !!isSignedIn : undefined}>
-      <AccountJoin {...props} />
-    </JoinGate>;
+  const join = useJoin(date, choices);
+  const [step, setStep] = useState<JoinStep | null>(null);
+  const resumed = useRef(false);
+  // back from the sign-in window (or from Google, a fresh page load): carry on at step 2, or show where you landed
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || join.me === undefined || resumed.current) return;
+    resumed.current = true;
+    if (takeJoinFlow(date)) queueMicrotask(() => setStep(join.me?.name ? 3 : 2));
+  }, [isLoaded, isSignedIn, join.me, date]);
+
+  const dialog = <JoinDialog step={step} onStep={setStep} onClose={() => setStep(null)} join={join} date={date} score={score} />;
+  // still finding out who's signed in: hold the space
+  if (!isLoaded || (isSignedIn && join.me === undefined)) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
+  // on the board: your rank and today's top five (behind the pop-up while it says where you landed)
+  if (isSignedIn && join.me?.name && step !== 2)
+    return (
+      <>
+        <AccountJoin join={join} />
+        {dialog}
+      </>
+    );
+  return (
+    <>
+      <JoinBar dialog onJoin={() => setStep(isSignedIn ? 2 : 1)} />
+      {dialog}
+    </>
+  );
 }
 
 function SavedPlayerGate(props: Props) {
@@ -55,7 +81,18 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
       </div>
     );
   }
-  // compact: "Get on the leaderboard · Join"; the full sign-up only opens after Join
+  return (
+    <JoinBar
+      onJoin={() => {
+        track("leaderboard_join_open");
+        setOpen(true);
+      }}
+    />
+  );
+}
+
+/** Compact "Get on the leaderboard · Join": the sign-up only opens after Join (in a pop-up when sign-in is on). */
+function JoinBar({ onJoin, dialog = false }: { onJoin: () => void; dialog?: boolean }) {
   return (
     <div className="mt-5 flex items-center gap-3 rounded-[22px] border-2 border-primary bg-primary-soft py-3 pl-4 pr-3 shadow-[0_6px_0_0_var(--color-primary-shadow)]">
       <TrophyIcon className="size-9" />
@@ -65,10 +102,11 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
       </span>
       <button
         type="button"
-        aria-expanded={false}
+        aria-haspopup={dialog ? "dialog" : undefined}
+        aria-expanded={dialog ? undefined : false}
         onClick={() => {
-          track("leaderboard_join_open");
-          setOpen(true);
+          if (dialog) track("leaderboard_join_open");
+          onJoin();
         }}
         className="btn btn-primary mb-1.5 h-12 shrink-0 px-6"
       >
