@@ -15,7 +15,8 @@ import { dailyCopy as t } from "@/content/daily";
 import { TrophyIcon } from "@/components/site/Icons";
 import { AgeCheck, useAgeOk } from "./AgeCheck";
 
-type Props = { date: string; choices: number[]; score: number };
+// `hint`: the line under "Get on the leaderboard" (the leaderboard page says the score instead of "See where you rank")
+type Props = { date: string; choices: number[]; score: number; hint?: string };
 
 /**
  * After the daily round: post the score. With sign-in on, players sign in (verified email); otherwise they type an email.
@@ -26,7 +27,7 @@ export function LeaderboardJoin(props: Props) {
   return signInOn ? <SignedInGate {...props} /> : <SavedPlayerGate {...props} />;
 }
 
-function SignedInGate({ date, choices, score }: Props) {
+function SignedInGate({ date, choices, score, hint }: Props) {
   const { isLoaded, isSignedIn, openSignIn, opening, openFailed } = useAccount();
   const join = useJoin(date, choices);
   const [step, setStep] = useState<JoinStep | null>(null);
@@ -84,7 +85,8 @@ function SignedInGate({ date, choices, score }: Props) {
         // failure can't fire again on a retry
         setStep(null);
         requestAnimationFrame(() => {
-          openSignIn("/daily");
+          // come back to the page the player joined from (/daily or /leaderboard); the join carries on there
+          openSignIn(window.location.pathname);
           setAwaiting(true);
         });
       }}
@@ -105,7 +107,7 @@ function SignedInGate({ date, choices, score }: Props) {
     );
   return (
     <>
-      <JoinBar dialog busy={awaiting && opening} onJoin={open} />
+      <JoinBar dialog busy={awaiting && opening} onJoin={open} hint={hint} />
       {dialog}
     </>
   );
@@ -114,13 +116,13 @@ function SignedInGate({ date, choices, score }: Props) {
 function SavedPlayerGate(props: Props) {
   const [joined, setJoined] = useState<boolean | undefined>(undefined);
   useEffect(() => queueMicrotask(() => setJoined(!!loadPlayer())), []);
-  return <JoinGate joined={joined}>
+  return <JoinGate joined={joined} hint={props.hint}>
       <EmailJoin {...props} />
     </JoinGate>;
 }
 
 /** Shows the sign-up behind a button until opened; `joined` (already on the board) opens it straight away. */
-function JoinGate({ joined, children }: { joined: boolean | undefined; children: React.ReactNode }) {
+function JoinGate({ joined, hint, children }: { joined: boolean | undefined; hint?: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -137,6 +139,7 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
   }
   return (
     <JoinBar
+      hint={hint}
       onJoin={() => {
         track("leaderboard_join_open");
         setOpen(true);
@@ -146,13 +149,13 @@ function JoinGate({ joined, children }: { joined: boolean | undefined; children:
 }
 
 /** Compact "Get on the leaderboard · Join": the sign-up only opens after Join (in a pop-up when sign-in is on). */
-function JoinBar({ onJoin, dialog = false, busy = false }: { onJoin: () => void; dialog?: boolean; busy?: boolean }) {
+function JoinBar({ onJoin, dialog = false, busy = false, hint = t.joinHint }: { onJoin: () => void; dialog?: boolean; busy?: boolean; hint?: string }) {
   return (
     <div className="mt-5 flex items-center gap-3 rounded-[22px] border-2 border-primary bg-primary-soft py-3 pl-4 pr-3 shadow-[0_6px_0_0_var(--color-primary-shadow)]">
       <TrophyIcon className="size-9" />
       <span className="min-w-0 flex-1">
         <span className="block font-display text-lg leading-tight text-ink">{t.joinCta}</span>
-        <span className="block text-sm text-muted">{t.joinHint}</span>
+        <span className="block text-sm text-muted">{hint}</span>
       </span>
       <button
         type="button"

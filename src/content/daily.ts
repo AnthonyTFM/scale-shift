@@ -15,6 +15,8 @@ export const dailyCopy = {
   signInOpening: "Opening sign-in…",
   joinCta: "Get on the leaderboard",
   joinHint: "See where you rank.",
+  // the leaderboard page, for someone who played today but isn't on the board yet
+  boardNudge: (score: number, total: number) => `You scored ${score}/${total} today. Post it and see where you rank.`,
   joinButton: "Join",
   // the join pop-up: step 1 the 13+ box and sign-in, step 2 the nickname, then where you landed
   joinDialog: {

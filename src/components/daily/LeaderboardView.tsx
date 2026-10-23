@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { MedalIcon } from "@/components/site/Icons";
-import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate } from "@/lib/daily";
+import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate, type DayRecord } from "@/lib/daily";
+import { dailyCopy } from "@/content/daily";
+import { LeaderboardJoin } from "./LeaderboardJoin";
+import { POSTED_EVENT } from "./useJoin";
 import type { AllTimeBoard, DayBoard, WeekBoard } from "@/lib/leaderboard-types";
 import { loadPlayer, playerId } from "@/lib/player";
 
@@ -34,15 +37,22 @@ export function LeaderboardView() {
   const [today, setToday] = useState<string | null>(null);
   const [date, setDate] = useState<string | null>(null);
   const [loaded, setLoaded] = useState<Loaded | null>(null);
-  const [me, setMe] = useState<{ name: string | null; playedToday: boolean }>({ name: null, playedToday: false });
+  // today's round from this browser: who played it, and their answers if they did (to post it from here)
+  const [me, setMe] = useState<{ name: string | null; playedToday: boolean; round?: DayRecord }>({ name: null, playedToday: false });
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     const t = localDateKey();
     queueMicrotask(() => {
       setToday(t);
       setDate(t);
-      setMe({ name: loadPlayer()?.name ?? null, playedToday: typeof loadSave().days[t]?.s === "number" });
+      const round = loadSave().days[t];
+      setMe({ name: loadPlayer()?.name ?? null, playedToday: typeof round?.s === "number", round });
     });
+    // a score posted from this page: load the board again so it shows
+    const posted = () => setReload((n) => n + 1);
+    window.addEventListener(POSTED_EVENT, posted);
+    return () => window.removeEventListener(POSTED_EVENT, posted);
   }, []);
 
   const key = tab === "all" ? "all" : tab === "week" ? (today ? `week:${today}` : "") : (date ?? "");
@@ -63,9 +73,16 @@ export function LeaderboardView() {
     return () => {
       alive = false;
     };
-  }, [key, tab]);
+  }, [key, tab, reload]);
 
   const current = loaded?.key === key ? loaded : null;
+  // played today in this browser, but the score isn't on today's board: offer to post it
+  const todayBoard = tab === "day" && date === today && current?.data && !current.failed ? (current.data as DayBoard) : null;
+  const notPosted =
+    !!todayBoard && me.playedToday && !!me.round?.c.length && !todayBoard.rows.some((r) => r.me) && !todayBoard.me;
+  // once offered, the join stays on the page: posting reloads the board, and the pop-up's "You're #N" step must not vanish
+  const [offered, setOffered] = useState(false);
+  if (notPosted && !offered) setOffered(true);
 
   return (
     <div>
@@ -131,6 +148,13 @@ export function LeaderboardView() {
           >
             ›
           </button>
+        </div>
+      ) : null}
+
+      {offered && today && me.round ? (
+        // hidden, not removed, on other tabs and days: a pop-up or post in progress carries on
+        <div hidden={!(tab === "day" && date === today)}>
+          <LeaderboardJoin date={today} choices={me.round.c} score={me.round.s ?? 0} hint={dailyCopy.boardNudge(me.round.s ?? 0, me.round.c.length)} />
         </div>
       ) : null}
 
