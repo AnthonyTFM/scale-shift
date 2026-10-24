@@ -135,6 +135,7 @@ function catchUp(g: Game): Game {
 const BOARD_MIN = 20;
 const CROWD_MIN = 30;
 const BETTER_MIN = 30;
+const TOP_MAX = 50;
 
 export function DailyChallenge() {
   const [game, setGame] = useState<Game | null>(null);
@@ -690,6 +691,8 @@ function Results({
   // where today's score sits on today's public board: your own row if you're on it, otherwise where you'd land if you
   // joined (and says so, so nobody thinks they're already ranked)
   const [rank, setRank] = useState<{ rank: number; of: number; joined: boolean } | null>(null);
+  // the middle card waits for the board, so it doesn't switch from one stat to another as answers arrive
+  const [boardChecked, setBoardChecked] = useState(false);
   useEffect(() => {
     if (!round.date) return;
     const id = playerId();
@@ -706,7 +709,8 @@ function Results({
             : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1, joined: false },
         );
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setBoardChecked(true));
     const posted = (e: Event) => {
       const d = (e as CustomEvent<Posted>).detail;
       if (d.date !== round.date) return;
@@ -731,13 +735,22 @@ function Results({
   // something; otherwise how you did against everyone who played today, or failing that how many days you've played
   const middle = (() => {
     if (rank?.joined) return [R.rank, `#${rank.rank}`, R.rankOf(rank.of)] as const;
+    if (!boardChecked) return [R.played, "—", "\u00a0"] as const;
     if (rank && rank.of >= BOARD_MIN) return [R.rankIfJoined, `#${rank.rank}`, R.rankOf(rank.of)] as const;
     if (crowd && crowd.n >= CROWD_MIN) {
-      const below = crowd.scores.slice(0, score).reduce((a, b) => a + b, 0);
-      if (score === total) return [R.topToday, `${Math.max(1, Math.ceil((100 * crowd.scores[total]) / crowd.n))}%`, R.betterSub] as const;
-      // only good news: "Better than 8%" after a rough day would sting, so a low share shows days played instead
-      const pct = Math.floor((100 * below) / crowd.n);
-      if (pct >= BETTER_MIN) return [R.betterThan, `${pct}%`, R.betterSub] as const;
+      const counts = [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0);
+      // the counts can be up to a minute old: if nobody shares your score yet, your own play isn't in them, so add it
+      if (!counts[score]) counts[score] = 1;
+      const n = counts.reduce((a, b) => a + b, 0);
+      // only good news: "Better than 8%" after a rough day would sting, and "Top 70%" isn't a boast, so those show
+      // days played instead
+      if (score === total) {
+        const top = Math.ceil((100 * counts[total]) / n);
+        if (top <= TOP_MAX) return [R.topToday, `${top}%`, R.betterSub] as const;
+      } else {
+        const pct = Math.floor((100 * counts.slice(0, score).reduce((a, b) => a + b, 0)) / n);
+        if (pct >= BETTER_MIN) return [R.betterThan, `${pct}%`, R.betterSub] as const;
+      }
     }
     return [R.played, String(s.played), R.playedSub(s.played)] as const;
   })();
@@ -863,7 +876,7 @@ function Results({
           {s.played >= 2 ? (
             <div className="mt-5">
               <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
-              <p className="text-sm text-muted">{R.scoresSub(s.played, s.average.toFixed(1))}</p>
+              <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
               <ol className="mt-2 space-y-1">
                 {spread
                   .map((days, n) => (
@@ -871,11 +884,13 @@ function Results({
                       <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
                         {n}
                       </span>
-                      <span className="sr-only">{R.scoreRow(n, days)}</span>
+                      <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
                       <span aria-hidden="true" className="flex-1">
                         <span
-                          className={`flex h-6 min-w-7 items-center justify-end rounded-md px-2 text-xs font-bold ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`}
-                          style={{ width: `${(days / most) * 100}%` }}
+                          className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                            !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                          }`}
+                          style={days ? { width: `${(days / most) * 100}%` } : undefined}
                         >
                           {days}
                         </span>
