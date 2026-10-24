@@ -131,6 +131,12 @@ function catchUp(g: Game): Game {
   return { ...g, save, choices: saved, step: Math.min(saved.length, g.round.questions.length) };
 }
 
+// results: "If you join #2 of 3" means little until this many have joined today, and "Better than N%" needs this many plays
+const BOARD_MIN = 20;
+const CROWD_MIN = 30;
+const BETTER_MIN = 30;
+const TOP_MAX = 50;
+
 export function DailyChallenge() {
   const [game, setGame] = useState<Game | null>(null);
   const [failed, setFailed] = useState(false);
@@ -685,6 +691,8 @@ function Results({
   // where today's score sits on today's public board: your own row if you're on it, otherwise where you'd land if you
   // joined (and says so, so nobody thinks they're already ranked)
   const [rank, setRank] = useState<{ rank: number; of: number; joined: boolean } | null>(null);
+  // the middle card waits for the board, so it doesn't switch from one stat to another as answers arrive
+  const [boardChecked, setBoardChecked] = useState(false);
   useEffect(() => {
     if (!round.date) return;
     const id = playerId();
@@ -701,7 +709,8 @@ function Results({
             : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1, joined: false },
         );
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setBoardChecked(true));
     const posted = (e: Event) => {
       const d = (e as CustomEvent<Posted>).detail;
       if (d.date !== round.date) return;
@@ -711,6 +720,44 @@ function Results({
     window.addEventListener(POSTED_EVENT, posted);
     return () => window.removeEventListener(POSTED_EVENT, posted);
   }, [round.date, score]);
+
+  // everyone's scores today (anonymous counts), for "Better than 62% of players today"
+  const [crowd, setCrowd] = useState<{ n: number; scores: number[] } | null>(null);
+  useEffect(() => {
+    if (!round.date) return;
+    fetch(`/api/plays?date=${round.date}`)
+      .then((r) => (r.ok ? (r.json() as Promise<{ n: number; scores: number[] }>) : null))
+      .then((c) => c && setCrowd(c))
+      .catch(() => {});
+  }, [round.date]);
+
+  // the middle card: your place on the board if you've joined, or where you'd land if enough have joined to mean
+  // something; otherwise how you did against everyone who played today, or failing that how many days you've played
+  const middle = (() => {
+    if (rank?.joined) return [R.rank, `#${rank.rank}`, R.rankOf(rank.of)] as const;
+    if (!boardChecked) return [R.played, "—", "\u00a0"] as const;
+    if (rank && rank.of >= BOARD_MIN) return [R.rankIfJoined, `#${rank.rank}`, R.rankOf(rank.of)] as const;
+    if (crowd && crowd.n >= CROWD_MIN) {
+      const counts = [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0);
+      // the counts can be up to a minute old: if nobody shares your score yet, your own play isn't in them, so add it
+      if (!counts[score]) counts[score] = 1;
+      const n = counts.reduce((a, b) => a + b, 0);
+      // only good news: "Better than 8%" after a rough day would sting, and "Top 70%" isn't a boast, so those show
+      // days played instead
+      if (score === total) {
+        const top = Math.ceil((100 * counts[total]) / n);
+        if (top <= TOP_MAX) return [R.topToday, `${top}%`, R.betterSub] as const;
+      } else {
+        const pct = Math.floor((100 * counts.slice(0, score).reduce((a, b) => a + b, 0)) / n);
+        if (pct >= BETTER_MIN) return [R.betterThan, `${pct}%`, R.betterSub] as const;
+      }
+    }
+    return [R.played, String(s.played), R.playedSub(s.played)] as const;
+  })();
+
+  // how many days you've scored 0, 1 … 5
+  const spread = [0, 1, 2, 3, 4, 5].map((n) => Object.values(save.days).filter((d) => d.s === n).length);
+  const most = Math.max(1, ...spread);
 
   const challengeFriend = () => {
     if (round.date) shareBox.share(challengeMessage(score, total, round.date), "results");
@@ -796,7 +843,7 @@ function Results({
           <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
             {[
               [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
-              [rank && !rank.joined ? R.rankIfJoined : R.rank, rank ? `#${rank.rank}` : "—", rank ? R.rankOf(rank.of) : R.rankNone],
+              middle,
               [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
             ].map(([k, v, sub]) => (
               <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
@@ -825,6 +872,35 @@ function Results({
             {copied}
           </p>
           {shareBox.box}
+          {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
+          {s.played >= 2 ? (
+            <div className="mt-5">
+              <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
+              <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
+              <ol className="mt-2 space-y-1">
+                {spread
+                  .map((days, n) => (
+                    <li key={n} className="flex items-center gap-2 text-sm">
+                      <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
+                        {n}
+                      </span>
+                      <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
+                      <span aria-hidden="true" className="flex-1">
+                        <span
+                          className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                            !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                          }`}
+                          style={days ? { width: `${(days / most) * 100}%` } : undefined}
+                        >
+                          {days}
+                        </span>
+                      </span>
+                    </li>
+                  ))
+                  .reverse()}
+              </ol>
+            </div>
+          ) : null}
         </>
       ) : (
         <div className="mt-6 grid gap-2 sm:grid-cols-2">

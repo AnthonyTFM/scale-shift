@@ -86,7 +86,17 @@ export const dailyCopy = {
     // before you've joined: where your score would land
     rankIfJoined: "If you join",
     rankOf: (n: number) => `of ${n} today`,
-    rankNone: "Join to rank",
+    // shown instead of "If you join #2 of 3" while today's board is small, once enough people have played today
+    betterThan: "Better than",
+    betterSub: "of players today",
+    // a perfect round can't beat anyone who also got 5: it shows "Top 8% of players today" instead
+    topToday: "Top",
+    played: "Played",
+    playedSub: (n: number) => (n === 1 ? "day" : "days"),
+    // the bar chart of your own daily scores
+    scoresTitle: "Your scores",
+    scoresSub: (avg: string) => `Average ${avg} out of 5`,
+    scoreRow: (score: number, days: number, today: boolean) => `${score} out of 5: ${days} ${days === 1 ? "day" : "days"}${today ? ", including today" : ""}`,
     allTime: "All-time",
     allTimeSub: "correct",
     share: "Share my score",
