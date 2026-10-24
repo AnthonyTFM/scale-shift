@@ -27,6 +27,8 @@ const V = `?v=${dataVersion.v}`;
 const COLORS = ["#FF5B4A", "#2F6BFF"];
 const W = 200;
 const H = 110;
+// shapes stand a little above the ground line, so a small island at the bottom never looks cut off by it
+const GROUND = H - 6;
 
 const getJson = <T,>(url: string) =>
   fetch(url).then((r) => {
@@ -56,7 +58,7 @@ const loadShapes = (q: Question) =>
 /** Both shapes side by side at one shared scale, standing on a common baseline; far-off islands are left out. */
 function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label: string; note: string }) {
   const drawn = outlines?.map(mainPart);
-  const k = drawn ? Math.min(...drawn.map(({ b: [x0, y0, x1, y1] }) => Math.min((W / 2 - 12) / (x1 - x0), (H - 8) / (y1 - y0)))) : 1;
+  const k = drawn ? Math.min(...drawn.map(({ b: [x0, y0, x1, y1] }) => Math.min((W / 2 - 12) / (x1 - x0), (H - 12) / (y1 - y0)))) : 1;
   return (
     <figure className="flex flex-col rounded-xl bg-white p-3 ring-1 ring-line">
       <figcaption className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</figcaption>
@@ -69,7 +71,7 @@ function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label:
             <g key={i}>
               <path
                 d={d}
-                transform={`translate(${cx} ${H - 2}) scale(${k}) translate(${-(x0 + x1) / 2} ${-y1})`}
+                transform={`translate(${cx} ${GROUND}) scale(${k}) translate(${-(x0 + x1) / 2} ${-y1})`}
                 fill={COLORS[i]}
                 fillOpacity={0.88}
                 stroke={COLORS[i]}
@@ -79,7 +81,7 @@ function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label:
                 strokeLinejoin="round"
               />
               {/* too small to see at this scale: ring it, like the game does */}
-              {tiny ? <circle cx={cx} cy={H - 2 - ((y1 - y0) * k) / 2} r={7} fill="none" stroke={COLORS[i]} strokeWidth={1.2} /> : null}
+              {tiny ? <circle cx={cx} cy={GROUND - ((y1 - y0) * k) / 2} r={7} fill="none" stroke={COLORS[i]} strokeWidth={1.2} /> : null}
             </g>
           );
         })}
