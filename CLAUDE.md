@@ -54,6 +54,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 - `npm run data`: rebuild map data, Antarctic claims and the daily puzzle pool
 - `npm run data:stats`: rebuild only the era statistics (era pages' "Largest" and "What changed") from the era files, no downloads
 - `npm run leads`: print form submissions (Redis when the Upstash settings are available, else the local file)
+- `npm run plays`: anonymous daily-game counts: players per day, new vs returning, Day-1 / Day-7 return
 
 ## Rules
 - Map snapshots are keyed `2000bce` … `1914` … `present`. Years before 1 CE are negative in code.
