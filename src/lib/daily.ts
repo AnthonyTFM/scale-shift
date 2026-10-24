@@ -59,6 +59,9 @@ export function dayNumber(key: string) {
   return dayIndex(key) - dayIndex(LAUNCH) + 1;
 }
 
+/** Whole days from one date key to another ("2026-10-20" → "2026-10-23" is 3). */
+export const daysBetween = (from: string, to: string) => dayIndex(to) - dayIndex(from);
+
 export function shiftDate(key: string, days: number) {
   return new Date((dayIndex(key) + days) * 86_400_000).toISOString().slice(0, 10);
 }
