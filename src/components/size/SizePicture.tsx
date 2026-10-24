@@ -5,6 +5,8 @@ import { mainPart, type ShapeFile } from "@/lib/outline";
 
 const W = 320;
 const H = 170;
+// shapes stand a little above the ground line, so a small island at the bottom never looks cut off by it
+const GROUND = H - 6;
 const COLORS = ["#2F6BFF", "#FF5B4A"];
 const TEXT = ["text-[#1A47B0]", "text-[#A82A1E]"];
 
@@ -13,7 +15,7 @@ const readShape = (id: string) => JSON.parse(fs.readFileSync(path.join(process.c
 function Panel({ files, names, view, label }: { files: ShapeFile[]; names: string[]; view: "merc" | "ea"; label: string }) {
   // one scale for both shapes in a panel, so they compare fairly; each panel fills its own frame
   const parts = files.map((f) => mainPart(f[view]));
-  const k = Math.min(...parts.map(({ b: [x0, y0, x1, y1] }) => Math.min((W / 2 - 12) / (x1 - x0), (H - 8) / (y1 - y0))));
+  const k = Math.min(...parts.map(({ b: [x0, y0, x1, y1] }) => Math.min((W / 2 - 12) / (x1 - x0), (H - 12) / (y1 - y0))));
   return (
     <figure className="rounded-xl bg-white p-3 ring-1 ring-line">
       <figcaption className="text-xs font-bold uppercase tracking-wide text-muted">{label}</figcaption>
@@ -26,7 +28,7 @@ function Panel({ files, names, view, label }: { files: ShapeFile[]; names: strin
             <g key={i}>
               <path
                 d={d}
-                transform={`translate(${cx} ${H - 2}) scale(${k}) translate(${-(x0 + x1) / 2} ${-y1})`}
+                transform={`translate(${cx} ${GROUND}) scale(${k}) translate(${-(x0 + x1) / 2} ${-y1})`}
                 fill={COLORS[i]}
                 fillOpacity={0.88}
                 stroke={COLORS[i]}
@@ -36,7 +38,7 @@ function Panel({ files, names, view, label }: { files: ShapeFile[]; names: strin
                 strokeLinejoin="round"
               />
               {/* too small to see at this scale: ring it, like the daily game does */}
-              {tiny ? <circle cx={cx} cy={H - 2 - ((y1 - y0) * k) / 2} r={7} fill="none" stroke={COLORS[i]} strokeWidth={1.2} /> : null}
+              {tiny ? <circle cx={cx} cy={GROUND - ((y1 - y0) * k) / 2} r={7} fill="none" stroke={COLORS[i]} strokeWidth={1.2} /> : null}
             </g>
           );
         })}
