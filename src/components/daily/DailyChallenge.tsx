@@ -5,6 +5,7 @@ import Link from "next/link";
 import dataVersion from "@/data/data-version.json";
 import { site } from "@/content/site";
 import { track } from "@/lib/analytics";
+import { reportPlay } from "@/lib/report-play";
 import {
   buildQuestions,
   dayNumber,
@@ -233,7 +234,10 @@ export function DailyChallenge() {
       const done = next.length >= round.questions.length;
       updated = { ...fresh, days: { ...fresh.days, [round.date]: { c: next, ...(done ? { s: scoreOf(round, next) } : {}) } } };
       writeSave(updated);
-      if (done) track("daily_complete", { score: scoreOf(round, next), day: dayNumber(round.date) });
+      if (done) {
+        track("daily_complete", { score: scoreOf(round, next), day: dayNumber(round.date) });
+        reportPlay(updated, round.date, scoreOf(round, next));
+      }
     }
     setGame({ ...game, choices: next, save: updated });
   };

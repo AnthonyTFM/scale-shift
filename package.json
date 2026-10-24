@@ -10,6 +10,7 @@
     "data": "node scripts/build-data.mjs && node scripts/build-antarctica.mjs && node scripts/build-daily.mjs && node scripts/build-globe.mjs && node scripts/build-lakes.mjs",
     "data:stats": "node scripts/build-era-stats.mjs",
     "leads": "node scripts/show-feedback.mjs",
+    "plays": "node scripts/show-plays.mjs",
     "typecheck": "tsc --noEmit",
     "check:data": "node scripts/check-data.mjs"
   },

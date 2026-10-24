@@ -1,7 +1,7 @@
 // Privacy policy, terms, the age check at sign-up and "Delete my data". Plain words; a lawyer should review before money.
 import { site } from "./site";
 
-export const legalUpdated = "October 23, 2026";
+export const legalUpdated = "October 24, 2026";
 
 /** Shown before anyone gives us an email (sign-in, the leaderboard, reminders). */
 export const ageCheck = {
@@ -63,6 +63,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
         ["Spam protection", "To stop one person flooding the leaderboard, we keep a scrambled code made from your network address with a secret key for three days. The address itself isn't stored."],
         ["Server logs", "Our host records basic request details (such as network address and browser type) to keep the site running and secure, and keeps them only briefly."],
         ["Visit counts", "We count visits with Vercel Web Analytics, which sets no cookies and doesn't follow you to other sites. For each page view it records the page, the site that linked to it, your country and your device and browser type. It doesn't store your network address or anything that names you. If we ever turn on Google Analytics or ads, we'll update this page first and ask for your consent where the law requires it."],
+        ["Game counts", "When you finish the daily challenge, your browser tells us the date, your score and how many days ago you first played. Nothing goes with it that could identify you or link one day to the next: we only add one to that day's totals, to see how many players come back. The browser remembers it already sent today's count so it isn't counted twice."],
       ],
     },
     {
