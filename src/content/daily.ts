@@ -90,6 +90,13 @@ export const dailyCopy = {
     allTime: "All-time",
     allTimeSub: "correct",
     share: "Share my score",
+    // the shared text: "Border Drift Daily #6 · 4/5 🔥3", the grid, then a dare for whoever sees it
+    shareHead: (site: string, day: number, score: number, total: number, streak: number) =>
+      `${site} Daily #${day} · ${score}/${total}${streak >= 2 ? ` 🔥${streak}` : ""}`,
+    shareDare: (misses: number) =>
+      misses === 0
+        ? "Perfect round. Bet the map fools you at least once."
+        : `The map fooled me ${misses === 1 ? "once" : misses === 2 ? "twice" : `${misses} times`}. Can you beat it?`,
     picture: "As a picture",
     // phones: the three share buttons sit in one row
     shareShort: "Share",

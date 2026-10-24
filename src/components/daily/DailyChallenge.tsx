@@ -724,7 +724,7 @@ function Results({
     const file = new File([blob], `border-drift-daily-${dayNumber(round.date)}.png`, { type: "image/png" });
     try {
       if (navigator.canShare?.({ files: [file] }) && matchMedia("(pointer: coarse)").matches) {
-        await navigator.share({ files: [file], text: `${location.origin}/daily` });
+        await navigator.share({ files: [file], text: `${R.shareDare(total - score)}\n${location.origin}/daily` });
         return;
       }
     } catch {
@@ -740,7 +740,8 @@ function Results({
 
   const share = () => {
     const url = `${location.origin}/daily`;
-    shareBox.share({ kind: "score", url, text: `${site.name} Daily #${dayNumber(today)} · ${score}/${total}\n${grid}\n${url}` }, "results");
+    const text = `${R.shareHead(site.name, dayNumber(today), score, total, s.streak)}\n${grid}\n${R.shareDare(total - score)}\n${url}`;
+    shareBox.share({ kind: "score", url, text }, "results");
   };
 
   return (
