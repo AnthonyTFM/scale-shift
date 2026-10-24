@@ -53,7 +53,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       title: "What we collect",
       items: [
         ["Map state", "The shapes you add live in the page address (the part after #). It never reaches our server unless you share the link."],
-        ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, your daily answers, scores and streak, your 13+ answer and, if you join, your player ID and nickname are saved in your browser's local storage. They stay on your device."],
+        ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, your daily answers, scores and streak, your 13+ answer, whether today's game count was sent and, if you join, your player ID and nickname are saved in your browser's local storage. They stay on your device."],
         [
           "Leaderboard and sign-in (optional, ages 13+)",
           "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email (with Google, Clerk also receives your name and profile photo). We store that email, the nickname you pick, your daily answers and scores and a random player ID. Nicknames and scores are public. Your email is private: it keeps one player per person, is never shown publicly or sold and only goes to the services below that run the site.",
@@ -63,7 +63,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
         ["Spam protection", "To stop one person flooding the leaderboard, we keep a scrambled code made from your network address with a secret key for three days. The address itself isn't stored."],
         ["Server logs", "Our host records basic request details (such as network address and browser type) to keep the site running and secure, and keeps them only briefly."],
         ["Visit counts", "We count visits with Vercel Web Analytics, which sets no cookies and doesn't follow you to other sites. For each page view it records the page, the site that linked to it, your country and your device and browser type. It doesn't store your network address or anything that names you. If we ever turn on Google Analytics or ads, we'll update this page first and ask for your consent where the law requires it."],
-        ["Game counts", "When you finish the daily challenge, your browser tells us the date, your score and how many days ago you first played. Nothing goes with it that could identify you or link one day to the next: we only add one to that day's totals, to see how many players come back. The browser remembers it already sent today's count so it isn't counted twice."],
+        ["Game counts", "When you finish the daily challenge, your browser tells us the date, your score and how many days ago you first finished one (if you're signed in, that includes days played on your other devices). No name, player ID or cookie goes with it, and nothing links one day to the next: we only add one to that day's totals, to see how many players come back. To stop floods, our server holds your network address in memory for up to ten minutes; it is never stored."],
       ],
     },
     {

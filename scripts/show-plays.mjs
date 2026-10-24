@@ -15,7 +15,7 @@ for (const f of [".env.local", ".env"]) {
   }
 }
 
-const LAUNCH = "2026-10-19";
+const LAUNCH = "2026-10-19"; // the first daily puzzle, as in src/lib/daily.ts
 const shift = (d, n) => new Date(Date.parse(`${d}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10);
 const today = new Date().toISOString().slice(0, 10);
 const dates = [];
@@ -32,6 +32,8 @@ if (url && token) {
   });
   if (!res.ok) throw new Error(`Redis responded ${res.status}`);
   const out = await res.json();
+  const err = out.find((o) => o.error);
+  if (err) throw new Error(err.error);
   days = Object.fromEntries(
     out.map((o, i) => {
       const a = o.result ?? [];
@@ -73,4 +75,7 @@ for (const k of [1, 7]) {
   const back = base.reduce((s, d) => s + get(shift(d, k), `f${k}`), 0);
   console.log(`Day-${k} return, all complete days: ${pct(back, fresh)} (${back} of ${fresh} new players)`);
 }
-console.log("\nNew = first daily puzzle in that browser. Players on two devices count twice; private windows count as new.");
+console.log(
+  "\nNew = their first finished daily puzzle. D1 / D7 return = back on exactly the next day / the 7th day." +
+    "\nCounted per browser: a player on two devices counts on both (signed-in players count as returning on a new device); private windows count as new.",
+);

@@ -5,7 +5,7 @@ import Link from "next/link";
 import dataVersion from "@/data/data-version.json";
 import { site } from "@/content/site";
 import { track } from "@/lib/analytics";
-import { reportPlay } from "@/lib/report-play";
+import { reportPlay, retryPendingPlay } from "@/lib/report-play";
 import {
   buildQuestions,
   dayNumber,
@@ -163,6 +163,9 @@ export function DailyChallenge() {
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
   }, [game?.step]);
+
+  // a play count that failed to send last time
+  useEffect(retryPendingPlay, []);
 
   useEffect(() => {
     const c = readChallenge(location.hash);
