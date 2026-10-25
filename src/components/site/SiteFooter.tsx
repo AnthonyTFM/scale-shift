@@ -44,8 +44,8 @@ export function SiteFooter() {
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-muted">
           © {site.copyrightHolder}. Historical borders: historical-basemaps by André Ourednik (GPL-3.0); 1800 to 1880: Cliopatria, Seshat
           Global History Databank (CC BY 4.0); Europe from 1815 to 1914: HistoGIS, Austrian Academy of Sciences (CC BY 4.0); 1800 to 1880
-          and Europe from 1920 to 1960: OpenHistoricalMap (public domain). 1994 to today: Natural Earth (public domain). Non-commercial
-          educational project.
+          and Europe from 1920 to 1960: OpenHistoricalMap (CC0; some lines CC BY 4.0, see the data license). 1994 to today: Natural Earth
+          (public domain). Non-commercial educational project.
         </p>
       </div>
     </footer>

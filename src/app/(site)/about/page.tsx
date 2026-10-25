@@ -91,8 +91,9 @@ export default function AboutPage() {
             <a href="https://www.openhistoricalmap.org/" rel="noopener noreferrer">
               OpenHistoricalMap
             </a>{" "}
-            contributors (public domain, CC0), which dates every border change to the day. It also gives the French zone of Morocco, the
-            Hatay State and Manchukuo.
+            contributors (public domain, CC0), which dates every border change to the day. Some of its border lines are CC BY 4.0, from
+            national mapping agencies such as Spain&apos;s IGN, Slovenia&apos;s GURS and Norway&apos;s Kartverket (all listed in the{" "}
+            <a href="/data/LICENSE.txt">data license</a>). It also gives the French zone of Morocco, the Hatay State and Manchukuo.
           </li>
           <li>
             <strong>1994, 2000, 2010 and the present day:</strong>{" "}

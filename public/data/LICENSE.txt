@@ -49,6 +49,14 @@ eras/1800.json, 1815.json, 1878.json and 1880.json
   OpenHistoricalMap contributors, https://www.openhistoricalmap.org/
   License: public domain dedication (CC0 1.0),
   https://creativecommons.org/publicdomain/zero/1.0/
+  except about 2,100 of the border lines these maps use, which OpenHistoricalMap
+  tags as Creative Commons Attribution 4.0 (CC BY 4.0,
+  https://creativecommons.org/licenses/by/4.0/). Their makers: Instituto
+  Geográfico Nacional de España / CNIG (municipal boundary lines), GURS, the
+  Surveying and Mapping Authority of Slovenia, Kartverket (Norwegian Mapping
+  Authority), OCHA's administrative boundaries of Ukraine (via HDX), DataMeet's
+  boundary of India (via the india-geodata collection) and the Bayerische
+  Vermessungsverwaltung.
   Changes made for this site: simplified, clipped to Natural Earth's coastline,
   quantized and merged with the rest of each map.
 
