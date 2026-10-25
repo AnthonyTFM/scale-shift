@@ -61,7 +61,7 @@ export default function AboutPage() {
         <h2>Where the borders come from</h2>
         <ul>
           <li>
-            <strong>2000 BCE to 2010:</strong>{" "}
+            <strong>2000 BCE to 1960:</strong>{" "}
             <a href="https://github.com/aourednik/historical-basemaps" rel="noopener noreferrer">
               historical-basemaps
             </a>{" "}
@@ -70,11 +70,36 @@ export default function AboutPage() {
             <a href="/data/LICENSE.txt">data license</a>).
           </li>
           <li>
-            <strong>Present day:</strong>{" "}
+            <strong>Europe in 1900 and 1914:</strong>{" "}
+            <a href="https://histogis.acdh.oeaw.ac.at/" rel="noopener noreferrer">
+              HistoGIS
+            </a>{" "}
+            by the Austrian Centre for Digital Humanities and Cultural Heritage, Austrian Academy of Sciences (CC BY 4.0), drawn from maps of
+            the time.
+          </li>
+          <li>
+            <strong>Europe from 1920 to 1960:</strong>{" "}
+            <a href="https://www.openhistoricalmap.org/" rel="noopener noreferrer">
+              OpenHistoricalMap
+            </a>{" "}
+            contributors (public domain, CC0), which dates every border change to the day. It also gives the French zone of Morocco, the
+            Hatay State and Manchukuo.
+          </li>
+          <li>
+            <strong>1994, 2000, 2010 and the present day:</strong>{" "}
             <a href="https://www.naturalearthdata.com/" rel="noopener noreferrer">
               Natural Earth
             </a>{" "}
-            1:50m country boundaries (public domain), packaged by world-atlas. US states come from the US Census Bureau via us-atlas.
+            1:50m country boundaries (public domain), packaged by world-atlas, rolled back to each year with the changes since. Natural
+            Earth&apos;s countries and provinces also redraw colonial Africa in 1900 and fix places where the historical source gave land to
+            the wrong country. US states come from the US Census Bureau via us-atlas.
+          </li>
+          <li>
+            <strong>Checked against:</strong> the maps from 1900 on were compared with{" "}
+            <a href="https://icr.ethz.ch/data/cshapes/" rel="noopener noreferrer">
+              CShapes 2.0
+            </a>{" "}
+            (ETH Zurich), the academic standard for country borders since 1886, to find and correct errors.
           </li>
           <li>
             <strong>Flags:</strong>{" "}

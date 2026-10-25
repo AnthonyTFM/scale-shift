@@ -4,7 +4,8 @@
 // so every shape reaches its own stretch of shore. Land that no shape touches (an island off the coast) stays as it is.
 // Strips go to unnamed shapes too, so a named shape never runs on along a coast in front of an unnamed one.
 // Everywhere, thin strips are filled; inside the region `inside` picks, wider ones too (wider blank land elsewhere can
-// be a real gap in the source), and so are strips build-data.mjs marks `j`: coastal land of the country there today.
+// be a real gap in the source), and so are strips build-data.mjs marks `j`: coastal land of the country there today,
+// or slivers a better border cut off a shape (marked `no` with that shape's name: they go to its neighbours).
 // The same goes for the thin coastal slivers of a "leftover" shape: an older shape the source still draws underneath
 // newer ones, which shows through only where they stop short of the coast. Its other pieces stay as they are.
 // Thin unnamed pieces wedged between two or more named neighbours, with no coast, go whole to the one they share most
@@ -247,7 +248,7 @@ export function fillGaps(topo, inside, leftover = () => false) {
     if (!polys.length) return;
     const it = { i, polys, box: boxOf(polys) };
     if (f.properties.m) {
-      if (thinStrip(polys) || inRegion(polys, inside) || f.properties.j) strips.push(it);
+      if (thinStrip(polys) || inRegion(polys, inside) || f.properties.j) strips.push({ ...it, no: f.properties.no });
     } else if (!f.properties.x) {
       drawn.push(it);
       if (!leftover(f.properties)) shapes.push(it);
@@ -285,7 +286,10 @@ export function fillGaps(topo, inside, leftover = () => false) {
     const changes = new Map();
     let ok = true;
     for (const rings of st.polys) {
-      const owners = bordering(rings, segs);
+      let owners = bordering(rings, segs);
+      // a sliver a new border cut off a shape goes to the others beside it, if it has any
+      const others = owners.filter((i) => feats[i].properties.n !== st.no);
+      if (st.no !== undefined && others.length) owners = others;
       if (!owners.length) {
         ok = false; // land no shape touches (an island): it stays as it is
         break;

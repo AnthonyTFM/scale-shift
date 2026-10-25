@@ -1,7 +1,7 @@
 Map data licenses for the files in this folder
 ==============================================
 
-eras/*.json (2000 BCE to 2010), polities.json, rulers-grid.json, era-stats.json,
+eras/*.json (2000 BCE to 1960), polities.json, rulers-grid.json, era-stats.json,
 and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
   Derived from historical-basemaps by André Ourednik and contributors
   https://github.com/aourednik/historical-basemaps
@@ -19,8 +19,25 @@ and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
   (src/content/data-corrections.json) are published at
   https://github.com/AnthonyTFM/scale-shift and are offered under GPL-3.0.
 
-eras/present.json, us-states.json, lakes.json, globe.json and the present-day
-shapes in daily/
+Europe in eras/1900.json and eras/1914.json
+  HistoGIS, Austrian Centre for Digital Humanities and Cultural Heritage (ACDH-CH),
+  Austrian Academy of Sciences, https://histogis.acdh.oeaw.ac.at/
+  License: Creative Commons Attribution 4.0 International (CC BY 4.0),
+  https://creativecommons.org/licenses/by/4.0/
+  Changes made for this site: clipped to Natural Earth's coastline, simplified
+  and quantized, merged with the rest of each map.
+
+Europe in eras/1920.json, 1930.json, 1938.json, 1945.json and 1960.json
+(plus French Morocco, the Hatay State and Manchukuo)
+  OpenHistoricalMap contributors, https://www.openhistoricalmap.org/
+  License: public domain dedication (CC0 1.0),
+  https://creativecommons.org/publicdomain/zero/1.0/
+  Changes made for this site: simplified, clipped to Natural Earth's coastline,
+  quantized and merged with the rest of each map.
+
+eras/1994.json, eras/2000.json, eras/2010.json, eras/present.json, us-states.json,
+lakes.json, globe.json and the present-day shapes in daily/, plus the outlines used
+to give land back to the right country on the maps from 1900 to 1960
   Natural Earth (public domain), https://www.naturalearthdata.com/
   US states: US Census Bureau via us-atlas (public domain)
   The site's /world.svg and /globe-still.svg images are drawn from the same

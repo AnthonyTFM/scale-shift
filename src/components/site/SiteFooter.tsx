@@ -42,8 +42,9 @@ export function SiteFooter() {
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-muted">
-          © {site.copyrightHolder}. Historical borders: historical-basemaps by André Ourednik (GPL-3.0). Present-day borders: Natural Earth (public
-          domain). Non-commercial educational project.
+          © {site.copyrightHolder}. Historical borders: historical-basemaps by André Ourednik (GPL-3.0); Europe in 1900 and 1914: HistoGIS,
+          Austrian Academy of Sciences (CC BY 4.0); Europe from 1920 to 1960: OpenHistoricalMap (public domain). 1994 to today: Natural
+          Earth (public domain). Non-commercial educational project.
         </p>
       </div>
     </footer>

@@ -19,6 +19,15 @@
       "why": "Brazil was an empire from 1822 until the republic was proclaimed in November 1889."
     },
     {
+      "name": "Sultanate of Zanzibar",
+      "years": [
+        1900
+      ],
+      "n": "Zanzibar",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A sultanate under British protection from 1890; its mainland coast was leased to Britain and Germany."
+    },
+    {
       "name": "Kingdom of Brazil",
       "years": [
         1900
@@ -421,6 +430,33 @@
       "why": "Papua New Guinea became a country in 1975."
     },
     {
+      "name": "Philippines",
+      "years": [
+        1900
+      ],
+      "s": "United States of America",
+      "note": "Ceded by Spain to the United States in 1898; the Philippine–American War went on until 1902.",
+      "why": "Shown with no ruler; Spain ceded the islands to the United States in 1898."
+    },
+    {
+      "name": "Kingdom of Hawaii",
+      "years": [
+        1900
+      ],
+      "n": "Hawaii",
+      "s": "United States of America",
+      "why": "The kingdom was overthrown in 1893 and annexed by the United States in 1898."
+    },
+    {
+      "name": "Māori",
+      "years": [
+        1900
+      ],
+      "n": "New Zealand",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "New Zealand had been a British colony since 1840."
+    },
+    {
       "name": "Papua New Guinea",
       "years": [
         1920,
@@ -501,15 +537,6 @@
       "why": "Independent as the Republic of the Congo in June 1960; Zaire only from 1971."
     },
     {
-      "name": "Zaire",
-      "years": [
-        2000,
-        2010
-      ],
-      "n": "DR Congo",
-      "why": "Renamed the Democratic Republic of the Congo in 1997."
-    },
-    {
       "name": "Tanzania, United Republic of",
       "years": [
         1920,
@@ -529,16 +556,6 @@
       "n": "Tanganyika",
       "s": "United Kingdom",
       "why": "Tanganyika became independent in December 1961."
-    },
-    {
-      "name": "Tanzania, United Republic of",
-      "years": [
-        1994,
-        2000,
-        2010
-      ],
-      "n": "Tanzania",
-      "why": "Shorter common name."
     },
     {
       "name": "Zambia",
@@ -585,6 +602,162 @@
       "why": "Botswana became independent in 1966."
     },
     {
+      "name": "British Protectorate",
+      "years": [
+        1914
+      ],
+      "n": "Aden Protectorate",
+      "why": "The British protectorates around Aden."
+    },
+    {
+      "name": "Kamerun",
+      "years": [
+        1914
+      ],
+      "s": "German Empire",
+      "why": "A German colony from 1884 until 1916."
+    },
+    {
+      "name": "Togoland",
+      "years": [
+        1914
+      ],
+      "s": "German Empire",
+      "why": "A German colony from 1884 until 1914."
+    },
+    {
+      "name": "German South-West Africa",
+      "years": [
+        1914
+      ],
+      "s": "German Empire",
+      "why": "A German colony from 1884 until 1915."
+    },
+    {
+      "name": "Morocco",
+      "years": [
+        1914
+      ],
+      "s": "France",
+      "note": "A French protectorate from 1912; Spain held a zone in the north.",
+      "why": "Morocco became a French protectorate in March 1912."
+    },
+    {
+      "name": "Spanish Morocco",
+      "years": [
+        1914
+      ],
+      "s": "Spain",
+      "why": "Spain's protectorate zone from 1912."
+    },
+    {
+      "name": "Djibouti",
+      "years": [
+        1914
+      ],
+      "n": "French Somaliland",
+      "why": "Independent as Djibouti from 1977."
+    },
+    {
+      "name": "Malaya",
+      "years": [
+        1914
+      ],
+      "n": "British Malaya",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "The British colonies and protectorates of the Malay Peninsula; Malaysia was formed in 1963."
+    },
+    {
+      "name": "Netherlands Indies",
+      "years": [
+        1914
+      ],
+      "s": "Netherlands",
+      "why": "A Dutch colony until Indonesia's independence (declared 1945, recognised 1949)."
+    },
+    {
+      "name": "Malawi",
+      "years": [
+        1914
+      ],
+      "n": "Nyasaland",
+      "why": "Named Nyasaland from 1907 until independence as Malawi in 1964."
+    },
+    {
+      "name": "Uganda",
+      "years": [
+        1914,
+        1920,
+        1930
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British protectorate from 1894 until independence in 1962."
+    },
+    {
+      "name": "Portuguese Guinea",
+      "years": [
+        1914
+      ],
+      "s": "Portugal",
+      "why": "Portugal's colony until independence as Guinea-Bissau in 1973–74."
+    },
+    {
+      "name": "Equatorial Guinea",
+      "years": [
+        1914,
+        1920,
+        1930,
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Spanish Guinea",
+      "s": "Spain",
+      "why": "Spain's colony until independence as Equatorial Guinea in 1968."
+    },
+    {
+      "name": "Lesotho",
+      "years": [
+        1914,
+        1920,
+        1930
+      ],
+      "n": "Basutoland",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British protectorate until independence as Lesotho in 1966."
+    },
+    {
+      "name": "Gambia, The",
+      "years": [
+        1914,
+        1920,
+        1930
+      ],
+      "n": "Gambia",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British colony and protectorate until independence in 1965."
+    },
+    {
+      "name": "Swaziland",
+      "years": [
+        1914,
+        1920,
+        1930
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "Under British protection from 1903 until independence in 1968."
+    },
+    {
+      "name": "Brunei",
+      "years": [
+        1914,
+        1920,
+        1930
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British protectorate from 1888 until 1984."
+    },
+    {
       "name": "Malaysia",
       "years": [
         1920,
@@ -595,6 +768,143 @@
       "n": "British Malaya",
       "s": "United Kingdom",
       "why": "Malaysia was formed in 1963."
+    },
+    {
+      "name": "Dutch East Indies",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "Netherlands",
+      "why": "A Dutch colony until Indonesia's independence (declared 1945, recognised 1949)."
+    },
+    {
+      "name": "Kenya",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British colony until independence in December 1963."
+    },
+    {
+      "name": "Guinea-Bissau",
+      "years": [
+        1920,
+        1930,
+        1938,
+        1960
+      ],
+      "n": "Portuguese Guinea",
+      "s": "Portugal",
+      "why": "Portugal's colony until independence as Guinea-Bissau in 1973–74."
+    },
+    {
+      "name": "Jamaica",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British colony until independence in 1962."
+    },
+    {
+      "name": "South Russia",
+      "years": [
+        1920
+      ],
+      "n": "Soviet Russia (RSFSR)",
+      "why": "The last White government left Crimea in November 1920."
+    },
+    {
+      "name": "Rwanda (Belgium)",
+      "years": [
+        1920,
+        1930,
+        1938
+      ],
+      "n": "Ruanda-Urundi",
+      "s": "Belgium",
+      "why": "Belgium held Ruanda and Urundi as one territory (a League of Nations mandate from 1922) until 1962."
+    },
+    {
+      "name": "Burundi",
+      "years": [
+        1920,
+        1930,
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Ruanda-Urundi",
+      "s": "Belgium",
+      "why": "Part of Belgian Ruanda-Urundi until independence in 1962."
+    },
+    {
+      "name": "Ghana",
+      "years": [
+        1920,
+        1930
+      ],
+      "n": "Gold Coast",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "A British colony, named Ghana at independence in 1957."
+    },
+    {
+      "name": "Algeria",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "France",
+      "why": "French from 1830 until independence in 1962."
+    },
+    {
+      "name": "Eritrea",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "Italy",
+      "why": "An Italian colony from 1890 until 1941."
+    },
+    {
+      "name": "Madagascar (France)",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "France",
+      "why": "A French colony from 1896 until 1960."
+    },
+    {
+      "name": "Togo",
+      "years": [
+        1920,
+        1930,
+        1938,
+        1945
+      ],
+      "s": "France",
+      "why": "French Togoland: held by France from 1914 (a League of Nations mandate from 1922) until independence in 1960."
+    },
+    {
+      "name": "Annam",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "France",
+      "why": "Part of French Indochina."
+    },
+    {
+      "name": "Cochin China",
+      "years": [
+        1920,
+        1930
+      ],
+      "s": "France",
+      "why": "Part of French Indochina."
     },
     {
       "name": "Malaysia",
@@ -627,6 +937,31 @@
       ],
       "n": "Republic of China",
       "why": "The Nationalist government reunified most of China in 1928."
+    },
+    {
+      "name": "Emirate of Bin Shal'an",
+      "years": [
+        1930
+      ],
+      "n": "Kingdom of Hejaz and Nejd",
+      "why": "Ibn Saud took al-Jawf, held by the Sha'lan emirs, in 1922."
+    },
+    {
+      "name": "Hail",
+      "years": [
+        1930
+      ],
+      "n": "Kingdom of Hejaz and Nejd",
+      "why": "Ibn Saud conquered the emirate of Ha'il in 1921."
+    },
+    {
+      "name": "Mesopotamia (GB)",
+      "years": [
+        1930
+      ],
+      "n": "Iraq",
+      "s": "United Kingdom of Great Britain and Ireland",
+      "why": "The Kingdom of Iraq, set up in 1921, under British mandate until independence in 1932."
     },
     {
       "name": "Chinese warlords",
@@ -724,11 +1059,372 @@
       "years": [
         1960
       ],
-      "note": "Divided into North and South Vietnam from 1954 to 1976.",
-      "why": "Shown as one country in 1960."
+      "why": "Divided at the 17th parallel from 1954 to 1976: the North (the Democratic Republic of Vietnam) keeps the source's shape; the South is drawn from today's provinces.",
+      "n": "North Vietnam"
+    },
+    {
+      "name": "Israel",
+      "years": [
+        1938,
+        1945
+      ],
+      "n": "Mandatory Palestine (GB)",
+      "s": "United Kingdom",
+      "why": "Israel was founded in May 1948; until then this was the British Mandate of Palestine."
+    },
+    {
+      "name": "Lesotho",
+      "years": [
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Basutoland",
+      "s": "United Kingdom",
+      "why": "A British protectorate until independence as Lesotho in 1966."
+    },
+    {
+      "name": "Gambia, The",
+      "years": [
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Gambia",
+      "s": "United Kingdom",
+      "why": "A British colony and protectorate until independence in 1965."
+    },
+    {
+      "name": "Brunei",
+      "years": [
+        1938,
+        1945,
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "A British protectorate from 1888 until 1984."
+    },
+    {
+      "name": "Jamaica",
+      "years": [
+        1938,
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "A British colony until independence in 1962."
+    },
+    {
+      "name": "Emirate of Bin Shal'an",
+      "years": [
+        1938
+      ],
+      "n": "Saudi Arabia",
+      "why": "Ibn Saud took al-Jawf, held by the Sha'lan emirs, in 1922."
+    },
+    {
+      "name": "Hail",
+      "years": [
+        1938
+      ],
+      "n": "Saudi Arabia",
+      "why": "Ibn Saud conquered the emirate of Ha'il in 1921."
+    },
+    {
+      "name": "Mesopotamia (GB)",
+      "years": [
+        1938
+      ],
+      "n": "Iraq",
+      "s": null,
+      "why": "Iraq was independent from 1932."
+    },
+    {
+      "name": "Cambodia",
+      "years": [
+        1938
+      ],
+      "n": "French Indo-China",
+      "s": "France",
+      "why": "French until Japan occupied Indochina in 1940–41."
+    },
+    {
+      "name": "Cochin China",
+      "years": [
+        1938
+      ],
+      "n": "French Indo-China",
+      "s": "France",
+      "why": "French until Japan occupied Indochina in 1940–41."
+    },
+    {
+      "name": "Mandatory Palestine (GB)",
+      "years": [
+        1938
+      ],
+      "s": "United Kingdom",
+      "why": "Under British mandate; the ruler was given under the United Kingdom's name before 1927."
+    },
+    {
+      "name": "India",
+      "years": [
+        1938
+      ],
+      "n": "Muscat and Oman",
+      "s": "United Kingdom",
+      "why": "The Musandam peninsula, part of Muscat and Oman, was labelled 'India'."
+    },
+    {
+      "name": "Oman (British Raj)",
+      "years": [
+        1938
+      ],
+      "n": "Muscat and Oman",
+      "s": "United Kingdom",
+      "why": "The Sultanate of Muscat and Oman was under British protection, not part of British India."
+    },
+    {
+      "name": "Yemen (UK)",
+      "years": [
+        1938
+      ],
+      "n": "Aden Protectorate",
+      "s": "United Kingdom",
+      "why": "Parts of the British Aden Protectorate."
+    },
+    {
+      "name": "Trucial Oman",
+      "years": [
+        1938
+      ],
+      "s": "United Kingdom",
+      "why": "Under British protection from 1892 until 1971."
+    },
+    {
+      "name": "Qatar",
+      "years": [
+        1938,
+        1945,
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "Under British protection from 1916 until 1971."
+    },
+    {
+      "name": "Jordan",
+      "years": [
+        1945
+      ],
+      "n": "Transjordan",
+      "s": "United Kingdom",
+      "why": "The Emirate of Transjordan was under British mandate until May 1946 and took the name Jordan in 1949."
+    },
+    {
+      "name": "Guinea-Bissau (Portugal)",
+      "years": [
+        1945
+      ],
+      "n": "Portuguese Guinea",
+      "s": "Portugal",
+      "why": "Portugal's colony until independence as Guinea-Bissau in 1973–74."
+    },
+    {
+      "name": "Rwanda",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "Ruanda-Urundi",
+      "s": "Belgium",
+      "why": "Part of Belgian Ruanda-Urundi until independence in 1962."
+    },
+    {
+      "name": "Bangladesh",
+      "years": [
+        1945
+      ],
+      "n": "British Raj",
+      "s": "United Kingdom",
+      "why": "Bangladesh became independent in 1971; in 1945 Bengal was part of British India."
+    },
+    {
+      "name": "Taiwan",
+      "years": [
+        1945
+      ],
+      "s": "China",
+      "note": "Taken over from Japan by the Republic of China in October 1945.",
+      "why": "Shown with no ruler."
+    },
+    {
+      "name": "Southern Cameroon",
+      "years": [
+        1945
+      ],
+      "n": "British Cameroons",
+      "s": "United Kingdom",
+      "why": "The British-run part of Cameroon was called the British Cameroons."
+    },
+    {
+      "name": "Cameroon",
+      "years": [
+        1945
+      ],
+      "n": "French Cameroons",
+      "s": "France",
+      "why": "French-run (a mandate, then a UN trust territory) until independence in 1960."
+    },
+    {
+      "name": "USA",
+      "years": [
+        1945
+      ],
+      "n": "United States",
+      "why": "The source names the United States 'USA' as a ruler."
+    },
+    {
+      "name": "Guyana",
+      "years": [
+        1945
+      ],
+      "n": "British Guiana",
+      "s": "United Kingdom",
+      "why": "British Guiana was labelled 'Guyana' and ruled by the Netherlands; it was British until independence in 1966."
+    },
+    {
+      "name": "Suriname",
+      "years": [
+        1945
+      ],
+      "s": "Netherlands",
+      "why": "A Dutch colony until independence in 1975."
+    },
+    {
+      "name": "United Arab Emirates",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "Trucial Oman",
+      "s": "United Kingdom",
+      "why": "The Trucial States were under British protection; the United Arab Emirates was formed in 1971."
+    },
+    {
+      "name": "Kuwait",
+      "years": [
+        1945,
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "Under British protection from 1899 until June 1961."
+    },
+    {
+      "name": "Oman",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "Muscat and Oman",
+      "why": "The Sultanate of Muscat and Oman took the name Oman in 1970."
+    },
+    {
+      "name": "Indonesia",
+      "years": [
+        1945
+      ],
+      "note": "The Republic of Indonesia declared independence in August 1945; the Netherlands recognised it in December 1949.",
+      "why": "Shown as an independent state in 1945."
+    },
+    {
+      "name": "Malawi",
+      "years": [
+        1960
+      ],
+      "n": "Nyasaland",
+      "s": "United Kingdom",
+      "why": "Part of the Federation of Rhodesia and Nyasaland; independent as Malawi in 1964."
+    },
+    {
+      "name": "Uganda",
+      "years": [
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "A British protectorate until independence in October 1962."
+    },
+    {
+      "name": "Kenya",
+      "years": [
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "A British colony until independence in December 1963."
+    },
+    {
+      "name": "Swaziland",
+      "years": [
+        1960
+      ],
+      "s": "United Kingdom",
+      "why": "Under British protection from 1903 until independence in 1968."
+    },
+    {
+      "name": "Algeria",
+      "years": [
+        1960
+      ],
+      "s": "France",
+      "note": "Independent in July 1962, after an eight-year war.",
+      "why": "French from 1830 until independence in 1962."
+    },
+    {
+      "name": "Eritrea",
+      "years": [
+        1960
+      ],
+      "s": "Ethiopia",
+      "note": "Federated with Ethiopia in 1952 and annexed in 1962.",
+      "why": "Eritrea became independent only in 1993."
+    },
+    {
+      "name": "Greenland",
+      "years": [
+        1960
+      ],
+      "s": "Denmark",
+      "why": "Part of the Danish realm."
     }
   ],
   "geometry": [
+    {
+      "era": "1994–2010",
+      "what": "Drew the 1994, 2000 and 2010 maps from Natural Earth’s present-day borders, rolled back to 31 December of each year: South Sudan joined to Sudan (independent 2011), Crimea to Ukraine (annexed by Russia in 2014), Serbia, Montenegro and Kosovo as Yugoslavia in 1994 and 2000, the Netherlands Antilles (dissolved 2010), East Timor under UN administration in 2000 and held by Indonesia in 1994, Zaire (renamed in 1997), British Hong Kong and Portuguese Macau in 1994, and the names countries had then (Turkey, Macedonia, Swaziland, Czech Republic, Cape Verde).",
+      "why": "The historical source’s outlines for these years were coarse and out of date: Bratislava was drawn inside Austria, Kosovo and East Timor were missing after independence, Walvis Bay was still South African, and several island countries were not mapped. Dates checked against CShapes 2.0 (ETH Zurich)."
+    },
+    {
+      "era": "1900, 1914",
+      "what": "Drew Europe’s national borders from HistoGIS (Austrian Academy of Sciences), which takes them from maps of the time: for example Alsace-Lorraine in Germany, Bessarabia in Russia, Finland, Iceland and the Caucasus within the empires that held them, Southern Dobruja Bulgarian in 1900 and Romanian in 1914. Cyprus in 1900 and 1914 is shown as Ottoman land under British administration.",
+      "why": "The historical source’s European borders were approximate; in 1914 it showed Finland, Georgia, Armenia and Azerbaijan as independent and Austria-Hungary about 4% too small. HistoGIS is published under CC BY 4.0."
+    },
+    {
+      "era": "1920–1960",
+      "what": "Drew Europe’s national borders from OpenHistoricalMap, which dates every border change to the day: for example Finland’s border before 1940 (Vyborg and Petsamo Finnish), Estonia’s and Latvia’s pre-war borders, the Free City of Danzig (1920–1938), the Memel Territory under Allied rule (1920), the Saar under the League of Nations (1920, 1930), Alsace-Lorraine French again, Italian Istria and Zadar, Czechoslovakia after the Munich Agreement and Hungary after the First Vienna Award (1938), the Hatay State (1938) and Poland’s borders after 1945. The same source gives the French zone of Morocco, so Spain’s zone shows apart from it (1920–1945), and Manchukuo (1938).",
+      "why": "The historical source’s European borders were approximate: in 1920 it showed Strasbourg as German and Vyborg as Russian, and in 1938 Danzig as Polish. OpenHistoricalMap is public domain (CC0); every border was checked against CShapes 2.0 (ETH Zurich) and agrees to within a few percent, except where CShapes keeps a border that had not yet changed in law."
+    },
+    {
+      "era": "1900",
+      "what": "Redrew Africa as it was divided between colonies, which had mostly drawn today’s borders by 1900 (shown with Natural Earth’s outlines, some by province), with the states still ruling themselves: Ethiopia, Liberia, Morocco, Darfur, Wadai, and the Boer republics at war with Britain. Also corrected Siam with the lands it ceded in 1904–1909, Chile with the Atacama coast and Tacna, Bolivia with Acre, British Guiana’s 1899 border, Bulgaria with Eastern Rumelia, the United States’ new Philippines, Hawaii, Puerto Rico and Cuba, Japanese Taiwan, Portuguese Timor, Sarawak and North Borneo, New Zealand, Newfoundland, and Australia’s six colonies on the eve of federation.",
+      "why": "The source showed much of Africa as peoples and kingdoms that colonial armies had already conquered (Samori Touré’s empire in 1898, the Ndebele kingdom in 1893, Benin in 1897), left large areas unnamed and still showed Harar as Egyptian, 15 years after Egypt left. Elsewhere it kept borders from before the War of the Pacific (1879–1884) and Spain’s colonies after 1898."
+    },
+    {
+      "era": "1914–1960",
+      "what": "Gave land drawn for the wrong country to the country that held it, using Natural Earth’s outlines of today’s borders and provinces: Turkey within its 1923 Lausanne borders in 1920 (no Sèvres zones), Greece with its Aegean islands in 1920, Tacna Chilean in 1914 (until 1929), Hatay to French Syria until 1938, Yemen and the British Aden Protectorate as separate states (from 1900), Transjordan apart from Iraq, Iraq independent in 1938, Saudi Arabia’s borders in 1930 and 1938 (no Ha’il emirate after 1921), Egypt and Libya with today’s border in 1914 and 1920, French Equatorial Africa apart from French West Africa in 1914, Italian Somaliland and British Jubaland in 1914, Jubaland British until 1925, British (Southern) Cameroons, Korea and Taiwan as Japanese colonies (1914–1938), Sarawak and North Borneo with today’s border with Dutch Borneo, Zanzibar, Hawaii (until statehood in 1959), Newfoundland apart from Canada, Cyprus as a British colony (1920–1945), Portuguese Timor, Trieste Italian in 1945 (run by the Allies from June 1945, Italian in law until 1947), Upper Volta split between its neighbours in 1945, Lebanon and North Yemen’s borders in 1945 and 1960, Peru and Ecuador with today’s border in 1938 (close to the line each held from 1936; the source drew Ecuador’s whole claim), and in 1960 the West Bank to Jordan, Gaza to Egypt, South Vietnam, Dutch New Guinea, Singapore and Hawaii (a US state from 1959). Colonies whose borders have not changed since (Gambia, Basutoland, Swaziland, Brunei, Portuguese and Spanish Guinea, Puerto Rico, Togo, Haiti from 1938) now follow today’s lines, Islands and small states the sources left blank or gave to a neighbour were added: the Solomon Islands, New Caledonia, the Bahamas, Jamaica, Trinidad, Cape Verde and Réunion; the Isle of Man, Malta, Liechtenstein, Andorra and San Marino on every map from 1900; the Dodecanese under Italian (1938) and British (1945) rule; and in 1945 and 1960 the Faroes and the Baltic coast and islands (Soviet from 1944), with Germany’s islands by occupation zone in 1945.",
+      "why": "Each map was checked against CShapes 2.0 (ETH Zurich) on its date (31 December, or 28 June for 1914), and these were the places where the source drew land for a country that did not hold it."
+    },
+    {
+      "era": "1900–1960",
+      "what": "Removed the thin strips of a shape’s old outline left along a new border or coastline: at sea they go, on land they go to the neighbours. For example, the source’s British Somaliland showed as a strip along the Italian coast in 1914.",
+      "why": "Where a better outline replaced the source’s, the old shape could show through as thin strips of the wrong colour."
+    },
     {
       "era": "1400",
       "what": "Split the 'Great Khanate' into the Ming Empire (outline from the 1492 snapshot) and the Northern Yuan.",
@@ -738,16 +1434,6 @@
       "era": "1279–1920",
       "what": "Separated Svalbard from Norway / Denmark-Norway / Sweden–Norway.",
       "why": "Svalbard belonged to no country until the 1920 Svalbard Treaty, which took effect in 1925."
-    },
-    {
-      "era": "1994–2010",
-      "what": "Named Switzerland, which the source draws without a name (it showed as 'not mapped'). The outline is the source's own.",
-      "why": "Switzerland has been an independent country throughout; the source's 1994, 2000 and 2010 snapshots leave its name blank."
-    },
-    {
-      "era": "1994–2010",
-      "what": "Joined Gotland to Sweden and Lewis and Harris to the United Kingdom, which the source draws without a name. In 1994 the source draws Taiwan twice; the map uses its unnamed outline (the one 2000 and 2010 use) instead of the older named one.",
-      "why": "They belonged to those countries throughout; without a name they showed as 'not mapped' (around Taiwan, as a blank rim)."
     },
     {
       "era": "1815–1900",
