@@ -1,5 +1,5 @@
 {
-  "_readme": "Fixes applied to the historical-basemaps source when `npm run data` builds the map. years = snapshot years (negative = BCE). n = new name, s = new 'ruled by' (null clears it), note = shown on the map as a data note. Every rule is listed on /about.",
+  "_readme": "Fixes applied to the base source when `npm run data` builds the map (historical-basemaps; Cliopatria for 1800 to 1880). years = snapshot years (negative = BCE). n = new name, s = new 'ruled by' (null clears it), note = shown on the map as a data note. Every rule is listed on /about.",
   "rules": [
     {
       "name": "Thai",
@@ -10,13 +10,361 @@
       "why": "An ethnic label stretched over regions it does not describe."
     },
     {
-      "name": "Kingdom of Brazil",
+      "name": "Holy Roman Empire Minor States",
+      "years": [
+        1800
+      ],
+      "n": "Holy Roman Empire",
+      "note": "The Empire's many smaller states, shown together. The Empire was dissolved in 1806.",
+      "why": "The Empire's smaller states, which Cliopatria draws as one."
+    },
+    {
+      "name": "Cispadane Republic",
+      "years": [
+        1800
+      ],
+      "n": "Cisalpine Republic",
+      "why": "The Cispadane Republic merged into the Cisalpine Republic in 1797."
+    },
+    {
+      "name": "Grand Duchy of Berg",
+      "years": [
+        1815
+      ],
+      "n": "Kingdom of Prussia",
+      "why": "The Grand Duchy ended in 1813; the Congress of Vienna gave its land to Prussia."
+    },
+    {
+      "name": "Nawab of Awadh",
+      "years": [
+        1800
+      ],
+      "n": "Awadh",
+      "why": "Cliopatria names the state after its ruler's title."
+    },
+    {
+      "name": "Maratha Empire",
+      "years": [
+        1815
+      ],
+      "n": "Maratha Confederacy",
+      "note": "Maratha states under the Peshwa at Pune. Defeated by the British in 1803–05, when Scindia lost Delhi, Agra and the Doab; the British ended the confederacy in 1818.",
+      "why": "Named as on the 1800 map."
+    },
+    {
+      "name": "British Ceylon",
+      "years": [
+        1800
+      ],
+      "n": "Kingdom of Kandy",
+      "s": null,
+      "note": "The Sinhalese kingdom of the island's hill country, ruled from Kandy. The British, who held the coast from 1796, took it in 1815.",
+      "why": "Cliopatria labels the inland kingdom, independent until 1815, as British Ceylon; the British held only the coast."
+    },
+    {
+      "name": "British trading posts",
+      "years": [
+        1800,
+        1815
+      ],
+      "note": "Fur-trading posts of the Hudson's Bay and North West companies, as Cliopatria draws them. First Nations held the land around them.",
+      "why": "Cliopatria draws these posts as part of the British Empire, with India."
+    },
+    {
+      "name": "Khmer Empire",
+      "years": [
+        1800
+      ],
+      "n": "Cambodia",
+      "note": "The Khmer kingdom, under Siamese and Vietnamese overlordship.",
+      "why": "The Khmer Empire ended in the 15th century; by 1800 Cambodia was a smaller kingdom."
+    },
+    {
+      "name": "Cambodia",
       "years": [
         1878,
         1880
       ],
-      "n": "Empire of Brazil",
-      "why": "Brazil was an empire from 1822 until the republic was proclaimed in November 1889."
+      "note": "A kingdom under French protection from 1863.",
+      "why": "Cliopatria draws it as part of French Indochina, which was formed only in 1887."
+    },
+    {
+      "name": "Qasimids",
+      "years": [
+        1800
+      ],
+      "n": "Imamate of Yemen",
+      "why": "Cliopatria names the Zaydi imamate after its ruling family."
+    },
+    {
+      "name": "Karamanli Dynasty",
+      "years": [
+        1800,
+        1815
+      ],
+      "n": "Tripolitania",
+      "s": "Ottoman Empire",
+      "note": "Ruled by the Karamanli pashas, in name for the Ottoman sultan, until 1835.",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Muhammad Ali dynasty",
+      "years": [
+        1815
+      ],
+      "n": "Egypt",
+      "s": "Ottoman Empire",
+      "note": "Ruled from 1805 by Muhammad Ali, the Ottoman sultan's governor in name and Egypt's master in fact.",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Omani Slave Coast",
+      "years": [
+        1815
+      ],
+      "n": "Zanzibar",
+      "s": "Omani Empire",
+      "note": "Zanzibar and the Swahili coast under the sultan of Oman, who moved his court to Zanzibar in 1840.",
+      "why": "Cliopatria's name for Oman's East African coast."
+    },
+    {
+      "name": "House of Khalifa",
+      "years": [
+        1815
+      ],
+      "n": "Bahrain",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Sultan of Yogyakarta",
+      "years": [
+        1800,
+        1815
+      ],
+      "n": "Yogyakarta Sultanate",
+      "why": "Cliopatria names the state after its ruler."
+    },
+    {
+      "name": "Merina Kingdom",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "n": "Kingdom of Imerina",
+      "why": "Named as OpenHistoricalMap names it."
+    },
+    {
+      "name": "People's Republic of Zanzibar",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Sultanate of Zanzibar",
+      "why": "The People's Republic dates from 1964; in 1878 the sultan of Zanzibar held this coast."
+    },
+    {
+      "name": "First Hellenic Republic",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Greece",
+      "why": "The First Hellenic Republic ended in 1832; by 1878 Greece was a kingdom."
+    },
+    {
+      "name": "German Africa",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Duala",
+      "s": null,
+      "note": "The Duala kings of the Cameroon estuary. Germany made it a protectorate in 1884.",
+      "why": "German rule here began in 1884."
+    },
+    {
+      "name": "Qatar Dynasty",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Qatar",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Comoro sultanates",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "s": null,
+      "note": "The sultanates of Anjouan, Mohéli and Grande Comore (and Mayotte, until France took it in 1841).",
+      "why": "Cliopatria draws these islands as part of French India or French Africa; France took Mayotte in 1841 and the rest in 1886."
+    },
+    {
+      "name": "Portuguese Mozambique",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "note": "Portugal held the coast and, through its estates (prazos), the Zambezi valley; African kingdoms ruled the interior.",
+      "why": "Cliopatria draws it as part of the Portuguese Empire."
+    },
+    {
+      "name": "South Georgia",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "note": "Claimed for Britain by James Cook in 1775; no one lived there, but sealers came.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Saint Pierre and Miquelon",
+      "years": [
+        1800
+      ],
+      "note": "French islands, held by Britain from 1793 to 1802.",
+      "why": "Cliopatria draws them as part of French Louisiana."
+    },
+    {
+      "name": "Colony of Sierra Leone",
+      "years": [
+        1800
+      ],
+      "note": "Freetown and its peninsula, settled by freed slaves from 1787 and run by the Sierra Leone Company until it became a crown colony in 1808.",
+      "why": "Cliopatria draws it as part of the British Cape Colony."
+    },
+    {
+      "name": "Colony of Sierra Leone",
+      "years": [
+        1815
+      ],
+      "note": "Freetown and its peninsula, a crown colony since 1808.",
+      "why": "Cliopatria draws it as part of the British Cape Colony."
+    },
+    {
+      "name": "Lagos Colony",
+      "years": [
+        1878,
+        1880
+      ],
+      "note": "Lagos and its coast, a British colony from 1861, run with the Gold Coast from 1874 to 1886.",
+      "why": "Cliopatria draws it as part of the British Gold Coast."
+    },
+    {
+      "name": "Fernando Po",
+      "years": [
+        1800
+      ],
+      "note": "Spain's by treaty since 1778; its settlers left in 1781, and the Bubi people held the island.",
+      "why": "Cliopatria draws it as part of the Spanish Empire."
+    },
+    {
+      "name": "Prince of Wales Island",
+      "years": [
+        1800,
+        1815
+      ],
+      "note": "Penang, which the East India Company took from the sultan of Kedah in 1786; the strip of mainland opposite (Province Wellesley) was added in 1800.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Malacca",
+      "years": [
+        1800
+      ],
+      "note": "A Dutch colony, held by Britain from 1795 to 1818; the Dutch traded it to Britain for good in 1824.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "North Borneo",
+      "years": [
+        1880
+      ],
+      "note": "Leased from the sultans of Brunei and Sulu in 1877–78 by Alfred Dent’s company, which Britain chartered as the British North Borneo Company in 1881.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Martinique",
+      "years": [
+        1800
+      ],
+      "note": "A French colony, held by Britain from 1794 to 1802.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Martinique",
+      "years": [
+        1815
+      ],
+      "note": "Returned to France in 1814. During Napoleon’s Hundred Days in 1815 British troops occupied it, staying until 1816.",
+      "why": "Cliopatria draws it as part of the Bourbon Kingdom of France."
+    },
+    {
+      "name": "Colony of Guadeloupe",
+      "years": [
+        1815
+      ],
+      "note": "Returned to France in 1814. During Napoleon’s Hundred Days in 1815 British troops occupied it, staying until 1816.",
+      "why": "Cliopatria draws it as part of the Bourbon Kingdom of France."
+    },
+    {
+      "name": "Curaçao",
+      "years": [
+        1800
+      ],
+      "note": "A Dutch colony, held by Britain from 1800 to 1803 and from 1807 to 1816.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "French Egypt",
+      "years": [
+        1800
+      ],
+      "note": "An Ottoman province, occupied by Napoleon’s army from 1798 until it surrendered in 1801.",
+      "why": "Cliopatria draws it as part of the French Consulate."
+    },
+    {
+      "name": "Konbaung Dynasty",
+      "years": [
+        1800,
+        1815
+      ],
+      "n": "Burma",
+      "why": "Cliopatria names the kingdom after its ruling dynasty."
+    },
+    {
+      "name": "Duchy of Bavaria",
+      "years": [
+        1800
+      ],
+      "n": "Electorate of Bavaria",
+      "why": "Bavaria’s rulers had been electors of the Holy Roman Empire since 1623."
+    },
+    {
+      "name": "Dutch Gold Coast",
+      "years": [
+        1800
+      ],
+      "s": "Batavian Republic",
+      "why": "Cliopatria gives the Dutch forts no ruler."
+    },
+    {
+      "name": "Dutch Gold Coast",
+      "years": [
+        1815
+      ],
+      "s": "United Kingdom of the Netherlands",
+      "why": "Cliopatria gives the Dutch forts no ruler."
     },
     {
       "name": "Sultanate of Zanzibar",
@@ -310,8 +658,7 @@
         1650,
         1700,
         1715,
-        1783,
-        1800
+        1783
       ],
       "note": "The Songhai Empire fell to Morocco in 1591. This area was then split between the Moroccan Pashalik of Timbuktu and smaller successor states; the source keeps the old outline.",
       "why": "Empire shown after its conquest."
@@ -339,8 +686,7 @@
         1650,
         1700,
         1715,
-        1783,
-        1800
+        1783
       ],
       "n": "Habsburg Monarchy",
       "why": "The Austrian Empire was only proclaimed in 1804."
@@ -363,42 +709,6 @@
       "why": "France ceded Canada to Britain in 1763."
     },
     {
-      "name": "Quebec",
-      "years": [
-        1800
-      ],
-      "n": "Upper and Lower Canada",
-      "s": "Great Britain",
-      "why": "British since 1763; split into Upper and Lower Canada in 1791."
-    },
-    {
-      "name": "Luisiana",
-      "years": [
-        1800
-      ],
-      "n": "Louisiana",
-      "s": "Spain",
-      "note": "Spain secretly agreed to return Louisiana to France in October 1800 (Treaty of San Ildefonso) but governed it until 1803.",
-      "why": "Spain still governed Louisiana in 1800."
-    },
-    {
-      "name": "Canada",
-      "years": [
-        1815
-      ],
-      "n": "British North America",
-      "s": "United Kingdom",
-      "why": "Canada was only formed in 1867."
-    },
-    {
-      "name": "United Provinces of the Río de la Plata",
-      "years": [
-        1815
-      ],
-      "s": null,
-      "why": "Self-governing since 1810; independence declared in 1816."
-    },
-    {
       "name": "Manchu Empire",
       "years": [
         1914
@@ -412,10 +722,7 @@
         1492,
         1500,
         1715,
-        1783,
-        1800,
-        1878,
-        1880
+        1783
       ],
       "n": "Papuan peoples",
       "why": "Papua New Guinea became a country in 1975."
@@ -1411,6 +1718,11 @@
       "why": "The historical source’s European borders were approximate: in 1920 it showed Strasbourg as German and Vyborg as Russian, and in 1938 Danzig as Polish. OpenHistoricalMap is public domain (CC0); every border was checked against CShapes 2.0 (ETH Zurich) and agrees to within a few percent, except where CShapes keeps a border that had not yet changed in law."
     },
     {
+      "era": "1800–1880",
+      "what": "Drew the maps from 1800 to 1880 from Cliopatria (Seshat Global History Databank), with OpenHistoricalMap’s dated borders laid over it and HistoGIS’s in Europe from 1815, instead of the historical-basemaps source. Where one source keeps a single outline for decades while the borders moved, the other’s dated outline is used: in India, Cliopatria’s Awadh in 1800 and Maratha Confederacy in 1815. A few places are set from Natural Earth’s outlines or Cliopatria’s: Bombay and Surat as British in 1800, the Mughal emperor’s Delhi in 1815, Bulgaria and Eastern Rumelia in 1878–80, the Falklands, and, approximately, Cutch and the Ahom kingdom of Assam. Cliopatria’s scattered pieces of an empire are named as the colonies they were (Algeria, Senegal, Martinique, Portuguese Mozambique).",
+      "why": "These sources date their borders to the year and allow any use with credit."
+    },
+    {
       "era": "1900",
       "what": "Redrew Africa as it was divided between colonies, which had mostly drawn today’s borders by 1900 (shown with Natural Earth’s outlines, some by province), with the states still ruling themselves: Ethiopia, Liberia, Morocco, Darfur, Wadai, and the Boer republics at war with Britain. Also corrected Siam with the lands it ceded in 1904–1909, Chile with the Atacama coast and Tacna, Bolivia with Acre, British Guiana’s 1899 border, Bulgaria with Eastern Rumelia, the United States’ new Philippines, Hawaii, Puerto Rico and Cuba, Japanese Taiwan, Portuguese Timor, Sarawak and North Borneo, New Zealand, Newfoundland, and Australia’s six colonies on the eve of federation.",
       "why": "The source showed much of Africa as peoples and kingdoms that colonial armies had already conquered (Samori Touré’s empire in 1898, the Ndebele kingdom in 1893, Benin in 1897), left large areas unnamed and still showed Harar as Egyptian, 15 years after Egypt left. Elsewhere it kept borders from before the War of the Pacific (1879–1884) and Spain’s colonies after 1898."
@@ -1421,7 +1733,7 @@
       "why": "Each map was checked against CShapes 2.0 (ETH Zurich) on its date (31 December, or 28 June for 1914), and these were the places where the source drew land for a country that did not hold it."
     },
     {
-      "era": "1900–1960",
+      "era": "1800–1960",
       "what": "Removed the thin strips of a shape’s old outline left along a new border or coastline: at sea they go, on land they go to the neighbours. For example, the source’s British Somaliland showed as a strip along the Italian coast in 1914.",
       "why": "Where a better outline replaced the source’s, the old shape could show through as thin strips of the wrong colour."
     },
@@ -1436,9 +1748,9 @@
       "why": "Svalbard belonged to no country until the 1920 Svalbard Treaty, which took effect in 1925."
     },
     {
-      "era": "1815–1900",
-      "what": "Named Tasmania, which the source draws without a name, as the British colony it was, like the mainland colonies: Van Diemen's Land in 1815, 'Tasmania (UK)' in 1878–1900.",
-      "why": "Tasmania was a British colony from 1803 until federation in 1901 (Van Diemen's Land until 1856); without a name it showed as 'not mapped'."
+      "era": "1900",
+      "what": "Named Tasmania, which the source draws without a name, as the British colony it was, like the mainland colonies: 'Tasmania (UK)'.",
+      "why": "Tasmania was a British colony from 1803 until federation in 1901; without a name it showed as 'not mapped'."
     },
     {
       "era": "Present",

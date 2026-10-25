@@ -108,7 +108,7 @@ export async function ohmRelations(cacheDir, ids) {
     const rel = JSON.parse(fs.readFileSync(file, "utf8")).elements.find((e) => e.type === "relation" && e.id === id);
     if (!rel) throw new Error(`OpenHistoricalMap relation ${id} not found`);
     const ways = { outer: [], inner: [] };
-    for (const m of rel.members)
+    for (const m of rel.members ?? [])
       if (m.type === "way" && m.geometry?.length > 1) (m.role === "inner" ? ways.inner : ways.outer).push(simplify(m.geometry.map((p) => [p.lon, p.lat]), SIMPLIFY_DEG));
     const outer = joinRings(ways.outer);
     const inner = joinRings(ways.inner);

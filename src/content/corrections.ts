@@ -3,6 +3,8 @@
 
 export const knownLimitations = [
   "Before about 1650 the source marks almost every border as approximate. Many peoples had no fixed borders, so those lines are scholarly estimates of zones of control.",
+  "The maps from 1800 to 1880 come from sources that draw states, not peoples. Land no state held (much of North America and inland Africa in 1800, for example) is shown as not mapped rather than as the Indigenous nations who lived there, and colonial claims over such land carry a note.",
+  "In India in 1800 and 1815, the states under the East India Company's protection (Hyderabad, Mysore, Travancore and others) are drawn as part of the Company's land, as both sources draw them.",
   "The map shows snapshots, not every year. Changes between two snapshots appear at the next one; use the event timeline for exact dates.",
   "The 1500 BCE, 1000 BCE and 700 BCE snapshots share most of their shapes in the source, so little changes between them on the map.",
   "Names follow the source dataset and can change spelling between snapshots (for example 'Castile' and 'Castille'). Shapes with different names are linked where we know they are the same state.",

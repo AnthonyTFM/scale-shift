@@ -379,7 +379,7 @@ export function fillGaps(topo, inside, leftover = () => false) {
 
 /**
  * Fills the coastal strips in every era file on disk (public/data/eras, in src/data/eras.json order): the thin ones
- * everywhere, the wider ones inside the region `inside` picks.
+ * everywhere, the wider ones inside the region `inside(point, year)` picks.
  * `leftover(year, props)` picks the shapes whose coastal slivers go too. Runs a few passes, so a strip that only touched
  * a sliver goes to the shape that took the sliver.
  */
@@ -392,7 +392,7 @@ export function fillGapEraFiles(root, inside, leftover = () => false) {
     let filled = 0;
     let inverted = false;
     for (let pass = 0; pass < 3; pass++) {
-      const r = fillGaps(topo, inside, (props) => leftover(e.year, props));
+      const r = fillGaps(topo, (pt) => inside(pt, e.year), (props) => leftover(e.year, props));
       inverted ||= !!r.inverted;
       if (!r.filled) break;
       topo = r.topo;

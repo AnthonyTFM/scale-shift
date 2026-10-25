@@ -611,7 +611,7 @@ export default function AtlasApp() {
                 </button>
               </div>
               <p className="text-xs text-panel-muted">
-                © {site.copyrightHolder}. Borders: historical-basemaps, HistoGIS, OpenHistoricalMap, Natural Earth.{" "}
+                © {site.copyrightHolder}. Borders: historical-basemaps, Cliopatria, HistoGIS, OpenHistoricalMap, Natural Earth.{" "}
                 <Link href="/about" className="underline hover:text-white">
                   Sources &amp; accuracy
                 </Link>

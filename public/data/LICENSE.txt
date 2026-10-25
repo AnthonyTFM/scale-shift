@@ -1,8 +1,8 @@
 Map data licenses for the files in this folder
 ==============================================
 
-eras/*.json (2000 BCE to 1960), polities.json, rulers-grid.json, era-stats.json,
-and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
+eras/*.json (2000 BCE to 1783, and 1900 to 1960), polities.json, rulers-grid.json,
+era-stats.json, and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
   Derived from historical-basemaps by André Ourednik and contributors
   https://github.com/aourednik/historical-basemaps
   License: GNU General Public License v3.0 (GPL-3.0)
@@ -19,7 +19,23 @@ and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
   (src/content/data-corrections.json) are published at
   https://github.com/AnthonyTFM/scale-shift and are offered under GPL-3.0.
 
-Europe in eras/1900.json and eras/1914.json
+eras/1800.json, eras/1815.json, eras/1878.json and eras/1880.json, and their entries
+in polities.json, rulers-grid.json and era-stats.json
+  Cliopatria (v0.2.1), Seshat: Global History Databank,
+  https://github.com/Seshat-Global-History-Databank/cliopatria
+  Bennett, J. S. et al. (2025). Cliopatria - A geospatial database of world-wide
+  political entities from 3400BCE to 2024CE. Scientific Data.
+  https://doi.org/10.1038/s41597-025-04516-9
+  License: Creative Commons Attribution 4.0 International (CC BY 4.0),
+  https://creativecommons.org/licenses/by/4.0/
+  Changes made for this site: clipped to Natural Earth's coastline, simplified
+  and quantized; OpenHistoricalMap's and HistoGIS's borders (below) laid over it;
+  some polities and rulers renamed where it was wrong for the year (listed at
+  /about and in src/content/data-corrections.json); a few places redrawn from
+  Natural Earth's outlines or approximately (listed in scripts/build-data.mjs).
+  These maps use no historical-basemaps data.
+
+Europe in eras/1815.json, 1878.json, 1880.json, 1900.json and 1914.json
   HistoGIS, Austrian Centre for Digital Humanities and Cultural Heritage (ACDH-CH),
   Austrian Academy of Sciences, https://histogis.acdh.oeaw.ac.at/
   License: Creative Commons Attribution 4.0 International (CC BY 4.0),
@@ -28,7 +44,8 @@ Europe in eras/1900.json and eras/1914.json
   and quantized, merged with the rest of each map.
 
 Europe in eras/1920.json, 1930.json, 1938.json, 1945.json and 1960.json
-(plus French Morocco, the Hatay State and Manchukuo)
+(plus French Morocco, the Hatay State and Manchukuo), and most states in
+eras/1800.json, 1815.json, 1878.json and 1880.json
   OpenHistoricalMap contributors, https://www.openhistoricalmap.org/
   License: public domain dedication (CC0 1.0),
   https://creativecommons.org/publicdomain/zero/1.0/
@@ -37,7 +54,7 @@ Europe in eras/1920.json, 1930.json, 1938.json, 1945.json and 1960.json
 
 eras/1994.json, eras/2000.json, eras/2010.json, eras/present.json, us-states.json,
 lakes.json, globe.json and the present-day shapes in daily/, plus the outlines used
-to give land back to the right country on the maps from 1900 to 1960
+to give land back to the right country on the maps from 1800 to 1960
   Natural Earth (public domain), https://www.naturalearthdata.com/
   US states: US Census Bureau via us-atlas (public domain)
   The site's /world.svg and /globe-still.svg images are drawn from the same

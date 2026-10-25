@@ -22,6 +22,7 @@ import { separateEraFiles } from "./lib/overlaps.mjs";
 import { fillGapEraFiles } from "./lib/gaps.mjs";
 import { histogisStates } from "./lib/histogis.mjs";
 import { ohmRelations } from "./lib/ohm.mjs";
+import { cliopatriaPolities } from "./lib/cliopatria.mjs";
 import { writeFileRetrying } from "./lib/files.mjs";
 import { eraStatsFromFiles } from "./lib/era-stats.mjs";
 
@@ -175,16 +176,25 @@ function ringPerimeterKm(ring) {
   return d;
 }
 
-/** Pieces of real land not covered by any shape in this era: compact pieces only (not coastline slivers). */
+/**
+ * Pieces of real land not covered by any shape in this era: compact pieces only (not coastline slivers). One landmass
+ * at a time, so a clipping failure on one leaves the others filled.
+ */
 function missingLand(features) {
-  const clips = features.flatMap((f) => f.geometry.coordinates).filter((p) => p[0].length > 3);
-  let diff;
-  try {
-    diff = polygonClipping.difference(landNoLakes(), ...clips);
-  } catch (err) {
-    console.warn("   (gap fill skipped:", err.message, ")");
-    return [];
+  const clips = features
+    .flatMap((f) => f.geometry.coordinates)
+    .filter((p) => p[0].length > 3)
+    .map((p) => ({ p, box: boxOfPolys([p]) }));
+  const diff = [];
+  let failed = 0;
+  for (const land of landNoLakes()) {
+    const box = boxOfPolys([land]);
+    const near = clips.filter((c) => boxesMeet(c.box, box)).map((c) => c.p);
+    const left = near.length ? clipSafely(polygonClipping.difference, [land], near) : [land];
+    if (left) diff.push(...left);
+    else failed++;
   }
+  if (failed) console.warn(`   (gap fill skipped on ${failed} landmass${failed === 1 ? "" : "es"})`);
   const out = [];
   for (const poly of diff) {
     const g = fixWinding({ type: "Polygon", coordinates: poly });
@@ -266,6 +276,98 @@ const ALPHA2_FIX = { Kosovo: "XK", "Northern Cyprus": null, Somaliland: null, "S
 // historical source), rolled back to 31 December of each year with the changes made since. Dates checked against
 // CShapes 2.0 (ETH Zurich).
 const FROM_NATURAL_EARTH = new Set([1994, 2000, 2010]);
+
+// ---------- the maps from 1800 to 1880: built without historical-basemaps ----------
+// Their base is Cliopatria (CC BY 4.0, see scripts/lib/cliopatria.mjs): the world's polities digitised from historical
+// atlases. OpenHistoricalMap's dated borders and HistoGIS's (Europe, from 1815) are laid over it, as on the later maps.
+// Cliopatria names the empire a polity belongs to ("(British Empire)"); here, the ruler's shape on that map.
+const FROM_CLIOPATRIA = new Set([1800, 1815, 1878, 1880]);
+const CLIO_RULERS = {
+  1800: { "(British Empire)": "Kingdom of Great Britain", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Kingdom of Portugal", "(French Consulate)": "French Republic", "(Kingdom of France)": "French Republic", "(Batavian Republic)": "Batavian Republic" },
+  1815: { "(British Empire)": "United Kingdom of Great Britain and Ireland", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "United Kingdom of Portugal, Brazil and the Algarves", "(Bourbon Kingdom of France)": "Kingdom of France", "(Netherlands)": "United Kingdom of the Netherlands" },
+  1878: { "(British Empire)": "United Kingdom of Great Britain and Ireland", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Portugal", "(French Third Republic)": "France", "(Netherlands)": "Netherlands" },
+};
+CLIO_RULERS[1880] = CLIO_RULERS[1878];
+// parts of a Cliopatria polity that are a territory of their own, by the box their middle lies in: Cliopatria often
+// groups an empire's scattered pieces under one name (its row for British India also holds the fur-trading posts of
+// North America). `member`: the empire they belong to, where it differs from the row's ("" for none); `years`: only on
+// these maps; `drop`: a piece the empire did not hold, left out
+const CLIO_PARTS = [
+  { from: "British Empire", box: [-170, 30, -50, 75], name: "British trading posts" },
+  { from: "British Colonial Empire", box: [-40, -56, -33, -53], name: "South Georgia" },
+  { from: "British Colonial Empire", box: [99.5, 4.5, 101, 6], name: "Prince of Wales Island", years: [1800, 1815] }, // Penang
+  { from: "British Colonial Empire", box: [101.5, 1.8, 103, 3], name: "Malacca", years: [1800] },
+  { from: "British Colonial Empire", box: [-61.3, 14.3, -60.7, 15], name: "Martinique", years: [1800] },
+  { from: "British Colonial Empire", box: [-70.5, 11.8, -67.8, 12.8], name: "Curaçao", years: [1800] },
+  { from: "French Consulate", box: [24, 21, 37, 32], name: "French Egypt" },
+  { from: "French Consulate", box: [-18, 11, -8, 17], name: "Senegal" },
+  { from: "French Consulate", box: [55, -5, 56, -4], name: "Seychelles" },
+  { from: "French Consulate", box: [-4.5, 4.5, -2.5, 6], drop: true }, // the Ivory Coast, where France had no post until 1843
+  { from: "Spanish Empire", box: [-62, -53, -57, -50.5], name: "Viceroyalty of the Río de la Plata", years: [1800] }, // the Falklands
+  { from: "British Colonial Empire", box: [165, -53, 179, -34], drop: true, years: [1800, 1815] }, // New Zealand (British from 1840) and its islands
+  { from: "British Colonial Empire", box: [115, 4, 120, 8], name: "North Borneo", years: [1880] },
+  { from: "French India", box: [55, -21.5, 56, -20.8], name: "La Réunion", years: [1800] },
+  { from: "French India", box: [57, -20.6, 58, -19.9], name: "Isle de France", years: [1800] },
+  { from: "British Cape Colony", box: [-14, 6, -10, 10.5], name: "Colony of Sierra Leone" },
+  { from: "British Gold Coast", box: [2.5, 6, 4.6, 7], name: "Lagos Colony" },
+  { from: "Portuguese Empire", box: [30, -27, 41.5, -10], name: "Portuguese Mozambique" },
+  { from: "Kingdom of Portugal", box: [30, -27, 41.5, -10], name: "Portuguese Mozambique" },
+  { from: "Kingdom of Portugal", box: [-32, 32, -16, 40.5], name: "Portugal", years: [1878, 1880] }, // the Azores and Madeira
+  { from: "Kingdom of Portugal", box: [11, -18.5, 24, -4.5], name: "Portuguese Angola", years: [1878, 1880] },
+  { from: "Portuguese Colonies", box: [122, -10, 127.5, -8], name: "Portuguese Timor" },
+  { from: "Spanish Empire", box: [-18.5, 27.5, -13, 29.5], name: "Spain" }, // the Canary Islands
+  { from: "Kingdom of Spain", box: [-18.5, 27.5, -13, 29.5], name: "Spain" },
+  { from: "Kingdom of Spain", box: [130, 0, 170, 12], drop: true, years: [1878, 1880] }, // the Carolines, claimed but not held until 1885
+  { from: "Spanish Empire", box: [8.3, 3.1, 9.0, 3.9], name: "Fernando Po" },
+  { from: "Spanish Empire", box: [116, 4, 127, 21], name: "Captaincy General of the Philippines", years: [1878, 1880] },
+  { from: "French India", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "" },
+  { from: "French Africa", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "" },
+  { from: "French Africa", box: [-9, 28, 12, 38], name: "Algeria" },
+  { from: "French Africa", box: [-18, 11, -8, 17], name: "Senegal" },
+  { from: "French Africa", box: [7, -4, 14, 3], name: "Gabon" },
+  { from: "French Africa", box: [13.5, -6, 17, -2], name: "French Congo" },
+  { from: "French Africa", box: [-4.5, 4.5, -2.5, 6], name: "Grand-Bassam" },
+  { from: "French Indochina", box: [102, 9.5, 108, 15], name: "Cambodia" },
+  { from: "French Indochina", box: [116, 38, 119, 41], name: "Qing Empire", member: "" }, // the concession at Tianjin
+  { from: "French Indochina", box: [163, -23, 169, -19], name: "New Caledonia" },
+  { from: "French Indochina", box: [55, -21.5, 56, -20.8], name: "La Réunion" },
+  { from: "French Third Republic", box: [-61.3, 14.3, -60.7, 15], name: "Martinique" },
+  { from: "French Third Republic", box: [-63.2, 17.8, -62.7, 18.3], name: "Colony of Guadeloupe" }, // Saint-Martin
+  { from: "Bourbon Kingdom of France", box: [-61.3, 14.3, -60.7, 15], name: "Martinique" },
+  { from: "Bourbon Kingdom of France", box: [-63.2, 15.8, -60.9, 18.3], name: "Colony of Guadeloupe" },
+  { from: "Bourbon Kingdom of France", box: [-4.5, 4.5, -2.5, 6], drop: true }, // the Ivory Coast, where France had no post until 1843
+  { from: "French Louisiana", box: [-56.6, 46.7, -56, 47.2], name: "Saint Pierre and Miquelon", member: "(British Empire)" }, // held by Britain 1793-1802
+  { from: "French Louisiana", box: [-63.2, 17.8, -62.7, 18.3], name: "Colony of Guadeloupe", member: "(French Consulate)" },
+  { from: "New Netherland", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Batavian Republic)" },
+  { from: "Netherlands Antilles", box: [-58.5, 1.5, -53.5, 6.5], name: "Suriname", member: "(Netherlands)" },
+  { from: "Netherlands Antilles", box: [-70.5, 11.8, -67.8, 12.8], name: "Curaçao", member: "(Netherlands)" },
+  { from: "Netherlands Antilles", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Netherlands)" },
+];
+const clioRaw = new Map(); // year -> Cliopatria's polities as it gives them, for the territory rules (`clio`)
+/** Cliopatria's polities for a year, in the historical source's form (NAME, SUBJECTO, BORDERPRECISION). */
+async function cliopatriaBase(year) {
+  const rows = await cliopatriaPolities(path.join(CACHE, "cliopatria"), year);
+  clioRaw.set(year, rows);
+  const rulerOf = (memberOf) => CLIO_RULERS[year][memberOf] ?? memberOf.replace(/^\((.*)\)$/, "$1");
+  return rows.flatMap((f) => {
+    const props = { NAME: f.properties.Name, SUBJECTO: rulerOf(f.properties.MemberOf || ""), BORDERPRECISION: 2 };
+    let polys = polysOfGeom(f.geometry);
+    const out = [];
+    for (const part of CLIO_PARTS) {
+      if (part.from !== f.properties.Name || (part.years && !part.years.includes(year))) continue;
+      const inBox = (p) => {
+        const [w, s, e, n] = boxOfPolys([p]);
+        return boxesMeet(part.box, [(w + e) / 2, (s + n) / 2, (w + e) / 2, (s + n) / 2]);
+      };
+      const got = polys.filter(inBox);
+      polys = polys.filter((p) => !inBox(p));
+      const SUBJECTO = "member" in part ? rulerOf(part.member) : props.SUBJECTO;
+      if (got.length && !part.drop) out.push({ type: "Feature", properties: { ...props, NAME: part.name, SUBJECTO }, geometry: { type: "MultiPolygon", coordinates: got } });
+    }
+    if (polys.length) out.push({ type: "Feature", properties: props, geometry: { type: "MultiPolygon", coordinates: polys } });
+    return out;
+  });
+}
 // present-day names that were different then (the countries were renamed between 2013 and 2022)
 const NAME_THEN = { Türkiye: "Turkey", "North Macedonia": "Macedonia", Eswatini: "Swaziland", Czechia: "Czech Republic", "Cabo Verde": "Cape Verde" };
 const isCrimea = (rings) => {
@@ -350,7 +452,51 @@ const HISTOGIS = {
     add: { Cyprus: CYPRUS },
     keep: {},
   },
+  // HistoGIS has no German states for 1815 (OpenHistoricalMap draws them)
+  1815: {
+    day: "1815-12-31",
+    names: {
+      Austria: "Austrian Empire",
+      Cracow: "Free City of Cracow",
+      France: "Kingdom of France",
+      Lucca: "Duchy of Lucca",
+      "Massa e Carrara": "Duchy of Massa and Carrara",
+      "Modena and Reggio": "Duchy of Modena and Reggio",
+      Naples: "Kingdom of Naples",
+      Parma: "Duchy of Parma and Piacenza",
+      Poland: "Congress Poland",
+      Portugal: "United Kingdom of Portugal, Brazil and the Algarves",
+      "Repubblica Settinsulare": "United States of the Ionian Islands",
+      Russia: "Russian Empire",
+      Sardinia: "Kingdom of Sardinia",
+      Sicily: "Kingdom of Sicily",
+      Sweden: "Sweden–Norway",
+      Tuscany: "Grand Duchy of Tuscany",
+      "Vereinigtes Königreich der Niederlande": "United Kingdom of the Netherlands",
+      "United Kingdom": UK_1900S,
+    },
+    add: {
+      "Congress Poland": { s: "Russian Empire", w: "A kingdom created at the Congress of Vienna, with the Russian emperor as its king." },
+      "United States of the Ionian Islands": { s: UK_1900S, w: "A British protectorate from November 1815 until the islands joined Greece in 1864." },
+      "Free City of Cracow": { w: "A free city under the protection of Austria, Prussia and Russia, 1815–1846." },
+      Malta: { s: UK_1900S },
+      Gibraltar: { s: UK_1900S },
+    },
+    keep: {},
+  },
+  1878: {
+    day: "1878-12-31",
+    names: { "Austria-Hungary": "Austria-Hungary", Italy: "Kingdom of Italy", "Bosnia and Herzegovina": "Bosnia-Herzegovina", Russia: "Russian Empire", Sweden: "Sweden–Norway", "United Kingdom": UK_1900S },
+    add: {
+      "Bosnia-Herzegovina": { s: "Austria-Hungary", w: "Ottoman land occupied and run by Austria-Hungary from 1878; annexed in 1908." },
+      Cyprus: { s: UK_1900S, w: "Ottoman land under British administration from 1878; Britain annexed it in November 1914." },
+      Malta: { s: UK_1900S },
+      Gibraltar: { s: UK_1900S },
+    },
+    keep: {},
+  },
 };
+HISTOGIS[1880] = { ...HISTOGIS[1878], day: "1880-12-31" };
 // OpenHistoricalMap's states, by map: [relation id, our name, options]. `parts`: which of the relation's parts count,
 // by where they lie (by default those in Europe: a relation can also hold a country's colonies, which the historical
 // source draws on their own). `props`: properties for the shape. `rest`: a shape for what ours of that name covers
@@ -524,6 +670,10 @@ const OHM = {
     [2905980, "Portugal"],
   ],
 };
+// From 1800 to 1880 the OpenHistoricalMap countries are many (over a hundred per map), so they are listed in a file of
+// their own, generated from OHM and checked against Cliopatria (see its _readme). They are laid over the Cliopatria base.
+const OHM_1800S = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "ohm-1800s.json"), "utf8"));
+for (const year of [1800, 1815, 1878, 1880]) OHM[year] = OHM_1800S[year];
 // Land between the OpenHistoricalMap states that was a territory of its own: { box, n, props }. Our shapes' pieces
 // there (outside every state) become it.
 const OHM_GAPS = {
@@ -617,6 +767,43 @@ function dropSlivers(f, before, wasKm2, box, out, anyWidth = false) {
   out.push(...sliverStrips(slivers, f.properties.n));
 }
 
+/** The shortest distance, in degrees of latitude, from the points of polygons `a` to the edges of polygons `b`. */
+function gapDeg(a, b) {
+  let best = Infinity;
+  for (const rings of b)
+    for (const r of rings)
+      for (let i = 1; i < r.length; i++) {
+        const [x1, y1] = r[i - 1];
+        const k = Math.cos((y1 * Math.PI) / 180); // a degree of longitude, in degrees of latitude
+        const [dx, dy] = [(r[i][0] - x1) * k, r[i][1] - y1];
+        const len2 = dx * dx + dy * dy;
+        for (const ra of a)
+          for (const ring of ra)
+            for (const [x, y] of ring) {
+              const [px, py] = [(x - x1) * k, y - y1];
+              const t = len2 ? Math.max(0, Math.min(1, (px * dx + py * dy) / len2)) : 0;
+              best = Math.min(best, Math.hypot(px - t * dx, py - t * dy));
+            }
+      }
+  return best;
+}
+
+/** Joins shapes that now share a name into one (the larger one's properties). */
+function mergeSameNames(grouped) {
+  const first = new Map();
+  for (let i = 0; i < grouped.length; i++) {
+    const f = grouped[i];
+    const into = first.get(f.properties.n);
+    if (!into) {
+      first.set(f.properties.n, f);
+      continue;
+    }
+    if (km2Of(f.geometry.coordinates) > km2Of(into.geometry.coordinates)) into.properties = { ...f.properties };
+    into.geometry.coordinates = [...into.geometry.coordinates, ...f.geometry.coordinates];
+    grouped.splice(i--, 1);
+  }
+}
+
 /** Cuts `polys` out of a shape. Returns the km² it lost. */
 function cutShape(f, polys, box) {
   if (!f.geometry.coordinates.length || !boxesMeet(boxOfPolys(f.geometry.coordinates), box)) return 0;
@@ -628,13 +815,14 @@ function cutShape(f, polys, box) {
 /** The HistoGIS and OpenHistoricalMap states for a map, as { n, polys, props, rest }, clipped to land. */
 async function bordersFor(year) {
   const shapes = [];
+  const histogis = [];
   if (HISTOGIS[year]) {
     const spec = HISTOGIS[year];
     for (const f of await histogisStates(path.join(CACHE, "histogis"), spec.day)) {
       const name = histogisEnglish(f);
       if (HISTOGIS_SKIP.has(name)) continue;
       const n = spec.names[name] ?? name;
-      shapes.push({ n, polys: onLandOnly(polysOfGeom(f.geometry)), add: spec.add[n] });
+      histogis.push({ n, polys: onLandOnly(polysOfGeom(f.geometry)), add: spec.add[n], props: spec.add[n] });
     }
   }
   if (OHM[year]) {
@@ -642,14 +830,15 @@ async function bordersFor(year) {
     for (const [id, n, opt = {}] of OHM[year]) {
       const rel = rels.find((r) => r.id === id);
       if (!rel) continue;
-      const keep = opt.parts ?? inEurope;
+      const keep = opt.parts ?? (OHM_1800S[year] ? anywhere : inEurope); // the 1800s lists cover the whole world
       const polys = rel.polys.filter((p) => {
         const [w, s, e, nn] = boxOfPolys([p]);
         return keep([(w + e) / 2, (s + nn) / 2]);
       });
-      shapes.push({ n, polys: onLandOnly(polys), props: opt.props, rest: opt.rest, restIn: opt.restIn, exact: opt.exact });
+      shapes.push({ n, polys: onLandOnly(polys), props: opt.props, rest: opt.rest, restIn: opt.restIn, exact: opt.exact, adopts: opt.adopts });
     }
   }
+  shapes.push(...histogis); // after OpenHistoricalMap's: where both draw a country, HistoGIS's border wins
   for (const s of shapes) s.box = boxOfPolys(s.polys);
   return shapes.filter((s) => s.polys.length);
 }
@@ -661,6 +850,13 @@ async function bordersFor(year) {
  */
 async function overlayBorders(grouped, year, slivers) {
   const shapes = await bordersFor(year);
+  // a state the base draws under another name (`adopts`) takes that shape over, so what the base draws outside the new
+  // border joins it instead of keeping the old name
+  const renames = new Map(shapes.flatMap((s) => (s.adopts ?? []).map((n) => [n, s.n])));
+  if (renames.size) {
+    for (const f of grouped) if (renames.has(f.properties.n)) f.properties.n = renames.get(f.properties.n);
+    mergeSameNames(grouped);
+  }
   // one state at a time: polygon-clipping copes far better with these than with one union of them all
   const lost = new Map(); // our shape -> { was: km², to: Map(state -> km² it took), before: keys of its parts }
   for (const f of grouped) {
@@ -712,14 +908,47 @@ async function overlayBorders(grouped, year, slivers) {
     f.properties.b = 3;
     setProps(f, s.props);
   }
-  // a shape that the states took almost entirely was part of one of them (Finland and Georgia were part of the Russian
-  // Empire in 1914): the slivers left over, where our outline ran past the coast, go too
+  // where two states overlap, the later one in the list wins, and the earlier keeps no slivers along its edge (where
+  // their coastlines differ); judged once all its cuts are made, as a strip can stay joined to land a later cut takes
+  const overlapCut = new Map(); // our shape -> { before: keys of its parts, was: km², box: of the states that cut it }
+  for (let j = 1; j < shapes.length; j++) {
+    for (let i = 0; i < j; i++) {
+      if (shapes[i].n === shapes[j].n || !boxesMeet(shapes[i].box, shapes[j].box)) continue;
+      const f = grouped.find((g) => g.properties.n === shapes[i].n);
+      if (!f) continue;
+      const rec = overlapCut.get(f) ?? { before: new Set(f.geometry.coordinates.map(partKey)), was: km2Of(f.geometry.coordinates), box: [180, 90, -180, -90] };
+      if (cutShape(f, shapes[j].polys, shapes[j].box) <= 0) continue;
+      const b = shapes[j].box;
+      rec.box = [Math.min(rec.box[0], b[0]), Math.min(rec.box[1], b[1]), Math.max(rec.box[2], b[2]), Math.max(rec.box[3], b[3])];
+      overlapCut.set(f, rec);
+    }
+  }
+  for (const [f, rec] of overlapCut) dropSlivers(f, rec.before, rec.was, rec.box, slivers);
+  // a shape that the states took almost entirely was part of them (Finland and Georgia were part of the Russian Empire
+  // in 1914): each piece left over beside a state that took part of it, where our outline ran past the coast, joins that
+  // state (the one that took most, if several reach it). Pieces far from them stay (a base polity can be a whole
+  // colonial empire, spread over several continents)
   for (const [f, rec] of lost) {
     if (!rec.to.size || mapped(f) || km2Of(f.geometry.coordinates) > 0.15 * rec.was) continue;
-    const [taker] = [...rec.to].sort((a, b) => b[1] - a[1])[0];
-    const into = grouped.find((g) => g.properties.n === taker);
-    into.geometry.coordinates = clipSafely(polygonClipping.union, into.geometry.coordinates, f.geometry.coordinates) ?? [...into.geometry.coordinates, ...f.geometry.coordinates];
-    f.geometry.coordinates = [];
+    const takers = [...rec.to].sort((a, b) => b[1] - a[1]).map(([n]) => ({ n, polys: shapes.filter((x) => x.n === n).flatMap((x) => x.polys) }));
+    const keep = [];
+    for (const p of f.geometry.coordinates) {
+      // beside: the state's land comes within about 15 km of the piece
+      const [w, sth, e, n] = boxOfPolys([p]).map((v, i) => v + (i < 2 ? -0.3 : 0.3));
+      const near = [[[w, sth], [e, sth], [e, n], [w, n], [w, sth]]];
+      const taker = takers.find((t) => {
+        const close = t.polys.filter((q) => boxesMeet(boxOfPolys([q]), [w, sth, e, n]));
+        const there = close.length ? clipSafely(polygonClipping.intersection, near, close) : null;
+        return there?.length && gapDeg([p], there) <= 0.15;
+      });
+      if (!taker) {
+        keep.push(p);
+        continue;
+      }
+      const into = grouped.find((g) => g.properties.n === taker.n);
+      into.geometry.coordinates = clipSafely(polygonClipping.union, into.geometry.coordinates, [p]) ?? [...into.geometry.coordinates, p];
+    }
+    f.geometry.coordinates = keep;
   }
   for (const [f, rec] of lost) if (rec.to.size && !mapped(f)) dropSlivers(f, rec.before, rec.was, rec.box, slivers);
   for (let i = grouped.length - 1; i >= 0; i--) {
@@ -735,10 +964,12 @@ async function overlayBorders(grouped, year, slivers) {
 // outline (Natural Earth, public domain) is cut out of every shape on the map and given to the country that held it,
 // in the order listed. `ne0`: countries (Natural Earth's names); `ne1`: provinces, "Country/Province"; `pick`: only the
 // parts of those whose middle lies in this lon/lat box; `source`: [year, name], a shape from another snapshot of the
-// historical source, where that border did not change in between. `from`: only these shapes lose land, and the country
-// gets only what they lose. `exact`: the country loses whatever it had beyond the new outline. `s`, `w`: ruler and
-// note (null removes one). Slivers left beside the new border go (see
-// dropSlivers).
+// historical source, where that border did not change in between. `clio`: Cliopatria's outline of these polities on
+// the map (1800 to 1880). `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
+// (shown approximately). `blank`: the country gets only the land there that no shape holds. `from`: only these shapes
+// lose land, and the country gets only what they lose. `exact`: the
+// country loses whatever it had beyond the new outline. `s`, `w`: ruler and note (null removes one). Slivers left
+// beside the new border go (see dropSlivers).
 const UK_1930S = "United Kingdom of Great Britain and Ireland";
 const UK_LATER = "United Kingdom";
 const NORTH_YEMEN = ["Sa`dah", "Hajjah", "Al Jawf", "Al Hudaydah", "Ta`izz", "Ma'rib", "Sana'a", "Raymah", "Al Bayda'", "Amran", "Ibb", "Al Mahwit", "Dhamar", "Amanat Al Asimah"].map((p) => `Yemen/${p}`);
@@ -802,7 +1033,55 @@ const EGYPT_LIBYA = (libya) => [
 const SAUDI = (n) => ({ to: n, ne0: ["Saudi Arabia"], exact: true }); // Ibn Saud took Ha'il in 1921 and al-Jawf in 1922
 const SOUTH_VIETNAM = ["Kon Tum", "Đắk Nông", "Đắk Lắk", "Gia Lai", "Bình Phước", "Tây Ninh", "Long An", "Ðong Tháp", "An Giang", "Kiên Giang", "Sóc Trăng", "Tiền Giang", "Bà Rịa - Vũng Tàu", "Hồ Chí Minh city", "Khánh Hòa", "Cà Mau", "Bạc Liêu", "Hau Giang", "Vĩnh Long", "Trà Vinh", "Bến Tre", "Đông Nam Bộ", "Bình Thuận", "Ninh Thuận", "Phú Yên", "Bình Định", "Quảng Ngãi", "Đà Nẵng", "Quàng Nam", "Thừa Thiên - Huế", "Quảng Trị", "Bình Dương", "Lâm Đồng", "Can Tho"].map((p) => `Vietnam/${p}`);
 const NIGERIA = (states) => states.map((p) => `Nigeria/${p}`);
+// Bulgaria from 1878: the principality north of the Balkan Mountains, Eastern Rumelia south of them (both under nominal
+// Ottoman rule), and the south-west and south, still Ottoman until 1912–13 (approximately, by today's provinces)
+const BULGARIA_1878 = [
+  { to: "Bulgaria", ne1: ["Vidin", "Montana", "Vratsa", "Pleven", "Lovech", "Veliko Tarnovo", "Gabrovo", "Ruse", "Razgrad", "Targovishte", "Shumen", "Silistra", "Dobrich", "Varna", "Sofia", "Grad Sofiya", "Pernik", "Kyustendil"].map((p) => `Bulgaria/${p}`), s: "Ottoman Empire", w: "An autonomous principality under nominal Ottoman rule, created in 1878. It took in Eastern Rumelia in 1885 and declared independence in 1908." },
+  { to: "Eastern Rumelia", ne1: ["Plovdiv", "Pazardzhik", "Stara Zagora", "Haskovo", "Sliven", "Yambol", "Burgas"].map((p) => `Bulgaria/${p}`), s: "Ottoman Empire", w: "An autonomous Ottoman province from 1878 until it joined Bulgaria in 1885 (shown approximately)." },
+  { to: "Ottoman Empire", ne1: ["Bulgaria/Kardzhali", "Bulgaria/Smolyan", "Bulgaria/Blagoevgrad"] },
+];
+// Cutch, between the Gulf of Kutch and the Rann (OpenHistoricalMap's Maratha outline runs over it; Cliopatria leaves it out)
+const CUTCH = {
+  to: "Cutch",
+  poly: [[68.0, 23.4], [68.3, 24.0], [69.5, 24.4], [70.5, 24.45], [71.1, 24.3], [71.3, 23.9], [71.1, 23.45], [70.85, 23.2], [70.6, 23.12], [70.35, 23.05], [70.1, 22.95], [69.5, 22.6], [68.6, 22.6], [68.0, 23.4]],
+  w: "A kingdom ruled by the Jadeja Raos from Bhuj (shown approximately). It came under British protection by a treaty of 1816.",
+};
+// the Ahom kingdom of Assam, which neither source draws: today's Assam, where no other state is drawn
+const AHOM = { to: "Ahom Kingdom", ne1: ["India/Assam"], blank: true, w: "The Ahom kings ruled the Brahmaputra valley from the 13th century until Burma conquered it in 1817–21; Britain took it in 1826 (shown approximately)." };
+// the Falklands, British from 1833 (OpenHistoricalMap's Argentina takes them in)
+const FALKLANDS = { to: "Falkland Islands", ne0: ["Falkland Is."], s: UK_1900S, w: "A British colony since 1841; Britain took the islands in 1833. Argentina claims them." };
+// Cliopatria's row for British India also holds Ceylon's coast, which was a colony of its own
+const CEYLON_COAST = (uk, w) => ({ to: "British Ceylon", ne0: ["Sri Lanka"], from: ["Company Raj"], s: uk, ...(w ? { w } : {}) });
 const TERRITORY = {
+  1800: [
+    ...MICROSTATES,
+    CUTCH,
+    AHOM,
+    CEYLON_COAST("Kingdom of Great Britain", "The coast Britain took from the Dutch in 1796, a crown colony from 1802. The Kingdom of Kandy held the hill country until 1815."),
+    // Bombay and Surat, British since 1668 and 1800 (Cliopatria draws them; OpenHistoricalMap's Maratha outline runs over them)
+    { to: "Company Raj", clio: ["British Empire"], pick: [72.5, 18.9, 73.2, 21.4], from: ["Maratha Confederacy"] },
+    // the Sikh states south of the Sutlej (Patiala, Nabha, Jind), which Cliopatria draws in its outline of Rajputana's states
+    { to: "Sikh Confederacy", ne1: ["India/Punjab"], from: ["Rajputana"] },
+    // the Falklands: Spain's garrison at Puerto Soledad, run from Buenos Aires, held them from 1767 to 1811
+    { to: "Viceroyalty of the Río de la Plata", ne0: ["Falkland Is."] },
+  ],
+  1815: [
+    ...MICROSTATES,
+    { to: "Kingdom of Saxony", ne1: ["Germany/Sachsen"] }, // the kingdom left after 1815 is today's Saxony
+    CUTCH,
+    AHOM,
+    CEYLON_COAST(UK_1900S),
+    // the Mughal emperor's court at Delhi, which Cliopatria draws inside its outline of Rajputana's states; and a speck of
+    // that outline on the Kathiawar coast, among the Maratha lands
+    { to: "Mughal Empire", clio: ["Mughal Empire"], pick: [76.9, 28.3, 77.6, 28.9], s: UK_1900S, w: "The Mughal emperor's court at Delhi. The British took Delhi in 1803 and ran the country around it; the emperor, Akbar II, lived on a British pension." },
+    { to: "Maratha Confederacy", clio: ["Mughal Empire"], pick: [70.2, 22.7, 70.5, 22.9] },
+    // Hispaniola: Spain held the east again from 1809 (OpenHistoricalMap's Kingdom of Haiti runs over the Cibao), and the
+    // north coast of Haiti is the Kingdom's (OpenHistoricalMap's New Spain, drawn over all the island, keeps it)
+    { to: "Captaincy General of Santo Domingo", ne0: ["Dominican Rep."], s: "Spain", w: "Spanish again from 1809 until it broke away in 1821; Haiti took it the next year." },
+    { to: "Kingdom of Haiti", poly: [[-74.6, 19.6], [-71.7, 19.6], [-71.7, 20.2], [-74.6, 20.2], [-74.6, 19.6]], from: ["Viceroyalty of New Spain"] },
+  ],
+  1878: [...MICROSTATES, ...BULGARIA_1878, FALKLANDS],
+  1880: [...MICROSTATES, ...BULGARIA_1878, FALKLANDS],
   1900: [
     ...MICROSTATES,
     KALIMANTAN("Netherlands Indies"),
@@ -1065,7 +1344,16 @@ const TERRITORY = {
 };
 // A ruler named differently from its shape on the same map ("United Kingdom" where the map names it the United Kingdom
 // of Great Britain and Ireland) takes the shape's name, so its land counts toward the empire it belongs to.
-const RULER_NAMES = [["United Kingdom", UK_1900S], ["Italy", "Kingdom of Italy"], ["Russia", "Russian Empire"]];
+const RULER_NAMES = [
+  ["United Kingdom", UK_1900S, "Kingdom of Great Britain", "British Empire"],
+  ["Italy", "Kingdom of Italy"],
+  ["Russia", "Russian Empire"],
+  ["Spain", "Kingdom of Spain", "Spanish Empire"],
+  ["Portugal", "Kingdom of Portugal", "Portuguese Empire", "United Kingdom of Portugal, Brazil and the Algarves"],
+  ["France", "French Republic", "Kingdom of France", "French Third Republic", "French Consulate", "Bourbon Kingdom of France"],
+  ["Netherlands", "United Kingdom of the Netherlands", "Batavian Republic"],
+  ["Denmark", "Denmark–Norway", "Denmark-Norway"],
+];
 function matchRulers(grouped) {
   const names = new Set(grouped.map((f) => f.properties.n));
   for (const f of grouped) {
@@ -1115,7 +1403,7 @@ function provincesLand(admin, chosen) {
     return shared && km2Of(shared) >= 0.5 * km2Of([p]);
   });
 }
-function territoryUnits(rule) {
+function territoryUnits(rule, year) {
   const out = [];
   const take = (polys) => {
     for (const rings of polys) {
@@ -1144,11 +1432,17 @@ function territoryUnits(rule) {
     if (!polys.length) console.warn(`  ! territory rule for ${rule.to}: no ${rule.source[1]} in ${rule.source[0]}`);
     out.push(...polys);
   }
+  if (rule.clio) {
+    const found = (clioRaw.get(year) ?? []).filter((f) => rule.clio.includes(f.properties.Name));
+    if (!found.length) console.warn(`  ! territory rule for ${rule.to}: no ${rule.clio.join(", ")} in Cliopatria's ${year}`);
+    take(found.flatMap(polysOfFeature));
+  }
+  if (rule.poly) take(onLandOnly([[rule.poly]]));
   return out;
 }
 function applyTerritory(grouped, year, slivers) {
   for (const rule of TERRITORY[year] ?? []) {
-    const polys = territoryUnits(rule);
+    const polys = territoryUnits(rule, year);
     if (!polys.length) continue;
     const box = boxOfPolys(polys);
     // blank strips left by an earlier cut give way to the land given here
@@ -1160,8 +1454,13 @@ function applyTerritory(grouped, year, slivers) {
       else if (left) slivers.splice(i, 1);
     }
     const taken = []; // with `from`: what those shapes lose
+    const held = []; // with `blank`: the land the shapes there hold
     for (const f of grouped) {
       if (!f.geometry.coordinates.length || !boxesMeet(boxOfPolys(f.geometry.coordinates), box)) continue;
+      if (rule.blank) {
+        held.push(...f.geometry.coordinates);
+        continue;
+      }
       if (rule.from && !rule.from.includes(f.properties.n)) continue;
       const before = new Set(f.geometry.coordinates.map(partKey));
       const was = km2Of(f.geometry.coordinates);
@@ -1171,7 +1470,7 @@ function applyTerritory(grouped, year, slivers) {
       if (rule.exact && f.properties.n === rule.to) dropSlivers(f, before, Infinity, box, slivers, true);
       else dropSlivers(f, before, was, box, slivers);
     }
-    const give = rule.from ? taken : polys;
+    const give = rule.from ? taken : rule.blank && held.length ? (clipSafely(polygonClipping.difference, polys, held) ?? []) : polys;
     if (!give.length) continue;
     let f = grouped.find((g) => g.properties.n === rule.to);
     if (f) f.geometry.coordinates = f.geometry.coordinates.length ? (clipSafely(polygonClipping.union, f.geometry.coordinates, give) ?? [...f.geometry.coordinates, ...give]) : give;
@@ -1273,17 +1572,7 @@ function touchesShape(patch, features) {
 const TASMANIA = [143.5, -44, 149, -39.5];
 const TASMANIA_NOTE = "The source leaves Tasmania unnamed in this snapshot. It was the British colony of Tasmania until federation in 1901, so it is named like the mainland colonies.";
 const UNNAMED = [
-  // like the mainland colonies: ruled by the United Kingdom in 1815 (as New South Wales), their own rulers in 1878 and
-  // 1880, ruled by the United Kingdom again in 1900
-  {
-    n: "Van Diemen's Land",
-    years: [1815],
-    today: "Australia",
-    box: TASMANIA,
-    s: "United Kingdom of Great Britain and Ireland",
-    note: "The source leaves Tasmania unnamed in this snapshot. It was the British colony of Van Diemen's Land, settled in 1803, governed from New South Wales until 1825 and renamed Tasmania in 1856.",
-  },
-  { n: "Tasmania (UK)", years: [1878, 1880], today: "Australia", box: TASMANIA, note: TASMANIA_NOTE },
+  // like the mainland colonies, ruled by the United Kingdom (the maps before 1900 are drawn from other sources)
   { n: "Tasmania (UK)", years: [1900], today: "Australia", box: TASMANIA, s: "United Kingdom of Great Britain and Ireland", note: TASMANIA_NOTE },
 ];
 
@@ -1408,7 +1697,11 @@ async function main() {
   const gridSources = []; // per era: named features, used for "Who ruled here?"
 
   for (const entry of index) {
-    const raw = FROM_NATURAL_EARTH.has(entry.year) ? { features: [] } : JSON.parse(fs.readFileSync(path.join(HB_DIR, entry.filename), "utf8"));
+    const raw = FROM_CLIOPATRIA.has(entry.year)
+      ? { features: await cliopatriaBase(entry.year) }
+      : FROM_NATURAL_EARTH.has(entry.year)
+        ? { features: [] }
+        : JSON.parse(fs.readFileSync(path.join(HB_DIR, entry.filename), "utf8"));
     const features = FROM_NATURAL_EARTH.has(entry.year) ? naturalEarthEra(entry.year) : [];
     const namedBack = new Map(); // countries in UNNAMED given their name back in this snapshot -> the pieces
     for (const f of raw.features) {
@@ -1438,7 +1731,7 @@ async function main() {
     const slivers = []; // thin pieces new borders cut off our shapes, left blank for the coast fill
     if (HISTOGIS[entry.year] || OHM[entry.year]) await overlayBorders(grouped, entry.year, slivers);
     if (TERRITORY[entry.year]) applyTerritory(grouped, entry.year, slivers);
-    if (entry.year >= 1900) matchRulers(grouped);
+    if (entry.year >= 1800) matchRulers(grouped);
     splitSvalbard(grouped, entry.year);
     if (entry.year === 1400) splitMing1400(grouped);
     for (const f of grouped) {
@@ -1610,7 +1903,7 @@ async function main() {
   // is coarse, wider ones too. In the snapshots that map its Aboriginal nations (1600–1815) the source's older shape for
   // the whole continent also shows through as thin slivers along the coast; those go to the nations beside them too.
   // Filled after colouring, so colours stay as they are; a shape that now borders a same-coloured neighbour gets a free one.
-  const inAustralia = (c) => presentOwnerAt(c) === "Australia";
+  const inAustralia = (c, year) => !FROM_CLIOPATRIA.has(year) && presentOwnerAt(c) === "Australia"; // the source's coarse coastline
   const leftover = (year, props) => props.n === "Australian aboriginal hunter-gatherers" && year >= 1600 && year <= 1815;
   const gaps = fillGapEraFiles(ROOT, inAustralia, leftover);
   const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
