@@ -136,15 +136,6 @@
       "why": "Cliopatria names the state after its ruling family."
     },
     {
-      "name": "Sultan of Yogyakarta",
-      "years": [
-        1800,
-        1815
-      ],
-      "n": "Yogyakarta Sultanate",
-      "why": "Cliopatria names the state after its ruler."
-    },
-    {
       "name": "Merina Kingdom",
       "years": [
         1800,
@@ -284,6 +275,70 @@
       ],
       "note": "A Dutch colony, held by Britain from 1795 to 1818; the Dutch traded it to Britain for good in 1824.",
       "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Malacca",
+      "years": [
+        1815
+      ],
+      "note": "A Dutch colony, held by Britain from 1795 to 1818; the Dutch traded it to Britain for good in 1824.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Padang",
+      "years": [
+        1800
+      ],
+      "note": "The Dutch posts on Sumatra's west coast around Padang, held by Britain from 1795 to 1819.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Padang",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch posts on Sumatra's west coast around Padang, held by Britain from 1795 to 1819.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Amboyna and Banda",
+      "years": [
+        1800
+      ],
+      "note": "The Dutch spice islands of Ambon and Banda, with Buru, Seram and the islands to the south-east, taken by Britain in 1796 and handed back in 1803 after the Peace of Amiens.",
+      "why": "Cliopatria draws them as part of the Dutch East Indies."
+    },
+    {
+      "name": "Bangka and Belitung",
+      "years": [
+        1815
+      ],
+      "note": "Ceded to Britain in 1812 by the sultan it had put on Palembang's throne. Under the treaty of 1814 Britain traded them to the Netherlands for Cochin, in India, and handed them over in 1816.",
+      "why": "Cliopatria draws Bangka as part of the Dutch East Indies and Belitung as part of the British Colonial Empire."
+    },
+    {
+      "name": "Makassar",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch government of Makassar in southern Celebes, which passed to Britain with Java in 1811; handed back to the Netherlands in 1816.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Kupang",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch post at Kupang on Timor, which surrendered to Britain in January 1812; handed back to the Netherlands in 1816.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Moluccas",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch spice islands (Ambon, Banda, Ternate and their dependencies, with Manado in Celebes), taken by Britain in 1810 and handed back to the Netherlands in 1817.",
+      "why": "Cliopatria draws them as part of the Dutch East Indies."
     },
     {
       "name": "North Borneo",
