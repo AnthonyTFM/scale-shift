@@ -7,8 +7,12 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { playerId } from "@/lib/player";
 import { home } from "@/content/home";
-import type { AllTimeBoard, DayBoard } from "@/lib/leaderboard-types";
-import { TrophyIcon } from "@/components/site/Icons";
+import type { AllTimeBoard, DayBoard, EndlessBoard } from "@/lib/leaderboard-types";
+import { FlameIcon, TrophyIcon } from "@/components/site/Icons";
+
+type Tab = "daily" | "endless";
+// the tab a visitor last looked at, so endless players land on their board
+const TAB_KEY = "atlas-home-board";
 
 /** Shown when today has no scores yet: yesterday's top three, or the all-time top three. */
 type Fallback = { kind: "yesterday" | "all"; rows: { rank: number; name: string; score: string }[] };
@@ -28,8 +32,74 @@ async function fallbackBoard(): Promise<Fallback | null> {
   return null;
 }
 
-/** The hero's right-hand card: today's top five, and your own spot if you've played. */
+/** The leaderboard card under the hero: the daily challenge's board or endless mode's best streaks, one tab each. */
 export function HeroLeaderboard() {
+  const [tab, setTab] = useState<Tab>("daily");
+  const t = home.hub;
+  useEffect(() => {
+    try {
+      if (localStorage.getItem(TAB_KEY) === "endless") queueMicrotask(() => setTab("endless"));
+    } catch {
+      /* storage blocked: start on the daily */
+    }
+  }, []);
+  const pick = (next: Tab) => {
+    setTab(next);
+    try {
+      localStorage.setItem(TAB_KEY, next);
+    } catch {
+      /* storage blocked */
+    }
+  };
+  const tabs: [Tab, string][] = [
+    ["daily", t.boardTabs.daily],
+    ["endless", t.boardTabs.endless],
+  ];
+  return (
+    <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:p-6">
+      <h2 className="flex items-center gap-2 font-display text-2xl text-ink sm:text-[1.7rem]">
+        <TrophyIcon className="size-8" /> {t.boardTitle}
+      </h2>
+      <div
+        role="tablist"
+        aria-label={t.boardTabsLabel}
+        onKeyDown={(e) => {
+          // arrow keys move between the two tabs, as screen-reader users expect from a tab list
+          if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key) || e.altKey || e.ctrlKey || e.metaKey) return;
+          e.preventDefault();
+          const next = tab === "daily" ? "endless" : "daily";
+          pick(e.key === "Home" ? "daily" : e.key === "End" ? "endless" : next);
+          e.currentTarget.querySelector<HTMLElement>(`[data-tab="${e.key === "Home" ? "daily" : e.key === "End" ? "endless" : next}"]`)?.focus();
+        }}
+        className="mt-3 grid grid-cols-2 rounded-2xl border-2 border-line bg-white p-1 text-sm font-bold"
+      >
+        {tabs.map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            data-tab={id}
+            id={`home-board-tab-${id}`}
+            aria-controls="home-board-panel"
+            aria-selected={tab === id}
+            tabIndex={tab === id ? 0 : -1}
+            onClick={() => pick(id)}
+            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl px-3 aria-selected:bg-primary aria-selected:text-white"
+          >
+            {id === "endless" ? <FlameIcon className="size-4" /> : null}
+            {label}
+          </button>
+        ))}
+      </div>
+      <div id="home-board-panel" role="tabpanel" aria-labelledby={`home-board-tab-${tab}`}>
+        {tab === "daily" ? <DailyBoard /> : <StreakBoard />}
+      </div>
+    </div>
+  );
+}
+
+/** Today's daily top five, and your own spot if you've played. */
+function DailyBoard() {
   const [board, setBoard] = useState<DayBoard | null | undefined>(undefined);
   const [myScore, setMyScore] = useState<number | null>(null);
   const [fallback, setFallback] = useState<Fallback | null>(null);
@@ -49,11 +119,8 @@ export function HeroLeaderboard() {
 
   const meBelow = board?.me && !board.rows.some((r) => r.me) ? board.me : null;
   return (
-    <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:p-6">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="flex items-center gap-2 font-display text-2xl text-ink sm:text-[1.7rem]"><TrophyIcon className="size-8" /> {t.boardTitle}</h2>
-        {board?.total ? <p className="whitespace-nowrap text-xs text-muted">{t.boardPlayers(board.total)}</p> : null}
-      </div>
+    <>
+      {board?.total ? <p className="mt-2 text-right text-xs text-muted">{t.boardPlayers(board.total)}</p> : null}
       {board === undefined ? (
         <ul aria-hidden="true" className="mt-4 space-y-2">
           {[0, 1, 2, 3, 4].map((i) => (
@@ -132,6 +199,81 @@ export function HeroLeaderboard() {
       <Link href="/leaderboard" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline">
         {t.boardCta} →
       </Link>
-    </div>
+    </>
+  );
+}
+
+/**
+ * Endless mode's best streaks today; while nobody has posted one today, the best of all time (or an invitation when
+ * there are none yet either).
+ */
+function StreakBoard() {
+  const [board, setBoard] = useState<EndlessBoard | null | undefined>(undefined);
+  const [allTime, setAllTime] = useState<EndlessBoard | null>(null);
+  const t = home.hub;
+
+  useEffect(() => {
+    const id = playerId();
+    getJson<EndlessBoard>(`/api/endless?scope=day&date=${localDateKey()}&limit=5${id ? `&player=${id}` : ""}`).then(async (b) => {
+      if (b && !b.rows.length) setAllTime(await getJson<EndlessBoard>(`/api/endless?scope=all&limit=3${id ? `&player=${id}` : ""}`));
+      setBoard(b);
+    });
+  }, []);
+
+  const rows = board?.rows.length ? board.rows : (allTime?.rows ?? []);
+  const meBelow = board?.me && !board.rows.some((r) => r.me) ? board.me : null;
+  const row = (r: (typeof rows)[number], key: string) => (
+    <li key={key} className={`flex items-center gap-3 rounded-lg px-3 py-2 ${r.me ? "bg-gold text-ink" : "bg-paper"}`}>
+      <span className={`w-6 text-center font-bold ${r.rank <= 3 && !r.me ? "text-primary" : ""}`}>{r.rank}</span>
+      <span className="min-w-0 flex-1 truncate font-semibold">
+        {r.name}
+        {r.me ? <span className="font-normal"> (you)</span> : null}
+      </span>
+      <span className="inline-flex items-center gap-1 font-mono text-sm">
+        <FlameIcon className="size-4" />
+        <span aria-hidden="true">{r.score}</span>
+        <span className="sr-only">{t.streakSr(r.score)}</span>
+      </span>
+    </li>
+  );
+  return (
+    <>
+      {board?.total ? <p className="mt-2 text-right text-xs text-muted">{t.boardPlayers(board.total)}</p> : null}
+      {board === undefined ? (
+        <ul aria-hidden="true" className="mt-4 space-y-2">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <li key={i} className="h-9 animate-pulse rounded-lg bg-beige" />
+          ))}
+        </ul>
+      ) : board?.rows.length ? (
+        <ol className="mt-4 space-y-1.5">
+          {rows.map((r) => row(r, r.rank + r.name))}
+          {meBelow ? row(meBelow, "me") : null}
+        </ol>
+      ) : rows.length ? (
+        <div className="mt-3">
+          <p className="text-sm font-semibold text-ink">{t.streakEmptyShort}</p>
+          <p className="mt-3 text-xs font-bold uppercase tracking-wide text-muted">{t.streakAllTime}</p>
+          <ol className="mt-1.5 space-y-1.5" aria-label={t.streakAllTime}>
+            {rows.map((r) => row(r, r.rank + r.name))}
+          </ol>
+        </div>
+      ) : (
+        <p className="mt-4 rounded-lg bg-paper px-3 py-6 text-center text-muted">{t.streakEmpty}</p>
+      )}
+      {board !== undefined && (board?.rows.length ?? 0) < 5 ? (
+        <Link
+          href="/endless"
+          className="mt-1.5 flex items-center gap-3 rounded-lg border-2 border-dashed border-line px-3 py-2 text-muted hover:border-primary hover:text-ink"
+        >
+          <span className="w-6 text-center font-bold">?</span>
+          <span className="min-w-0 flex-1 truncate font-semibold">{t.spotWaiting}</span>
+          <span className="text-sm font-bold text-primary">{t.streakPlay} →</span>
+        </Link>
+      ) : null}
+      <Link href="/leaderboard#endless" className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline">
+        {t.boardCta} →
+      </Link>
+    </>
   );
 }
