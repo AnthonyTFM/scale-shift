@@ -175,29 +175,6 @@ export function sizeLine(big: PoolEntry, small: PoolEntry) {
   return `${p.big} ${p.link} ${p.small}.`;
 }
 
-export function explain(q: Question) {
-  const big = q.options[q.answer];
-  const small = q.options[1 - q.answer];
-  const S = nameInSentence(small);
-  const lines = [sizeLine(big, small)];
-  const looks = small.m / big.m;
-  if (looks > 1.05) {
-    lines.push(
-      `On a normal web map, ${S} looks ${times(looks)}× bigger than ${nameInSentence(big)}, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
-    );
-  } else {
-    // same 15% line as the "Map: 1.2× too big" chip on the cards, so the sentence never contradicts them
-    const more = stretch(big) > stretch(small) ? big : small;
-    const other = more === big ? small : big;
-    if (stretch(other) >= 1.15)
-      lines.push(`Web maps draw both too big (${nameInSentence(more)} ${times(stretch(more))}×, ${nameInSentence(other)} ${times(stretch(other))}×).`);
-    else if (stretch(more) >= 1.15)
-      lines.push(`Web maps draw ${nameInSentence(more)} ${times(stretch(more))}× too big, so the gap looks ${more === big ? "bigger" : "smaller"} than it really is.`);
-    else lines.push("Both sit close to the equator, so web maps get these two roughly right.");
-  }
-  return lines;
-}
-
 // ---------- saved progress (this browser only) ----------
 
 /** c = the option picked for each question so far; s = final score once all five are answered. */

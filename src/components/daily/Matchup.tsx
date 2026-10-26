@@ -3,9 +3,10 @@
 // The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
 import { useEffect, useRef, useState } from "react";
 import dataVersion from "@/data/data-version.json";
-import { explain, type PoolEntry, type Question } from "@/lib/daily";
+import { sizeLine, stretch, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
-import { formatBoth } from "@/lib/format";
+import { formatArea, type AreaUnit } from "@/lib/format";
+import { preferredUnit } from "@/lib/units";
 import { mapUrl } from "@/lib/share";
 import { setSound, soundOn } from "@/lib/sound";
 import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
@@ -20,8 +21,11 @@ export const ROUND_TOP = 88;
 // at its own proportions)
 const TILE = "aspect-square [@media(min-width:768px)_and_(max-height:820px)]:aspect-[5/4]";
 
-// the two shapes on the game tiles: bright fills (they are drawings, not text)
+// the two shapes on the game tiles: bright fills (they are drawings, not text); grey for how a web map draws them
 const COLORS = ["#FF5B4A", "#2F6BFF"];
+const GHOST = "#8A93A8";
+/** "2.1" or "12" for a ratio, as the reveal writes it */
+const times = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
 const V = `?v=${dataVersion.v}`;
 
 let poolPromise: Promise<PoolEntry[]> | null = null;
@@ -120,15 +124,30 @@ export function QuestionCard({
   const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
   const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
 
-  const lines = explain(q);
+  const big = q.options[q.answer];
+  const small = q.options[1 - q.answer];
+  const gap = big.a / small.a;
+  // "1.6×" or, for close calls, "12%"
+  const gapText = gap < 1.2 ? `${Math.round((gap - 1) * 100)}%` : `${times(gap)}×`;
+  // the cards only show after the first load, in the browser, so this never runs on the server
+  const [unit] = useState<AreaUnit>(preferredUnit);
+  const sectionRef = useRef<HTMLElement>(null);
+  const verdictRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!answered) return;
     // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
     nextRef.current?.focus({ preventScroll: true });
-    // once the shapes have settled, bring the explanation and "Next" into view on short screens
+    // once the shapes have settled, bring the verdict into view on short screens ("Next" sticks to the bottom of the
+    // screen), but never so far that the top of the card (the round and level) slides under the header
     const id = setTimeout(
-      () => nextRef.current?.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }),
+      () => {
+        const card = sectionRef.current?.getBoundingClientRect();
+        const verdict = verdictRef.current?.getBoundingClientRect();
+        if (!card || !verdict) return;
+        const want = Math.min(verdict.bottom - (innerHeight - 88), card.top - ROUND_TOP);
+        if (want > 0) scrollTo({ top: scrollY + want, behavior: reducedMotion() ? "auto" : "smooth" });
+      },
       reducedMotion() ? 0 : 1400,
     );
     return () => clearTimeout(id);
@@ -136,6 +155,7 @@ export function QuestionCard({
 
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="daily-q"
       className="rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:p-6"
     >
@@ -158,9 +178,6 @@ export function QuestionCard({
               : picked === i
                 ? "reveal-shake border-red [--press-shadow:var(--color-red-shadow)]"
                 : "opacity-70";
-          const inflate = o.m / o.a;
-          const x = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
-          const mapNote = inflate >= 1.15 ? reveal.mapTooBig(x(inflate)) : inflate <= 0.87 ? reveal.mapTooSmall(x(1 / inflate)) : reveal.mapAboutRight;
           return (
             <button
               key={o.id}
@@ -182,21 +199,22 @@ export function QuestionCard({
               <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
               {answered ? (
                 <>
-                  <TrueArea from={o.m} to={o.a} />
+                  <TrueArea from={o.m} to={o.a} unit={unit} />
+                  {/* the result in plain words, so it reads without comparing the numbers */}
                   <span
-                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight text-ink ${inflate >= 1.15 ? "bg-gold-soft" : "bg-beige"}`}
+                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight ${isAnswer ? "bg-green-soft text-green-text" : "bg-beige text-ink-soft"}`}
                   >
-                    {mapNote}
+                    {isAnswer ? reveal.biggerBy(gapText) : reveal.smaller}
                   </span>
                 </>
               ) : null}
             </button>
           );
         })}
-        {/* the gold VS coin between the cards */}
+        {/* the gold VS coin between the cards; it fades once answered, so it doesn't sit on the shapes */}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-gold font-display text-sm text-ink shadow-[0_4px_0_0_var(--color-gold-shadow)]"
+          className={`pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-gold font-display text-sm text-ink shadow-[0_4px_0_0_var(--color-gold-shadow)] transition-opacity duration-300 ${answered ? "opacity-0" : ""}`}
         >
           {reveal.vs}
         </span>
@@ -205,7 +223,7 @@ export function QuestionCard({
       <WhoIsWho options={q.options} />
 
       {/* the verdict, read out by screen readers: soft green when you're right, soft red when the map fooled you */}
-      <div aria-live="polite">
+      <div ref={verdictRef} aria-live="polite">
         {answered ? (
           <div
             className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
@@ -219,21 +237,58 @@ export function QuestionCard({
               </span>
               {verdict(correct)}
             </p>
-            <p className="mt-2 font-semibold leading-snug">{lines[0]}</p>
-            {lines.slice(1).map((line) => (
-              <p key={line} className="mt-1.5 text-sm leading-relaxed text-ink-soft">
-                {line}
-              </p>
-            ))}
+            <p className="mt-2 font-semibold leading-snug">{sizeLine(big, small)}</p>
+            <StretchStrip options={q.options} title={correct ? reveal.stretchTitleRight : reveal.stretchTitle} />
           </div>
         ) : null}
       </div>
       {answered ? (
-        <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg mt-4 w-full">
-          {nextLabel} <span aria-hidden="true">→</span>
-        </button>
+        // stays at the bottom of the screen while the reveal is longer than the screen, so moving on is always one tap
+        <div className="sticky bottom-3 z-20 mt-4">
+          <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg w-full">
+            {nextLabel} <span aria-hidden="true">→</span>
+          </button>
+        </div>
       ) : null}
     </section>
+  );
+}
+
+/**
+ * Why a web map gets the sizes wrong: each place's distance from the equator on a line from the equator to the pole,
+ * and how much a web map stretches it there.
+ */
+function StretchStrip({ options, title }: { options: Question["options"]; title: string }) {
+  const lat = (o: PoolEntry) => Math.min(90, Math.round(Math.abs(o.lat)));
+  const drawn = (o: PoolEntry) => (stretch(o) >= 1.15 ? reveal.drawnTooBig(times(stretch(o))) : reveal.drawnAboutRight);
+  return (
+    <div className="mt-3 rounded-2xl bg-white/80 p-3 ring-1 ring-ink/10">
+      <p className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">{title}</p>
+      <div aria-hidden="true" className="mt-3 flex items-center gap-3 text-[11px] font-semibold text-muted">
+        <span>{reveal.equator}</span>
+        <span className="relative h-2 flex-1 rounded-full bg-[linear-gradient(90deg,var(--color-line),var(--color-gold))]">
+        {options.map((o, i) => (
+          <span
+            key={o.id}
+            className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_1px_2px_rgba(29,33,64,0.4)]"
+            style={{ left: `${(lat(o) / 90) * 100}%`, background: COLORS[i] }}
+          />
+        ))}
+        </span>
+        <span>{reveal.pole}</span>
+      </div>
+      <ul className="mt-2 space-y-1 text-[13px] leading-snug text-ink-soft sm:text-sm">
+        {options.map((o, i) => (
+          <li key={o.id} className="flex items-baseline gap-2">
+            <span aria-hidden="true" className="size-2.5 shrink-0 translate-y-px rounded-full" style={{ background: COLORS[i] }} />
+            <span>
+              <strong className="text-ink">{o.n}</strong>: {reveal.stretchRow(lat(o), drawn(o))}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-1.5 text-xs text-muted">{reveal.stretchNote}</p>
+    </div>
   );
 }
 
@@ -262,8 +317,11 @@ const size = (o: Outline) => {
   return Math.max(x1 - x0, y1 - y0);
 };
 
-/** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
-function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
+/**
+ * One outline centred in a 100 × 100 tile, at the tile's shared scale. `ghost` draws it as a web map's version: a pale
+ * grey fill ("fill"), or a grey line over the real shape ("line"), so it shows even where the real shape covers it.
+ */
+function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: "fill" | "line" }) {
   const { d, b: [x0, y0, x1, y1] } = mainPart(outline);
   const k = 100 / span;
   const tiny = size(outline) < span * 0.06;
@@ -272,11 +330,11 @@ function Shape({ outline, span, color, ghost }: { outline: Outline; span: number
       <path
         d={d}
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
-        fill={ghost ? "none" : color}
-        fillOpacity={0.88}
-        stroke={color}
-        strokeWidth={ghost ? 1.5 : 1}
-        strokeDasharray={ghost ? "4 3" : undefined}
+        fill={ghost === "line" ? "none" : ghost ? GHOST : color}
+        fillOpacity={ghost ? 0.3 : 0.88}
+        stroke={ghost ? GHOST : color}
+        strokeWidth={ghost === "line" ? 1.25 : 1}
+        strokeOpacity={ghost === "fill" ? 0 : 1}
         vectorEffect="non-scaling-stroke"
         fillRule="evenodd"
         strokeLinejoin="round"
@@ -288,8 +346,8 @@ function Shape({ outline, span, color, ghost }: { outline: Outline; span: number
 
 /**
  * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
- * it really is next to the other shape, then the true outline fades in, with a dashed trace of the map's version left behind
- * so the difference stays visible.
+ * it really is next to the other shape, then the true outline fades in, with the map's version left behind in grey so the
+ * difference stays visible. Both are labelled in the tile.
  */
 function RevealTile({
   map,
@@ -310,22 +368,43 @@ function RevealTile({
   };
   const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
   return (
-    <svg viewBox="0 0 100 100" className={`${TILE} w-full rounded-2xl bg-tile`} aria-hidden="true">
-      <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
-        <Shape outline={map} span={spans.merc} color={color} />
-      </g>
-      <g className="reveal-true" style={{ opacity: revealed ? 0.55 : 0 }}>
-        <Shape outline={map} span={spans.merc} color={color} ghost />
-      </g>
-      <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
-        <Shape outline={real} span={spans.ea} color={color} />
-      </g>
-    </svg>
+    <span className="relative block">
+      <svg viewBox="0 0 100 100" className={`${TILE} w-full rounded-2xl bg-tile`} aria-hidden="true">
+        <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
+          <Shape outline={map} span={spans.merc} color={color} />
+        </g>
+        <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
+          <Shape outline={map} span={spans.merc} color={color} ghost="fill" />
+        </g>
+        <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
+          <Shape outline={real} span={spans.ea} color={color} />
+        </g>
+        <g className="reveal-true" style={{ opacity: revealed ? 0.9 : 0 }}>
+          <Shape outline={map} span={spans.merc} color={color} ghost="line" />
+        </g>
+      </svg>
+      {revealed ? (
+        // what the two drawings are, right where they are (the tile is hidden from screen readers; the text says it all)
+        <span
+          aria-hidden="true"
+          className="pop-in reveal-late pointer-events-none absolute bottom-1.5 left-1.5 flex gap-1 whitespace-nowrap text-[10px] font-bold leading-none"
+        >
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/85 px-1.5 py-1 text-ink">
+            <span className="size-2 rounded-sm" style={{ background: color }} />
+            {reveal.realLabel}
+          </span>
+          <span className="inline-flex items-center gap-1 rounded-full bg-white/85 px-1.5 py-1 text-ink-soft">
+            <span className="size-2 rounded-sm border" style={{ borderColor: GHOST, background: `${GHOST}55` }} />
+            {reveal.mapLabel}
+          </span>
+        </span>
+      ) : null}
+    </span>
   );
 }
 
 /** The real area, counting down (or up) from the size the map makes it look, as the shapes change size. */
-function TrueArea({ from, to }: { from: number; to: number }) {
+function TrueArea({ from, to, unit }: { from: number; to: number; unit: AreaUnit }) {
   const [v, setV] = useState(from);
   useEffect(() => {
     if (reducedMotion()) {
@@ -343,13 +422,7 @@ function TrueArea({ from, to }: { from: number; to: number }) {
     id = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(id);
   }, [from, to]);
-  const [km, mi] = formatBoth(v).replace(")", "").split(" (");
-  return (
-    <span className="mt-1.5 block tabular-nums">
-      <span className="block font-display text-base text-ink">{km}</span>
-      <span className="block text-xs text-muted">{mi}</span>
-    </span>
-  );
+  return <span className="mt-1.5 block font-display text-base tabular-nums text-ink">{formatArea(v, unit, false)}</span>;
 }
 
 /** The two shapes side by side on the real-size map. */

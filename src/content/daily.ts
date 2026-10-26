@@ -49,16 +49,27 @@ export const dailyCopy = {
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
     ask: "Sized the way a normal web map shows them. Tap the bigger one.",
-    // the tiles compare the two shapes with each other (one scale per view), so the legend says "compare", not "size"
-    legend: "Dashed: how the two compare on a web map. Solid: how they really compare.",
+    // after the answer, in place of `ask` (same height, so the tiles don't jump); each tile also labels its two drawings
+    legend: "Grey shows how a web map draws each one.",
+    realLabel: "Real size",
+    mapLabel: "Map",
     right: "You got it!",
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
     next: "Next round",
     seeResults: "See my results",
-    mapTooBig: (x: string) => `Map: ${x}× too big`,
-    mapTooSmall: (x: string) => `Map: ${x}× too small`,
-    mapAboutRight: "Map: about right",
+    // under each name once answered: the result in plain words
+    biggerBy: (gap: string) => `${gap} bigger`,
+    smaller: "Smaller",
+    // the strip in the verdict: how far each place is from the equator, and how much a web map stretches it
+    stretchTitle: "Why the map fooled you",
+    stretchTitleRight: "Why the map misleads",
+    equator: "Equator",
+    pole: "Pole",
+    stretchRow: (lat: number, stretch: string) => `${lat}°, ${stretch}`,
+    drawnTooBig: (x: string) => `map ${x}× too big`,
+    drawnAboutRight: "map about right",
+    stretchNote: "The farther from the equator, the more a web map blows land up.",
     bigger: "Bigger",
     yourPick: "Your pick",
     vs: "VS",
