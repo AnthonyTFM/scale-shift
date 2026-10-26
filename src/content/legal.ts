@@ -1,7 +1,7 @@
 // Privacy policy, terms, the age check at sign-up and "Delete my data". Plain words; a lawyer should review before money.
 import { site } from "./site";
 
-export const legalUpdated = "October 24, 2026";
+export const legalUpdated = "October 26, 2026";
 
 /** Shown before anyone gives us an email (sign-in, the leaderboard, reminders). */
 export const ageCheck = {
@@ -53,10 +53,10 @@ export const privacy: { title: string; lead: string; description: string; sectio
       title: "What we collect",
       items: [
         ["Map state", "The shapes you add live in the page address (the part after #). It never reaches our server unless you share the link."],
-        ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, your daily answers, scores and streak, your 13+ answer, whether today's game count was sent and, if you join, your player ID and nickname are saved in your browser's local storage. They stay on your device."],
+        ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, your daily answers, scores and streak, your endless-mode runs and best streak, your 13+ answer, whether today's game count was sent and, if you join, your player ID and nickname are saved in your browser's local storage. They stay on your device."],
         [
           "Leaderboard and sign-in (optional, ages 13+)",
-          "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email (with Google, Clerk also receives your name and profile photo). We store that email, the nickname you pick, your daily answers and scores and a random player ID. Nicknames and scores are public. Your email is private: it keeps one player per person, is never shown publicly or sold and only goes to the services below that run the site.",
+          "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email (with Google, Clerk also receives your name and profile photo). We store that email, the nickname you pick, your daily answers and scores, your best endless-mode streaks (and, for three days, the runs you post, so we can check them) and a random player ID. Nicknames, scores and streaks are public. Your email is private: it keeps one player per person, is never shown publicly or sold and only goes to the services below that run the site.",
         ],
         ["Reminder emails (optional)", "Only if you tick the box. We record when you agreed. Once reminders start, we'll send at most one email a day, each with a one-click unsubscribe, and you can turn them off after any daily round."],
         ["Feedback form", "What you type, plus your name and email if you give them, and your browser type so we can reproduce map problems."],
@@ -95,7 +95,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       id: "rights",
       title: "Your choices and rights",
       paras: [
-        "Signed in? Open the Leaderboard page and tap “Delete my data”. It removes your scores, nickname, email, reminder choice and sign-in account straight away.",
+        "Signed in? Open the Leaderboard page and tap “Delete my data”. It removes your scores and streaks, nickname, email, reminder choice and sign-in account straight away.",
         `You can also email ${site.contactEmail} to see, correct or delete your data, object to how we use it or withdraw consent. Wherever you live, we'll honor these requests. If you're in the EU or UK, you can also complain to your data protection authority.`,
         "To clear what's saved on your device, clear this site's data in your browser settings.",
         "We don't track you across other websites, so Do Not Track settings don't change anything here.",
@@ -140,7 +140,7 @@ export const terms: { title: string; lead: string; description: string; sections
       title: "The leaderboard",
       paras: [
         "You must be 13 or older to sign in, join the leaderboard or get emails.",
-        "One player per person. Only your first try each day counts. Don't use bots, scripts or other tricks to post scores. We may remove scores or players that break these rules.",
+        "One player per person. In the daily challenge only your first try each day counts; in endless mode, your longest run does. Don't use bots, scripts or other tricks to post scores. We may remove scores or players that break these rules.",
         "There are no prizes. Rankings are just for fun.",
       ],
     },
