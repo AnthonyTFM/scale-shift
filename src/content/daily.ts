@@ -49,10 +49,9 @@ export const dailyCopy = {
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
     ask: "Sized the way a normal web map shows them. Tap the bigger one.",
-    // after the answer, in place of `ask` (same height, so the tiles don't jump); each tile also labels its two drawings
-    legend: "Grey shows how a web map draws each one.",
+    // after the answer, a key in place of `ask`: each tile's colour fill is its real size, the grey behind it the web map's
     realLabel: "Real size",
-    mapLabel: "Map",
+    mapLabel: "On a web map",
     right: "You got it!",
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
@@ -62,8 +61,11 @@ export const dailyCopy = {
     biggerBy: (gap: string) => `${gap} bigger`,
     smaller: "Smaller",
     // the strip in the verdict: how far each place is from the equator, and how much a web map stretches it
+    // the strip's title: the map showed the smaller one as bigger (fooled you / misleads), or it didn't
     stretchTitle: "Why the map fooled you",
     stretchTitleRight: "Why the map misleads",
+    stretchTitleHonest: "How a web map stretches these two",
+    stretchTitleBoth: "Both near the equator: web maps get these about right",
     equator: "Equator",
     pole: "Pole",
     stretchRow: (lat: number, stretch: string) => `${lat}°, ${stretch}`,

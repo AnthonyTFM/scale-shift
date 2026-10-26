@@ -143,7 +143,14 @@ export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[]
 
 // ---------- explanations ----------
 
-const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
+/** "2.1" or "12" for a ratio, as the game writes it. */
+export const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
+
+/** How much bigger one place is than another: "1.6×", or for close calls (under 1.2×) "12%". */
+export function gapText(big: PoolEntry, small: PoolEntry) {
+  const r = big.a / small.a;
+  return r < 1.2 ? `${Math.round((r - 1) * 100)}%` : `${times(r)}×`;
+}
 
 /** How many times too big a shape is drawn on a web map. */
 export const stretch = (e: PoolEntry) => e.m / e.a;
@@ -164,9 +171,8 @@ export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** The pieces of "The Roman Empire was 1.8× the size of Brazil." / "Brazil is 12% bigger than Peru." */
 export function sizeParts(big: PoolEntry, small: PoolEntry) {
-  const r = big.a / small.a;
   const verb = big.kind === "history" ? "was" : "is";
-  const gap = r < 1.2 ? `${Math.round((r - 1) * 100)}% bigger than` : `${times(r)}× the size of`;
+  const gap = big.a / small.a < 1.2 ? `${gapText(big, small)} bigger than` : `${gapText(big, small)} the size of`;
   return { big: capitalize(nameInSentence(big)), link: `${verb} ${gap}`, small: nameInSentence(small) };
 }
 

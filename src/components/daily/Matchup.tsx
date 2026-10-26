@@ -3,7 +3,7 @@
 // The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
 import { useEffect, useRef, useState } from "react";
 import dataVersion from "@/data/data-version.json";
-import { sizeLine, stretch, type PoolEntry, type Question } from "@/lib/daily";
+import { gapText, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
 import { formatArea, type AreaUnit } from "@/lib/format";
 import { preferredUnit } from "@/lib/units";
@@ -21,11 +21,13 @@ export const ROUND_TOP = 88;
 // at its own proportions)
 const TILE = "aspect-square [@media(min-width:768px)_and_(max-height:820px)]:aspect-[5/4]";
 
-// the two shapes on the game tiles: bright fills (they are drawings, not text); grey for how a web map draws them
+// the two shapes on the game tiles: bright fills (they are drawings, not text); grey for how a web map draws them, with
+// a darker outline that stands out on the tile and on the colour fills
 const COLORS = ["#FF5B4A", "#2F6BFF"];
 const GHOST = "#8A93A8";
-/** "2.1" or "12" for a ratio, as the reveal writes it */
-const times = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
+const GHOST_LINE = "#5D6280";
+/** a web map stretches land by less than this: "about right" (and never "1.1× too big") */
+const ABOUT_RIGHT = 1.15;
 const V = `?v=${dataVersion.v}`;
 
 let poolPromise: Promise<PoolEntry[]> | null = null;
@@ -120,15 +122,22 @@ export function QuestionCard({
   const answered = picked !== undefined;
   const correct = picked === q.answer;
   const nextRef = useRef<HTMLButtonElement>(null);
-  // one shared scale per view for both tiles, so the two drawings compare fairly
-  const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
-  const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
+  // one scale for both tiles and both drawings (a web map's and the real one are in the same units), so the shapes
+  // compare fairly side by side, and each real shape shrinks from its map version by exactly what the strip says. A
+  // web map never draws land smaller than it is, so the map drawings set the scale and frame the tiles before answering.
+  const span = Math.max(...q.options.flatMap((o) => [size(shapes[o.id].merc), size(shapes[o.id].ea)])) * 1.12;
 
   const big = q.options[q.answer];
   const small = q.options[1 - q.answer];
-  const gap = big.a / small.a;
-  // "1.6×" or, for close calls, "12%"
-  const gapText = gap < 1.2 ? `${Math.round((gap - 1) * 100)}%` : `${times(gap)}×`;
+  // the strip's title: did the map show the smaller one as bigger?
+  const stripTitle =
+    small.m >= big.m
+      ? correct
+        ? reveal.stretchTitleRight
+        : reveal.stretchTitle
+      : q.options.every((o) => stretch(o) < ABOUT_RIGHT)
+        ? reveal.stretchTitleBoth
+        : reveal.stretchTitleHonest;
   // the cards only show after the first load, in the browser, so this never runs on the server
   const [unit] = useState<AreaUnit>(preferredUnit);
   const sectionRef = useRef<HTMLElement>(null);
@@ -166,7 +175,26 @@ export function QuestionCard({
       <h2 id="daily-q" className="mt-1 text-center font-display text-[1.7rem] leading-[1.1] text-ink sm:text-4xl">
         {q.prompt}
       </h2>
-      <p className="mt-1.5 text-center text-sm text-muted">{answered ? reveal.legend : reveal.ask}</p>
+      {/* two lines tall on phones either way (the question's hint wraps there), so the tiles don't jump on answering */}
+      <div className="mt-1.5 flex min-h-10 items-center justify-center text-center text-sm text-muted sm:min-h-5">
+        {answered ? (
+          <p className="pop-in flex flex-wrap items-center justify-center gap-x-3 gap-y-1 font-semibold text-ink-soft">
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className="flex">
+                <span className="size-3 rounded-l-sm" style={{ background: COLORS[0] }} />
+                <span className="size-3 rounded-r-sm" style={{ background: COLORS[1] }} />
+              </span>
+              {reveal.realLabel}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span aria-hidden="true" className="size-3 rounded-sm border-2" style={{ borderColor: GHOST_LINE, background: `${GHOST}4D` }} />
+              {reveal.mapLabel}
+            </span>
+          </p>
+        ) : (
+          <p>{reveal.ask}</p>
+        )}
+      </div>
 
       <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
         {q.options.map((o, i) => {
@@ -194,7 +222,7 @@ export function QuestionCard({
                   {isAnswer ? reveal.bigger : reveal.yourPick}
                 </span>
               ) : null}
-              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
+              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} span={span} revealed={answered} color={COLORS[i]} />
               <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
               <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
               {answered ? (
@@ -204,7 +232,7 @@ export function QuestionCard({
                   <span
                     className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight ${isAnswer ? "bg-green-soft text-green-text" : "bg-beige text-ink-soft"}`}
                   >
-                    {isAnswer ? reveal.biggerBy(gapText) : reveal.smaller}
+                    {isAnswer ? reveal.biggerBy(gapText(big, small)) : reveal.smaller}
                   </span>
                 </>
               ) : null}
@@ -238,14 +266,14 @@ export function QuestionCard({
               {verdict(correct)}
             </p>
             <p className="mt-2 font-semibold leading-snug">{sizeLine(big, small)}</p>
-            <StretchStrip options={q.options} title={correct ? reveal.stretchTitleRight : reveal.stretchTitle} />
+            <StretchStrip options={q.options} title={stripTitle} />
           </div>
         ) : null}
       </div>
       {answered ? (
         // stays at the bottom of the screen while the reveal is longer than the screen, so moving on is always one tap
         <div className="sticky bottom-3 z-20 mt-4">
-          <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg w-full">
+          <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg w-full disabled:opacity-100">
             {nextLabel} <span aria-hidden="true">→</span>
           </button>
         </div>
@@ -259,8 +287,13 @@ export function QuestionCard({
  * and how much a web map stretches it there.
  */
 function StretchStrip({ options, title }: { options: Question["options"]; title: string }) {
-  const lat = (o: PoolEntry) => Math.min(90, Math.round(Math.abs(o.lat)));
-  const drawn = (o: PoolEntry) => (stretch(o) >= 1.15 ? reveal.drawnTooBig(times(stretch(o))) : reveal.drawnAboutRight);
+  // where the land sits as a web map sees it: a web map stretches area by 1 / cos²(latitude), so this latitude gives
+  // exactly the stretch shown, and the farther dot is always the more stretched place
+  const lat = (o: PoolEntry) => Math.round((Math.acos(Math.sqrt(Math.min(1, 1 / stretch(o)))) * 180) / Math.PI);
+  const drawn = (o: PoolEntry) =>
+    stretch(o) >= ABOUT_RIGHT ? reveal.drawnTooBig(times(Math.max(1.2, stretch(o)))) : reveal.drawnAboutRight;
+  // two dots this close would cover each other: lift one and drop the other a little
+  const close = Math.abs(lat(options[0]) - lat(options[1])) < 6;
   return (
     <div className="mt-3 rounded-2xl bg-white/80 p-3 ring-1 ring-ink/10">
       <p className="text-xs font-extrabold uppercase tracking-wide text-ink-soft">{title}</p>
@@ -271,7 +304,7 @@ function StretchStrip({ options, title }: { options: Question["options"]; title:
           <span
             key={o.id}
             className="absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white shadow-[0_1px_2px_rgba(29,33,64,0.4)]"
-            style={{ left: `${(lat(o) / 90) * 100}%`, background: COLORS[i] }}
+            style={{ left: `${(lat(o) / 90) * 100}%`, background: COLORS[i], marginTop: close ? (i ? 5 : -5) : 0 }}
           />
         ))}
         </span>
@@ -332,7 +365,7 @@ function Shape({ outline, span, color, ghost }: { outline: Outline; span: number
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
         fill={ghost === "line" ? "none" : ghost ? GHOST : color}
         fillOpacity={ghost ? 0.3 : 0.88}
-        stroke={ghost ? GHOST : color}
+        stroke={ghost ? GHOST_LINE : color}
         strokeWidth={ghost === "line" ? 1.25 : 1}
         strokeOpacity={ghost === "fill" ? 0 : 1}
         vectorEffect="non-scaling-stroke"
@@ -347,18 +380,19 @@ function Shape({ outline, span, color, ghost }: { outline: Outline; span: number
 /**
  * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
  * it really is next to the other shape, then the true outline fades in, with the map's version left behind in grey so the
- * difference stays visible. Both are labelled in the tile.
+ * difference stays visible. The key above the tiles says which is which.
  */
 function RevealTile({
   map,
   real,
-  spans,
+  span,
   revealed,
   color,
 }: {
   map: Outline;
   real: Outline;
-  spans: { merc: number; ea: number };
+  /** the one scale both tiles and both drawings use */
+  span: number;
   revealed: boolean;
   color: string;
 }) {
@@ -366,39 +400,23 @@ function RevealTile({
     const [x0, y0, x1, y1] = mainBox(o);
     return ((x1 - x0) * (y1 - y0)) / (span * span);
   };
-  const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
+  const grow = Math.sqrt(area(real, span) / Math.max(area(map, span), 1e-9)) || 1;
   return (
-    <span className="relative block">
+    <span className="block">
       <svg viewBox="0 0 100 100" className={`${TILE} w-full rounded-2xl bg-tile`} aria-hidden="true">
         <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
-          <Shape outline={map} span={spans.merc} color={color} />
+          <Shape outline={map} span={span} color={color} />
         </g>
         <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
-          <Shape outline={map} span={spans.merc} color={color} ghost="fill" />
+          <Shape outline={map} span={span} color={color} ghost="fill" />
         </g>
         <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
-          <Shape outline={real} span={spans.ea} color={color} />
+          <Shape outline={real} span={span} color={color} />
         </g>
         <g className="reveal-true" style={{ opacity: revealed ? 0.9 : 0 }}>
-          <Shape outline={map} span={spans.merc} color={color} ghost="line" />
+          <Shape outline={map} span={span} color={color} ghost="line" />
         </g>
       </svg>
-      {revealed ? (
-        // what the two drawings are, right where they are (the tile is hidden from screen readers; the text says it all)
-        <span
-          aria-hidden="true"
-          className="pop-in reveal-late pointer-events-none absolute bottom-1.5 left-1.5 flex gap-1 whitespace-nowrap text-[10px] font-bold leading-none"
-        >
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/85 px-1.5 py-1 text-ink">
-            <span className="size-2 rounded-sm" style={{ background: color }} />
-            {reveal.realLabel}
-          </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-white/85 px-1.5 py-1 text-ink-soft">
-            <span className="size-2 rounded-sm border" style={{ borderColor: GHOST, background: `${GHOST}55` }} />
-            {reveal.mapLabel}
-          </span>
-        </span>
-      ) : null}
     </span>
   );
 }
