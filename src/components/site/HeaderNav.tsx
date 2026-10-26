@@ -16,7 +16,7 @@ export function HeaderNav() {
             <Link
               href={item.href}
               aria-current={here ? "page" : undefined}
-              className="relative rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft hover:bg-white hover:text-ink aria-[current=page]:bg-white aria-[current=page]:text-ink aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:-bottom-px aria-[current=page]:after:h-[3px] aria-[current=page]:after:rounded-full aria-[current=page]:after:bg-primary"
+              className="relative whitespace-nowrap rounded-xl px-3 py-2 text-sm font-semibold text-ink-soft hover:bg-white hover:text-ink aria-[current=page]:bg-white aria-[current=page]:text-ink aria-[current=page]:after:absolute aria-[current=page]:after:inset-x-3 aria-[current=page]:after:-bottom-px aria-[current=page]:after:h-[3px] aria-[current=page]:after:rounded-full aria-[current=page]:after:bg-primary"
             >
               {item.label}
             </Link>

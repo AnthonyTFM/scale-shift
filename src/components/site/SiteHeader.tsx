@@ -15,7 +15,7 @@ export function SiteHeader() {
         <nav aria-label="Main" className="hidden flex-1 md:block">
           <HeaderNav />
         </nav>
-        <Link href="/map" className="btn btn-primary ml-auto mb-0 hidden h-11 text-sm md:inline-flex">
+        <Link href="/map" className="btn btn-primary ml-auto mb-0 hidden h-11 text-sm lg:inline-flex">
           Open the map
         </Link>
         <SiteMenu variant="header" />

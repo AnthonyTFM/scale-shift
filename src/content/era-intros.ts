@@ -22,7 +22,7 @@ export const eraIntros: Record<string, string> = {
   "1914":
     "On the eve of the First World War, European empires control most of Africa and much of Asia, and the Russian, Ottoman and Austro-Hungarian empires are still standing.",
   "1920":
-    "Four empires have fallen. New states fill Central and Eastern Europe, and Soviet Russia is emerging from civil war.",
+    "The German, Austro-Hungarian and Russian empires have fallen, and the Ottoman Empire is being carved up. New states fill Central and Eastern Europe, and Soviet Russia is emerging from civil war.",
   "1938":
     "The last full year of peace before the Second World War. Germany has just annexed Austria and the Sudetenland.",
   "1945":

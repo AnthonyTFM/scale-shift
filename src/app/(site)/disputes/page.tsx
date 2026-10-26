@@ -8,7 +8,7 @@ import { mapLink } from "@/lib/share";
 import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
-  title: "Disputed borders today: who controls them vs. who claims them",
+  title: "Disputed borders: who controls vs. who claims",
   description:
     "Crimea, Kashmir, Taiwan, Western Sahara, Golan Heights and more: who controls each territory, since when, who claims it and whether that control has ever been formally recognized.",
   alternates: { canonical: "/disputes" },

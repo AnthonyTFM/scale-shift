@@ -113,7 +113,8 @@ export const disputes: Dispute[] = [
     controlledBy: "Morocco (about three-quarters) and the Sahrawi Republic / Polisario (the east)",
     claimedBy: ["Morocco", "Sahrawi Arab Democratic Republic"],
     taken: 1975,
-    formalStatus: "UN non-self-governing territory. The US recognized Moroccan sovereignty in 2020.",
+    formalStatus:
+      "UN non-self-governing territory. The US recognized Moroccan sovereignty in 2020, and in 2025 the UN Security Council (Resolution 2797) called for talks based on Morocco's autonomy plan.",
     summary:
       "The source data draws Morocco-administered land as part of Morocco and labels only the Polisario-held east 'Western Sahara', so Morocco's area here includes the disputed part.",
     polities: ["Western Sahara", "Morocco"],

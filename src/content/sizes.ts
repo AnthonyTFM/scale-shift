@@ -20,7 +20,7 @@ export const sizes = {
     allTitle: "Every country, A to Z",
   },
   title: (name: string) => `How big is ${name} really?`,
-  metaTitle: (name: string) => `How big is ${name} really? Real size vs the map`,
+  metaTitle: (name: string) => `How big is ${name} really?`,
   metaDescription: (Name: string, area: string, like: string, stretchLine: string) => `${Name} covers ${area}, ${like}. ${stretchLine}`,
   metaStretch: (x: string) => `A normal web map draws it ${x}× too big.`,
   metaRight: "A normal web map shows it about the right size.",
