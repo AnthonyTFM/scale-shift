@@ -39,8 +39,11 @@ export default function LeaderboardPage() {
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 md:py-10">
         <div className="max-w-2xl">
           <SignInProvider>
-            <AccountBar />
             <LeaderboardView />
+            {/* below the boards, so on phones the boards start on the first screen */}
+            <div className="mt-6">
+              <AccountBar />
+            </div>
           </SignInProvider>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Scores are checked on our server, and only your first try each day counts (in endless mode, your longest run does). Each email gets one player, and each nickname belongs to the
