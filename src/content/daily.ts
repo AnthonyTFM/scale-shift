@@ -49,9 +49,15 @@ export const dailyCopy = {
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
     ask: "Sized the way a normal web map shows them. Tap the bigger one.",
-    // after the answer, a key in place of `ask`: each tile's colour fill is its real size, the grey behind it the web map's
-    realLabel: "Real size",
-    mapLabel: "On a web map",
+    // after the answer, in place of `ask`, with a button that plays the shrink again
+    watch: "Watch the map size shrink to real size.",
+    replay: "Replay",
+    replaySr: "Replay the shrink",
+    // on each tile once it has shrunk: the pale tint is the web map's version, the full colour the real size
+    tagMap: "Map",
+    tagReal: "Real",
+    divide: (x: string) => `÷${x}`,
+    aboutSame: "≈ same",
     right: "You got it!",
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
