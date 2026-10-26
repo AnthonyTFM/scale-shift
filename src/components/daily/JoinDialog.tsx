@@ -310,8 +310,9 @@ function DoneStep({ titleId, join, score, text, onClose }: { titleId: string; jo
       </div>
     );
   const rows = top?.rows ?? [];
-  // the top three, plus your own row if you're further down
-  const shown = [...rows.slice(0, 3), ...rows.filter((r) => r.me && r.rank > 3)];
+  // the top three, plus your own row if you're further down (in the top five, or below it)
+  const mine = rows.find((r) => r.me) ?? top?.me;
+  const shown = [...rows.slice(0, 3), ...(mine && mine.rank > 3 ? [mine] : [])];
   return (
     <div className="text-center">
       <MarkIcon right className="mx-auto size-12" />

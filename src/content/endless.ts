@@ -64,7 +64,7 @@ export const endlessCopy = {
     retry: "Try again",
     rank: (rank: number, total: number) => `#${rank} of all time, out of ${total} ${total === 1 ? "player" : "players"}`,
     yourBest: (best: number) => `Your best: ${best} in a row`,
-    better: (best: number) => `Your best run (${best} in a row) is the one on the board.`,
+    better: (run: number, best: number) => `This run: ${run} in a row. Your best (${best} in a row) stays on the board.`,
     signedIn: "Signed in.",
     signOut: "Sign out",
     // sign-in is off (running locally without Clerk) and this browser hasn't joined the daily's leaderboard

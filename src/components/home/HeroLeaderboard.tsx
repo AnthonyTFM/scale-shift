@@ -68,7 +68,8 @@ export function HeroLeaderboard() {
   return (
     <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h2 className="flex items-center gap-2 font-display text-2xl text-ink sm:text-[1.7rem]">
+        {/* hidden (but holding its space) until the saved tab is known, so the title doesn't change in front of you */}
+        <h2 className={`flex items-center gap-2 font-display text-2xl text-ink sm:text-[1.7rem] ${tab ? "" : "invisible"}`}>
           <TrophyIcon className="size-8" /> {tab === "endless" ? t.streakTitle : t.boardTitle}
         </h2>
         {/* beside the title (under it on narrow phones), not above the list, so the list doesn't jump when it arrives */}

@@ -91,6 +91,7 @@ function SignedIn({ seed, token, choices, streak }: Props) {
     return (
       <>
         <Posted
+          streak={streak}
           status={join.status}
           error={join.error}
           result={join.result}
@@ -139,7 +140,7 @@ function SignedIn({ seed, token, choices, streak }: Props) {
 }
 
 /** Sign-in off (local development): a browser that joined the daily's leaderboard posts its runs with that player. */
-function SavedPlayer({ seed, token, choices }: Props) {
+function SavedPlayer({ seed, token, choices, streak }: Props) {
   const [state, setState] = useState<{ status: "idle" | "sending" | "done" | "error"; error: string; result: Extract<EndlessSubmitResult, { ok: true }> | null; top: EndlessBoard | null }>({
     status: "idle",
     error: "",
@@ -179,11 +180,12 @@ function SavedPlayer({ seed, token, choices }: Props) {
 
   if (joined === undefined) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
   if (!joined) return <p className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4 text-sm text-ink-soft">{t.joinFromDaily}</p>;
-  return <Posted status={state.status} error={state.error} result={state.result} top={state.top} onRetry={post} />;
+  return <Posted streak={streak} status={state.status} error={state.error} result={state.result} top={state.top} onRetry={post} />;
 }
 
 /** Where the streak landed: the player's best of all time, its rank, and the all-time top five. */
 function Posted({
+  streak,
   status,
   error,
   result,
@@ -191,6 +193,8 @@ function Posted({
   onRetry,
   footer,
 }: {
+  /** this run's streak (the board shows the player's best, which may be an earlier run) */
+  streak: number;
   status: "idle" | "sending" | "done" | "error";
   error: string;
   result: Extract<EndlessSubmitResult, { ok: true }> | null;
@@ -227,15 +231,15 @@ function Posted({
             <p className="mt-2 text-ink">
               <strong className="text-lg">{t.rank(result.rank, result.total)}</strong>
             </p>
-            <p className="text-sm text-ink-soft">{t.yourBest(result.score)}</p>
-            {result.duplicate ? <p className="mt-1 text-sm text-muted">{t.better(result.score)}</p> : null}
+            <p className="text-sm text-ink-soft">{result.duplicate ? t.better(streak, result.score) : t.yourBest(result.score)}</p>
           </>
         ) : null}
       </div>
       {top?.rows.length ? (
         <ol className="mt-3 space-y-1 text-sm">
-          {top.rows.map((r) => (
-            <li key={`${r.rank}-${r.name}`} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-gold-soft font-bold" : ""}`}>
+          {/* the top five, plus your own row if you're further down */}
+          {[...top.rows, ...(top.me && !top.rows.some((r) => r.me) ? [top.me] : [])].map((r, i) => (
+            <li key={i} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-gold-soft font-bold" : ""}`}>
               <span className="w-6 text-right text-muted">{r.rank}</span>
               <span className="min-w-0 flex-1 truncate">
                 {r.name}

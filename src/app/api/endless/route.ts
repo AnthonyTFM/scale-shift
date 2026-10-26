@@ -95,8 +95,9 @@ export async function POST(request: Request) {
     return Response.json({
       ok: true,
       score: all.me?.score ?? run.streak,
-      rank: all.me?.rank ?? all.total,
-      total: all.total,
+      // not on the board (a removed player, or a streak waiting for review): after everyone who is
+      rank: all.me?.rank ?? all.total + 1,
+      total: all.me ? all.total : all.total + 1,
       // a better run from before is the one on the board
       duplicate: (all.me?.score ?? run.streak) > run.streak,
       player: { id: player, name },
