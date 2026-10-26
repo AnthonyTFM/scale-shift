@@ -7,7 +7,7 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { playerId } from "@/lib/player";
 import { home } from "@/content/home";
-import type { AllTimeBoard, DayBoard, EndlessBoard } from "@/lib/leaderboard-types";
+import type { AllTimeBoard, DayBoard, DayRow, EndlessBoard } from "@/lib/leaderboard-types";
 import { FlameIcon, TrophyIcon } from "@/components/site/Icons";
 
 type Tab = "daily" | "endless";
@@ -69,10 +69,12 @@ export function HeroLeaderboard() {
     <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <h2 className="flex items-center gap-2 font-display text-2xl text-ink sm:text-[1.7rem]">
-          <TrophyIcon className="size-8" /> {t.boardTitle}
+          <TrophyIcon className="size-8" /> {tab === "endless" ? t.streakTitle : t.boardTitle}
         </h2>
         {/* beside the title (under it on narrow phones), not above the list, so the list doesn't jump when it arrives */}
-        {tab && totals[tab] ? <p className="whitespace-nowrap text-xs text-muted">{t.boardPlayers(totals[tab])}</p> : null}
+        {tab && totals[tab] ? (
+          <p className="whitespace-nowrap text-xs text-muted">{tab === "endless" ? t.streakPlayers(totals[tab]) : t.boardPlayers(totals[tab])}</p>
+        ) : null}
       </div>
       <div
         role="tablist"
@@ -235,28 +237,22 @@ function DailyBoard({ onTotal }: { onTotal: (n: number) => void }) {
   );
 }
 
-/**
- * Endless mode's best streaks today; while nobody has posted one today, the best of all time (or an invitation when
- * there are none yet either).
- */
+/** Endless mode's best streaks of all time: the top five, and your own spot if you've posted one. */
 function StreakBoard({ onTotal }: { onTotal: (n: number) => void }) {
   const [board, setBoard] = useState<EndlessBoard | null | undefined>(undefined);
-  const [allTime, setAllTime] = useState<EndlessBoard | null>(null);
   const t = home.hub;
 
   useEffect(() => {
     const id = playerId();
-    getJson<EndlessBoard>(`/api/endless?scope=day&date=${localDateKey()}&limit=5${id ? `&player=${id}` : ""}`).then(async (b) => {
-      if (b && !b.rows.length) setAllTime(await getJson<EndlessBoard>(`/api/endless?scope=all&limit=3${id ? `&player=${id}` : ""}`));
+    getJson<EndlessBoard>(`/api/endless?scope=all&limit=5${id ? `&player=${id}` : ""}`).then((b) => {
       setBoard(b);
       if (b?.total) onTotal(b.total);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const rows = board?.rows.length ? board.rows : (allTime?.rows ?? []);
   const meBelow = board?.me && !board.rows.some((r) => r.me) ? board.me : null;
-  const row = (r: (typeof rows)[number], key: string) => (
+  const row = (r: DayRow, key: string) => (
     <li key={key} className={`flex items-center gap-3 rounded-lg px-3 py-2 ${r.me ? "bg-gold text-ink" : "bg-paper"}`}>
       <span className={`w-6 text-center font-bold ${r.rank <= 3 && !r.me ? "text-primary" : ""}`}>{r.rank}</span>
       <span className="min-w-0 flex-1 truncate font-semibold">
@@ -278,17 +274,9 @@ function StreakBoard({ onTotal }: { onTotal: (n: number) => void }) {
         <p className="mt-4 rounded-lg bg-paper px-3 py-6 text-center text-muted">{t.boardFailed}</p>
       ) : board.rows.length ? (
         <ol className="mt-4 space-y-1.5">
-          {rows.map((r, i) => row(r, String(i)))}
+          {board.rows.map((r, i) => row(r, String(i)))}
           {meBelow ? row(meBelow, "me") : null}
         </ol>
-      ) : rows.length ? (
-        <div className="mt-3">
-          <p className="text-sm font-semibold text-ink">{t.streakEmptyShort}</p>
-          <p className="mt-3 text-xs font-bold uppercase tracking-wide text-muted">{t.streakAllTime}</p>
-          <ol className="mt-1.5 space-y-1.5" aria-label={t.streakAllTime}>
-            {rows.map((r, i) => row(r, String(i)))}
-          </ol>
-        </div>
       ) : (
         <p className="mt-4 rounded-lg bg-paper px-3 py-6 text-center text-muted">{t.streakEmpty}</p>
       )}

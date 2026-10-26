@@ -32,9 +32,10 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST { player, name, email, seed, token, choices: [0|1 …], website } → the player's best streak today, its rank today
- * and of all time. The server re-marks the run from its seed (see src/lib/endless-server.ts). Sign-in works as on the
- * daily's POST /api/leaderboard.
+ * POST { player, name, email, seed, token, choices: [0|1 …], website } → the player's best streak of all time and its
+ * rank. Each day's best streaks are still recorded, so a daily board could come back, but only all time is shown. The
+ * server re-marks the run from its seed (see src/lib/endless-server.ts). Sign-in works as on the daily's
+ * POST /api/leaderboard.
  */
 export async function POST(request: Request) {
   const fail = (error: string, status: number, field?: "name" | "email") =>
@@ -90,17 +91,14 @@ export async function POST(request: Request) {
       return fail("That run is already over. Start a new one.", 422);
     await store.setName(player, name);
     await store.endlessPost(run.date, player, run.streak, Date.now());
-    const [day, all] = await Promise.all([endlessBoard(run.date, 0, player), endlessBoard(null, 0, player)]);
+    const all = await endlessBoard(null, 0, player);
     return Response.json({
       ok: true,
-      score: day.me?.score ?? run.streak,
-      rank: day.me?.rank ?? day.total,
-      total: day.total,
-      // a better run today is the one on the board
-      duplicate: (day.me?.score ?? run.streak) > run.streak,
-      best: all.me?.score ?? run.streak,
-      allRank: all.me?.rank ?? all.total,
-      allTotal: all.total,
+      score: all.me?.score ?? run.streak,
+      rank: all.me?.rank ?? all.total,
+      total: all.total,
+      // a better run from before is the one on the board
+      duplicate: (all.me?.score ?? run.streak) > run.streak,
       player: { id: player, name },
     } satisfies EndlessSubmitResult);
   } catch (e) {

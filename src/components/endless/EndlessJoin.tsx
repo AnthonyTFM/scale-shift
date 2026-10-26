@@ -17,8 +17,8 @@ const t = endlessCopy.board;
 /** A finished run the server handed out, ready to post. */
 type Props = { seed: string; token: string; choices: number[]; streak: number };
 
-const dayOf = (seed: string) => seed.slice(0, 10);
-const boardUrl = (seed: string, id: string) => `/api/endless?scope=day&date=${dayOf(seed)}&limit=5&player=${id}`;
+// the all-time Best streaks board's top five, with this player marked
+const boardUrl = (id: string) => `/api/endless?scope=all&limit=5&player=${id}`;
 
 /**
  * After an endless run: put the streak on the Best streaks board. Players already on the leaderboard (signed in, with a
@@ -30,7 +30,7 @@ export function EndlessJoin(props: Props) {
 
 function SignedIn({ seed, token, choices, streak }: Props) {
   const { isLoaded, isSignedIn, openSignIn, opening, openFailed, signOut } = useAccount();
-  const join = useJoinTo<EndlessSubmitResult>({ endpoint: "/api/endless", payload: { seed, token, choices }, board: (id) => boardUrl(seed, id) });
+  const join = useJoinTo<EndlessSubmitResult>({ endpoint: "/api/endless", payload: { seed, token, choices }, board: boardUrl });
   const [step, setStep] = useState<JoinStep | null>(null);
   const [awaiting, setAwaiting] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -161,7 +161,7 @@ function SavedPlayer({ seed, token, choices }: Props) {
       });
       const data = (await res.json()) as EndlessSubmitResult;
       if (!data.ok) return setState((s) => ({ ...s, status: "error", error: data.error }));
-      const top = await fetch(boardUrl(seed, p.id)).then((r) => (r.ok ? (r.json() as Promise<EndlessBoard>) : null));
+      const top = await fetch(boardUrl(p.id)).then((r) => (r.ok ? (r.json() as Promise<EndlessBoard>) : null));
       setState({ status: "done", error: "", result: data, top });
     } catch {
       setState((s) => ({ ...s, status: "error", error: "Couldn't reach the leaderboard. Check your connection and try again." }));
@@ -182,7 +182,7 @@ function SavedPlayer({ seed, token, choices }: Props) {
   return <Posted status={state.status} error={state.error} result={state.result} top={state.top} onRetry={post} />;
 }
 
-/** Where the streak landed: today's rank, the all-time rank, and today's top five. */
+/** Where the streak landed: the player's best of all time, its rank, and the all-time top five. */
 function Posted({
   status,
   error,
@@ -225,9 +225,9 @@ function Posted({
         {result ? (
           <>
             <p className="mt-2 text-ink">
-              <strong className="text-lg">{t.rankToday(result.rank, result.total)}</strong>
+              <strong className="text-lg">{t.rank(result.rank, result.total)}</strong>
             </p>
-            <p className="text-sm text-ink-soft">{t.rankAll(result.allRank, result.best)}</p>
+            <p className="text-sm text-ink-soft">{t.yourBest(result.score)}</p>
             {result.duplicate ? <p className="mt-1 text-sm text-muted">{t.better(result.score)}</p> : null}
           </>
         ) : null}
