@@ -15,7 +15,7 @@ export const leaderboardCopy = {
     after: " goes on the Endless board.",
   },
   // phones show this instead, so the boards start on the first screen
-  leadShort: "Today's best, all-time points and the longest endless runs.",
+  leadShort: "Today's best, this week's and all-time points, and the longest endless runs.",
   failed: "The leaderboard couldn't load.",
   retry: "Try again",
 };

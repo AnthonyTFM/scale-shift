@@ -179,6 +179,7 @@ export function LeaderboardView() {
       <div
         id="lb-panel"
         role="tabpanel"
+        tabIndex={-1}
         aria-labelledby={`lb-tab-${tab}`}
         className="card mt-4 overflow-hidden"
         aria-live="polite"
@@ -191,11 +192,14 @@ export function LeaderboardView() {
             ))}
           </div>
         ) : current.failed ? (
-          <div role="alert" className="p-6 text-center text-ink-soft">
+          // the panel is already a polite live region, so this needs no alert role of its own
+          <div className="p-6 text-center text-ink-soft">
             <p>{L.failed}</p>
             <button
               type="button"
               onClick={() => {
+                // the button gives way to the loading rows: keep keyboard focus in the panel rather than the page top
+                document.getElementById("lb-panel")?.focus({ preventScroll: true });
                 setLoaded(null);
                 setReload((n) => n + 1);
               }}
