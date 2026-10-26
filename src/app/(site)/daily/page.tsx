@@ -18,6 +18,7 @@ export default function DailyPage() {
       <PageHero
         center
         compact
+        game
         eyebrow={t.eyebrow}
         title={t.title}
         lead={

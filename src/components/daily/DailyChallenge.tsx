@@ -20,7 +20,7 @@ import {
 } from "@/lib/daily";
 import { LeaderboardJoin } from "./LeaderboardJoin";
 import { POSTED_EVENT, type Posted } from "./useJoin";
-import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, Skeleton } from "./Matchup";
+import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "./Matchup";
 import { readChallenge, type Challenge } from "@/lib/challenge";
 import { playerId, rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
@@ -118,8 +118,11 @@ export function DailyChallenge() {
     // a new round is still loading: keep waiting for its first question
     if (!heading || !card) return;
     advanced.current = false;
-    const top = card.getBoundingClientRect().top;
-    if (top < 72) scrollTo({ top: top + scrollY - 80, behavior: reducedMotion() ? "auto" : "smooth" });
+    // line up the progress bar above the card (not the card itself) just under the header, so it stays in view (near the
+    // top of the screen on phones held sideways, where the header doesn't stick)
+    const top = (document.getElementById("daily-progress") ?? card).getBoundingClientRect().top;
+    const at = innerHeight <= 500 ? 8 : ROUND_TOP;
+    if (top < at - 16) scrollTo({ top: top + scrollY - at, behavior: reducedMotion() ? "auto" : "smooth" });
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
   }, [game?.step]);
@@ -264,7 +267,7 @@ function OnSignIn({ run }: { run: () => void }) {
 
 function Progress({ round, choices, step }: { round: Round; choices: number[]; step: number }) {
   return (
-    <ol className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Progress">
+    <ol id="daily-progress" className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Progress">
       {round.questions.map((q, i) => {
         const done = i < choices.length;
         const right = done && choices[i] === q.answer;
