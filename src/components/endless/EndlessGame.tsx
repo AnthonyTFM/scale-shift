@@ -360,11 +360,14 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
       <button type="button" onClick={onAgain} className="btn btn-gold btn-lg mt-5 w-full">
         {R.playAgain} <span aria-hidden="true">→</span>
       </button>
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
-          <span className="sm:hidden">{R.shareShort}</span>
-          <span className="hidden sm:inline">{R.share}</span>
-        </button>
+      {/* a run that missed the first matchup has nothing to share: just the daily */}
+      <div className={`mt-3 grid gap-2 ${streak > 0 ? "grid-cols-2" : ""}`}>
+        {streak > 0 ? (
+          <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
+            <span className="sm:hidden">{R.shareShort}</span>
+            <span className="hidden sm:inline">{R.share}</span>
+          </button>
+        ) : null}
         <Link href="/daily" className="btn btn-white h-12 px-2 text-sm sm:text-base">
           {dailyDone ? R.dailyDone : R.dailyPlay}
         </Link>

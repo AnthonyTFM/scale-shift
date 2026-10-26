@@ -483,7 +483,7 @@ function Results({
           </div>
         ))}
       </dl>
-      {/* sharing: one compact row, so the leaderboard stays the main call to action */}
+      {/* sharing: one compact row, so the leaderboard stays the main call to action; one solid button, two quiet ones */}
       <div className="mt-5 grid grid-cols-3 gap-2">
         <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
           <span className="sm:hidden">{R.shareShort}</span>
@@ -493,7 +493,7 @@ function Results({
           <span className="sm:hidden">{R.pictureShort}</span>
           <span className="hidden sm:inline">{R.picture}</span>
         </button>
-        <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-red h-12 px-2 text-sm sm:text-base">
+        <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-white h-12 px-2 text-sm sm:text-base">
           <span className="sm:hidden">{R.challengeShort}</span>
           <span className="hidden sm:inline">{R.challenge}</span>
         </button>
