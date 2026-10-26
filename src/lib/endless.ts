@@ -1,5 +1,5 @@
-// Endless mode: one "which is bigger?" matchup after another, each level a closer call than the last, until the first
-// wrong answer. Uses the daily puzzle's shape pool. A run is fixed by its seed: round n is always the same matchup for
+// Endless mode: one "which is bigger?" matchup after another, closer calls the further you go, until the first wrong
+// answer. Uses the daily puzzle's shape pool. A run is fixed by its seed: round n is always the same matchup for
 // the same seed, so a reload resumes the run where it was (and the server can re-mark a run from its seed and picks).
 import { pick, ratio, rng, type PoolEntry, type Question, type QuestionKind } from "./daily";
 
@@ -94,14 +94,22 @@ function tryLevel(pool: PoolEntry[], level: (typeof LEVELS)[number], r: () => nu
 
 /**
  * Round `round` (1-based) of the run with this seed. `used` holds the shapes from the run's earlier rounds and gets this
- * round's two added, so no shape comes back within a run (until the pool runs dry, which takes well over 100 rounds).
+ * round's two added, so no shape comes back within a run until the pool runs dry (after about 100 rounds); then it starts
+ * over, so a shape still never comes back within about 100 rounds.
  */
 export function endlessQuestion(all: PoolEntry[], seed: string, round: number, used: Set<string>): Question {
   const pool = poolFor(all, seed);
   const r = rng(`atlas-endless:${seed}:${round}`);
-  // the round's own level first, then easier ones if the pool has run out of pairs that close
+  // the round's own level first (with every shape free again once the unused ones have no pair left), then easier ones
   for (let l = levelOf(round); l >= 0; l--) {
-    const q = tryLevel(pool, LEVELS[l], r, used) ?? (used.size ? tryLevel(pool, LEVELS[l], r, new Set()) : null);
+    let q = tryLevel(pool, LEVELS[l], r, used);
+    if (!q && used.size) {
+      // start over, keeping the last round's two (a Set keeps insertion order) so neither comes straight back
+      const last = [...used].slice(-2);
+      used.clear();
+      for (const id of last) used.add(id);
+      q = tryLevel(pool, LEVELS[l], r, used);
+    }
     if (q) {
       for (const o of q.options) used.add(o.id);
       return q;
@@ -124,15 +132,22 @@ export function streakOf(questions: Question[], choices: number[]) {
 
 // ---------- saved progress (this browser only) ----------
 
-/** best = longest run, runs = runs finished, run = the run in progress (or the last one, once over). */
-export type EndlessSave = { v: 1; best: number; runs: number; run?: { seed: string; c: number[]; over?: boolean } };
+/**
+ * best = longest run, runs = runs started, run = the run in progress (or the last one, once over): its seed, its answers
+ * and b, the best before it started (for "New best!" after a reload).
+ */
+export type EndlessSave = { v: 1; best: number; runs: number; run?: { seed: string; c: number[]; b?: number; over?: boolean } };
 
 const KEY = "atlas-endless-v1";
 
 export function loadEndless(): EndlessSave {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? "null");
-    if (raw?.v === 1 && typeof raw.best === "number" && typeof raw.runs === "number") return raw;
+    if (raw?.v === 1 && typeof raw.best === "number" && typeof raw.runs === "number") {
+      // a damaged run would stop the game loading for good: drop it and start a new one
+      const ok = typeof raw.run?.seed === "string" && Array.isArray(raw.run.c) && raw.run.c.every((c: unknown) => c === 0 || c === 1);
+      return ok ? raw : { v: 1, best: raw.best, runs: raw.runs };
+    }
   } catch {
     /* private window or blocked storage: play without saving */
   }

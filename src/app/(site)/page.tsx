@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 const x = home.explore;
 const places = [
-  { href: "/endless", Icon: FlameIcon, title: "Endless mode", line: x.endless },
+  { href: "/endless", Icon: FlameIcon, title: x.endlessTitle, line: x.endless },
   { href: "/leaderboard", Icon: TrophyIcon, title: "Leaderboard", line: x.leaderboard },
   { href: "/eras", Icon: ColumnsIcon, title: "Eras", line: x.eras(eras.length) },
   { href: "/timeline", Icon: TimelineIcon, title: "Timeline", line: x.timeline(events.length) },

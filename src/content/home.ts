@@ -10,7 +10,8 @@ export const home = {
   // "More to explore": the rest of the site, one line each (the game and the map have their own cards above)
   explore: {
     title: "More to explore",
-    endless: "Closer every round, until your first miss",
+    endlessTitle: "Endless mode",
+    endless: "Closer and closer matchups, until your first miss",
     leaderboard: "Today's best and all-time points",
     eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
     timeline: (n: number) => `${n} times land changed hands`,

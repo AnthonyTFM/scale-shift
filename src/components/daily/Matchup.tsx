@@ -53,9 +53,10 @@ export async function loadShapes(questions: Question[]): Promise<Record<string, 
 }
 
 /** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
-export function Skeleton({ label }: { label: string }) {
+export function Skeleton({ label, pills }: { label: string; /** room for a row of pills above the bar (endless mode) */ pills?: boolean }) {
   return (
     <div aria-busy="true" aria-label={label}>
+      {pills ? <div aria-hidden="true" className="mb-2 h-9" /> : null}
       <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
       <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6 [@media(min-width:768px)_and_(max-height:820px)]:min-h-[476px]">
         <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
@@ -95,6 +96,7 @@ export function QuestionCard({
   picked,
   verdict,
   nextLabel,
+  busy,
   onPick,
   onNext,
 }: {
@@ -106,6 +108,8 @@ export function QuestionCard({
   /** the reveal's headline for a right or a wrong answer */
   verdict: (correct: boolean) => string;
   nextLabel: string;
+  /** the next round is loading: Next is disabled until it's ready */
+  busy?: boolean;
   onPick: (i: number) => void;
   onNext: () => void;
 }) {
@@ -225,7 +229,7 @@ export function QuestionCard({
         ) : null}
       </div>
       {answered ? (
-        <button ref={nextRef} type="button" onClick={onNext} className="btn btn-primary btn-lg mt-4 w-full">
+        <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg mt-4 w-full">
           {nextLabel} <span aria-hidden="true">→</span>
         </button>
       ) : null}

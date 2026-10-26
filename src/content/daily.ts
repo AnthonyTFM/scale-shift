@@ -113,7 +113,7 @@ export const dailyCopy = {
     challenge: "Challenge a friend",
     // after the daily: endless mode is the next thing to play
     endless: "Play endless mode",
-    endlessLine: "One matchup after another, each closer than the last. How far can you go?",
+    endlessLine: "One matchup after another, closer the further you go. How far can you get?",
     answers: "The answers",
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",

@@ -426,7 +426,7 @@ function Results({
       className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7"
     >
       <div className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">{`Daily #${dayNumber(round.date)}`}</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">Daily #{dayNumber(round.date)}</p>
         <p aria-hidden="true" className="pop-in mt-1 font-display text-[5.5rem] leading-none text-ink sm:text-8xl">
           {score}
           <span className="text-primary">/</span>
@@ -465,71 +465,69 @@ function Results({
         ))}
       </ol>
 
-      <>
-        {/* getting on the leaderboard is the first thing after the score */}
-        <LeaderboardJoin date={round.date} choices={choices} score={score} />
-        <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
-          {[
-            [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
-            middle,
-            [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
-          ].map(([k, v, sub]) => (
-            <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
-              <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
-              <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
-              <dd className="order-3 text-xs text-muted">{sub}</dd>
-            </div>
-          ))}
-        </dl>
-        {/* sharing: one compact row, so the leaderboard stays the main call to action */}
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
-            <span className="sm:hidden">{R.shareShort}</span>
-            <span className="hidden sm:inline">{R.share}</span>
-          </button>
-          <button type="button" onClick={shareImage} className="btn btn-white h-12 px-2 text-sm sm:text-base">
-            <span className="sm:hidden">{R.pictureShort}</span>
-            <span className="hidden sm:inline">{R.picture}</span>
-          </button>
-          <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-red h-12 px-2 text-sm sm:text-base">
-            <span className="sm:hidden">{R.challengeShort}</span>
-            <span className="hidden sm:inline">{R.challenge}</span>
-          </button>
-        </div>
-        <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
-          {copied}
-        </p>
-        {shareBox.box}
-        {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
-        {s.played >= 2 ? (
-          <div className="mt-5">
-            <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
-            <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
-            <ol className="mt-2 space-y-1">
-              {spread
-                .map((days, n) => (
-                  <li key={n} className="flex items-center gap-2 text-sm">
-                    <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
-                      {n}
-                    </span>
-                    <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
-                    <span aria-hidden="true" className="flex-1">
-                      <span
-                        className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
-                          !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
-                        }`}
-                        style={days ? { width: `${(days / most) * 100}%` } : undefined}
-                      >
-                        {days}
-                      </span>
-                    </span>
-                  </li>
-                ))
-                .reverse()}
-            </ol>
+      {/* getting on the leaderboard is the first thing after the score */}
+      <LeaderboardJoin date={round.date} choices={choices} score={score} />
+      <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
+        {[
+          [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
+          middle,
+          [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
+        ].map(([k, v, sub]) => (
+          <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
+            <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
+            <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
+            <dd className="order-3 text-xs text-muted">{sub}</dd>
           </div>
-        ) : null}
-      </>
+        ))}
+      </dl>
+      {/* sharing: one compact row, so the leaderboard stays the main call to action */}
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
+          <span className="sm:hidden">{R.shareShort}</span>
+          <span className="hidden sm:inline">{R.share}</span>
+        </button>
+        <button type="button" onClick={shareImage} className="btn btn-white h-12 px-2 text-sm sm:text-base">
+          <span className="sm:hidden">{R.pictureShort}</span>
+          <span className="hidden sm:inline">{R.picture}</span>
+        </button>
+        <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-red h-12 px-2 text-sm sm:text-base">
+          <span className="sm:hidden">{R.challengeShort}</span>
+          <span className="hidden sm:inline">{R.challenge}</span>
+        </button>
+      </div>
+      <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
+        {copied}
+      </p>
+      {shareBox.box}
+      {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
+      {s.played >= 2 ? (
+        <div className="mt-5">
+          <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
+          <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
+          <ol className="mt-2 space-y-1">
+            {spread
+              .map((days, n) => (
+                <li key={n} className="flex items-center gap-2 text-sm">
+                  <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
+                    {n}
+                  </span>
+                  <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
+                  <span aria-hidden="true" className="flex-1">
+                    <span
+                      className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                        !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                      }`}
+                      style={days ? { width: `${(days / most) * 100}%` } : undefined}
+                    >
+                      {days}
+                    </span>
+                  </span>
+                </li>
+              ))
+              .reverse()}
+          </ol>
+        </div>
+      ) : null}
 
       <h3 className="mt-7 font-display text-xl text-ink">{R.answers}</h3>
       <ol className="mt-2 divide-y divide-line">
@@ -554,7 +552,7 @@ function Results({
 
       {/* the next thing to play: endless mode, while the next daily is on its way */}
       <div className="mt-4 border-t border-line pt-4">
-        <Link href="/endless" className="btn btn-gold btn-lg w-full">
+        <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold btn-lg w-full">
           {R.endless} <span aria-hidden="true">→</span>
         </Link>
         <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>

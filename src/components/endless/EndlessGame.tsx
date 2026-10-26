@@ -33,6 +33,8 @@ type Run = {
   over: boolean;
   /** the results screen is showing */
   done: boolean;
+  /** the run is saved in this browser (false with storage blocked: then there's no other tab to keep in step with) */
+  saved: boolean;
 };
 
 /** Builds rounds up to `count` (they only depend on the seed, so this is the same run every time). */
@@ -47,16 +49,19 @@ async function prepare(fresh: boolean): Promise<Run> {
   const save = loadEndless();
   const old = !fresh && save.run && !save.run.over ? save.run : null;
   const seed = old?.seed ?? newSeed(localDateKey());
-  const run: Run = { pool, seed, questions: [], used: new Set(), shapes: {}, choices: old?.c ?? [], step: 0, bestBefore: save.best, over: false, done: false };
+  // the best is saved after every right answer, so a resumed run takes the best from before it started
+  const bestBefore = old ? (old.b ?? save.best) : save.best;
+  const run: Run = { pool, seed, questions: [], used: new Set(), shapes: {}, choices: old?.c ?? [], step: 0, bestBefore, over: false, done: false, saved: false };
   if (old) {
     upTo(run, old.c.length + 1);
-    // a run saved mid-reveal of a wrong answer is over: start a new one instead
+    // saved answers that don't fit this run (one missed but not marked over): start a new one instead
     if (streakOf(run.questions, old.c) < old.c.length) return prepare(true);
     run.step = old.c.length;
   } else {
-    writeEndless({ ...save, runs: save.runs + 1, run: { seed, c: [] } });
+    writeEndless({ ...save, runs: save.runs + 1, run: { seed, c: [], b: bestBefore } });
     track("endless_start");
   }
+  run.saved = loadEndless().run?.seed === seed;
   const q = run.questions[run.step] ?? upTo(run, run.step + 1);
   run.shapes = await loadShapes([q]);
   return run;
@@ -65,6 +70,8 @@ async function prepare(fresh: boolean): Promise<Run> {
 export function EndlessGame() {
   const [run, setRun] = useState<Run | null>(null);
   const [failed, setFailed] = useState(false);
+  // the next round's drawings are still on their way
+  const [busy, setBusy] = useState(false);
   // set when the player moves on, so the next question (or the results) takes focus; not on first load
   const advanced = useRef(false);
   const top = useRef<HTMLDivElement>(null);
@@ -73,6 +80,8 @@ export function EndlessGame() {
 
   const start = (fresh: boolean) => {
     setFailed(false);
+    // the loading card replaces the results (or the error), so nothing can be tapped twice while the run loads
+    setRun(null);
     prepare(fresh)
       .then(setRun)
       .catch(() => setFailed(true));
@@ -115,7 +124,7 @@ export function EndlessGame() {
       </div>
     );
   }
-  if (!run) return <Skeleton label={t.loading} />;
+  if (!run) return <Skeleton label={t.loading} pills />;
 
   const q = run.questions[run.step];
   const streak = streakOf(run.questions, run.choices);
@@ -124,30 +133,42 @@ export function EndlessGame() {
 
   const answer = (choice: number) => {
     if (run.choices.length > run.step) return;
+    const save = loadEndless();
+    const saved = save.run;
+    if (run.saved && (saved?.seed !== run.seed || saved.c.length !== run.choices.length)) {
+      // another tab has moved this run on (or started a new one): its answers stand, so pick up from there
+      advanced.current = true;
+      return start(false);
+    }
     const choices = [...run.choices, choice];
     const right = q.answer === choice;
     play(right ? "right" : "wrong");
     buzz(right ? 12 : [30, 50, 30]);
     track("endless_answer", { n: run.step + 1, correct: right });
-    const save = loadEndless();
     const n = streakOf(run.questions, choices);
-    const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, c: choices, ...(right ? {} : { over: true }) } };
+    const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, b: run.bestBefore, c: choices, ...(right ? {} : { over: true }) } };
     writeEndless(updated);
     if (!right) track("endless_end", { streak: n });
     setRun({ ...run, choices, over: !right });
   };
 
   const next = async () => {
+    if (busy) return;
     advanced.current = true;
     if (run.over) return setRun({ ...run, done: true });
     const following = upTo(run, run.step + 2);
+    setBusy(true);
     try {
       const pending = nextShapes.current?.key === `${run.seed}:${run.step + 1}` ? nextShapes.current.shapes : null;
       const shapes = (await pending) ?? {};
       const ok = following.options.every((o) => shapes[o.id]);
       setRun({ ...run, step: run.step + 1, shapes: { ...run.shapes, ...(ok ? shapes : await loadShapes([following])) } });
     } catch {
+      // "Try again" resumes this run from the saved answers
+      setRun(null);
       setFailed(true);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -186,7 +207,8 @@ export function EndlessGame() {
           shapes={run.shapes}
           picked={run.choices[run.step]}
           verdict={(right) => (right ? t.right : t.wrong)}
-          nextLabel={run.over ? t.seeRun : t.next}
+          nextLabel={run.over ? t.seeRun : busy ? t.loadingNext : t.next}
+          busy={busy}
           onPick={answer}
           onNext={next}
         />
@@ -271,7 +293,7 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
           </p>
         ) : null}
         <h2 id="endless-done" className="mt-3 font-display text-3xl leading-tight text-ink">
-          <span className="sr-only">{R.scoreSr(streak)} </span>
+          <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
           {R.title(streak)}
         </h2>
         <p className="mt-1 text-muted">{R.verdict(streak + 1)}</p>
@@ -280,7 +302,8 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
       <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
         {[
           [R.best, best, R.bestSub],
-          [R.runs, runs ?? "—", R.runsSub],
+          // with storage blocked nothing is counted, but this run still happened
+          [R.runs, runs === null ? "—" : Math.max(1, runs), R.runsSub],
           [R.level, `${level + 1}/${LEVELS.length}`, t.levels[level]],
         ].map(([k, v, sub]) => (
           <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
@@ -341,7 +364,7 @@ function Answer({ q, right }: { q: Question; right: boolean }) {
       </span>
       <Link
         href={mapHref(q)}
-        aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`}
+        aria-label={R.dragOnMapSr(nameInSentence(big), nameInSentence(small))}
         className="col-start-2 font-semibold text-primary hover:underline"
       >
         {R.dragOnMap} →

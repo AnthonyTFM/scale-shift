@@ -3,9 +3,13 @@
 export const endlessCopy = {
   eyebrow: "Endless mode",
   title: "How far can you go?",
-  lead: "One matchup after another, each a closer call than the last. Get one wrong and the run is over. Your best run is saved in this browser.",
+  lead: "One matchup after another, and the further you go, the closer they get. Get one wrong and the run is over.",
   // phones show this instead, so the first matchup is on screen without scrolling
-  leadShort: "Each matchup closer than the last. One miss ends the run.",
+  leadShort: "The further you go, the closer they get. One miss ends the run.",
+  metaTitle: "Endless mode: which is bigger?",
+  metaDescription:
+    "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
+  note: "Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few percent. Your best run is saved in this browser only.",
   loading: "Loading endless mode",
   failed: "We couldn't load endless mode.",
   retry: "Try again",
@@ -18,11 +22,12 @@ export const endlessCopy = {
   right: "You got it!",
   wrong: "Not quite! Run over.",
   next: "Next round",
+  loadingNext: "Loading…",
   seeRun: "See my run",
   results: {
     eyebrow: "Endless run",
     inARow: (n: number) => (n === 1 ? "right answer in a row" : "right answers in a row"),
-    scoreSr: (n: number) => `You got ${n} in a row.`,
+    scoreSr: (n: number, best: boolean) => `You got ${n} in a row${best ? ", a new best" : ""}.`,
     title: (n: number) =>
       n >= 20 ? "Ruler of the world!" : n >= 12 ? "Emperor!" : n >= 7 ? "Empire builder!" : n >= 3 ? "Regional power" : "The map fooled you",
     verdict: (round: number) => `Your run ended on round ${round}.`,
@@ -45,5 +50,6 @@ export const endlessCopy = {
     missTitle: "The one that got you",
     allTitle: (n: number) => `All ${n} matchups`,
     dragOnMap: "Compare sizes on the map",
+    dragOnMapSr: (big: string, small: string) => `Compare the sizes of ${big} and ${small} on the map`,
   },
 };
