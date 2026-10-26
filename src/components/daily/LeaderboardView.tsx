@@ -18,9 +18,7 @@ const TABS = [
   ["all", "All time"],
   ["endless", endlessCopy.board.tab],
 ] as const satisfies readonly (readonly [Tab, string])[];
-/** Endless mode's two boards: today's best streaks and the best of all time. */
-type EndlessBoards = { today: EndlessBoard; all: EndlessBoard };
-type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | EndlessBoards | null; failed: boolean };
+type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | EndlessBoard | null; failed: boolean };
 const E = endlessCopy.board;
 
 /** A drawn medal for the top three (the rank is read out to screen readers), the plain number below that. */
@@ -63,27 +61,21 @@ export function LeaderboardView() {
   }, []);
 
   const key =
-    tab === "all" ? "all" : tab === "week" ? (today ? `week:${today}` : "") : tab === "endless" ? (today ? `endless:${today}` : "") : (date ?? "");
+    tab === "all" ? "all" : tab === "week" ? (today ? `week:${today}` : "") : tab === "endless" ? "endless" : (date ?? "");
   useEffect(() => {
     if (!key) return;
     let alive = true;
     const id = playerId();
     const me = id ? `&player=${id}` : "";
-    if (tab === "endless") {
-      const get = (url: string) => fetch(`${url}${me}`).then((r) => (r.ok ? (r.json() as Promise<EndlessBoard>) : Promise.reject()));
-      Promise.all([get(`/api/endless?scope=day&date=${key.slice(8)}&limit=100`), get(`/api/endless?scope=all&limit=100`)])
-        .then(([today, all]) => alive && setLoaded({ key, data: { today, all }, failed: false }))
-        .catch(() => alive && setLoaded({ key, data: null, failed: true }));
-      return () => {
-        alive = false;
-      };
-    }
+    // endless mode's Best streaks: all time only
     const url =
-      tab === "all"
-        ? `/api/leaderboard?scope=all&limit=100`
-        : tab === "week"
-          ? `/api/leaderboard?scope=week&date=${key.slice(5)}&limit=100`
-          : `/api/leaderboard?scope=day&date=${key}&limit=100`;
+      tab === "endless"
+        ? `/api/endless?scope=all&limit=100`
+        : tab === "all"
+          ? `/api/leaderboard?scope=all&limit=100`
+          : tab === "week"
+            ? `/api/leaderboard?scope=week&date=${key.slice(5)}&limit=100`
+            : `/api/leaderboard?scope=day&date=${key}&limit=100`;
     fetch(`${url}${me}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => alive && setLoaded({ key, data, failed: false }))
@@ -202,12 +194,7 @@ export function LeaderboardView() {
             The leaderboard couldn&apos;t load. Please try again in a minute.
           </p>
         ) : tab === "endless" ? (
-          <>
-            <DayTable board={(current.data as EndlessBoards).today} caption={E.todayCaption} empty={E.emptyToday} scoreLabel={E.streak} cell={String} note={E.note} />
-            <div className="border-t-2 border-line">
-              <DayTable board={(current.data as EndlessBoards).all} caption={E.allCaption} empty={E.emptyAll} scoreLabel={E.streak} cell={String} note={E.note} />
-            </div>
-          </>
+          <DayTable board={current.data as EndlessBoard} caption={E.allCaption} empty={E.emptyAll} scoreLabel={E.streak} cell={String} note={E.note} />
         ) : tab === "day" ? (
           <DayTable board={current.data as DayBoard} />
         ) : tab === "week" ? (

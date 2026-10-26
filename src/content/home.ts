@@ -63,10 +63,11 @@ export const home = {
     boardTabs: { daily: "Daily", endless: "Endless" },
     boardTabsLabel: "Which leaderboard",
     streakEmpty: "No streaks yet. Start the first run!",
-    streakEmptyShort: "No streaks yet today. Be the first!",
-    streakAllTime: "Best streaks of all time",
+    // the card's title on the Endless tab: its board is all-time only
+    streakTitle: "Best streaks ever",
+    streakPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"}`,
     streakSr: (n: number) => `${n} in a row`,
-    // someone already on today's Best streaks board
+    // someone already on the Best streaks board
     streakBeat: (n: number) => `Beat your ${n} in a row`,
     you: "(you)",
     // the leaderboard couldn't be reached

@@ -9,7 +9,7 @@ export const endlessCopy = {
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
-  note: "Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few percent. Your best run is saved in this browser, and runs by players on the leaderboard go on the Best streaks board.",
+  note: "Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few percent. Your best run is saved in this browser, and runs by players on the leaderboard go on the all-time Best streaks board.",
   loading: "Loading endless mode",
   failed: "We couldn't load endless mode.",
   retry: "Try again",
@@ -54,7 +54,7 @@ export const endlessCopy = {
   },
   // the Best streaks board: on the results screen and the leaderboard page
   board: {
-    title: "Best streaks today",
+    title: "Best streaks ever",
     seeAll: "See all",
     joinCta: "Get on the Best streaks board",
     joinHint: "See where your run ranks.",
@@ -62,9 +62,9 @@ export const endlessCopy = {
     opening: "Opening sign-in…",
     posting: "Posting your streak…",
     retry: "Try again",
-    rankToday: (rank: number, total: number) => `#${rank} of ${total} today`,
-    rankAll: (rank: number, best: number) => `#${rank} of all time, with your best of ${best} in a row`,
-    better: (best: number) => `Your best run today (${best} in a row) is the one on the board.`,
+    rank: (rank: number, total: number) => `#${rank} of all time, out of ${total} ${total === 1 ? "player" : "players"}`,
+    yourBest: (best: number) => `Your best: ${best} in a row`,
+    better: (run: number, best: number) => `This run: ${run} in a row. Your best (${best} in a row) stays on the board.`,
     signedIn: "Signed in.",
     signOut: "Sign out",
     // sign-in is off (running locally without Clerk) and this browser hasn't joined the daily's leaderboard
@@ -72,19 +72,17 @@ export const endlessCopy = {
     dialog: {
       title: "Get on the Best streaks board",
       lead: (n: number) => `You got ${n} in a row. Sign in so your streak counts and nobody else can post as you.`,
-      doneTitle: (rank: number) => `You're #${rank} today!`,
-      doneLead: (n: number) => `is on today's Best streaks board with ${n} in a row.`,
-      duplicate: "Your best run today is the one that counts.",
+      doneTitle: (rank: number) => `You're #${rank} of all time!`,
+      doneLead: (n: number) => `is on the Best streaks board with ${n} in a row.`,
+      duplicate: "Your best run ever is the one that counts.",
       back: "Back to my run",
       post: "Post my streak",
     },
     // the leaderboard page's Endless tab
     tab: "Endless",
-    todayCaption: "Best streaks today",
     allCaption: "Best streaks of all time",
     streak: "Streak",
     note: "Your longest run of right answers in endless mode. Ties share a rank; whoever got there first is listed first.",
-    emptyToday: "No streaks posted today yet. Play endless mode to take the lead.",
     emptyAll: "No streaks posted yet. Play endless mode to be the first.",
     play: "Play endless mode",
   },
