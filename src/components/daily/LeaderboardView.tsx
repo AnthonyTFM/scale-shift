@@ -6,6 +6,7 @@ import { MedalIcon } from "@/components/site/Icons";
 import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate, type DayRecord } from "@/lib/daily";
 import { dailyCopy } from "@/content/daily";
 import { endlessCopy } from "@/content/endless";
+import { leaderboardCopy as L } from "@/content/leaderboard";
 import { LeaderboardJoin } from "./LeaderboardJoin";
 import { POSTED_EVENT } from "./useJoin";
 import type { AllTimeBoard, DayBoard, EndlessBoard, WeekBoard } from "@/lib/leaderboard-types";
@@ -190,9 +191,19 @@ export function LeaderboardView() {
             ))}
           </div>
         ) : current.failed ? (
-          <p role="alert" className="p-6 text-center text-ink-soft">
-            The leaderboard couldn&apos;t load. Please try again in a minute.
-          </p>
+          <div role="alert" className="p-6 text-center text-ink-soft">
+            <p>{L.failed}</p>
+            <button
+              type="button"
+              onClick={() => {
+                setLoaded(null);
+                setReload((n) => n + 1);
+              }}
+              className="btn btn-white mt-3 h-11 px-5 text-sm"
+            >
+              {L.retry}
+            </button>
+          </div>
         ) : tab === "endless" ? (
           <DayTable board={current.data as EndlessBoard} caption={E.allCaption} empty={E.emptyAll} scoreLabel={E.streak} cell={String} note={E.note} />
         ) : tab === "day" ? (
@@ -281,7 +292,7 @@ function DayTable({
             </td>
             <td className="max-w-0 px-2 py-2.5 text-ink">
               <span className="flex min-w-0 items-center gap-1.5">
-                <span className="truncate">{r.name}</span>
+                <span className="min-w-0 [overflow-wrap:anywhere]">{r.name}</span>
                 {r.me ? <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
               </span>
             </td>
@@ -342,7 +353,7 @@ function AllTable({
               <td className="px-3 py-2.5 text-ink sm:px-4">{rankCell(r.rank)}</td>
               <td className="max-w-0 px-2 py-2.5 text-ink">
                 <span className="flex min-w-0 items-center gap-1.5">
-                  <span className="truncate">{r.name}</span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{r.name}</span>
                   {r.me ? <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
                 </span>
               </td>
