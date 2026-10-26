@@ -18,6 +18,7 @@ import {
 import type { SubmitResult } from "@/lib/leaderboard-types";
 import { rateLimited } from "@/lib/submissions";
 import { playerFor, signInEnabled, verifiedUser } from "@/lib/account";
+import { limited } from "@/lib/rate-limit";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
@@ -58,7 +59,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   const fail = (error: string, status: number, field?: "name" | "email") => Response.json({ ok: false, error, ...(field ? { field } : {}) } satisfies SubmitResult, { status });
-  if (rateLimited(`lb-post:${ipOf(request)}`, 30)) return fail("Too many tries. Please wait a few minutes.", 429);
+  if (await limited("lb-post", ipOf(request), 30)) return fail("Too many tries. Please wait a few minutes.", 429);
 
   let body: Record<string, unknown>;
   try {

@@ -2,7 +2,7 @@ import { connection } from "next/server";
 import { clerkClient } from "@clerk/nextjs/server";
 import { existingPlayer, signInEnabled, verifiedUser } from "@/lib/account";
 import { getStore, isDateKey, isPlayableDate, playerHistory } from "@/lib/leaderboard";
-import { rateLimited } from "@/lib/submissions";
+import { limited } from "@/lib/rate-limit";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 export async function DELETE(request: Request) {
   await connection();
   if (!signInEnabled()) return Response.json({ ok: false, error: "Sign-in is off, so there is nothing to delete." }, { status: 400 });
-  if (rateLimited(`lb-del:${ipOf(request)}`, 10)) return Response.json({ ok: false, error: "Too many tries. Please wait a few minutes." }, { status: 429 });
+  if (await limited("lb-del", ipOf(request), 10)) return Response.json({ ok: false, error: "Too many tries. Please wait a few minutes." }, { status: 429 });
   try {
     const user = await verifiedUser();
     if (!user) return Response.json({ ok: false, error: "Sign in first, then delete your data." }, { status: 401 });

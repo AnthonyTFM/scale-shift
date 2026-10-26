@@ -1,5 +1,6 @@
 import { validateFeedback } from "@/lib/feedback";
-import { deliver, rateLimited, type Submission } from "@/lib/submissions";
+import { deliver, type Submission } from "@/lib/submissions";
+import { limited } from "@/lib/rate-limit";
 
 const MIN_FILL_MS = 2500;
 
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
   }
 
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
-  if (rateLimited(ip)) {
+  if (await limited("feedback", ip, 5)) {
     return Response.json({ ok: false, error: "Too many messages. Please wait a few minutes and try again." }, { status: 429 });
   }
 

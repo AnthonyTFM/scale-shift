@@ -4,6 +4,7 @@ import type { EndlessSubmitResult } from "@/lib/leaderboard-types";
 import { markRun } from "@/lib/endless-server";
 import { rateLimited } from "@/lib/submissions";
 import { playerFor, signInEnabled, verifiedUser } from "@/lib/account";
+import { limited } from "@/lib/rate-limit";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
@@ -40,7 +41,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   const fail = (error: string, status: number, field?: "name" | "email") =>
     Response.json({ ok: false, error, ...(field ? { field } : {}) } satisfies EndlessSubmitResult, { status });
-  if (rateLimited(`endless-post:${ipOf(request)}`, 60)) return fail("Too many tries. Please wait a few minutes.", 429);
+  if (await limited("endless-post", ipOf(request), 60)) return fail("Too many tries. Please wait a few minutes.", 429);
 
   let body: Record<string, unknown>;
   try {
