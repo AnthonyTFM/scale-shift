@@ -36,12 +36,13 @@ export default function ErasPage() {
             <h2 id={`g-${g.title}`} className="font-display text-2xl text-ink">
               {g.title}
             </h2>
-            <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {/* two columns on phones too, so the 49 eras aren't one very long scroll */}
+            <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {eras.filter(g.test).map((e) => (
                 <li key={e.key}>
                   <Link
                     href={`/eras/${eraSlug(e.key)}`}
-                    className="flex h-full flex-col press-card rounded-card p-3 hover:border-primary"
+                    className="flex h-full flex-col press-card rounded-card p-2 hover:border-primary sm:p-3"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- a small WebP made at build time */}
                     <img
@@ -51,18 +52,18 @@ export default function ErasPage() {
                       height={THUMB_H}
                       loading="lazy"
                       decoding="async"
-                      className="mb-3 h-auto w-full rounded-xl bg-white"
+                      className="mb-2 h-auto w-full rounded-xl bg-white sm:mb-3"
                     />
-                    <span className="font-display text-2xl text-ink">{e.label}</span>
-                    <span className="mt-1 text-sm text-muted">
+                    <span className="font-display text-xl text-ink sm:text-2xl">{e.label}</span>
+                    <span className="mt-1 text-xs text-muted sm:text-sm">
                       {e.key === "present" ? `${e.count} countries & territories` : `${e.count} mapped states & peoples`}
                     </span>
                     <span
-                      className={`mt-2 self-start rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${e.precision >= 3 ? "bg-green-soft text-green-text ring-green/40" : "bg-gold-soft text-ink ring-gold"}`}
+                      className={`mt-2 hidden self-start rounded-full px-2.5 py-1 text-xs font-semibold ring-1 sm:inline-block ${e.precision >= 3 ? "bg-green-soft text-green-text ring-green/40" : "bg-gold-soft text-ink ring-gold"}`}
                     >
                       {appCopy.eraPrecision[e.precision]}
                     </span>
-                    {eraIntros[e.key] ? <span className="mt-2 line-clamp-3 text-sm text-ink-soft">{eraIntros[e.key]}</span> : null}
+                    {eraIntros[e.key] ? <span className="mt-2 hidden text-sm text-ink-soft sm:line-clamp-3">{eraIntros[e.key]}</span> : null}
                   </Link>
                 </li>
               ))}
