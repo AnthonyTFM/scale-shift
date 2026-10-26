@@ -31,14 +31,15 @@ export function PlayedElsewhere() {
             openSignIn("/daily");
           }}
           disabled={opening}
-          className="inline-flex min-h-11 items-center font-bold text-primary hover:underline"
+          className="inline-flex min-h-11 items-center gap-1 font-bold text-primary hover:underline"
         >
           {opening ? (
             t.signInOpening
           ) : (
             <>
               <span className="sm:hidden">{t.signInToSeeShort}</span>
-              <span className="hidden sm:inline">{t.signInToSee}</span> →
+              <span className="hidden sm:inline">{t.signInToSee}</span>
+              <span aria-hidden="true">→</span>
             </>
           )}
         </button>
