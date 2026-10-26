@@ -59,6 +59,18 @@ export const home = {
     boardPoints: (n: number) => `${n} pts`,
     boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
     boardCta: "Full leaderboard",
+    // the card's two boards: the daily challenge and endless mode's best streaks
+    boardTabs: { daily: "Daily", endless: "Endless" },
+    boardTabsLabel: "Which leaderboard",
+    streakEmpty: "No streaks yet. Start the first run!",
+    streakEmptyShort: "No streaks yet today. Be the first!",
+    streakAllTime: "Best streaks of all time",
+    streakSr: (n: number) => `${n} in a row`,
+    // someone already on today's Best streaks board
+    streakBeat: (n: number) => `Beat your ${n} in a row`,
+    you: "(you)",
+    // the leaderboard couldn't be reached
+    boardFailed: "Couldn't load the leaderboard. Try again in a minute.",
     nextIn: (h: number, m: number) => `Next game in ${h}h ${m}m`,
     nextReady: "A new game is ready",
     challengeCta: "Challenge a friend",
