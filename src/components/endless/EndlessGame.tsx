@@ -40,8 +40,9 @@ type Run = {
   token?: string;
 };
 
-// a run that ended this recently shows its results again on a reload (or when sign-in comes back from Google)
-const RECENT = 10 * 60_000;
+// a run that ended this recently shows its results again on a reload, or when sign-in comes back from Google (the join
+// pop-up waits as long: see JoinDialog's FLOW_MAX_AGE)
+const RECENT = 30 * 60_000;
 
 /** A new run from the server, which can then go on the Best streaks board; or, if it can't be reached, one made here. */
 async function newRun(date: string): Promise<{ seed: string; token?: string }> {

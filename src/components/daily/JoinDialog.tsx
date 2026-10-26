@@ -25,6 +25,8 @@ export type JoinText = {
   back: string;
   /** where "Sign out" lands */
   page: string;
+  /** the nickname step's button */
+  post: string;
 };
 
 const dailyText = (score: number): JoinText => ({
@@ -36,6 +38,7 @@ const dailyText = (score: number): JoinText => ({
   scoreCell: (n) => `${n}/5`,
   back: t.back,
   page: "/daily",
+  post: t.post,
 });
 
 /**
@@ -267,7 +270,7 @@ function NameStep({ titleId, join, text, onPosted }: { titleId: string; join: Jo
         ) : null}
       </div>
       <button type="submit" disabled={status === "sending"} className="btn btn-gold btn-lg mt-5 w-full">
-        {status === "sending" ? t.posting : t.post}
+        {status === "sending" ? t.posting : text.post}
       </button>
       <p className="mt-3 text-center text-xs text-muted">
         {t.notYou}{" "}

@@ -76,6 +76,7 @@ export const endlessCopy = {
       doneLead: (n: number) => `is on today's Best streaks board with ${n} in a row.`,
       duplicate: "Your best run today is the one that counts.",
       back: "Back to my run",
+      post: "Post my streak",
     },
     // the leaderboard page's Endless tab
     tab: "Endless",

@@ -62,8 +62,11 @@ function SignedIn({ seed, token, choices, streak }: Props) {
       step={step}
       onPosted={() => setStep((s) => (s ? 3 : s))}
       onClose={() => {
+        const wasDone = step === 3;
         if (step === 1) clearJoinFlow();
         setStep(null);
+        // the Join button that opened this has gone: land on the card that now shows the rank
+        if (wasDone) requestAnimationFrame(() => document.getElementById("endless-board-h")?.focus());
       }}
       onContinue={() => {
         startJoinFlow(flow);
@@ -198,7 +201,11 @@ function Posted({
   return (
     <div className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-        <h3 className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
+        <h3
+          id="endless-board-h"
+          tabIndex={-1}
+          className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink outline-none min-[400px]:text-lg sm:gap-2 sm:text-xl"
+        >
           <TrophyIcon className="size-5 min-[400px]:size-6 sm:size-7" /> {t.title}
         </h3>
         <Link href="/leaderboard#endless" className="whitespace-nowrap text-sm font-semibold text-primary hover:underline">

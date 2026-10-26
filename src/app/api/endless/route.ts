@@ -52,7 +52,13 @@ export async function POST(request: Request) {
   if (!accounts && !isPlayerId(body.player)) return fail("Something went wrong. Reload the page and try again.", 400);
   const { name, error } = checkName(body.name);
   if (error) return fail(error, 422, "name");
-  const run = markRun(body.seed, body.token, body.choices);
+  let run: ReturnType<typeof markRun>;
+  try {
+    run = markRun(body.seed, body.token, body.choices);
+  } catch (e) {
+    console.error("[endless] marking failed", e);
+    return fail("We couldn't check that run. Please try again in a minute.", 503);
+  }
   if (!run.ok) return fail(run.error, 422);
   if (!run.streak) return fail("Get at least one right to post a streak.", 422);
 

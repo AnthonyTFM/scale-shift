@@ -123,7 +123,10 @@ interface Store {
 // whoever reached that streak first and "only if better" keeps the first time a streak was reached.
 const endlessScore = (streak: number, at: number) => streak + (1 - at / 1e13);
 const ENDLESS_RUN_TTL = 3 * 86400;
-type EndlessRunRecord = { n: number; over: boolean; p: string };
+/** Endless streaks above this stay off the boards until someone checks them (see endlessBoard). */
+export const ENDLESS_REVIEW_OVER = 100;
+/** n = streak, over = ended on a miss, p = the player who posted it, a = when (the JSON file only: Redis expires it) */
+type EndlessRunRecord = { n: number; over: boolean; p: string; a?: number };
 
 /** Every date a score could have been posted on (the day before launch, as UTC-1 counts, to tomorrow), for wiping one player's scores. */
 function playableDates(now = new Date()) {
@@ -295,9 +298,22 @@ function redisStore(url: string, token: string): Store {
     },
     async endlessRun(seed, id, streak, over) {
       const key = `lb2:endless:run:${seed}`;
+      const value = JSON.stringify({ n: streak, over, p: id });
+      // the first post claims the run in one step (NX), so two accounts posting it at once can't both get it; the list of
+      // a player's runs lets "Delete my data" find them
+      const [claimed] = await run([["SET", key, value, "NX", "EX", ENDLESS_RUN_TTL]]);
+      if (claimed === "OK") {
+        const mine = `lb2:endless:runs-of:${id}`;
+        await run([
+          ["SADD", mine, seed],
+          ["EXPIRE", mine, ENDLESS_RUN_TTL],
+        ]);
+        return null;
+      }
       const [raw] = await run([["GET", key]]);
       const old = typeof raw === "string" ? (JSON.parse(raw) as EndlessRunRecord) : null;
-      if (!old || (!old.over && old.p === id)) await run([["SET", key, JSON.stringify({ n: streak, over, p: id }), "EX", ENDLESS_RUN_TTL]]);
+      // the owner's run grows while it lasts; anything else leaves the record as it was
+      if (old && old.p === id && !old.over && streak >= old.n) await run([["SET", key, value, "XX", "EX", ENDLESS_RUN_TTL]]);
       return old;
     },
     async endlessBests(date) {
@@ -323,7 +339,9 @@ function redisStore(url: string, token: string): Store {
         ["HDEL", `lb2:day:${d}`, id],
         ["ZREM", `lb2:endless:day:${d}`, id],
       ]);
-      cmds.push(["ZREM", "lb2:endless:all", id]);
+      const [seeds] = await run([["SMEMBERS", `lb2:endless:runs-of:${id}`]]);
+      for (const seed of (seeds as string[]) ?? []) cmds.push(["DEL", `lb2:endless:run:${seed}`]);
+      cmds.push(["ZREM", "lb2:endless:all", id], ["DEL", `lb2:endless:runs-of:${id}`]);
       cmds.push(["ZREM", "lb2:points", id], ["HDEL", "lb2:days", id], ["HDEL", "lb2:names", id], ["HDEL", "lb2:emails", id], ["HDEL", "lb2:reminders", id]);
       for (const [k, v] of Object.entries(pairs(owners))) if (v === id) cmds.push(["HDEL", "lb2:owners", k]);
       for (const [k, v] of Object.entries(pairs(emailOwners))) if (v === id) cmds.push(["HDEL", "lb2:email-owners", k]);
@@ -481,8 +499,11 @@ function fileStore(file: string): Store {
     endlessRun: (seed, id, streak, over) =>
       write((d) => {
         const e = (d.endless ??= { days: {}, all: {}, runs: {} });
+        const now = Date.now();
+        // runs are only kept three days, as in Redis
+        for (const [k, r] of Object.entries(e.runs)) if (!r.a || now - r.a > ENDLESS_RUN_TTL * 1000) delete e.runs[k];
         const old = e.runs[seed] ?? null;
-        if (!old || (!old.over && old.p === id)) e.runs[seed] = { n: streak, over, p: id };
+        if (!old || (old.p === id && !old.over && streak >= old.n)) e.runs[seed] = { n: streak, over, p: id, a: now };
         return old;
       }),
     async endlessBests(date) {
@@ -498,6 +519,7 @@ function fileStore(file: string): Store {
         if (d.endless) {
           for (const day of Object.values(d.endless.days)) delete day[id];
           delete d.endless.all[id];
+          for (const [k, r] of Object.entries(d.endless.runs)) if (r.p === id) delete d.endless.runs[k];
         }
         delete d.names[id];
         if (d.emails) delete d.emails[id];
@@ -585,11 +607,12 @@ export function checkUnsubscribeToken(id: string, token: string) {
 export const NEW_PLAYERS_PER_NETWORK = 5;
 
 const REMOVED = new Set(removed.names.map((n) => nameKey(n)));
+const REMOVED_IDS = new Set<string>(removed.ids);
 /** Kept off the boards: offensive names, and anyone listed in src/content/removed-players.json. */
-const hidden = (name: string) => isOffensive(name) || REMOVED.has(nameKey(name));
+const hidden = (name: string, id?: string) => isOffensive(name) || REMOVED.has(nameKey(name)) || (!!id && REMOVED_IDS.has(id));
 
 export async function dayBoard(date: string, limit: number, me: string | null): Promise<DayBoard> {
-  const entries = (await getStore().day(date)).filter((e) => !hidden(e.name)).sort((a, b) => b.s - a.s || a.t - b.t);
+  const entries = (await getStore().day(date)).filter((e) => !hidden(e.name, e.id)).sort((a, b) => b.s - a.s || a.t - b.t);
   const ranked = rankBy(entries, (e) => e.s);
   const toRow = ({ r, rank }: (typeof ranked)[number]): DayRow => ({ rank, name: r.name, score: r.s, ...(r.id === me ? { me: true } : {}) });
   const mine = me ? ranked.find((x) => x.r.id === me) : undefined;
@@ -599,7 +622,7 @@ export async function dayBoard(date: string, limit: number, me: string | null): 
 export async function allTimeBoard(limit: number, me: string | null): Promise<AllTimeBoard> {
   const { total: stored, top: all, me: mine } = await getStore().allTime(limit, me);
   // names saved before the filter was tightened are hidden until someone removes them from the store
-  const top = all.filter((t) => !hidden(t.name));
+  const top = all.filter((t) => !hidden(t.name, t.id));
   const total = stored - (all.length - top.length);
   const rows: AllTimeRow[] = rankBy(top, (t) => t.points).map(({ r, rank }) => ({
     rank,
@@ -629,7 +652,7 @@ export async function weekBoard(date: string, limit: number, me: string | null):
   const totals = new Map<string, { name: string; points: number; days: number; t: number }>();
   for (const day of days)
     for (const e of day) {
-      if (hidden(e.name)) continue;
+      if (hidden(e.name, e.id)) continue;
       const t = totals.get(e.id) ?? { name: e.name, points: 0, days: 0, t: 0 };
       t.points += e.s;
       t.days += 1;
@@ -656,7 +679,9 @@ export async function weekBoard(date: string, limit: number, me: string | null):
  * time (`date` null). Rows use the daily's shape, with the streak as the score.
  */
 export async function endlessBoard(date: string | null, limit: number, me: string | null): Promise<EndlessBoard> {
-  const entries = (await getStore().endlessBests(date)).filter((e) => !hidden(e.name));
+  // no one gets anywhere near this many right in a row at the closest level: a longer streak waits for a look at the
+  // run (add the player to src/content/removed-players.json, or raise this)
+  const entries = (await getStore().endlessBests(date)).filter((e) => !hidden(e.name, e.id) && e.n <= ENDLESS_REVIEW_OVER);
   const ranked = rankBy(entries, (e) => e.n);
   const toRow = ({ r, rank }: (typeof ranked)[number]): DayRow => ({ rank, name: r.name, score: r.n, ...(r.id === me ? { me: true } : {}) });
   const mine = me ? ranked.find((x) => x.r.id === me) : undefined;

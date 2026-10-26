@@ -6,13 +6,16 @@
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import pool from "@/data/daily-pool.json";
 import type { PoolEntry } from "./daily";
-import { endlessRun, streakOf } from "./endless";
+import { endlessQuestion } from "./endless";
 import { isDateKey, isPlayableDate, unsubscribeSecret } from "./leaderboard";
 
 /** How long after it starts a run can still be posted. */
 const RUN_MAX_AGE = 24 * 3600_000;
-/** The fastest anyone can answer and move on, per round. A run posted faster than this was played by a script. */
-const MIN_MS_PER_ROUND = 1000;
+/**
+ * The fastest anyone can play a round: read two names, tap, watch the reveal, tap "Next round". A run posted faster
+ * than this was played by a script.
+ */
+const MIN_MS_PER_ROUND = 2000;
 /** No run is longer than this (the pool repeats long before). */
 export const MAX_ROUNDS = 500;
 
@@ -46,9 +49,10 @@ export function markRun(seed: unknown, token: unknown, choices: unknown, now = D
   if (!isDateKey(date) || !isPlayableDate(date, new Date(at))) return fail("That run can't be posted. Start a new one.");
   if (!Array.isArray(choices) || !choices.length || choices.length > MAX_ROUNDS || !choices.every((c) => c === 0 || c === 1))
     return fail("Those answers don't match this run.");
-  const questions = endlessRun(pool as PoolEntry[], seed, choices.length);
-  const streak = streakOf(questions, choices);
-  // answers after the miss can't exist: the run ends there
+  // mark round by round, stopping at the first miss: answers after it can't exist, as the run ends there
+  const used = new Set<string>();
+  let streak = 0;
+  while (streak < choices.length && endlessQuestion(pool as PoolEntry[], seed, streak + 1, used).answer === choices[streak]) streak++;
   if (streak < choices.length - 1) return fail("Those answers don't match this run.");
   if (now - at < streak * MIN_MS_PER_ROUND) return fail("That run was too fast to count.");
   return { ok: true, streak, over: streak < choices.length, date };
