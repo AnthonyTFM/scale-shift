@@ -4,10 +4,11 @@ import Link from "next/link";
 import { LeaderboardView } from "@/components/daily/LeaderboardView";
 import { SignInProvider } from "@/components/daily/SignInProvider";
 import { AccountBar } from "@/components/daily/AccountBar";
+import { leaderboardCopy as t } from "@/content/leaderboard";
 
 export const metadata: Metadata = {
-  title: "Leaderboard: daily challenge scores",
-  description: "Today's top scores in the daily size challenge, the players with the most points of all time, and the longest runs in endless mode.",
+  title: t.metaTitle,
+  description: t.metaDescription,
   alternates: { canonical: "/leaderboard" },
 };
 
@@ -15,26 +16,34 @@ export default function LeaderboardPage() {
   return (
     <>
       <PageHero
-        eyebrow="Daily challenge"
-        title="Leaderboard"
+        compact
+        eyebrow={t.eyebrow}
+        title={t.title}
         lead={
-          <p>
-            Think you know the world? Prove it. Finish the <Link href="/daily" className="font-semibold text-primary underline">
-              daily challenge
-            </Link>, sign in with your email and pick a nickname. Your score
-            lands here. Every correct answer adds a point to the all-time ranking. Your longest run in{" "}
-            <Link href="/endless" className="font-semibold text-primary underline">
-              endless mode
-            </Link>{" "}
-            goes on the Endless board.
-          </p>
+          <>
+            <p className="sm:hidden">{t.leadShort}</p>
+            <p className="hidden sm:block">
+              {t.lead.before}
+              <Link href="/daily" className="font-semibold text-primary underline">
+                {t.lead.daily}
+              </Link>
+              {t.lead.middle}
+              <Link href="/endless" className="font-semibold text-primary underline">
+                {t.lead.endless}
+              </Link>
+              {t.lead.after}
+            </p>
+          </>
         }
       />
-      <div className="mx-auto max-w-6xl px-4 py-8 md:py-10">
+      <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 md:py-10">
         <div className="max-w-2xl">
           <SignInProvider>
-            <AccountBar />
             <LeaderboardView />
+            {/* below the boards, so on phones the boards start on the first screen */}
+            <div className="mt-6">
+              <AccountBar />
+            </div>
           </SignInProvider>
           <p className="mt-6 text-xs leading-relaxed text-muted">
             Scores are checked on our server, and only your first try each day counts (in endless mode, your longest run does). Each email gets one player, and each nickname belongs to the
