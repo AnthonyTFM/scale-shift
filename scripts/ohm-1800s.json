@@ -112,15 +112,6 @@
    }
   ],
   [
-   2801147,
-   "Dutch East Indies",
-   {
-    "props": {
-     "s": "Batavian Republic"
-    }
-   }
-  ],
-  [
    2694887,
    "Persia",
    {
@@ -388,6 +379,29 @@
   [
    2860769,
    "Sultanate of Sulu"
+  ],
+  [
+   2948780,
+   "Sultanate of Tidore",
+   {
+    "partsIn": [
+     [
+      127,
+      -2.3,
+      131.5,
+      1
+     ],
+     [
+      129.3,
+      -4.7,
+      131.8,
+      -2.7
+     ]
+    ],
+    "props": {
+     "w": "Prince Nuku drove out the Dutch-backed sultan in 1797 and ruled Tidore with British support until his death in 1805; the Dutch took it back in 1806. Shown without the coasts and islands of New Guinea that its sultans claimed."
+    }
+   }
   ],
   [
    2841730,
@@ -1058,16 +1072,6 @@
    {
     "props": {
      "s": "Spain"
-    }
-   }
-  ],
-  [
-   2848265,
-   "Dutch East Indies",
-   {
-    "props": {
-     "s": "United Kingdom of the Netherlands",
-     "w": "Returned to the Netherlands by the Convention of London (1814); Britain, which took Java in 1811, handed it back in 1816."
     }
    }
   ],
@@ -3849,7 +3853,7 @@
    "Sultanate of the Maldive Islands"
   ]
  ],
- "_readme": "OpenHistoricalMap countries laid over the Cliopatria base on the maps from 1800 to 1880, by map: [relation id, our name, options], largest first (where two overlap, the later one wins). Options: props (ruler s, note w) for the shape, adopts (Cliopatria polities that are the same country: they take this name). Generated from OHM and checked against Cliopatria and HistoGIS; relations left out are listed in `left out` (every map) and `left out by map`.",
+ "_readme": "OpenHistoricalMap countries laid over the Cliopatria base on the maps from 1800 to 1880, by map: [relation id, our name, options], largest first (where two overlap, the later one wins). Options: props (ruler s, note w) for the shape, partsIn (only the relation's parts whose middle lies in these lon/lat boxes), adopts (Cliopatria polities that are the same country: they take this name). Generated from OHM and checked against Cliopatria and HistoGIS; relations left out are listed in `left out` (every map) and `left out by map`.",
  "left out": {
   "2696467": "Holy Roman Empire: one shape over its member states, which would hide the Habsburg lands; Cliopatria draws the members",
   "2698118": "Ottoman Empire (1878-80): as above",
@@ -3877,10 +3881,13 @@
  "left out by map": {
   "1800": {
    "2801004": "British Ceylon, 1796-1802: drawn over the whole island but a small hole at Kandy, while the Kingdom of Kandy held the hill country until 1815; Cliopatria's coast and kingdom are used",
-   "2847598": "Awadh, 1722-1801: one outline for eighty years, which in 1800 runs over Benares (British from 1775), the upper Doab (Scindia's) and Bundelkhand; Cliopatria's outline for 1800 is used"
+   "2801147": "Dutch East Indies, 1800-1810: drawn over all of today's Indonesia and western New Guinea, while the Dutch held Java and scattered posts and Britain held Ambon, Banda and Padang; Cliopatria's outline of the posts is used",
+   "2847598": "Awadh, 1722-1801: one outline for eighty years, which in 1800 runs over Benares (British from 1775), the upper Doab (Scindia's) and Bundelkhand; Cliopatria's outline for 1800 is used",
+   "2948781": "Sultanate of Tidore, 1797-1806: a gap in its border (two lines across south Halmahera); its outline from 1806 on (2948780), the same but for that line, is used"
   },
   "1815": {
    "2828775": "Colony of Sierra Leone, 1808-1896: drawn at the borders of the 1896 protectorate, while the colony was the Freetown peninsula; Cliopatria's outline is used",
+   "2848265": "Dutch East Indies, 1815-1824: drawn over all of today's Indonesia, while Britain still held the Dutch posts (Java until August 1816, the Moluccas until 1817); Cliopatria's outlines of them are drawn as British",
    "2965452": "Maratha Confederacy, 1788-1818: one outline, traced from a map of 1792, so it still holds Delhi, the Doab, Cuttack and Gujarat, taken by the British in 1803-05; Cliopatria's outline for 1815 is used"
   },
   "1878": {

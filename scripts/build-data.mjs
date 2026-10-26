@@ -316,6 +316,36 @@ const CLIO_PARTS = [
   { from: "French Consulate", box: [-4.5, 4.5, -2.5, 6], drop: true }, // the Ivory Coast, where France had no post until 1843
   { from: "Spanish Empire", box: [-62, -53, -57, -50.5], name: "Viceroyalty of the Río de la Plata", years: [1800] }, // the Falklands
   { from: "British Colonial Empire", box: [165, -53, 179, -34], drop: true, years: [1800, 1815] }, // New Zealand (British from 1840) and its islands
+  // the East Indies. Java is drawn from Natural Earth (TERRITORY), with the Javanese kingdoms the Dutch held as vassals;
+  // east Sumbawa is the Sultanate of Bima's; and in 1800 a second row repeats the one for the Dutch East Indies
+  { from: "Dutch East Indies", box: [105, -9, 115, -5.5], drop: true, years: [1800, 1815] },
+  { from: "Sultan of Yogyakarta", box: [105, -9, 115, -5.5], drop: true, years: [1800, 1815] },
+  { from: "Surakarta Sunanate", box: [105, -9, 115, -5.5], drop: true, years: [1800, 1815] },
+  { from: "Sultanate of Banten", box: [100, -8, 107, -3], drop: true, years: [1800] },
+  { from: "Dutch East Indies", box: [118, -9.2, 119.3, -8], drop: true, years: [1800, 1815] },
+  { from: "Batavian Republic", box: [90, -12, 142, 8], drop: true, years: [1800] },
+  // pieces Cliopatria names wrongly: its "Sultanate of Malacca" in north-east Sumatra and south Java, and Johor's central
+  // Sumatra, which was Siak's (independent of Johor from the 1720s)
+  { from: "Sultanate of Malacca", box: [94, -9, 111, 5], drop: true, years: [1800, 1815] },
+  { from: "Sultanate of Johor", box: [99.5, -1.2, 103.1, 2.1], drop: true, years: [1800, 1815] },
+  // 1800: Britain held Ambon and Banda with their islands (1796–1803) and the posts around Padang (1795–1819); Nuku of
+  // Tidore held Misool and Bacan's Obi (OpenHistoricalMap draws his Tidore)
+  { from: "Dutch East Indies", box: [125.5, -9, 135, -2.9], name: "Amboyna and Banda", member: "(British Empire)", years: [1800] },
+  { from: "Dutch East Indies", box: [127, -2.3, 130.5, -1.2], drop: true, years: [1800] },
+  { from: "British Colonial Empire", box: [98.5, -3.5, 101.8, 0.6], name: "Padang", years: [1800] },
+  // 1815: Britain still held every Dutch post, handed back from August 1816 (Java) to 1819 (Padang). The row also holds
+  // the Dutch posts in India (the Company Raj covers them) and the Nicobars (Danish), and Lampung, where Britain held
+  // only Semangka Bay; Bangka and Belitung were Britain's, not Palembang's, from 1812
+  { from: "Dutch East Indies", box: [75, 5, 95, 25], drop: true, years: [1815] },
+  { from: "Dutch East Indies", box: [101.4, -6.2, 106.2, -3.2], drop: true, years: [1815] },
+  { from: "Dutch East Indies", box: [98.5, -3.3, 101.7, 0.6], name: "Padang", member: "(British Empire)", years: [1815] },
+  { from: "Dutch East Indies", box: [101.5, 1.8, 103, 3], name: "Malacca", member: "(British Empire)", years: [1815] },
+  { from: "Dutch East Indies", box: [104.9, -3.5, 107, -1.4], name: "Bangka and Belitung", member: "(British Empire)", years: [1815] },
+  { from: "British Colonial Empire", box: [107.3, -3.4, 108.4, -2.4], name: "Bangka and Belitung", years: [1815] },
+  { from: "Sultanate of Palembang", box: [104.9, -3.5, 108.5, -1.4], drop: true, years: [1815] },
+  { from: "Dutch East Indies", box: [119, -6, 123.2, -4], name: "Makassar", member: "(British Empire)", years: [1815] },
+  { from: "Dutch East Indies", box: [122.5, -10.8, 125.2, -8], name: "Kupang", member: "(British Empire)", years: [1815] },
+  { from: "Dutch East Indies", box: [124.5, -9, 135, 2], name: "Moluccas", member: "(British Empire)", years: [1815] },
   { from: "British Colonial Empire", box: [115, 4, 120, 8], name: "North Borneo", years: [1880] },
   { from: "French India", box: [55, -21.5, 56, -20.8], name: "La Réunion", years: [1800] },
   { from: "French India", box: [57, -20.6, 58, -19.9], name: "Isle de France", years: [1800] },
@@ -1192,6 +1222,10 @@ const AHOM = { to: "Ahom Kingdom", ne1: ["India/Assam"], blank: true, w: "The Ah
 const FALKLANDS = { to: "Falkland Islands", ne0: ["Falkland Is."], s: UK_1900S, w: "A British colony since 1841; Britain took the islands in 1833. Argentina claims them." };
 // Cliopatria's row for British India also holds Ceylon's coast, which was a colony of its own
 const CEYLON_COAST = (uk, w) => ({ to: "British Ceylon", ne0: ["Sri Lanka"], from: ["Company Raj"], s: uk, ...(w ? { w } : {}) });
+// Java and Madura, with the Javanese kingdoms the Dutch held as vassals (Cliopatria draws them a little off the coast)
+const JAVA = ["Banten", "Jakarta Raya", "Jawa Barat", "Jawa Tengah", "Yogyakarta", "Jawa Timur"].map((p) => `Indonesia/${p}`);
+// the town of Pontianak, which lies just north of Cliopatria's outline of its sultanate
+const PONTIANAK = { to: "Pontianak Kadriyah Sultanate", poly: [[109.1, 0.1], [109.6, 0.1], [109.6, -0.25], [109.1, -0.25], [109.1, 0.1]], blank: true, w: "Founded in 1771 where the Landak joins the Kapuas (shown approximately)." };
 const TERRITORY = {
   1800: [
     ...MICROSTATES,
@@ -1204,6 +1238,10 @@ const TERRITORY = {
     { to: "Sikh Confederacy", ne1: ["India/Punjab"], from: ["Rajputana"] },
     // the Falklands: Spain's garrison at Puerto Soledad, run from Buenos Aires, held them from 1767 to 1811
     { to: "Viceroyalty of the Río de la Plata", ne0: ["Falkland Is."] },
+    // the Dutch East Indies: Java and Banten's Lampung (Cliopatria draws the other Dutch posts)
+    { to: "Dutch East Indies", ne1: JAVA, s: "Batavian Republic", w: "Ruled from Batavia: the Dutch state took over the Dutch East India Company's possessions on 1 January 1800. Shown with the Javanese kingdoms it held as vassals: Banten (with its pepper lands of Lampung, in Sumatra), Yogyakarta and Surakarta." },
+    { to: "Dutch East Indies", ne1: ["Indonesia/Lampung"], blank: true },
+    PONTIANAK,
   ],
   1815: [
     ...MICROSTATES,
@@ -1219,6 +1257,9 @@ const TERRITORY = {
     // north coast of Haiti is the Kingdom's (OpenHistoricalMap's New Spain, drawn over all the island, keeps it)
     { to: "Captaincy General of Santo Domingo", ne0: ["Dominican Rep."], s: "Spain", w: "Spanish again from 1809 until it broke away in 1821; Haiti took it the next year." },
     { to: "Kingdom of Haiti", poly: [[-74.6, 19.6], [-71.7, 19.6], [-71.7, 20.2], [-74.6, 20.2], [-74.6, 19.6]], from: ["Viceroyalty of New Spain"] },
+    // the Dutch East Indies were still British: Java until August 1816 (the other posts are Cliopatria's, see CLIO_PARTS)
+    { to: "Java", ne1: JAVA, s: UK_1900S, w: "Taken from the Dutch by Britain in 1811 and governed by Stamford Raffles, with the Javanese kingdoms under British rule; handed back to the Netherlands on 19 August 1816." },
+    PONTIANAK,
   ],
   1878: [...MICROSTATES, ...BULGARIA_1878, FALKLANDS],
   1880: [...MICROSTATES, ...BULGARIA_1878, FALKLANDS],
