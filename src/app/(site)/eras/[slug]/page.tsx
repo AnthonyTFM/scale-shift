@@ -36,8 +36,17 @@ function summary(key: string) {
   );
 }
 
-/** A meta description of at most `max` characters, cut at a word with an ellipsis if it's longer. */
-const clip = (text: string, max: number) => (text.length <= max ? text : `${text.slice(0, text.lastIndexOf(" ", max - 1)).replace(/[,;:.]$/, "")}…`);
+/**
+ * A meta description of at most `max` characters: whole sentences if they fill most of it, else cut at a word with an
+ * ellipsis.
+ */
+function clip(text: string, max: number) {
+  if (text.length <= max) return text;
+  const end = text.lastIndexOf(". ", max - 1);
+  if (end >= max * 0.5) return text.slice(0, end + 1);
+  const space = text.lastIndexOf(" ", max - 1);
+  return `${text.slice(0, space > 0 ? space : max - 1).replace(/[,;:.]$/, "")}…`;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
