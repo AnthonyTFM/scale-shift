@@ -214,7 +214,6 @@ export function QuestionCard({
                 span={span}
                 revealed={answered}
                 rewind={rewind}
-                stretchBy={stretch(o)}
                 color={COLORS[i]}
               />
               <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
@@ -374,8 +373,8 @@ function Shape({ outline, span, color, ghost }: { outline: Outline; span: number
 
 /**
  * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it shrinks (or grows) to its
- * real size while a counter ticks down from the map's stretch, then the real shape stays in full colour over a pale tint
- * of the map's version, both tagged. `rewind` jumps back to the map drawing with no animation, so a replay can run again.
+ * real size, then the real shape stays in full colour over a pale tint of the map's version (the line above the tiles
+ * says which is which). `rewind` jumps back to the map drawing with no animation, so a replay can run again.
  */
 function RevealTile({
   map,
@@ -383,7 +382,6 @@ function RevealTile({
   span,
   revealed,
   rewind,
-  stretchBy,
   color,
 }: {
   map: Outline;
@@ -392,8 +390,6 @@ function RevealTile({
   span: number;
   revealed: boolean;
   rewind: boolean;
-  /** how many times too big a web map draws it */
-  stretchBy: number;
   color: string;
 }) {
   const area = (o: Outline) => {
@@ -419,53 +415,6 @@ function RevealTile({
           <Shape outline={map} span={span} color={color} ghost="line" />
         </g>
       </svg>
-      {shown ? (
-        <>
-          <ShrinkCounter stretchBy={stretchBy} />
-          {/* which drawing is which, once the shrink has settled (the text below the tile says it for screen readers) */}
-          <span aria-hidden="true" className="pop-in reveal-late pointer-events-none absolute bottom-1.5 left-1.5 flex gap-1 text-[10px] font-bold leading-none">
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-1 text-ink-soft">
-              <span className="size-2 rounded-sm border" style={{ borderColor: color, background: `${color}38` }} />
-              {reveal.tagMap}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/90 px-1.5 py-1 text-ink">
-              <span className="size-2 rounded-sm" style={{ background: color }} />
-              {reveal.tagReal}
-            </span>
-          </span>
-        </>
-      ) : null}
-    </span>
-  );
-}
-
-/**
- * Top-left of a revealed tile: the map's stretch ticking down to the real size as the shape shrinks ("×3.7" … "×1.0"),
- * then "÷3.7". A place a web map draws about right just says so.
- */
-function ShrinkCounter({ stretchBy }: { stretchBy: number }) {
-  const settle = stretchBy < ABOUT_RIGHT;
-  const [v, setV] = useState<number | null>(settle || reducedMotion() ? null : stretchBy);
-  useEffect(() => {
-    if (settle || reducedMotion()) return;
-    // the same timing as the shrink itself (.reveal-map: 1.1s after a 0.15s wait)
-    const start = performance.now() + 150;
-    let id = 0;
-    const tick = (now: number) => {
-      const t = Math.min(1, Math.max(0, (now - start) / 1100));
-      const ease = 1 - Math.pow(1 - t, 3);
-      setV(t < 1 ? stretchBy + (1 - stretchBy) * ease : null);
-      if (t < 1) id = requestAnimationFrame(tick);
-    };
-    id = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(id);
-  }, [settle, stretchBy]);
-  return (
-    <span
-      aria-hidden="true"
-      className="pointer-events-none absolute left-1.5 top-1.5 rounded-full bg-white/90 px-2 py-1 font-display text-sm leading-none text-ink tabular-nums shadow-[0_1px_2px_rgba(29,33,64,0.2)]"
-    >
-      {settle ? reveal.aboutSame : v !== null ? `×${v.toFixed(1)}` : reveal.divide(times(Math.max(1.2, stretchBy)))}
     </span>
   );
 }
