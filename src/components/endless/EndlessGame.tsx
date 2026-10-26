@@ -13,6 +13,7 @@ import { buzz, confetti } from "@/lib/celebrate";
 import { useShareBox } from "@/components/site/ShareBox";
 import { FlameIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "@/components/daily/Matchup";
+import { EndlessJoin } from "./EndlessJoin";
 
 const R = t.results;
 
@@ -35,7 +36,34 @@ type Run = {
   done: boolean;
   /** the run is saved in this browser (false with storage blocked: then there's no other tab to keep in step with) */
   saved: boolean;
+  /** the server's token for this run, needed to post it on the Best streaks board (none if the server couldn't be reached) */
+  token?: string;
 };
+
+// a run that ended this recently shows its results again on a reload, or when sign-in comes back from Google (the join
+// pop-up waits as long: see JoinDialog's FLOW_MAX_AGE)
+const RECENT = 30 * 60_000;
+
+/** A new run from the server, which can then go on the Best streaks board; or, if it can't be reached, one made here. */
+async function newRun(date: string): Promise<{ seed: string; token?: string }> {
+  const abort = new AbortController();
+  const id = setTimeout(() => abort.abort(), 4000);
+  try {
+    const res = await fetch("/api/endless/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ date }),
+      signal: abort.signal,
+    });
+    const d = res.ok ? ((await res.json()) as { seed?: unknown; token?: unknown }) : null;
+    if (typeof d?.seed === "string" && typeof d.token === "string") return { seed: d.seed, token: d.token };
+  } catch {
+    /* offline or slow: play anyway */
+  } finally {
+    clearTimeout(id);
+  }
+  return { seed: newSeed(date) };
+}
 
 /** Builds rounds up to `count` (they only depend on the seed, so this is the same run every time). */
 function upTo(run: Run, count: number) {
@@ -43,23 +71,33 @@ function upTo(run: Run, count: number) {
   return run.questions[count - 1];
 }
 
-/** The run in progress in this browser (after a reload), or a new one. */
+/** The run in progress in this browser (after a reload), the results of one that just ended, or a new one. */
 async function prepare(fresh: boolean): Promise<Run> {
-  const pool = await loadPool();
   const save = loadEndless();
-  const old = !fresh && save.run && !save.run.over ? save.run : null;
-  const seed = old?.seed ?? newSeed(localDateKey());
+  const last = fresh ? null : save.run;
+  const old = last && !last.over ? last : null;
+  const ended = last?.over && last.e && Date.now() - last.e < RECENT ? last : null;
+  const [pool, started] = await Promise.all([loadPool(), old || ended ? null : newRun(localDateKey())]);
+  const kept = old ?? ended;
+  const seed = kept?.seed ?? started!.seed;
   // the best is saved after every right answer, so a resumed run takes the best from before it started
-  const bestBefore = old ? (old.b ?? save.best) : save.best;
-  const run: Run = { pool, seed, questions: [], used: new Set(), shapes: {}, choices: old?.c ?? [], step: 0, bestBefore, over: false, done: false, saved: false };
+  const bestBefore = kept ? (kept.b ?? save.best) : save.best;
+  const token = kept ? kept.t : started!.token;
+  const run: Run = { pool, seed, questions: [], used: new Set(), shapes: {}, choices: kept?.c ?? [], step: 0, bestBefore, over: false, done: false, saved: false, token };
+  if (ended) {
+    // straight to its results (they need no drawings); answers that don't fit start a new run instead
+    upTo(run, ended.c.length);
+    if (streakOf(run.questions, ended.c) !== ended.c.length - 1) return prepare(true);
+    return { ...run, step: ended.c.length - 1, over: true, done: true, saved: true };
+  }
   if (old) {
     upTo(run, old.c.length + 1);
     // saved answers that don't fit this run (one missed but not marked over): start a new one instead
     if (streakOf(run.questions, old.c) < old.c.length) return prepare(true);
     run.step = old.c.length;
   } else {
-    writeEndless({ ...save, runs: save.runs + 1, run: { seed, c: [], b: bestBefore } });
-    track("endless_start");
+    writeEndless({ ...save, runs: save.runs + 1, run: { seed, c: [], b: bestBefore, ...(token ? { t: token } : {}) } });
+    track("endless_start", { ranked: !!token });
   }
   run.saved = loadEndless().run?.seed === seed;
   const q = run.questions[run.step] ?? upTo(run, run.step + 1);
@@ -146,7 +184,7 @@ export function EndlessGame() {
     buzz(right ? 12 : [30, 50, 30]);
     track("endless_answer", { n: run.step + 1, correct: right });
     const n = streakOf(run.questions, choices);
-    const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, b: run.bestBefore, c: choices, ...(right ? {} : { over: true }) } };
+    const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, b: run.bestBefore, c: choices, ...(run.token ? { t: run.token } : {}), ...(right ? {} : { over: true, e: Date.now() }) } };
     writeEndless(updated);
     if (!right) track("endless_end", { streak: n });
     setRun({ ...run, choices, over: !right });
@@ -313,6 +351,9 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
           </div>
         ))}
       </dl>
+
+      {/* the run goes on the Best streaks board if the server handed it out (and at least one answer was right) */}
+      {run.token && streak > 0 ? <EndlessJoin seed={run.seed} token={run.token} choices={run.choices} streak={streak} /> : null}
 
       <button type="button" onClick={onAgain} className="btn btn-gold btn-lg mt-5 w-full">
         {R.playAgain} <span aria-hidden="true">→</span>
