@@ -11,6 +11,34 @@ const matchers = [...(proxy.match(/matcher:\s*\[([^\]]*)\]/)?.[1] ?? "").matchAl
 // "/api/x/:path*" covers /api/x and everything under it; anything else must match exactly
 const covered = (route) => matchers.some((m) => (m.endsWith("/:path*") ? route === m.slice(0, -7) || route.startsWith(`${m.slice(0, -7)}/`) : route === m));
 
+// a file reads the signed-in player if it uses Clerk's server helpers, or imports a file of ours that does (followed
+// through src/lib, any quoting, relative or "@/" imports)
+const src = path.join(root, "src");
+const CLERK = /from\s+["']@clerk\/nextjs\/server["']/;
+const seen = new Map();
+function readsPlayer(file) {
+  if (seen.has(file)) return seen.get(file);
+  seen.set(file, false);
+  const text = readFileSync(file, "utf8");
+  let hit = CLERK.test(text) && /\b(auth|currentUser)\b/.test(text);
+  for (const [, spec] of hit ? [] : text.matchAll(/from\s+["']((?:@\/|\.)[^"']+)["']/g)) {
+    const base = spec.startsWith("@/") ? path.join(src, spec.slice(2)) : path.resolve(path.dirname(file), spec);
+    const found = [".ts", ".tsx", "/index.ts"].map((ext) => base + ext).find((f) => {
+      try {
+        return statSync(f).isFile();
+      } catch {
+        return false;
+      }
+    });
+    if (found && found.startsWith(src) && !found.includes(`${path.sep}components${path.sep}`) && readsPlayer(found)) {
+      hit = true;
+      break;
+    }
+  }
+  seen.set(file, hit);
+  return hit;
+}
+
 const routes = [];
 const walk = (dir) => {
   for (const name of readdirSync(dir)) {
@@ -22,7 +50,7 @@ const walk = (dir) => {
 walk(api);
 
 const missing = routes
-  .filter((file) => /from "@\/lib\/account"|\bauth\(\)/.test(readFileSync(file, "utf8")))
+  .filter((file) => readsPlayer(file))
   .map((file) => `/api/${path.relative(api, path.dirname(file)).split(path.sep).join("/")}`)
   .filter((route) => !covered(route));
 
