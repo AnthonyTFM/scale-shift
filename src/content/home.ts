@@ -66,7 +66,11 @@ export const home = {
     streakEmptyShort: "No streaks yet today. Be the first!",
     streakAllTime: "Best streaks of all time",
     streakSr: (n: number) => `${n} in a row`,
-    streakPlay: "Play endless",
+    // someone already on today's Best streaks board
+    streakBeat: (n: number) => `Beat your ${n} in a row`,
+    you: "(you)",
+    // the leaderboard couldn't be reached
+    boardFailed: "Couldn't load the leaderboard. Try again in a minute.",
     nextIn: (h: number, m: number) => `Next game in ${h}h ${m}m`,
     nextReady: "A new game is ready",
     challengeCta: "Challenge a friend",
