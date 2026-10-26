@@ -6,9 +6,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menu } from "@/content/site";
 import { Wordmark } from "./Wordmark";
-import { MapIcon, TargetIcon, TrophyIcon } from "./Icons";
+import { FlameIcon, MapIcon, TargetIcon, TrophyIcon } from "./Icons";
 
-const ICONS = { map: MapIcon, target: TargetIcon, trophy: TrophyIcon } as const;
+const ICONS = { map: MapIcon, target: TargetIcon, trophy: TrophyIcon, flame: FlameIcon } as const;
 
 /**
  * The "three lines" menu. variant="map" is the floating button on the map page (always visible);

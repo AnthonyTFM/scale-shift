@@ -11,7 +11,7 @@ import { LegacyMapRedirect } from "@/components/home/LegacyMapRedirect";
 import { JsonLd } from "@/components/site/PageHero";
 import { GlobeLazy } from "@/components/home/GlobeLazy";
 import { YesterdayMatchup } from "@/components/home/YesterdayMatchup";
-import { BookIcon, ColumnsIcon, DisputeIcon, MapIcon, TimelineIcon, TrophyIcon } from "@/components/site/Icons";
+import { BookIcon, ColumnsIcon, DisputeIcon, FlameIcon, MapIcon, TimelineIcon, TrophyIcon } from "@/components/site/Icons";
 import { home } from "@/content/home";
 
 export const metadata: Metadata = {
@@ -22,6 +22,7 @@ export const metadata: Metadata = {
 
 const x = home.explore;
 const places = [
+  { href: "/endless", Icon: FlameIcon, title: "Endless mode", line: x.endless },
   { href: "/leaderboard", Icon: TrophyIcon, title: "Leaderboard", line: x.leaderboard },
   { href: "/eras", Icon: ColumnsIcon, title: "Eras", line: x.eras(eras.length) },
   { href: "/timeline", Icon: TimelineIcon, title: "Timeline", line: x.timeline(events.length) },

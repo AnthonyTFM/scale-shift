@@ -29,7 +29,7 @@ export type Question = {
   answer: 0 | 1;
 };
 
-type QuestionKind = "trap" | "close" | "state" | "history" | "history2";
+export type QuestionKind = "trap" | "close" | "state" | "history" | "history2";
 
 /** Day 1 of the challenge. Day numbers count from here. */
 export const LAUNCH = "2026-10-19";
@@ -74,7 +74,8 @@ function hash(s: string) {
   return h >>> 0;
 }
 
-function rng(seed: string) {
+/** A repeatable random number generator: the same seed always gives the same numbers. */
+export function rng(seed: string) {
   let a = hash(seed);
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -86,7 +87,7 @@ function rng(seed: string) {
 
 // ---------- question building ----------
 
-const ratio = (x: PoolEntry, y: PoolEntry) => Math.max(x.a, y.a) / Math.min(x.a, y.a);
+export const ratio = (x: PoolEntry, y: PoolEntry) => Math.max(x.a, y.a) / Math.min(x.a, y.a);
 
 /** Rules each question type must meet: [first pick, second pick, does the pair qualify?] */
 const RULES: Record<QuestionKind, [(e: PoolEntry) => boolean, (e: PoolEntry) => boolean, (x: PoolEntry, y: PoolEntry) => boolean]> = {
@@ -106,13 +107,13 @@ const RULES: Record<QuestionKind, [(e: PoolEntry) => boolean, (e: PoolEntry) => 
   history2: [(e) => e.kind === "history", (e) => e.kind === "history", (x, y) => x.era !== y.era && ratio(x, y) >= 1.1 && ratio(x, y) <= 2],
 };
 
-function pick<T>(list: T[], r: () => number) {
+export function pick<T>(list: T[], r: () => number) {
   return list[Math.floor(r() * list.length)];
 }
 
-/** The day's five questions. `seed` is the date key, or anything else for a practice round. */
+/** The day's five questions. `seed` is the date key (any other seed draws from the whole pool). */
 export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[] {
-  // a dated round only uses shapes that were in the pool that day (practice rounds use everything)
+  // a dated round only uses shapes that were in the pool that day
   const dated = /^\d{4}-\d{2}-\d{2}$/.test(seed);
   const pool = allShapes.filter((e) => !e.since || !dated || e.since <= seed);
   const r = rng(`atlas-daily:${seed}`);
