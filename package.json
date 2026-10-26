@@ -12,7 +12,7 @@
     "leads": "node scripts/show-feedback.mjs",
     "plays": "node scripts/show-plays.mjs",
     "typecheck": "tsc --noEmit",
-    "check:data": "node scripts/check-data.mjs"
+    "check:data": "node scripts/check-data.mjs && node scripts/check-routes.mjs"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.9.17",
