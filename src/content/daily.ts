@@ -49,10 +49,8 @@ export const dailyCopy = {
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
     ask: "Sized the way a normal web map shows them. Tap the bigger one.",
-    // after the answer, in place of `ask`, with a button that plays the shrink again
-    watch: "Watch the map size shrink to real size.",
-    replay: "Replay",
-    replaySr: "Replay the shrink",
+    // after the answer, in place of `ask`: tapping a tile then plays the shrink again
+    watch: "Tap a shape to watch it shrink again.",
     // on each tile once it has shrunk: the pale tint is the web map's version, the full colour the real size
     tagMap: "Map",
     tagReal: "Real",

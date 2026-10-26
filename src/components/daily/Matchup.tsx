@@ -139,7 +139,7 @@ export function QuestionCard({
   // the cards only show after the first load, in the browser, so this never runs on the server
   const [unit] = useState<AreaUnit>(preferredUnit);
   const sectionRef = useRef<HTMLElement>(null);
-  // "Replay": jump both tiles back to the map's drawing for a frame, then let the shrink run again
+  // tapping a tile after answering: jump both tiles back to the map's drawing for a frame, then let the shrink run again
   const [rewind, setRewind] = useState(false);
   const replay = () => {
     setRewind(true);
@@ -179,27 +179,8 @@ export function QuestionCard({
       <h2 id="daily-q" className="mt-1 text-center font-display text-[1.7rem] leading-[1.1] text-ink sm:text-4xl">
         {q.prompt}
       </h2>
-      {/* the same height before and after answering (the Replay button is 44px), so the tiles don't jump */}
-      <div className="mt-1.5 flex min-h-11 items-center justify-center gap-2 text-center text-sm text-muted">
-        {answered ? (
-          <>
-            <p className="min-w-0">{reveal.watch}</p>
-            <button
-              type="button"
-              onClick={replay}
-              aria-label={reveal.replaySr}
-              className="inline-flex min-h-11 shrink-0 items-center gap-1 rounded-full border-2 border-line bg-white px-3 text-xs font-bold text-ink-soft hover:border-primary hover:text-ink"
-            >
-              <span aria-hidden="true" className="text-base leading-none">
-                ↻
-              </span>
-              {reveal.replay}
-            </button>
-          </>
-        ) : (
-          <p>{reveal.ask}</p>
-        )}
-      </div>
+      {/* the same height before and after answering (`ask` wraps to two lines on phones), so the tiles don't jump */}
+      <p className="mt-1.5 flex min-h-10 items-center justify-center text-center text-sm text-muted">{answered ? reveal.watch : reveal.ask}</p>
 
       <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
         {q.options.map((o, i) => {
@@ -215,10 +196,10 @@ export function QuestionCard({
             <button
               key={o.id}
               type="button"
-              disabled={answered}
-              onClick={() => onPick(i)}
+              // once answered, a tap plays the shrink again (the answer can't change)
+              onClick={() => (answered ? replay() : onPick(i))}
               aria-label={answered ? undefined : `${o.n}, ${o.sub}`}
-              className={`press-card relative flex min-w-0 flex-col rounded-[20px] p-2 text-left disabled:cursor-default sm:p-3 ${look}`}
+              className={`press-card relative flex min-w-0 flex-col rounded-[20px] p-2 text-left sm:p-3 ${look}`}
             >
               {answered && (isAnswer || picked === i) ? (
                 <span
