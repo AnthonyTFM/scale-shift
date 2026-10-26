@@ -1,0 +1,358 @@
+"use client";
+
+// The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
+import { useEffect, useRef, useState } from "react";
+import dataVersion from "@/data/data-version.json";
+import { explain, type PoolEntry, type Question } from "@/lib/daily";
+import { dailyContext } from "@/content/daily-context";
+import { formatBoth } from "@/lib/format";
+import { mapUrl } from "@/lib/share";
+import { setSound, soundOn } from "@/lib/sound";
+import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
+import { dailyCopy } from "@/content/daily";
+import { SpeakerIcon, TickIcon } from "@/components/site/Icons";
+
+const reveal = dailyCopy.reveal;
+export const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+// where a new round lines up: just under the sticky site header
+export const ROUND_TOP = 88;
+// square tiles, a little flatter on short laptop screens so both shapes fit on the first screen (the drawing stays centred
+// at its own proportions)
+const TILE = "aspect-square [@media(min-width:768px)_and_(max-height:820px)]:aspect-[5/4]";
+
+// the two shapes on the game tiles: bright fills (they are drawings, not text)
+const COLORS = ["#FF5B4A", "#2F6BFF"];
+const V = `?v=${dataVersion.v}`;
+
+let poolPromise: Promise<PoolEntry[]> | null = null;
+export const loadPool = () =>
+  (poolPromise ??= fetch(`/data/daily/index.json${V}`)
+    .then((r) => {
+      if (!r.ok) throw new Error("pool");
+      return r.json() as Promise<PoolEntry[]>;
+    })
+    .catch((e) => {
+      // let "Try again" fetch it afresh
+      poolPromise = null;
+      throw e;
+    }));
+
+/** The drawings for every shape in these questions, keyed by shape id. */
+export async function loadShapes(questions: Question[]): Promise<Record<string, ShapeFile>> {
+  const ids = [...new Set(questions.flatMap((q) => q.options.map((o) => o.id)))];
+  const files = await Promise.all(
+    ids.map((id) =>
+      fetch(`/data/daily/shapes/${id}.json${V}`).then((r) => {
+        if (!r.ok) throw new Error(id);
+        return r.json() as Promise<ShapeFile>;
+      }),
+    ),
+  );
+  const entry = new Map(questions.flatMap((q) => q.options).map((o) => [o.id, o]));
+  return Object.fromEntries(ids.map((id, i) => [id, withMapDrawing(files[i], entry.get(id)!)]));
+}
+
+/** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
+export function Skeleton({ label, pills }: { label: string; /** room for a row of pills above the bar (endless mode) */ pills?: boolean }) {
+  return (
+    <div aria-busy="true" aria-label={label}>
+      {pills ? <div aria-hidden="true" className="mb-2 h-9" /> : null}
+      <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
+      <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6 [@media(min-width:768px)_and_(max-height:820px)]:min-h-[476px]">
+        <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
+          <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Sound effects on or off (on by default). */
+function SoundToggle() {
+  // on by default, so the first paint already says "Sound on" for almost everyone
+  const [on, setOn] = useState(true);
+  useEffect(() => queueMicrotask(() => setOn(soundOn())), []);
+  return (
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={() => {
+        setSound(!on);
+        setOn(!on);
+      }}
+      className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-xs font-bold text-ink-soft hover:text-ink"
+    >
+      <SpeakerIcon on={on} /> Sound
+    </button>
+  );
+}
+
+export function QuestionCard({
+  eyebrow,
+  q,
+  shapes,
+  picked,
+  verdict,
+  nextLabel,
+  busy,
+  onPick,
+  onNext,
+}: {
+  /** "Round 2 of 5" */
+  eyebrow: string;
+  q: Question;
+  shapes: Record<string, ShapeFile>;
+  picked: number | undefined;
+  /** the reveal's headline for a right or a wrong answer */
+  verdict: (correct: boolean) => string;
+  nextLabel: string;
+  /** the next round is loading: Next is disabled until it's ready */
+  busy?: boolean;
+  onPick: (i: number) => void;
+  onNext: () => void;
+}) {
+  const answered = picked !== undefined;
+  const correct = picked === q.answer;
+  const nextRef = useRef<HTMLButtonElement>(null);
+  // one shared scale per view for both tiles, so the two drawings compare fairly
+  const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
+  const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
+
+  const lines = explain(q);
+
+  useEffect(() => {
+    if (!answered) return;
+    // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
+    nextRef.current?.focus({ preventScroll: true });
+    // once the shapes have settled, bring the explanation and "Next" into view on short screens
+    const id = setTimeout(
+      () => nextRef.current?.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }),
+      reducedMotion() ? 0 : 1400,
+    );
+    return () => clearTimeout(id);
+  }, [answered]);
+
+  return (
+    <section
+      aria-labelledby="daily-q"
+      className="rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:p-6"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
+        <SoundToggle />
+      </div>
+      <h2 id="daily-q" className="mt-1 text-center font-display text-[1.7rem] leading-[1.1] text-ink sm:text-4xl">
+        {q.prompt}
+      </h2>
+      <p className="mt-1.5 text-center text-sm text-muted">{answered ? reveal.legend : reveal.ask}</p>
+
+      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
+        {q.options.map((o, i) => {
+          const isAnswer = i === q.answer;
+          const look = !answered
+            ? "hover:border-primary"
+            : isAnswer
+              ? "reveal-win border-green [--press-shadow:var(--color-green-shadow)]"
+              : picked === i
+                ? "reveal-shake border-red [--press-shadow:var(--color-red-shadow)]"
+                : "opacity-70";
+          const inflate = o.m / o.a;
+          const x = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
+          const mapNote = inflate >= 1.15 ? reveal.mapTooBig(x(inflate)) : inflate <= 0.87 ? reveal.mapTooSmall(x(1 / inflate)) : reveal.mapAboutRight;
+          return (
+            <button
+              key={o.id}
+              type="button"
+              disabled={answered}
+              onClick={() => onPick(i)}
+              aria-label={answered ? undefined : `${o.n}, ${o.sub}`}
+              className={`press-card relative flex min-w-0 flex-col rounded-[20px] p-2 text-left disabled:cursor-default sm:p-3 ${look}`}
+            >
+              {answered && (isAnswer || picked === i) ? (
+                <span
+                  className={`pop-in absolute -top-3.5 right-2 z-10 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-white ${isAnswer ? "reveal-late bg-green-text" : "bg-red"}`}
+                >
+                  {isAnswer ? reveal.bigger : reveal.yourPick}
+                </span>
+              ) : null}
+              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
+              <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
+              <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
+              {answered ? (
+                <>
+                  <TrueArea from={o.m} to={o.a} />
+                  <span
+                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight text-ink ${inflate >= 1.15 ? "bg-gold-soft" : "bg-beige"}`}
+                  >
+                    {mapNote}
+                  </span>
+                </>
+              ) : null}
+            </button>
+          );
+        })}
+        {/* the gold VS coin between the cards */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-gold font-display text-sm text-ink shadow-[0_4px_0_0_var(--color-gold-shadow)]"
+        >
+          {reveal.vs}
+        </span>
+      </div>
+
+      <WhoIsWho options={q.options} />
+
+      {/* the verdict, read out by screen readers: soft green when you're right, soft red when the map fooled you */}
+      <div aria-live="polite">
+        {answered ? (
+          <div
+            className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
+          >
+            <p className="flex items-center gap-2.5 font-display text-2xl leading-tight">
+              <span
+                aria-hidden="true"
+                className={`grid size-8 shrink-0 place-items-center rounded-full text-base text-white ${correct ? "bg-green-text" : "bg-danger"}`}
+              >
+                <TickIcon right={correct} className="size-4" />
+              </span>
+              {verdict(correct)}
+            </p>
+            <p className="mt-2 font-semibold leading-snug">{lines[0]}</p>
+            {lines.slice(1).map((line) => (
+              <p key={line} className="mt-1.5 text-sm leading-relaxed text-ink-soft">
+                {line}
+              </p>
+            ))}
+          </div>
+        ) : null}
+      </div>
+      {answered ? (
+        <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg mt-4 w-full">
+          {nextLabel} <span aria-hidden="true">→</span>
+        </button>
+      ) : null}
+    </section>
+  );
+}
+
+/** Short "what was it / where is it today" notes for the historical states in a question. */
+function WhoIsWho({ options }: { options: Question["options"] }) {
+  const notes = options.filter((o) => o.kind === "history" && dailyContext[o.src]);
+  if (!notes.length) return null;
+  return (
+    <div className="mt-4 space-y-2 rounded-2xl bg-paper p-3 text-sm ring-1 ring-line">
+      {notes.map((o) => {
+        const c = dailyContext[o.src];
+        return (
+          <p key={o.id} className="leading-relaxed text-ink-soft">
+            <strong className="text-ink">{o.n}</strong> <span className="text-muted">({o.sub})</span>: {c.what}{" "}
+            <span className="font-semibold text-ink">Today: {c.today}.</span>
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+// framed and drawn on the main landmass, so far-off islands don't shrink a country to a speck
+const size = (o: Outline) => {
+  const [x0, y0, x1, y1] = mainBox(o);
+  return Math.max(x1 - x0, y1 - y0);
+};
+
+/** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
+function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
+  const { d, b: [x0, y0, x1, y1] } = mainPart(outline);
+  const k = 100 / span;
+  const tiny = size(outline) < span * 0.06;
+  return (
+    <>
+      <path
+        d={d}
+        transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
+        fill={ghost ? "none" : color}
+        fillOpacity={0.88}
+        stroke={color}
+        strokeWidth={ghost ? 1.5 : 1}
+        strokeDasharray={ghost ? "4 3" : undefined}
+        vectorEffect="non-scaling-stroke"
+        fillRule="evenodd"
+        strokeLinejoin="round"
+      />
+      {tiny && !ghost ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
+    </>
+  );
+}
+
+/**
+ * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
+ * it really is next to the other shape, then the true outline fades in, with a dashed trace of the map's version left behind
+ * so the difference stays visible.
+ */
+function RevealTile({
+  map,
+  real,
+  spans,
+  revealed,
+  color,
+}: {
+  map: Outline;
+  real: Outline;
+  spans: { merc: number; ea: number };
+  revealed: boolean;
+  color: string;
+}) {
+  const area = (o: Outline, span: number) => {
+    const [x0, y0, x1, y1] = mainBox(o);
+    return ((x1 - x0) * (y1 - y0)) / (span * span);
+  };
+  const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
+  return (
+    <svg viewBox="0 0 100 100" className={`${TILE} w-full rounded-2xl bg-tile`} aria-hidden="true">
+      <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
+        <Shape outline={map} span={spans.merc} color={color} />
+      </g>
+      <g className="reveal-true" style={{ opacity: revealed ? 0.55 : 0 }}>
+        <Shape outline={map} span={spans.merc} color={color} ghost />
+      </g>
+      <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
+        <Shape outline={real} span={spans.ea} color={color} />
+      </g>
+    </svg>
+  );
+}
+
+/** The real area, counting down (or up) from the size the map makes it look, as the shapes change size. */
+function TrueArea({ from, to }: { from: number; to: number }) {
+  const [v, setV] = useState(from);
+  useEffect(() => {
+    if (reducedMotion()) {
+      const id = requestAnimationFrame(() => setV(to));
+      return () => cancelAnimationFrame(id);
+    }
+    const start = performance.now() + 150;
+    let id = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, Math.max(0, (now - start) / 1000));
+      const ease = 1 - Math.pow(1 - t, 3);
+      setV(from + (to - from) * ease);
+      if (t < 1) id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [from, to]);
+  const [km, mi] = formatBoth(v).replace(")", "").split(" (");
+  return (
+    <span className="mt-1.5 block tabular-nums">
+      <span className="block font-display text-base text-ink">{km}</span>
+      <span className="block text-xs text-muted">{mi}</span>
+    </span>
+  );
+}
+
+/** The two shapes side by side on the real-size map. */
+export function mapHref(q: Question) {
+  return mapUrl({ era: "present", shapes: q.options.map((o, i) => ({ era: o.era, name: o.src, color: i })) });
+}

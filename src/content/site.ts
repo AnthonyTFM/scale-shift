@@ -15,6 +15,7 @@ export const site = {
 export const nav: { href: string; label: string; from?: "lg" | "xl" }[] = [
   { href: "/map", label: "Map" },
   { href: "/daily", label: "Daily challenge" },
+  { href: "/endless", label: "Endless" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/eras", label: "Eras" },
   { href: "/timeline", label: "Timeline", from: "lg" },
@@ -31,10 +32,11 @@ export const footerNav = [
   { href: "/terms", label: "Terms" },
 ];
 
-/** The phone menu: the three main places first (the game leads), then history pages, then the small print. */
+/** The phone menu: the main places first (the games lead), then history pages, then the small print. */
 export const menu = {
   main: [
     { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "target" as const },
+    { href: "/endless", label: "Endless mode", blurb: "Closer and closer, until your first miss", icon: "flame" as const },
     { href: "/leaderboard", label: "Leaderboard", blurb: "Today, this week and all time", icon: "trophy" as const },
     { href: "/map", label: "Map", blurb: "Drag any country to its real size", icon: "map" as const },
   ],

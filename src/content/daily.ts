@@ -48,7 +48,6 @@ export const dailyCopy = {
   // the reveal after each answer
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
-    practice: "Practice",
     ask: "Sized the way a normal web map shows them. Tap the bigger one.",
     // the tiles compare the two shapes with each other (one scale per view), so the legend says "compare", not "size"
     legend: "Dashed: how the two compare on a web map. Solid: how they really compare.",
@@ -79,7 +78,6 @@ export const dailyCopy = {
     scoreSr: (score: number, total: number) => `You got ${score} out of ${total}.`,
     // above the progress bar while playing, for players with a streak going
     streakPill: (n: number) => `${n}-day streak`,
-    practiceRound: "Practice round",
     streak: "Streak",
     best: (n: number) => `Best ${n}`,
     rank: "Today's rank",
@@ -113,9 +111,9 @@ export const dailyCopy = {
     pictureShort: "Picture",
     challengeShort: "Challenge",
     challenge: "Challenge a friend",
-    practice: "Play more rounds for fun",
-    anotherPractice: "Another practice round",
-    backToToday: "Back to today's results",
+    // after the daily: endless mode is the next thing to play
+    endless: "Play endless mode",
+    endlessLine: "One matchup after another, closer the further you go. How far can you get?",
     answers: "The answers",
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",
