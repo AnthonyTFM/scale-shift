@@ -36,13 +36,16 @@ function summary(key: string) {
   );
 }
 
+/** A meta description of at most `max` characters, cut at a word with an ellipsis if it's longer. */
+const clip = (text: string, max: number) => (text.length <= max ? text : `${text.slice(0, text.lastIndexOf(" ", max - 1)).replace(/[,;:.]$/, "")}…`);
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const e = eraByKey(keyFromSlug(slug));
   if (!e) return {};
   return {
     title: e.key === "present" ? "World map today: borders, disputes and real sizes" : `World map in ${e.label}: borders, empires and real sizes`,
-    description: summary(e.key).slice(0, 155),
+    description: clip(summary(e.key), 155),
     alternates: { canonical: `/eras/${eraSlug(e.key)}` },
   };
 }

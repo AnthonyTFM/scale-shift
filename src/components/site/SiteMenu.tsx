@@ -62,7 +62,8 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
   const here = (href: string) => (pathname === href ? "page" : undefined);
 
   return (
-    <div className={variant === "header" ? "ml-auto md:hidden" : ""}>
+    // in the header until every link fits beside the logo (Timeline and Disputed borders hide below xl)
+    <div className={variant === "header" ? "ml-auto md:ml-0 xl:hidden" : ""}>
       <button
         ref={buttonRef}
         type="button"
@@ -138,10 +139,15 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
               </ul>
             </nav>
             <nav aria-label="About" className="mt-auto border-t border-line pt-4">
-              <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted">
+              <ul className="flex flex-wrap gap-x-4 text-sm text-muted">
                 {menu.more.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} onClick={close} aria-current={here(item.href)} className="hover:text-primary hover:underline aria-[current=page]:font-semibold aria-[current=page]:text-primary">
+                    <Link
+                      href={item.href}
+                      onClick={close}
+                      aria-current={here(item.href)}
+                      className="inline-flex min-h-11 items-center hover:text-primary hover:underline aria-[current=page]:font-semibold aria-[current=page]:text-primary"
+                    >
                       {item.label}
                     </Link>
                   </li>

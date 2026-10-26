@@ -15,7 +15,7 @@ import { BookIcon, ColumnsIcon, DisputeIcon, FlameIcon, MapIcon, TimelineIcon, T
 import { home } from "@/content/home";
 
 export const metadata: Metadata = {
-  title: { absolute: `${site.name}: the real size of countries and empires, 2000 BCE to today` },
+  title: { absolute: `${site.name}: real country sizes, 2000 BCE to today` },
   description: site.description,
   alternates: { canonical: "/" },
 };
