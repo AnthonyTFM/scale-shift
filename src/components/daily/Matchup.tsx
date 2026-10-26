@@ -19,7 +19,9 @@ export const reducedMotion = () => typeof matchMedia !== "undefined" && matchMed
 export const ROUND_TOP = 88;
 // square tiles, a little flatter on short laptop screens so both shapes fit on the first screen (the drawing stays centred
 // at its own proportions)
-const TILE = "aspect-square [@media(min-width:768px)_and_(max-height:820px)]:aspect-[5/4]";
+// square; wider on short laptop screens; wide and short on phones held sideways, so the reveal fits the screen
+const TILE =
+  "aspect-square [@media(min-width:768px)_and_(min-height:501px)_and_(max-height:820px)]:aspect-[5/4] [@media(max-height:500px)]:aspect-[2/1]";
 
 // the two shapes on the game tiles: bright fills (they are drawings, not text); a pale tint of the same colour for how a
 // web map draws them, so the two read as before and after of one shape
@@ -146,19 +148,29 @@ export function QuestionCard({
     requestAnimationFrame(() => requestAnimationFrame(() => setRewind(false)));
   };
   const verdictRef = useRef<HTMLDivElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const barRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!answered) return;
-    // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
+    // keyboard and screen-reader users land on "Next", which reads out the verdict with it (aria-describedby: a live
+    // region filled as focus moves is often dropped); preventScroll keeps the page where it is (the reveal is the thing to watch)
     nextRef.current?.focus({ preventScroll: true });
-    // once the shapes have settled, bring the verdict into view on short screens ("Next" sticks to the bottom of the
-    // screen), but never so far that the top of the card (the round and level) slides under the header
+    // once the shapes have settled, bring the verdict into view above the bar "Next" sits in at the bottom of the screen,
+    // but never past its own top, and (unless the screen is too short to show both, on a phone held sideways) never so
+    // far that the tops of the shapes slide under the header
     const id = setTimeout(
       () => {
-        const card = sectionRef.current?.getBoundingClientRect();
+        const grid = gridRef.current?.getBoundingClientRect();
         const verdict = verdictRef.current?.getBoundingClientRect();
-        if (!card || !verdict) return;
-        const want = Math.min(verdict.bottom - (innerHeight - 88), card.top - ROUND_TOP);
+        if (!grid || !verdict) return;
+        const bar = barRef.current?.getBoundingClientRect().height ?? 80;
+        const short = innerHeight <= 500;
+        const want = Math.min(
+          verdict.bottom + 12 - (innerHeight - bar),
+          verdict.top - (short ? 16 : ROUND_TOP),
+          short ? Infinity : grid.top - ROUND_TOP + 16,
+        );
         if (want > 0) scrollTo({ top: scrollY + want, behavior: reducedMotion() ? "auto" : "smooth" });
       },
       reducedMotion() ? 0 : 1400,
@@ -182,7 +194,7 @@ export function QuestionCard({
       {/* the same height before and after answering (`ask` wraps to two lines on phones), so the tiles don't jump */}
       <p className="mt-1.5 flex min-h-10 items-center justify-center text-center text-sm text-muted">{answered ? reveal.watch : reveal.ask}</p>
 
-      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
+      <div ref={gridRef} className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
         {q.options.map((o, i) => {
           const isAnswer = i === q.answer;
           const look = !answered
@@ -243,13 +255,13 @@ export function QuestionCard({
 
       <WhoIsWho options={q.options} />
 
-      {/* the verdict, read out by screen readers: soft green when you're right, soft red when the map fooled you */}
-      <div ref={verdictRef} aria-live="polite">
+      {/* the verdict: soft green when you're right, soft red when the map fooled you (screen readers hear it with "Next") */}
+      <div ref={verdictRef}>
         {answered ? (
           <div
             className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
           >
-            <p className="flex items-center gap-2.5 font-display text-2xl leading-tight">
+            <p id="daily-verdict" className="flex items-center gap-2.5 font-display text-2xl leading-tight">
               <span
                 aria-hidden="true"
                 className={`grid size-8 shrink-0 place-items-center rounded-full text-base text-white ${correct ? "bg-green-text" : "bg-danger"}`}
@@ -258,15 +270,29 @@ export function QuestionCard({
               </span>
               {verdict(correct)}
             </p>
-            <p className="mt-2 font-semibold leading-snug">{sizeLine(big, small)}</p>
+            <p id="daily-verdict-size" className="mt-2 font-semibold leading-snug">
+              {sizeLine(big, small)}
+            </p>
             <StretchStrip options={q.options} title={stripTitle} />
           </div>
         ) : null}
       </div>
       {answered ? (
-        // stays at the bottom of the screen while the reveal is longer than the screen, so moving on is always one tap
-        <div className="sticky bottom-3 z-20 mt-4">
-          <button ref={nextRef} type="button" onClick={onNext} disabled={busy} aria-busy={busy} className="btn btn-primary btn-lg w-full disabled:opacity-100">
+        // a bar pinned to the bottom of the screen while the reveal is longer than the screen, so moving on is always one
+        // tap; the fade above it shows the reveal carries on underneath
+        <div
+          ref={barRef}
+          className="sticky bottom-0 z-20 -mx-4 mt-2 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
+        >
+          <button
+            ref={nextRef}
+            type="button"
+            onClick={onNext}
+            disabled={busy}
+            aria-busy={busy}
+            aria-describedby="daily-verdict daily-verdict-size"
+            className="btn btn-primary btn-lg w-full disabled:opacity-100"
+          >
             {nextLabel} <span aria-hidden="true">→</span>
           </button>
         </div>

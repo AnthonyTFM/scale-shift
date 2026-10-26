@@ -22,7 +22,8 @@ export function PageHero({
   compact?: boolean;
 }) {
   return (
-    <section className="ocean-band border-b border-line text-ink">
+    // a compact hero (above a game) is only for screen readers on phones held sideways, so the game fits the screen
+    <section className={`ocean-band border-b border-line text-ink ${compact ? "[@media(max-height:500px)]:sr-only" : ""}`}>
       <div className={`mx-auto max-w-6xl px-4 ${compact ? "pb-4 pt-3 md:pb-6 md:pt-6" : "pb-10 pt-8 md:pb-14 md:pt-12"} ${center ? "text-center" : ""}`}>
         {crumbs ? (
           <nav aria-label="Breadcrumb" className="mb-2 text-sm text-muted">
