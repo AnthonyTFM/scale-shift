@@ -49,16 +49,33 @@ export const dailyCopy = {
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
     ask: "Sized the way a normal web map shows them. Tap the bigger one.",
-    // the tiles compare the two shapes with each other (one scale per view), so the legend says "compare", not "size"
-    legend: "Dashed: how the two compare on a web map. Solid: how they really compare.",
+    // after the answer, in place of `ask`: tapping a tile then plays the shrink again
+    watch: "Tap a shape to watch it shrink again.",
+    // on each tile once it has shrunk: the pale tint is the web map's version, the full colour the real size
+    tagMap: "Map",
+    tagReal: "Real",
+    divide: (x: string) => `÷${x}`,
+    aboutSame: "≈ same",
     right: "You got it!",
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
     next: "Next round",
     seeResults: "See my results",
-    mapTooBig: (x: string) => `Map: ${x}× too big`,
-    mapTooSmall: (x: string) => `Map: ${x}× too small`,
-    mapAboutRight: "Map: about right",
+    // under each name once answered: the result in plain words
+    biggerBy: (gap: string) => `${gap} bigger`,
+    smaller: "Smaller",
+    // the strip in the verdict: how far each place is from the equator, and how much a web map stretches it
+    // the strip's title: the map showed the smaller one as bigger (fooled you / misleads), or it didn't
+    stretchTitle: "Why the map fooled you",
+    stretchTitleRight: "Why the map misleads",
+    stretchTitleHonest: "How a web map stretches these two",
+    stretchTitleBoth: "Both near the equator: web maps get these about right",
+    equator: "Equator",
+    pole: "Pole",
+    stretchRow: (lat: number, stretch: string) => `${lat}°, ${stretch}`,
+    drawnTooBig: (x: string) => `map ${x}× too big`,
+    drawnAboutRight: "map about right",
+    stretchNote: "The farther from the equator, the more a web map blows land up.",
     bigger: "Bigger",
     yourPick: "Your pick",
     vs: "VS",

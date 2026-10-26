@@ -143,7 +143,14 @@ export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[]
 
 // ---------- explanations ----------
 
-const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
+/** "2.1" or "12" for a ratio, as the game writes it. */
+export const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
+
+/** How much bigger one place is than another: "1.6×", or for close calls (under 1.2×) "12%". */
+export function gapText(big: PoolEntry, small: PoolEntry) {
+  const r = big.a / small.a;
+  return r < 1.2 ? `${Math.round((r - 1) * 100)}%` : `${times(r)}×`;
+}
 
 /** How many times too big a shape is drawn on a web map. */
 export const stretch = (e: PoolEntry) => e.m / e.a;
@@ -164,38 +171,14 @@ export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** The pieces of "The Roman Empire was 1.8× the size of Brazil." / "Brazil is 12% bigger than Peru." */
 export function sizeParts(big: PoolEntry, small: PoolEntry) {
-  const r = big.a / small.a;
   const verb = big.kind === "history" ? "was" : "is";
-  const gap = r < 1.2 ? `${Math.round((r - 1) * 100)}% bigger than` : `${times(r)}× the size of`;
+  const gap = big.a / small.a < 1.2 ? `${gapText(big, small)} bigger than` : `${gapText(big, small)} the size of`;
   return { big: capitalize(nameInSentence(big)), link: `${verb} ${gap}`, small: nameInSentence(small) };
 }
 
 export function sizeLine(big: PoolEntry, small: PoolEntry) {
   const p = sizeParts(big, small);
   return `${p.big} ${p.link} ${p.small}.`;
-}
-
-export function explain(q: Question) {
-  const big = q.options[q.answer];
-  const small = q.options[1 - q.answer];
-  const S = nameInSentence(small);
-  const lines = [sizeLine(big, small)];
-  const looks = small.m / big.m;
-  if (looks > 1.05) {
-    lines.push(
-      `On a normal web map, ${S} looks ${times(looks)}× bigger than ${nameInSentence(big)}, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
-    );
-  } else {
-    // same 15% line as the "Map: 1.2× too big" chip on the cards, so the sentence never contradicts them
-    const more = stretch(big) > stretch(small) ? big : small;
-    const other = more === big ? small : big;
-    if (stretch(other) >= 1.15)
-      lines.push(`Web maps draw both too big (${nameInSentence(more)} ${times(stretch(more))}×, ${nameInSentence(other)} ${times(stretch(other))}×).`);
-    else if (stretch(more) >= 1.15)
-      lines.push(`Web maps draw ${nameInSentence(more)} ${times(stretch(more))}× too big, so the gap looks ${more === big ? "bigger" : "smaller"} than it really is.`);
-    else lines.push("Both sit close to the equator, so web maps get these two roughly right.");
-  }
-  return lines;
 }
 
 // ---------- saved progress (this browser only) ----------
