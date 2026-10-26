@@ -146,8 +146,10 @@ export function EndlessGame() {
     if (!heading || !card) return;
     advanced.current = false;
     // line the game up under the header, then hand focus to the new heading for keyboard and screen-reader users
+    // (near the top of the screen on phones held sideways, where the header doesn't stick)
     const y = (top.current ?? card).getBoundingClientRect().top;
-    if (y < 72 || run?.done) scrollTo({ top: Math.max(0, y + scrollY - ROUND_TOP), behavior: reducedMotion() ? "auto" : "smooth" });
+    const at = innerHeight <= 500 ? 8 : ROUND_TOP;
+    if (y < at - 16 || run?.done) scrollTo({ top: Math.max(0, y + scrollY - at), behavior: reducedMotion() ? "auto" : "smooth" });
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
   }, [run]);

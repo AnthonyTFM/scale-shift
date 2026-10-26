@@ -16,6 +16,7 @@ export default function EndlessPage() {
       <PageHero
         center
         compact
+        game
         eyebrow={t.eyebrow}
         title={t.title}
         lead={

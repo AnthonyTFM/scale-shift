@@ -255,7 +255,12 @@ export function QuestionCard({
 
       <WhoIsWho options={q.options} />
 
-      {/* the verdict: soft green when you're right, soft red when the map fooled you (screen readers hear it with "Next") */}
+      {/* screen readers: the verdict in short, announced as it appears (and again as the description of "Next", for
+          readers that drop an announcement while focus moves) */}
+      <p role="status" className="sr-only">
+        {answered ? `${verdict(correct)} ${sizeLine(big, small)}` : ""}
+      </p>
+      {/* the verdict: soft green when you're right, soft red when the map fooled you */}
       <div ref={verdictRef}>
         {answered ? (
           <div
@@ -282,7 +287,7 @@ export function QuestionCard({
         // tap; the fade above it shows the reveal carries on underneath
         <div
           ref={barRef}
-          className="sticky bottom-0 z-20 -mx-4 mt-2 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
+          className="sticky bottom-0 z-20 -mx-4 mt-6 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
         >
           <button
             ref={nextRef}

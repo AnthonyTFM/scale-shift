@@ -118,9 +118,11 @@ export function DailyChallenge() {
     // a new round is still loading: keep waiting for its first question
     if (!heading || !card) return;
     advanced.current = false;
-    // line up the progress bar above the card (not the card itself) just under the header, so it stays in view
+    // line up the progress bar above the card (not the card itself) just under the header, so it stays in view (near the
+    // top of the screen on phones held sideways, where the header doesn't stick)
     const top = (document.getElementById("daily-progress") ?? card).getBoundingClientRect().top;
-    if (top < 72) scrollTo({ top: top + scrollY - ROUND_TOP, behavior: reducedMotion() ? "auto" : "smooth" });
+    const at = innerHeight <= 500 ? 8 : ROUND_TOP;
+    if (top < at - 16) scrollTo({ top: top + scrollY - at, behavior: reducedMotion() ? "auto" : "smooth" });
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
   }, [game?.step]);
