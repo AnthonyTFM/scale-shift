@@ -1,7 +1,7 @@
 Map data licenses for the files in this folder
 ==============================================
 
-eras/*.json (2000 BCE to 1783, and 1900 to 1960), polities.json, rulers-grid.json,
+eras/*.json (2000 BCE to 1783), polities.json, rulers-grid.json,
 era-stats.json, and the historical shapes in daily/ (daily/index.json and daily/shapes/*)
   Derived from historical-basemaps by André Ourednik and contributors
   https://github.com/aourednik/historical-basemaps
@@ -19,8 +19,9 @@ era-stats.json, and the historical shapes in daily/ (daily/index.json and daily/
   (src/content/data-corrections.json) are published at
   https://github.com/AnthonyTFM/scale-shift and are offered under GPL-3.0.
 
-eras/1800.json, eras/1815.json, eras/1878.json and eras/1880.json, and their entries
-in polities.json, rulers-grid.json and era-stats.json
+The eleven maps from 1800 to 1960 (eras/1800.json, 1815, 1878, 1880, 1900, 1914,
+1920, 1930, 1938, 1945 and 1960.json), and their entries in polities.json,
+rulers-grid.json and era-stats.json
   Cliopatria (v0.2.1), Seshat: Global History Databank,
   https://github.com/Seshat-Global-History-Databank/cliopatria
   Bennett, J. S. et al. (2025). Cliopatria - A geospatial database of world-wide
@@ -43,20 +44,21 @@ Europe in eras/1815.json, 1878.json, 1880.json, 1900.json and 1914.json
   Changes made for this site: clipped to Natural Earth's coastline, simplified
   and quantized, merged with the rest of each map.
 
-Europe in eras/1920.json, 1930.json, 1938.json, 1945.json and 1960.json
-(plus French Morocco, the Hatay State and Manchukuo), and most states in
-eras/1800.json, 1815.json, 1878.json and 1880.json
+Most states in the eleven maps from 1800 to 1960
   OpenHistoricalMap contributors, https://www.openhistoricalmap.org/
   License: public domain dedication (CC0 1.0),
   https://creativecommons.org/publicdomain/zero/1.0/
-  except about 2,100 of the border lines these maps use, which OpenHistoricalMap
+  except some 630 of the border lines these maps use, which OpenHistoricalMap
   tags as Creative Commons Attribution 4.0 (CC BY 4.0,
   https://creativecommons.org/licenses/by/4.0/). Their makers: Instituto
   Geográfico Nacional de España / CNIG (municipal boundary lines), GURS, the
   Surveying and Mapping Authority of Slovenia, Kartverket (Norwegian Mapping
   Authority), OCHA's administrative boundaries of Ukraine (via HDX), DataMeet's
   boundary of India (via the india-geodata collection) and the Bayerische
-  Vermessungsverwaltung.
+  Vermessungsverwaltung; and 10 lines in eastern Ukraine (on the 1920 map) from
+  DuckArchive's map (https://github.com/duckarchive/map), which OpenHistoricalMap
+  tags as MIT License: Copyright (c) 2025 DuckArchive, under the MIT License
+  (full text at the end of this file).
   Changes made for this site: simplified, clipped to Natural Earth's coastline,
   quantized and merged with the rest of each map.
 
@@ -74,3 +76,24 @@ antarctic-claims.json
 
 Population figures: World Bank, World Development Indicators (CC BY 4.0),
 https://data.worldbank.org/
+
+MIT License (for the DuckArchive lines above)
+  Copyright (c) 2025 DuckArchive
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.

@@ -277,24 +277,35 @@ const ALPHA2_FIX = { Kosovo: "XK", "Northern Cyprus": null, Somaliland: null, "S
 // CShapes 2.0 (ETH Zurich).
 const FROM_NATURAL_EARTH = new Set([1994, 2000, 2010]);
 
-// ---------- the maps from 1800 to 1880: built without historical-basemaps ----------
+// ---------- the maps from 1800 to 1960: built without historical-basemaps ----------
 // Their base is Cliopatria (CC BY 4.0, see scripts/lib/cliopatria.mjs): the world's polities digitised from historical
-// atlases. OpenHistoricalMap's dated borders and HistoGIS's (Europe, from 1815) are laid over it, as on the later maps.
+// atlases. OpenHistoricalMap's dated borders and HistoGIS's (Europe, from 1815 to 1914) are laid over it.
 // Cliopatria names the empire a polity belongs to ("(British Empire)"); here, the ruler's shape on that map.
-const FROM_CLIOPATRIA = new Set([1800, 1815, 1878, 1880]);
+const FROM_CLIOPATRIA = new Set([1800, 1815, 1878, 1880, 1900, 1914, 1920, 1930, 1938, 1945, 1960]);
+const CLIO_EMPIRES = (uk) => ({ "(British Empire)": uk, "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Portugal", "(French Third Republic)": "France", "(French Fourth Republic)": "France", "(Vichy France)": "France", "(Netherlands)": "Netherlands" });
 const CLIO_RULERS = {
   1800: { "(British Empire)": "Kingdom of Great Britain", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Kingdom of Portugal", "(French Consulate)": "French Republic", "(Kingdom of France)": "French Republic", "(Batavian Republic)": "Batavian Republic" },
   1815: { "(British Empire)": "United Kingdom of Great Britain and Ireland", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "United Kingdom of Portugal, Brazil and the Algarves", "(Bourbon Kingdom of France)": "Kingdom of France", "(Netherlands)": "United Kingdom of the Netherlands" },
   1878: { "(British Empire)": "United Kingdom of Great Britain and Ireland", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Portugal", "(French Third Republic)": "France", "(Netherlands)": "Netherlands" },
 };
 CLIO_RULERS[1880] = CLIO_RULERS[1878];
+for (const year of [1900, 1914, 1920, 1930]) CLIO_RULERS[year] = CLIO_EMPIRES("United Kingdom of Great Britain and Ireland");
+for (const year of [1938, 1945, 1960]) CLIO_RULERS[year] = CLIO_EMPIRES("United Kingdom");
 // parts of a Cliopatria polity that are a territory of their own, by the box their middle lies in: Cliopatria often
 // groups an empire's scattered pieces under one name (its row for British India also holds the fur-trading posts of
-// North America). `member`: the empire they belong to, where it differs from the row's ("" for none); `years`: only on
-// these maps; `drop`: a piece the empire did not hold, left out
+// North America). `member`: the empire they belong to, where it differs from the row's ("" for none), or `s`: their
+// ruler; `years`: only on these maps; `drop`: a piece the empire did not hold, left out
 const CLIO_PARTS = [
   { from: "British Empire", box: [-170, 30, -50, 75], name: "British trading posts" },
   { from: "British Colonial Empire", box: [-40, -56, -33, -53], name: "South Georgia" },
+  // Papua's islands, and Bass Strait's (Tasmanian)
+  { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "British New Guinea", member: "(British Empire)", years: [1900] },
+  { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "Territory of Papua", s: "Australia", years: [1914, 1920, 1930, 1938, 1945] },
+  { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "Territory of Papua and New Guinea", s: "Australia", years: [1960] },
+  { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Tasmania (UK)", member: "(British Empire)", years: [1900] },
+  { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Australia", s: "", years: [1914, 1920, 1930, 1938, 1945, 1960] },
+  // a strip of the Empty Quarter south of the Trucial coast, which no one held
+  { from: "Kingdom of Great Britain", box: [50, 19, 58, 24.4], drop: true, years: [1900, 1914, 1920, 1930, 1938, 1945, 1960] },
   { from: "British Colonial Empire", box: [99.5, 4.5, 101, 6], name: "Prince of Wales Island", years: [1800, 1815] }, // Penang
   { from: "British Colonial Empire", box: [101.5, 1.8, 103, 3], name: "Malacca", years: [1800] },
   { from: "British Colonial Empire", box: [-61.3, 14.3, -60.7, 15], name: "Martinique", years: [1800] },
@@ -309,10 +320,10 @@ const CLIO_PARTS = [
   { from: "French India", box: [55, -21.5, 56, -20.8], name: "La Réunion", years: [1800] },
   { from: "French India", box: [57, -20.6, 58, -19.9], name: "Isle de France", years: [1800] },
   { from: "British Cape Colony", box: [-14, 6, -10, 10.5], name: "Colony of Sierra Leone" },
-  { from: "British Gold Coast", box: [2.5, 6, 4.6, 7], name: "Lagos Colony" },
+  { from: "British Gold Coast", box: [2.5, 6, 4.6, 7], name: "Lagos Colony", years: [1878, 1880, 1900] },
   { from: "Portuguese Empire", box: [30, -27, 41.5, -10], name: "Portuguese Mozambique" },
   { from: "Kingdom of Portugal", box: [30, -27, 41.5, -10], name: "Portuguese Mozambique" },
-  { from: "Kingdom of Portugal", box: [-32, 32, -16, 40.5], name: "Portugal", years: [1878, 1880] }, // the Azores and Madeira
+  { from: "Kingdom of Portugal", box: [-32, 32, -16, 40.5], name: "Portugal", years: [1878, 1880, 1900] }, // the Azores and Madeira
   { from: "Kingdom of Portugal", box: [11, -18.5, 24, -4.5], name: "Portuguese Angola", years: [1878, 1880] },
   { from: "Portuguese Colonies", box: [122, -10, 127.5, -8], name: "Portuguese Timor" },
   { from: "Spanish Empire", box: [-18.5, 27.5, -13, 29.5], name: "Spain" }, // the Canary Islands
@@ -321,14 +332,14 @@ const CLIO_PARTS = [
   { from: "Spanish Empire", box: [8.3, 3.1, 9.0, 3.9], name: "Fernando Po" },
   { from: "Spanish Empire", box: [116, 4, 127, 21], name: "Captaincy General of the Philippines", years: [1878, 1880] },
   { from: "French India", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "" },
-  { from: "French Africa", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "" },
+  { from: "French Africa", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "", years: [1878, 1880] },
   { from: "French Africa", box: [-9, 28, 12, 38], name: "Algeria" },
   { from: "French Africa", box: [-18, 11, -8, 17], name: "Senegal" },
   { from: "French Africa", box: [7, -4, 14, 3], name: "Gabon" },
-  { from: "French Africa", box: [13.5, -6, 17, -2], name: "French Congo" },
-  { from: "French Africa", box: [-4.5, 4.5, -2.5, 6], name: "Grand-Bassam" },
+  { from: "French Africa", box: [13.5, -6, 17, -2], name: "French Congo", years: [1878, 1880, 1900] },
+  { from: "French Africa", box: [-4.5, 4.5, -2.5, 6], name: "Grand-Bassam", years: [1878, 1880] },
   { from: "French Indochina", box: [102, 9.5, 108, 15], name: "Cambodia" },
-  { from: "French Indochina", box: [116, 38, 119, 41], name: "Qing Empire", member: "" }, // the concession at Tianjin
+  { from: "French Indochina", box: [116, 38, 119, 41], name: "Qing Empire", member: "", years: [1878, 1880] }, // the concession at Tianjin
   { from: "French Indochina", box: [163, -23, 169, -19], name: "New Caledonia" },
   { from: "French Indochina", box: [55, -21.5, 56, -20.8], name: "La Réunion" },
   { from: "French Third Republic", box: [-61.3, 14.3, -60.7, 15], name: "Martinique" },
@@ -340,13 +351,79 @@ const CLIO_PARTS = [
   { from: "French Louisiana", box: [-63.2, 17.8, -62.7, 18.3], name: "Colony of Guadeloupe", member: "(French Consulate)" },
   { from: "New Netherland", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Batavian Republic)" },
   { from: "Netherlands Antilles", box: [-58.5, 1.5, -53.5, 6.5], name: "Suriname", member: "(Netherlands)" },
+  // Curaçao and the Windward Islands were one colony, the Netherlands Antilles from 1954
+  { from: "Netherlands Antilles", box: [-70.5, 11.8, -67.8, 12.8], name: "Netherlands Antilles", member: "(Netherlands)", years: [1960] },
+  { from: "Netherlands Antilles", box: [-63.5, 17.3, -62.7, 18.3], name: "Netherlands Antilles", member: "(Netherlands)", years: [1960] },
   { from: "Netherlands Antilles", box: [-70.5, 11.8, -67.8, 12.8], name: "Curaçao", member: "(Netherlands)" },
   { from: "Netherlands Antilles", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Netherlands)" },
+  // the Isle of Pines, left out of Cuba's borders in 1903 until a treaty settled it as Cuban in 1925 (Cuba ran it), and
+  // Hawaii's western islands
+  { from: "United States of America", box: [-83.3, 21.3, -82.3, 22.1], name: "Cuba", s: "", years: [1914, 1920] },
+  { from: "United States of America", box: [-162.5, 21.5, -159.5, 23.5], name: "Hawaii", s: "United States", years: [1914, 1920, 1930, 1938, 1945] },
+  // after the war: Greenland (defended by the United States from 1941) and Mindanao back to their own governments,
+  // Bougainville to New Guinea (OpenHistoricalMap draws it)
+  { from: "United States of America", box: [-75, 59, -10, 84], name: "Greenland", s: "Denmark", years: [1945] },
+  { from: "United States of America", box: [121, 4.5, 127, 10.5], name: "Philippines", s: "", years: [1945] },
+  { from: "United States of America", box: [154, -7.5, 157, -4.5], drop: true, years: [1945] },
+  // Japan's empire after its surrender: the islands it occupied in the war, south of Taiwan, are drawn under their own
+  // rulers (OpenHistoricalMap draws them)
+  { from: "Empire of Japan", box: [90, -15, 170, 23.4], drop: true, years: [1945] },
+  { from: "North Yemen", box: [41.5, 16.3, 42.5, 17.2], name: "Asir", s: "", years: [1920] }, // the Farasan Islands, the Idrisids'
+  { from: "French Africa", box: [43, -13.2, 45.5, -11.2], name: "Comoros", s: "France", years: [1945] }, // part of Madagascar until 1946
+  // France's overseas departments and territories, and Portugal's colonies, which Cliopatria draws as one with them
+  ...[
+    [[-55, 1.5, -51, 6.5], "French Guiana"],
+    [[41, 10.5, 44, 13], "French Somaliland"],
+    [[43, -13.2, 45.5, -11.2], "Comoros"],
+    [[55, -21.5, 56, -20.8], "Réunion"],
+    [[163, -23, 169, -19.5], "New Caledonia"],
+    [[-62, 15.8, -61, 16.6], "Guadeloupe"],
+    [[-61.3, 14.3, -60.7, 15], "Martinique"],
+    [[-56.6, 46.7, -56, 47.2], "Saint Pierre and Miquelon"],
+    [[68, -50, 71, -48], "French Southern and Antarctic Lands"],
+  ].map(([box, name]) => ({ from: "French Fifth Republic", box, name, s: "France", years: [1960] })),
+  ...[
+    [[124, -9.6, 127.5, -8], "Portuguese Timor"],
+    [[6.2, -0.2, 7.6, 1.8], "São Tomé and Príncipe"],
+    [[11.5, -6, 13.2, -4.3], "Angola"], // Cabinda, run as part of Angola from 1956
+  ].map(([box, name]) => ({ from: "Estado Novo", box, name, s: "Portugal", years: [1960] })),
 ];
+/**
+ * Cliopatria's outlines run past the coast here and there. Cut to Natural Earth's land, as the other sources' are, they
+ * leave no strip at sea where a better outline takes the land beside them. A small island the outline covers in good
+ * part is taken whole (Cliopatria's islands can sit a little off); a part with almost no land under it (an island
+ * Natural Earth leaves out) stays as drawn. Cached per year (delete the file to redo it).
+ */
+const ISLAND_KM2 = 5000;
+function cliopatriaOnLand(year, rows) {
+  const file = path.join(CACHE, "cliopatria", `polities-on-land-${year}.json`);
+  if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, "utf8"));
+  const land = landWithLakes().map((p) => ({ p, box: boxOfPolys([p]), km2: km2Of([p]) }));
+  const out = rows.map((f) => {
+    const polys = [];
+    for (const p of polysOfGeom(f.geometry)) {
+      const box = boxOfPolys([p]);
+      const whole = [];
+      const cut = [];
+      for (const l of land) {
+        if (!boxesMeet(l.box, box)) continue;
+        const shared = l.km2 <= ISLAND_KM2 ? clipSafely(polygonClipping.intersection, [p], [l.p]) : null;
+        if (shared && km2Of(shared) >= 0.25 * l.km2) whole.push(l.p);
+        else cut.push(l.p);
+      }
+      const on = cut.length ? clipSafely(polygonClipping.intersection, [p], cut) : [];
+      const kept = on ? [...on, ...whole] : null;
+      polys.push(...(kept && km2Of(kept) >= 0.1 * km2Of([p]) ? kept : [p]));
+    }
+    return { ...f, geometry: { type: "MultiPolygon", coordinates: polys } };
+  });
+  fs.writeFileSync(file, JSON.stringify(out));
+  return out;
+}
 const clioRaw = new Map(); // year -> Cliopatria's polities as it gives them, for the territory rules (`clio`)
 /** Cliopatria's polities for a year, in the historical source's form (NAME, SUBJECTO, BORDERPRECISION). */
 async function cliopatriaBase(year) {
-  const rows = await cliopatriaPolities(path.join(CACHE, "cliopatria"), year);
+  const rows = cliopatriaOnLand(year, await cliopatriaPolities(path.join(CACHE, "cliopatria"), year));
   clioRaw.set(year, rows);
   const rulerOf = (memberOf) => CLIO_RULERS[year][memberOf] ?? memberOf.replace(/^\((.*)\)$/, "$1");
   return rows.flatMap((f) => {
@@ -361,7 +438,7 @@ async function cliopatriaBase(year) {
       };
       const got = polys.filter(inBox);
       polys = polys.filter((p) => !inBox(p));
-      const SUBJECTO = "member" in part ? rulerOf(part.member) : props.SUBJECTO;
+      const SUBJECTO = "s" in part ? part.s : "member" in part ? rulerOf(part.member) : props.SUBJECTO;
       if (got.length && !part.drop) out.push({ type: "Feature", properties: { ...props, NAME: part.name, SUBJECTO }, geometry: { type: "MultiPolygon", coordinates: got } });
     }
     if (polys.length) out.push({ type: "Feature", properties: props, geometry: { type: "MultiPolygon", coordinates: polys } });
@@ -614,7 +691,7 @@ const OHM = {
   ],
   1945: [
     [2692206, "Poland", { exact: true }],
-    [2692360, "Austria"],
+    [2692360, "Austria", { props: { w: "Occupied in four zones by the Allies from 1945 until 1955; its provisional government was recognised in October 1945." } }],
     [2877966, "Romania", { exact: true }],
     [2923084, "Yugoslavia"],
     [2878108, "Albania"],
@@ -639,6 +716,9 @@ const OHM = {
     [2692766, "Czechoslovakia", { exact: true }],
     [2878067, "Hungary", { exact: true }],
     FRENCH_MOROCCO,
+    // Berlin's western sectors, inside the Soviet zone (OHM's outline of West Berlin, which keeps the sector lines; the
+    // Soviet sector is set in TERRITORY)
+    [2692239, "Berlin (Western sectors)", { props: { w: "The American, British and French sectors of Berlin, occupied from July 1945; the four powers governed the city together." } }],
   ],
   1960: [
     [2743709, "West Germany"],
@@ -668,12 +748,17 @@ const OHM = {
     [2798802, "Switzerland"],
     [2860482, "Spain"],
     [2905980, "Portugal"],
+    [2692239, "West Berlin", { props: { w: "Held by the United States, Britain and France; tied to West Germany but not part of it in law." } }],
   ],
 };
 // From 1800 to 1880 the OpenHistoricalMap countries are many (over a hundred per map), so they are listed in a file of
 // their own, generated from OHM and checked against Cliopatria (see its _readme). They are laid over the Cliopatria base.
 const OHM_1800S = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "ohm-1800s.json"), "utf8"));
 for (const year of [1800, 1815, 1878, 1880]) OHM[year] = OHM_1800S[year];
+// From 1900 to 1960 the rest of the world's OpenHistoricalMap countries are listed the same way, and laid down before the
+// European ones above (where two overlap, the later one wins)
+const OHM_1900S = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "ohm-1900s.json"), "utf8"));
+for (const year of [1900, 1914, 1920, 1930, 1938, 1945, 1960]) OHM[year] = [...OHM_1900S[year].map(([id, n, opt = {}]) => [id, n, { ...opt, parts: anywhere }]), ...(OHM[year] ?? [])];
 // Land between the OpenHistoricalMap states that was a territory of its own: { box, n, props }. Our shapes' pieces
 // there (outside every state) become it.
 const OHM_GAPS = {
@@ -830,7 +915,9 @@ async function bordersFor(year) {
     for (const [id, n, opt = {}] of OHM[year]) {
       const rel = rels.find((r) => r.id === id);
       if (!rel) continue;
-      const keep = opt.parts ?? (OHM_1800S[year] ? anywhere : inEurope); // the 1800s lists cover the whole world
+      // `partsIn`: the parts whose middle lies in these lon/lat boxes (a relation that holds a country and its colonies)
+      const inBoxes = (boxes) => ([x, y]) => boxes.some(([w, s, e, n]) => x >= w && x <= e && y >= s && y <= n);
+      const keep = opt.partsIn ? inBoxes(opt.partsIn) : (opt.parts ?? (OHM_1800S[year] ? anywhere : inEurope)); // the 1800s lists cover the whole world
       const polys = rel.polys.filter((p) => {
         const [w, s, e, nn] = boxOfPolys([p]);
         return keep([(w + e) / 2, (s + nn) / 2]);
@@ -965,9 +1052,9 @@ async function overlayBorders(grouped, year, slivers) {
 // in the order listed. `ne0`: countries (Natural Earth's names); `ne1`: provinces, "Country/Province"; `pick`: only the
 // parts of those whose middle lies in this lon/lat box; `source`: [year, name], a shape from another snapshot of the
 // historical source, where that border did not change in between. `clio`: Cliopatria's outline of these polities on
-// the map (1800 to 1880). `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
-// (shown approximately). `blank`: the country gets only the land there that no shape holds. `from`: only these shapes
-// lose land, and the country gets only what they lose. `exact`: the
+// the map (1800 to 1960). `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
+// (shown approximately). `ohm`: an OpenHistoricalMap relation's outline, by id. `blank`: the country gets only the land
+// there that no shape holds. `from`: only these shapes lose land, and the country gets only what they lose. `exact`: the
 // country loses whatever it had beyond the new outline. `s`, `w`: ruler and note (null removes one). Slivers left
 // beside the new border go (see dropSlivers).
 const UK_1930S = "United Kingdom of Great Britain and Ireland";
@@ -982,8 +1069,9 @@ const LAUSANNE = (to, year) => [
   // Turkey's borders from the Treaty of Lausanne (1923); the Sèvres treaty of 1920 never took effect. From 1930
   // OpenHistoricalMap draws Turkey, and in 1938 Hatay as a state of its own
   ...(year === 1920 ? [{ to, ne0: ["Turkey"] }] : []),
-  ...(year === 1938 ? [] : [{ to: "Syria (France)", ne1: ["Turkey/Hatay"] }]), // Hatay was French Syria's until 1938
-  { to: "Armenia", ne0: ["Armenia"] }, // the Armenian SSR from December 1920
+  // Hatay was French Syria's until 1938 (in 1920 a sanjak of the State of Aleppo)
+  ...(year === 1938 ? [] : [{ to: year === 1920 ? "State of Aleppo" : "Syria (France)", ne1: ["Turkey/Hatay"], s: "France" }]),
+  ...(year === 1920 ? [{ to: "Armenian SSR", ne0: ["Armenia"] }] : []), // Soviet from December 1920 (later, part of the USSR's outline)
   { to: "Yemen", ne1: NORTH_YEMEN }, // the Mutawakkilite Kingdom of Yemen, independent from 1918
 ];
 const ISLANDS = (uk) => [
@@ -992,12 +1080,12 @@ const ISLANDS = (uk) => [
 ];
 // colonies whose borders were set before 1914 and are today's
 const COLONIAL_BORDERS = (uk, us) => [
-  { to: "Gambia", ne0: ["Gambia"], exact: true },
-  { to: "Basutoland", ne0: ["Lesotho"], exact: true },
-  { to: "Swaziland", ne0: ["eSwatini"], exact: true },
-  { to: "Brunei", ne0: ["Brunei"], exact: true },
-  { to: "Portuguese Guinea", ne0: ["Guinea-Bissau"], exact: true },
-  { to: "Spanish Guinea", ne0: ["Eq. Guinea"], exact: true },
+  { to: "Gambia", ne0: ["Gambia"], exact: true, s: uk },
+  { to: "Basutoland", ne0: ["Lesotho"], exact: true, s: uk },
+  { to: "Swaziland", ne0: ["eSwatini"], exact: true, s: uk },
+  { to: "Brunei", ne0: ["Brunei"], exact: true, s: uk },
+  { to: "Portuguese Guinea", ne0: ["Guinea-Bissau"], exact: true, s: "Portugal" },
+  { to: "Spanish Guinea", ne0: ["Eq. Guinea"], exact: true, s: "Spain" },
   { to: "Puerto Rico", ne0: ["Puerto Rico"], s: us },
   { to: "Zanzibar", ne1: ZANZIBAR_ISLES, s: uk, w: "A sultanate under British protection from 1890 until 1963." },
 ];
@@ -1025,11 +1113,63 @@ const BRITISH_ISLES = (uk) => [
 // Dutch (from 1945 Indonesian) Borneo: the source's Malaya ran past today's border into it
 const KALIMANTAN = (n) => ({ to: n, ne1: ["Kalimantan Barat", "Kalimantan Timur", "Kalimantan Tengah", "Kalimantan Selatan"].map((p) => `Indonesia/${p}`) });
 const PORTUGUESE_TIMOR = { to: "Portuguese Timor", ne0: ["Timor-Leste"], s: "Portugal" }; // Portuguese until 1975
-const EGYPT_LIBYA = (libya) => [
+const EGYPT_LIBYA = (libya, italy, egypt) => [
   // Egypt and Libya had no agreed border until 1925, when it was set where it is today
-  { to: "Egypt", ne0: ["Egypt"], exact: true },
-  { to: libya, ne0: ["Libya"], exact: true },
+  { to: "Egypt", ne0: ["Egypt"], exact: true, ...egypt },
+  { to: libya, ne0: ["Libya"], exact: true, s: italy },
 ];
+// From 1900 the base (Cliopatria) draws an empire's colonies as one, and OpenHistoricalMap leaves some of them to it:
+// they are set here by today's borders, which are theirs or close to them
+const GREENLAND = { to: "Greenland", ne0: ["Greenland"], s: "Denmark" };
+const GULF = (uk, muscat) => [
+  { to: "Trucial Oman", ne0: ["United Arab Emirates"], s: uk },
+  { to: "Muscat and Oman", ne0: ["Oman"], s: muscat },
+];
+const SOUTH_WEST_AFRICA = (sa) => ({ to: "South West Africa", ne0: ["Namibia"], s: sa, w: "German until 1915, then a League of Nations mandate run by South Africa, which held it until Namibia's independence in 1990." });
+const ALGERIA = (n) => ({ to: n, ne0: ["Algeria"], s: "France" });
+const FRENCH_EQUATORIAL_AFRICA = { to: "French Equatorial Africa", ne0: ["Chad", "Central African Rep.", "Congo", "Gabon"], s: "France" };
+// Natural Earth's Morocco runs south over the Western Sahara as far as the berm (its "W. Sahara" is only the land east
+// of it). The Spanish Sahara was everything south of 27°40′N, the line Spain and France agreed in 1912; from 1900 to
+// 1904, Spain's Río de Oro ended at 26°N. `morocco`: our shape that holds the land first
+const SPANISH_SAHARA = (to, morocco, north = 27.667) => [
+  { to: morocco, ne0: ["W. Sahara"] },
+  { to, poly: [[-17.5, 20.7], [-8.66, 20.7], [-8.66, north], [-17.5, north], [-17.5, 20.7]], from: [morocco], s: "Spain" },
+];
+// Ifni, Spanish from 1934 (Cliopatria's outline of it lies 60 km away): the coast between the Noun and the Bou Sedra and
+// about 25 km inland, approximately
+const IFNI = [[-10.65, 29.05], [-10.1, 29.7], [-9.82, 29.5], [-10.34, 28.87], [-10.65, 29.05]];
+// Morocco, a French protectorate from 1912, with Spain's two zones: the north as Cliopatria draws it, the far south
+// approximately, and Ifni; and the Spanish Sahara
+const SPANISH_ZONES_NOTE = "Spain's protectorate zones in Morocco, in the north and the far south (1912–1956; the southern one until 1958).";
+const SPAIN_IN_AFRICA = (spain, morocco, ifni) => [
+  { to: morocco, ne0: ["Morocco"], s: "France" },
+  { to: "Spanish Morocco", clio: spain, pick: [-6.5, 34.6, -1.9, 36.0], s: "Spain", w: ifni ? `${SPANISH_ZONES_NOTE} With Ifni, Spanish from 1934.` : SPANISH_ZONES_NOTE },
+  { to: "Spanish Morocco", poly: [[-13.4, 27.66], [-8.67, 27.66], [-8.67, 28.65], [-13.4, 28.65], [-13.4, 27.66]], from: [morocco], s: "Spain" },
+  ...(ifni ? [{ to: "Spanish Morocco", poly: IFNI, s: "Spain" }] : []),
+  ...SPANISH_SAHARA("Spanish Sahara", morocco),
+];
+// Where Ecuador's claims ran over land Peru and Colombia held, and Bolivia's over the Chaco Paraguay held: today's
+// borders, near the lines each side held (OpenHistoricalMap draws each country's whole claim)
+const AMAZON_CHACO = [
+  { to: "Peru", ne0: ["Peru"], from: ["Ecuador"] },
+  { to: "Colombia", ne0: ["Colombia"], from: ["Ecuador"] },
+  { to: "Paraguay", ne0: ["Paraguay"], from: ["Bolivia"] },
+];
+// Laos and Cambodia, French protectorates with today's borders from 1907 (Tonkin, Annam and Cochinchina come from
+// OpenHistoricalMap)
+const LAOS_CAMBODIA = [
+  { to: "Laos", ne0: ["Laos"], s: "France", w: "A French protectorate, part of French Indochina." },
+  { to: "Cambodia", ne0: ["Cambodia"], s: "France", w: "A French protectorate under its own kings, part of French Indochina." },
+];
+const TOGO = { to: "Togo", ne0: ["Togo"], exact: true, s: "France", w: "The east of German Togoland, run by France (a League of Nations mandate from 1922); independent in 1960." };
+const RHODESIAS = (uk) => {
+  const w = "Part of the Federation of Rhodesia and Nyasaland (1953–1963).";
+  return [
+    { to: "Northern Rhodesia", ne0: ["Zambia"], s: uk, w },
+    { to: "Southern Rhodesia", ne0: ["Zimbabwe"], s: uk, w: `A self-governing British colony. ${w}` },
+    { to: "Nyasaland", ne0: ["Malawi"], s: uk, w },
+  ];
+};
 const SAUDI = (n) => ({ to: n, ne0: ["Saudi Arabia"], exact: true }); // Ibn Saud took Ha'il in 1921 and al-Jawf in 1922
 const SOUTH_VIETNAM = ["Kon Tum", "Đắk Nông", "Đắk Lắk", "Gia Lai", "Bình Phước", "Tây Ninh", "Long An", "Ðong Tháp", "An Giang", "Kiên Giang", "Sóc Trăng", "Tiền Giang", "Bà Rịa - Vũng Tàu", "Hồ Chí Minh city", "Khánh Hòa", "Cà Mau", "Bạc Liêu", "Hau Giang", "Vĩnh Long", "Trà Vinh", "Bến Tre", "Đông Nam Bộ", "Bình Thuận", "Ninh Thuận", "Phú Yên", "Bình Định", "Quảng Ngãi", "Đà Nẵng", "Quàng Nam", "Thừa Thiên - Huế", "Quảng Trị", "Bình Dương", "Lâm Đồng", "Can Tho"].map((p) => `Vietnam/${p}`);
 const NIGERIA = (states) => states.map((p) => `Nigeria/${p}`);
@@ -1094,12 +1234,15 @@ const TERRITORY = {
     // conquered by 1900 (Samori Touré's empire in 1898, the Ndebele kingdom in 1893). Today's borders were mostly drawn
     // by 1900, between colonies; states still ruling themselves keep their own shapes
     { to: "Morocco", ne0: ["Morocco"] },
-    { to: "Rio De Oro", ne0: ["W. Sahara"], s: "Spain" },
+    ...SPANISH_SAHARA("Rio De Oro", "Morocco", 26),
     { to: "Algeria", ne0: ["Algeria"], s: "France" },
     { to: "Tunisia", ne0: ["Tunisia"], s: "France" },
     { to: "Ottoman Empire", ne0: ["Libya"] }, // Tripolitania and Cyrenaica, Ottoman until 1912
     { to: "Egypt", ne0: ["Egypt"], s: UK_1900S, w: "A khedivate under nominal Ottoman rule, occupied by Britain since 1882." },
     { to: "Anglo-Egyptian Sudan", ne0: ["Sudan", "S. Sudan"], s: UK_1900S, w: "Ruled jointly by Britain and Egypt from 1899, in practice by Britain." },
+    { to: "Lado Enclave", ohm: 2961764, s: "Congo Free State", w: "Leased to King Leopold II for the Congo Free State in 1894; it went back to the Anglo-Egyptian Sudan in 1910, after his death." },
+    // OpenHistoricalMap's Khiva leaves out the oasis of Khiva and Urgench itself, today's Khorezm province
+    { to: "Khanate of Khiva", ne1: ["Uzbekistan/Khorezm"], s: "Russian Empire" },
     { to: "Darfur", ne1: ["Central Darfur", "Southern Darfur", "North Darfur", "Western Darfur", "Eastern Darfur"].map((p) => `Sudan/${p}`), w: "A sultanate restored in 1898. Counted as part of Anglo-Egyptian Sudan, it ran its own affairs until Britain conquered it in 1916." },
     { to: "Ethiopia", ne0: ["Ethiopia"] },
     { to: "Eritrea", ne0: ["Eritrea"], s: "Italy" },
@@ -1129,7 +1272,7 @@ const TERRITORY = {
     { to: "Liberia", ne0: ["Liberia"] },
     { to: "Ivory Coast", ne0: ["Côte d'Ivoire"], s: "France" },
     { to: "Gold Coast", ne0: ["Ghana"], s: UK_1900S, w: "A British colony; Ashanti, occupied in 1896, rose in 1900 and was annexed in 1902." },
-    { to: "Togoland", source: [1914, "Togoland"], s: "Germany" }, // German Togoland's borders were set by 1899
+    { to: "Togoland", ne1: ["Ghana/Volta"], s: "Germany" }, // the south-west of German Togoland, in Ghana today
     { to: "Dahomey", ne0: ["Benin"], s: "France" },
     { to: "Lagos", ne1: NIGERIA(["Lagos", "Ogun", "Oyo", "Osun", "Ondo", "Ekiti"]), s: UK_1900S, w: "The British Colony and Protectorate of Lagos (shown approximately)." },
     { to: "Southern Nigeria", ne1: NIGERIA(["Edo", "Delta", "Bayelsa", "Rivers", "Akwa Ibom", "Cross River", "Abia", "Imo", "Anambra", "Enugu", "Ebonyi"]), s: UK_1900S, w: "A British protectorate from 1900 (shown approximately)." },
@@ -1184,10 +1327,15 @@ const TERRITORY = {
     { to: "Chile", ne0: ["Chile"] }, // Chile took the Atacama coast from Bolivia and Peru in 1879–1884
     { to: "Chile", ne1: ["Peru/Tacna"] }, // held by Chile until 1929
     { to: "Bolivia", ne1: ["Brazil/Acre"] }, // Bolivian until 1903
+    ...AMAZON_CHACO,
   ],
   1914: [
     ...MICROSTATES,
     KALIMANTAN("Netherlands Indies"),
+    ...SPAIN_IN_AFRICA(["Kingdom of Spain"], "Morocco", false),
+    { to: "Mongolia", ne0: ["Mongolia"], w: "The Bogd Khanate, which broke away from China in 1911; it accepted autonomy under Chinese suzerainty in 1915." },
+    { to: "Khanate of Khiva", ne1: ["Uzbekistan/Khorezm"], s: "Russian Empire" }, // the oasis OpenHistoricalMap's Khiva leaves out
+    { to: "Abyssinia", ne0: ["Ethiopia"], from: ["Sultanate of Hobyo"] }, // OpenHistoricalMap's Hobyo runs into the Ogaden
     ADEN(UK_1930S),
     ...BRITISH_ISLES(UK_1930S),
     { to: "British Somaliland", ne0: ["Somaliland"] },
@@ -1201,9 +1349,12 @@ const TERRITORY = {
     { to: "Trinidad and Tobago", ne0: ["Trinidad and Tobago"], s: UK_1930S },
     { to: "Cape Verde", ne0: ["Cabo Verde"], s: "Portugal" },
     { to: "Réunion", ne1: ["France/La Réunion"], s: "France" },
-    ...EGYPT_LIBYA("Libya"),
+    ...EGYPT_LIBYA("Libya", "Kingdom of Italy", { s: UK_1930S, w: "A khedivate under nominal Ottoman rule, occupied by Britain since 1882; a British protectorate from December 1914." }),
     // Chad, Ubangi-Shari and the Congo were French Equatorial Africa from 1910, not French West Africa
     { to: "French Equatorial Africa", ne0: ["Chad", "Central African Rep.", "Congo", "Gabon"], from: ["French West Africa"] },
+    // the Barotseland border set by arbitration in 1905 (OpenHistoricalMap draws the line held before it until 1915)
+    { to: "Angola", ne0: ["Angola"], from: ["Northern Rhodesia"] },
+    ...AMAZON_CHACO,
     ...COLONIAL_BORDERS(UK_1930S, "United States"),
     ...BORNEO(UK_1930S),
     ...KOREA_TAIWAN("Empire of Japan"),
@@ -1217,20 +1368,33 @@ const TERRITORY = {
     KALIMANTAN("Dutch East Indies"),
     ...BRITISH_ISLES(UK_1930S),
     ...LAUSANNE("Ottoman Sultanate", 1920),
+    GREENLAND,
+    ...GULF(UK_1930S, UK_1930S),
+    SOUTH_WEST_AFRICA("Union of South Africa"),
+    ALGERIA("Algeria"),
+    FRENCH_EQUATORIAL_AFRICA,
+    ...SPAIN_IN_AFRICA(["Kingdom of Spain"], "Morocco", false),
     ADEN(UK_1930S),
-    { to: "Mandatory Palestine (GB)", ne0: ["Jordan"] }, // east of the Jordan: part of the British mandate (the emirate from 1921)
-    { to: "Hejaz", ne1: ["Jordan/Aqaba", "Jordan/Ma`an"] }, // Aqaba and Ma'an were held by the Hejaz until 1925
+    { to: "Mandatory Palestine (GB)", ne0: ["Jordan"], s: UK_1930S }, // east of the Jordan: part of the British mandate (the emirate from 1921)
+    { to: "Kingdom of Hejaz", ne1: ["Jordan/Aqaba", "Jordan/Ma`an"] }, // Aqaba and Ma'an were held by the Hejaz until 1925
+    { to: "Khorezm People's Soviet Republic", ne1: ["Uzbekistan/Khorezm"] }, // the oasis OpenHistoricalMap's outline leaves out
+    { to: "Ethiopia", ne0: ["Ethiopia"], from: ["Sultanate of Hobyo", "Majeerteen Sultanate"] }, // OpenHistoricalMap's outlines run into the Ogaden
+    // the Byelorussian SSR of late 1920 was the land around Minsk: the provinces to its east were Soviet Russia's
+    // until 1924 and 1926 (approximately, by today's provinces)
+    { to: "Soviet Russia (RSFSR)", ne1: ["Belarus/Vitebsk", "Belarus/Mogilev", "Belarus/Gomel"], from: ["Byelorussian SSR"] },
+    ...LAOS_CAMBODIA,
+    ...AMAZON_CHACO,
     { to: "Kenya", ne1: JUBALAND },
     { to: "British Cameroons", ne1: SOUTHERN_CAMEROONS, s: UK_1930S }, // a British mandate, never French
     ...ISLANDS(UK_1930S),
     { to: "Bahamas", ne0: ["Bahamas"], s: UK_1930S },
-    ...EGYPT_LIBYA("Libya (IT)"),
+    ...EGYPT_LIBYA("Libya (IT)", "Italy", { s: UK_1930S, w: "A British protectorate from 1914; Britain recognised its independence in 1922." }),
     ...COLONIAL_BORDERS(UK_1930S, "United States"),
     ...BORNEO(UK_1930S),
     ...KOREA_TAIWAN("Empire of Japan"),
     PORTUGUESE_TIMOR,
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true }, // French Togoland; the west was British Togoland, run with the Gold Coast
+    TOGO, // the west was British Togoland, run with the Gold Coast
     { to: "Greece", ne0: ["Greece"] }, // with its Aegean islands, Greek from 1912
     { to: "Dodecanese Islands", ne0: ["Greece"], pick: DODECANESE, s: "Italy" },
     CYPRUS_COLONY(UK_1930S),
@@ -1242,6 +1406,12 @@ const TERRITORY = {
     KALIMANTAN("Dutch East Indies"),
     ...BRITISH_ISLES(UK_1930S),
     ...LAUSANNE("Republic of Turkey", 1930),
+    GREENLAND,
+    ...GULF(UK_1930S, UK_1930S),
+    SOUTH_WEST_AFRICA("Union of South Africa"),
+    ALGERIA("Algeria"),
+    FRENCH_EQUATORIAL_AFRICA,
+    ...SPAIN_IN_AFRICA(["Kingdom of Spain"], "Morocco", false),
     ADEN(UK_1930S),
     { to: "Transjordan", ne0: ["Jordan"], s: UK_1930S }, // an emirate under British mandate, 1921–1946
     { to: "British Cameroons", ne1: SOUTHERN_CAMEROONS, s: UK_1930S },
@@ -1256,7 +1426,9 @@ const TERRITORY = {
     ...KOREA_TAIWAN("Empire of Japan"),
     PORTUGUESE_TIMOR,
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true },
+    TOGO,
+    ...LAOS_CAMBODIA,
+    ...AMAZON_CHACO,
   ],
   1938: [
     ...MICROSTATES,
@@ -1264,6 +1436,11 @@ const TERRITORY = {
     ...BRITISH_ISLES(UK_LATER),
     { to: "Italy", ne0: ["Greece"], pick: DODECANESE }, // the Dodecanese
     ...LAUSANNE("Turkey", 1938),
+    GREENLAND,
+    ...GULF(UK_LATER, UK_LATER),
+    SOUTH_WEST_AFRICA("Union of South Africa"),
+    ALGERIA("Algeria (France)"),
+    ...SPAIN_IN_AFRICA(["Second Spanish Republic", "Spanish Nationalists"], "Morocco (France)", true),
     ADEN(UK_LATER),
     { to: "Transjordan", ne0: ["Jordan"], s: UK_LATER },
     { to: "Iraq", ne0: ["Iraq"] }, // independent from October 1932
@@ -1279,10 +1456,11 @@ const TERRITORY = {
     ...KOREA_TAIWAN("Empire of Japan"),
     PORTUGUESE_TIMOR,
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true },
+    TOGO,
     { to: "Haiti", ne0: ["Haiti"], exact: true }, // the border with the Dominican Republic fixed in 1929–1936
     { to: "Cape Verde", ne0: ["Cabo Verde"], s: "Portugal" },
     { to: "Réunion", ne1: ["France/La Réunion"], s: "France" },
+    ...LAOS_CAMBODIA,
   ],
   1945: [
     ...MICROSTATES,
@@ -1296,6 +1474,35 @@ const TERRITORY = {
     { to: "Germany (Soviet)", ne0: ["Germany"], pick: [11.3, 53.85, 14.5, 54.75] },
     ADEN(UK_LATER),
     PORTUGUESE_TIMOR, // Indonesia was not yet a state
+    GREENLAND,
+    ...GULF(UK_LATER, null),
+    SOUTH_WEST_AFRICA("South Africa"),
+    ALGERIA("Algeria"),
+    ...SPAIN_IN_AFRICA(["Francoist Spain"], "Morocco", true),
+    // French West and Equatorial Africa, by colony
+    ...[["Senegal", "Senegal"], ["Mauritania", "Mauritania"], ["French Sudan", "Mali"], ["Niger", "Niger"], ["French Guinea", "Guinea"], ["Ivory Coast", "Côte d'Ivoire"], ["Dahomey", "Benin"], ["Chad", "Chad"], ["Ubangi-Shari", "Central African Rep."], ["Middle Congo", "Congo"], ["Gabon", "Gabon"]].map(([to, n]) => ({ to, ne0: [n], s: "France" })),
+    // Germany's occupation zones: OpenHistoricalMap draws the American and British ones and Berlin's sectors; the Soviet
+    // zone and the French one by today's states, and the French part of Baden-Württemberg
+    { to: "Germany (Soviet)", ne1: ["Mecklenburg-Vorpommern", "Brandenburg", "Sachsen", "Sachsen-Anhalt", "Thüringen"].map((n) => `Germany/${n}`), s: "USSR" },
+    { to: "Germany (Soviet)", ohm: 2693415 }, // Berlin's Soviet sector (OHM's East Berlin)
+    { to: "Germany (France)", ne1: ["Germany/Rheinland-Pfalz", "Germany/Saarland"], s: "France" },
+    { to: "Germany (France)", ne1: ["Germany/Baden-Württemberg"], from: ["France", "French Fourth Republic"], s: "France" },
+    // East Asia after Japan's surrender
+    { to: "Japan (USA)", ne0: ["Japan"], s: "United States", w: "Occupied by the Allies, chiefly the United States, from September 1945 until 1952." },
+    // what OpenHistoricalMap's Empire of Japan of late 1945 still holds beyond Japan: the Kwantung peninsula, taken by
+    // the Soviet army, and the Pacific islands of Japan's mandate, taken by the United States
+    { to: "Kwantung (USSR)", poly: [[120.8, 38.6], [122.9, 38.6], [122.9, 39.5], [120.8, 39.5], [120.8, 38.6]], from: ["Empire of Japan"], s: "USSR", w: "The Kwantung Leased Territory, Japanese from 1905, taken by the Soviet army in August 1945. The Soviet Union kept Port Arthur as a naval base until 1955." },
+    { to: "Pacific Islands (USA)", poly: [[130, 0], [172, 0], [172, 22], [130, 22], [130, 0]], from: ["Empire of Japan"], s: "United States", w: "Japan's League of Nations mandate, taken by the United States in 1944–45; a UN trust territory under US rule from 1947." },
+    { to: "USSR", ne1: ["Russia/Sakhalin"] }, // southern Sakhalin and the Kurils, taken by the Soviet Union in August 1945
+    { to: "Taiwan", ne0: ["Taiwan"], s: "China", w: "A Japanese colony from 1895; run by the Republic of China from October 1945." },
+    { to: "French Indochina", ne0: ["Vietnam"], s: "France", w: "Under Japanese control from 1940. In September 1945 Ho Chi Minh declared Vietnam independent in Hanoi while British and French troops retook the south; war with France followed in 1946." },
+    { to: "Laos", ne0: ["Laos"], s: "France" },
+    // Thailand gave back the Malay states and the Shan lands Japan had given it in 1943 after the war, but held the
+    // land it took from French Indochina in 1941 until November 1946
+    { to: "Thailand", ne1: ["Laos/Xaignabouri"] },
+    { to: "British Malaya", ne1: ["Malaysia/Kedah", "Malaysia/Perlis", "Malaysia/Kelantan", "Malaysia/Terengganu"], from: ["Thailand"] },
+    { to: "Burma", ne1: ["Myanmar/Shan"], from: ["Thailand"] },
+    { to: "Netherlands New Guinea", ne1: ["Indonesia/Papua", "Indonesia/Papua Barat"], s: "Netherlands" },
     // Upper Volta was split between its neighbours from 1932 to 1947 (approximately, by today's provinces)
     { to: "Ivory Coast", ne0: ["Burkina Faso"] },
     { to: "Niger", ne1: ["Gourma", "Gnagna", "Tapoa", "Komondjari", "Kompienga", "Séno", "Yagha", "Oudalan", "Soum"].map((p) => `Burkina Faso/${p}`) },
@@ -1310,7 +1517,7 @@ const TERRITORY = {
     ...COLONIAL_BORDERS(UK_LATER, "United States"),
     ...BORNEO(UK_LATER),
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true },
+    TOGO,
     { to: "Haiti", ne0: ["Haiti"], exact: true },
     { to: "Dominion of Newfoundland", ne1: ["Canada/Newfoundland and Labrador"], s: UK_LATER }, // part of Canada only from 1949
     { to: "Cape Verde", ne0: ["Cabo Verde"], s: "Portugal" },
@@ -1324,7 +1531,17 @@ const TERRITORY = {
     { to: "USSR", ne0: ["Estonia", "Latvia", "Lithuania"] },
     ADEN(UK_LATER),
     { to: "Jordan", ne0: ["Palestine"], pick: [34.8, 31.2, 35.7, 32.7] }, // the West Bank, annexed by Jordan in 1950
-    { to: "Egypt", ne0: ["Palestine"], pick: [34.1, 31.1, 34.7, 31.7] }, // Gaza, held by Egypt from 1948 to 1967
+    ...GULF(UK_LATER, null),
+    SOUTH_WEST_AFRICA("South Africa"),
+    ALGERIA("Algeria"),
+    ...SPANISH_SAHARA("Spanish Sahara", "Morocco"),
+    { to: "Ifni", poly: IFNI, s: "Spain", w: "Spanish from 1934 until it was returned to Morocco in 1969." },
+    { to: "Eritrea", ne0: ["Eritrea"], s: "Ethiopia", w: "Federated with Ethiopia from 1952 as an autonomous unit; Ethiopia annexed it in 1962." },
+    ...RHODESIAS(UK_LATER),
+    { to: "Angola", ne0: ["Angola"], s: "Portugal" },
+    { to: "Mozambique", ne0: ["Mozambique"], s: "Portugal" },
+    { to: "East Germany", ohm: 2693415 }, // East Berlin, its capital (the Western powers held it to be the Soviet sector)
+    { to: "United Arab Republic", ne0: ["Palestine"], pick: [34.1, 31.1, 34.7, 31.7] }, // Gaza, held by Egypt from 1948 to 1967
     { to: "British Cameroons", ne1: SOUTHERN_CAMEROONS, s: UK_LATER }, // a British trust territory until October 1961
     ...ISLANDS(UK_LATER),
     { to: "Yemen", ne1: NORTH_YEMEN, exact: true },
@@ -1375,6 +1592,7 @@ function sourceShape(year, name) {
 }
 let admin1Cache = null;
 let countries50 = null;
+const ohmForRules = new Map(); // OpenHistoricalMap relation id -> its land, for the territory rules (`ohm`)
 const ADMIN1_COUNTRY = { "United Republic of Tanzania": "Tanzania", "Republic of the Congo": "Congo", "Democratic Republic of the Congo": "Dem. Rep. Congo" };
 const polysOfFeature = (f) => fixWinding(f.geometry)?.coordinates ?? [];
 /**
@@ -1438,6 +1656,7 @@ function territoryUnits(rule, year) {
     take(found.flatMap(polysOfFeature));
   }
   if (rule.poly) take(onLandOnly([[rule.poly]]));
+  if (rule.ohm) take(ohmForRules.get(rule.ohm) ?? []);
   return out;
 }
 function applyTerritory(grouped, year, slivers) {
@@ -1568,13 +1787,9 @@ function touchesShape(patch, features) {
 // In these snapshots the source draws land but leaves its name blank, so it showed as "not mapped". The unnamed pieces
 // lying in that country today get the country's name back (joining its shape, for islands); the outline is the source's own.
 // `today` + `box`: the piece lies in a different country today (Tasmania, in Australia), inside this lon/lat box.
-// `s`: who ruled it, as for the source's own colonies (colonies take their ruler's colour).
-const TASMANIA = [143.5, -44, 149, -39.5];
-const TASMANIA_NOTE = "The source leaves Tasmania unnamed in this snapshot. It was the British colony of Tasmania until federation in 1901, so it is named like the mainland colonies.";
-const UNNAMED = [
-  // like the mainland colonies, ruled by the United Kingdom (the maps before 1900 are drawn from other sources)
-  { n: "Tasmania (UK)", years: [1900], today: "Australia", box: TASMANIA, s: "United Kingdom of Great Britain and Ireland", note: TASMANIA_NOTE },
-];
+// `s`: who ruled it, as for the source's own colonies (colonies take their ruler's colour). None at present: the one
+// case, Tasmania in 1900, is now drawn from other sources.
+const UNNAMED = [];
 
 /** Splits the pieces of an unnamed source shape that belong to a country in UNNAMED into shapes of their own. */
 function nameUnnamed(geometry, b, year, features, found) {
@@ -1730,7 +1945,11 @@ async function main() {
     const grouped = groupByName(features);
     const slivers = []; // thin pieces new borders cut off our shapes, left blank for the coast fill
     if (HISTOGIS[entry.year] || OHM[entry.year]) await overlayBorders(grouped, entry.year, slivers);
-    if (TERRITORY[entry.year]) applyTerritory(grouped, entry.year, slivers);
+    if (TERRITORY[entry.year]) {
+      const ids = TERRITORY[entry.year].filter((rule) => rule.ohm).map((rule) => rule.ohm);
+      if (ids.length) for (const rel of await ohmRelations(path.join(CACHE, "ohm"), ids)) ohmForRules.set(rel.id, onLandOnly(rel.polys));
+      applyTerritory(grouped, entry.year, slivers);
+    }
     if (entry.year >= 1800) matchRulers(grouped);
     splitSvalbard(grouped, entry.year);
     if (entry.year === 1400) splitMing1400(grouped);

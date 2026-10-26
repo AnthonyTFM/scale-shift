@@ -58,7 +58,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 
 ## Rules
 - Map snapshots are keyed `2000bce` … `1914` … `present`. Years before 1 CE are negative in code.
-- Historical data is GPL-3.0 (historical-basemaps), except 1800–1880: Cliopatria (CC BY 4.0) with OpenHistoricalMap (CC0, some lines CC BY 4.0) and HistoGIS (CC BY 4.0). Keep all the credits in the footer, on /about and in `public/data/LICENSE.txt`.
+- Historical data is GPL-3.0 (historical-basemaps), except 1800–1960: Cliopatria (CC BY 4.0) with OpenHistoricalMap (CC0, some lines CC BY 4.0) and HistoGIS (CC BY 4.0). Keep all the credits in the footer, on /about and in `public/data/LICENSE.txt`.
 - Antarctica is drawn with its territorial claims (`src/content/antarctic-claims.json`), each shown only from the year it was made.
 - Never commit secrets. `.env*` files are ignored; keys go in Vercel's environment variables.
 - Original work only: thetruesize.com inspired the idea, but never copy its text, name, design or code.

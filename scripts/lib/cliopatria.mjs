@@ -1,6 +1,6 @@
 // Cliopatria (Seshat Global History Databank; CC BY 4.0, https://github.com/Seshat-Global-History-Databank/cliopatria):
 // the world's polities from 3400 BCE to 2024, digitised from historical atlases (Bennett et al., Scientific Data 2025).
-// Used as the base of the maps from 1800 to 1880. Downloads one release once, unzips it and caches the polities valid
+// Used as the base of the maps from 1800 to 1960. Downloads one release once, unzips it and caches the polities valid
 // in each year asked for in `.cache/cliopatria/`. Used by build-data.mjs.
 
 import fs from "node:fs";
