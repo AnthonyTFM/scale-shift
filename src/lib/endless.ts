@@ -40,9 +40,13 @@ const PROMPTS: Record<QuestionKind, string> = {
   history2: "Empire vs. empire: which was bigger?",
 };
 
-/** A new run's seed: the date (which shapes are in the pool) and a random part. */
+/**
+ * A new run's seed: the date (which shapes are in the pool) and a random part. Runs normally get theirs from the server
+ * (POST /api/endless/start), which can then check them; this one is for when it can't be reached (the run still plays,
+ * but can't be posted).
+ */
 export function newSeed(date: string) {
-  const rand = Array.from(crypto.getRandomValues(new Uint32Array(2)), (n) => n.toString(36)).join("");
+  const rand = Array.from(crypto.getRandomValues(new Uint8Array(8)), (n) => n.toString(16).padStart(2, "0")).join("");
   return `${date}.${rand}`;
 }
 
@@ -133,10 +137,16 @@ export function streakOf(questions: Question[], choices: number[]) {
 // ---------- saved progress (this browser only) ----------
 
 /**
- * best = longest run, runs = runs started, run = the run in progress (or the last one, once over): its seed, its answers
- * and b, the best before it started (for "New best!" after a reload).
+ * best = longest run, runs = runs started, run = the run in progress (or the last one, once over): its seed, its answers,
+ * b (the best before it started, for "New best!" after a reload), t (the server's token, to post it on the Best streaks
+ * board) and e (when it ended).
  */
-export type EndlessSave = { v: 1; best: number; runs: number; run?: { seed: string; c: number[]; b?: number; over?: boolean } };
+export type EndlessSave = {
+  v: 1;
+  best: number;
+  runs: number;
+  run?: { seed: string; c: number[]; b?: number; t?: string; over?: boolean; e?: number };
+};
 
 const KEY = "atlas-endless-v1";
 

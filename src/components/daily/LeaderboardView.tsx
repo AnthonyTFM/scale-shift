@@ -5,18 +5,23 @@ import Link from "next/link";
 import { MedalIcon } from "@/components/site/Icons";
 import { dayNumber, LAUNCH, localDateKey, loadSave, shiftDate, type DayRecord } from "@/lib/daily";
 import { dailyCopy } from "@/content/daily";
+import { endlessCopy } from "@/content/endless";
 import { LeaderboardJoin } from "./LeaderboardJoin";
 import { POSTED_EVENT } from "./useJoin";
-import type { AllTimeBoard, DayBoard, WeekBoard } from "@/lib/leaderboard-types";
+import type { AllTimeBoard, DayBoard, EndlessBoard, WeekBoard } from "@/lib/leaderboard-types";
 import { loadPlayer, playerId } from "@/lib/player";
 
-type Tab = "day" | "week" | "all";
+type Tab = "day" | "week" | "all" | "endless";
 const TABS = [
   ["day", "Daily"],
   ["week", "This week"],
   ["all", "All time"],
+  ["endless", endlessCopy.board.tab],
 ] as const satisfies readonly (readonly [Tab, string])[];
-type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | null; failed: boolean };
+/** Endless mode's two boards: today's best streaks and the best of all time. */
+type EndlessBoards = { today: EndlessBoard; all: EndlessBoard };
+type Loaded = { key: string; data: DayBoard | WeekBoard | AllTimeBoard | EndlessBoards | null; failed: boolean };
+const E = endlessCopy.board;
 
 /** A drawn medal for the top three (the rank is read out to screen readers), the plain number below that. */
 const rankCell = (rank: number) =>
@@ -49,24 +54,37 @@ export function LeaderboardView() {
       const round = loadSave().days[t];
       setMe({ name: loadPlayer()?.name ?? null, playedToday: typeof round?.s === "number", round });
     });
+    // /leaderboard#endless (from endless mode's results) opens the Endless tab
+    if (location.hash === "#endless") queueMicrotask(() => setTab("endless"));
     // a score posted from this page: load the board again so it shows
     const posted = () => setReload((n) => n + 1);
     window.addEventListener(POSTED_EVENT, posted);
     return () => window.removeEventListener(POSTED_EVENT, posted);
   }, []);
 
-  const key = tab === "all" ? "all" : tab === "week" ? (today ? `week:${today}` : "") : (date ?? "");
+  const key =
+    tab === "all" ? "all" : tab === "week" ? (today ? `week:${today}` : "") : tab === "endless" ? (today ? `endless:${today}` : "") : (date ?? "");
   useEffect(() => {
     if (!key) return;
     let alive = true;
     const id = playerId();
+    const me = id ? `&player=${id}` : "";
+    if (tab === "endless") {
+      const get = (url: string) => fetch(`${url}${me}`).then((r) => (r.ok ? (r.json() as Promise<EndlessBoard>) : Promise.reject()));
+      Promise.all([get(`/api/endless?scope=day&date=${key.slice(8)}&limit=100`), get(`/api/endless?scope=all&limit=100`)])
+        .then(([today, all]) => alive && setLoaded({ key, data: { today, all }, failed: false }))
+        .catch(() => alive && setLoaded({ key, data: null, failed: true }));
+      return () => {
+        alive = false;
+      };
+    }
     const url =
       tab === "all"
         ? `/api/leaderboard?scope=all&limit=100`
         : tab === "week"
           ? `/api/leaderboard?scope=week&date=${key.slice(5)}&limit=100`
           : `/api/leaderboard?scope=day&date=${key}&limit=100`;
-    fetch(`${url}${id ? `&player=${id}` : ""}`)
+    fetch(`${url}${me}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((data) => alive && setLoaded({ key, data, failed: false }))
       .catch(() => alive && setLoaded({ key, data: null, failed: true }));
@@ -101,7 +119,7 @@ export function LeaderboardView() {
           setTab(id);
           e.currentTarget.querySelector<HTMLElement>(`[data-tab="${id}"]`)?.focus();
         }}
-        className="inline-grid grid-cols-3 rounded-2xl border-2 border-line bg-white p-1 text-sm font-semibold"
+        className="grid w-full grid-cols-4 rounded-2xl border-2 border-line bg-white p-1 text-sm font-semibold sm:inline-grid sm:w-auto"
       >
         {TABS.map(([id, label]) => (
           <button
@@ -114,7 +132,7 @@ export function LeaderboardView() {
             aria-selected={tab === id}
             tabIndex={tab === id ? 0 : -1}
             onClick={() => setTab(id)}
-            className="min-h-11 rounded-xl px-3 py-2 font-bold aria-selected:bg-primary aria-selected:text-white sm:px-5"
+            className="min-h-11 rounded-xl px-1 py-2 font-bold aria-selected:bg-primary aria-selected:text-white sm:px-5"
           >
             {label}
           </button>
@@ -183,6 +201,13 @@ export function LeaderboardView() {
           <p role="alert" className="p-6 text-center text-ink-soft">
             The leaderboard couldn&apos;t load. Please try again in a minute.
           </p>
+        ) : tab === "endless" ? (
+          <>
+            <DayTable board={(current.data as EndlessBoards).today} caption={E.todayCaption} empty={E.emptyToday} scoreLabel={E.streak} cell={String} note={E.note} />
+            <div className="border-t-2 border-line">
+              <DayTable board={(current.data as EndlessBoards).all} caption={E.allCaption} empty={E.emptyAll} scoreLabel={E.streak} cell={String} note={E.note} />
+            </div>
+          </>
         ) : tab === "day" ? (
           <DayTable board={current.data as DayBoard} />
         ) : tab === "week" ? (
@@ -196,6 +221,12 @@ export function LeaderboardView() {
           <AllTable board={current.data as AllTimeBoard} />
         )}
       </div>
+      {tab === "endless" ? (
+        <Link href="/endless" className="btn btn-gold mt-4 w-full justify-between px-4 py-3 text-left leading-snug">
+          <span>{E.play}</span>
+          <span aria-hidden="true">→</span>
+        </Link>
+      ) : null}
       {me.name ? (
         <p className="mt-3 text-sm text-muted">
           You&apos;re playing as <strong className="text-ink">{me.name}</strong>. Change your nickname on the results screen after a daily round.
@@ -209,12 +240,39 @@ function Empty({ text }: { text: string }) {
   return <p className="p-6 text-center text-ink-soft">{text}</p>;
 }
 
-function DayTable({ board }: { board: DayBoard }) {
-  if (!board.rows.length) return <Empty text="No scores yet for this day." />;
+function DayTable({
+  board,
+  caption,
+  empty = "No scores yet for this day.",
+  scoreLabel = "Score",
+  cell = (n) => `${n}/5`,
+  note = "Ties share a rank; earlier finishers are listed first.",
+}: {
+  board: DayBoard | EndlessBoard;
+  /** shown above the table (the daily's is for screen readers only: the date is above it) */
+  caption?: string;
+  empty?: string;
+  scoreLabel?: string;
+  cell?: (score: number) => string;
+  note?: string;
+}) {
+  if (!board.rows.length)
+    return caption ? (
+      <>
+        <p className="px-4 pt-3 text-xs font-semibold text-muted">{caption}</p>
+        <Empty text={empty} />
+      </>
+    ) : (
+      <Empty text={empty} />
+    );
   const meOutside = board.me && !board.rows.some((r) => r.me);
   return (
     <table className="w-full table-fixed text-left text-sm">
-      <caption className="sr-only">Scores for {board.date}</caption>
+      {caption ? (
+        <caption className="px-4 pt-3 text-left text-xs font-semibold text-muted">{caption}</caption>
+      ) : (
+        <caption className="sr-only">Scores for {board.date}</caption>
+      )}
       <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
         <tr>
           <th scope="col" className="w-12 px-3 py-2.5 sm:w-16 sm:px-4">
@@ -224,7 +282,7 @@ function DayTable({ board }: { board: DayBoard }) {
             Player
           </th>
           <th scope="col" className="w-20 px-3 py-2.5 text-right sm:w-24 sm:px-4">
-            Score
+            {scoreLabel}
           </th>
         </tr>
       </thead>
@@ -240,14 +298,14 @@ function DayTable({ board }: { board: DayBoard }) {
                 {r.me ? <span className="shrink-0 rounded bg-primary px-1.5 py-0.5 text-[10px] uppercase leading-none text-white">You</span> : null}
               </span>
             </td>
-            <td className="px-3 py-2.5 text-right font-display tabular-nums text-ink sm:px-4">{r.score}/5</td>
+            <td className="px-3 py-2.5 text-right font-display tabular-nums text-ink sm:px-4">{cell(r.score)}</td>
           </tr>
         ))}
       </tbody>
       <tfoot>
         <tr>
           <td colSpan={3} className="border-t border-line px-4 py-2 text-xs text-muted">
-            {board.total} {board.total === 1 ? "player" : "players"}. Ties share a rank; earlier finishers are listed first.
+            {board.total} {board.total === 1 ? "player" : "players"}. {note}
           </td>
         </tr>
       </tfoot>
