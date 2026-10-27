@@ -13,6 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { geoArea, geoAzimuthalEqualArea, geoCentroid, geoMercator, geoPath } from "d3-geo";
 import * as client from "topojson-client";
+import { loadRegions } from "./lib/regions.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const DATA = path.join(ROOT, "public", "data");
@@ -346,6 +347,11 @@ fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
   }
 }
 
+// Regions of six big countries: Canadian provinces and territories, Australian, Mexican, Brazilian and Indian states,
+// Chinese provinces (added Oct 27; see scripts/lib/regions.mjs). The map can't draw these yet, so their era starts with
+// "adm1-" and puzzles with one leave out the "compare on the map" link.
+for (const r of await loadRegions(ROOT)) add({ n: r.n, era: `adm1-${r.cc.toLowerCase()}`, kind: "state", sub: r.sub }, r.geometry);
+
 // Historical states
 {
   const polities = JSON.parse(fs.readFileSync(path.join(DATA, "polities.json"), "utf8"));
@@ -377,8 +383,9 @@ for (const [id] of previous)
   }
 pool.unshift(...previous.values());
 fs.writeFileSync(path.join(OUT, "index.json"), JSON.stringify(pool));
-// new version stamp, so browsers fetch the new pool instead of a cached one (a stale pool would build different puzzles)
-fs.writeFileSync(path.join(ROOT, "src", "data", "data-version.json"), JSON.stringify({ v: Date.now().toString(36) }));
+// new version stamp, so browsers fetch the new pool instead of a cached one (a stale pool would build different puzzles).
+// The pool has its own stamp, so a pool change doesn't need a new map-data stamp (data-version.json) and the reverse.
+fs.writeFileSync(path.join(ROOT, "src", "data", "daily-version.json"), JSON.stringify({ v: Date.now().toString(36) }));
 // the same pool, bundled into the server so the leaderboard can score answers itself
 fs.writeFileSync(path.join(ROOT, "src", "data", "daily-pool.json"), JSON.stringify(pool));
 const bytes = fs.readdirSync(path.join(OUT, "shapes")).reduce((s, f) => s + fs.statSync(path.join(OUT, "shapes", f)).size, 0);

@@ -3,6 +3,7 @@
 // The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
 import { useEffect, useRef, useState } from "react";
 import dataVersion from "@/data/data-version.json";
+import dailyVersion from "@/data/daily-version.json";
 import { gapText, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
 import { formatArea, type AreaUnit } from "@/lib/format";
@@ -28,7 +29,8 @@ const TILE =
 const COLORS = ["#FF5B4A", "#2F6BFF"];
 /** a web map stretches land by less than this: "about right" (and never "1.1× too big") */
 const ABOUT_RIGHT = 1.15;
-const V = `?v=${dataVersion.v}`;
+// both stamps: a new pool (daily-version) or new map data (data-version) means fresh files, not cached ones
+const V = `?v=${dataVersion.v}.${dailyVersion.v}`;
 
 let poolPromise: Promise<PoolEntry[]> | null = null;
 export const loadPool = () =>
