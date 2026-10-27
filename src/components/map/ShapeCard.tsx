@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { appCopy } from "@/content/site";
 import { eventsForPolity, eraByKey, formatYear } from "@/lib/eras";
 import { compactNumber, formatArea, type AreaUnit } from "@/lib/format";
-import { mercatorInflation } from "@/lib/geo";
+import { placeGeometry, webMapArea } from "@/lib/geo";
 import { TakenFormalized } from "@/components/EventCard";
 import { DataNote } from "./InfoSheet";
 import { PALETTE, type Overlay } from "./engine";
@@ -30,7 +30,13 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
   const prev = steps && idx > 0 ? steps[idx - 1] : null;
   const next = steps && idx >= 0 && idx < steps.length - 1 ? steps[idx + 1] : null;
   const history = eventsForPolity(lineageFor(o.name));
-  const looks = mercatorInflation(o.lat) / mercatorInflation(o.origin[1]);
+  // how much bigger or smaller the shape is drawn here than at home: the ratio of the two web-map areas, over the whole
+  // shape (moving it along the map changes nothing, so it only counts once moved)
+  const looks = useMemo(() => {
+    if (!o.moved) return 1;
+    const home = webMapArea(o.geom);
+    return home ? webMapArea(placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot)) / home : 1;
+  }, [o.moved, o.geom, o.origin, o.lon, o.lat, o.rot]);
 
   return (
     <section aria-label={`${o.name} details`} className="rounded-xl bg-panel-2 p-4 text-panel-text">
