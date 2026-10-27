@@ -76,7 +76,7 @@ export async function POST(request: Request) {
   const named = typeof body.name === "string" && body.name.trim() !== "";
   const { name, error } = named ? checkName(body.name) : { name: "", error: "" };
   if (error) return fail(error, 422, "name");
-  if (!isDateKey(body.date) || !isPlayableDate(body.date)) return fail("Only today's challenge can go on the leaderboard.", 422);
+  if (!isDateKey(body.date) || !isPlayableDate(body.date)) return fail("Only today's challenge can be saved.", 422);
   const score = scoreAnswers(body.date, body.choices);
   if (score === null) return fail("Those answers don't match today's questions.", 422);
 

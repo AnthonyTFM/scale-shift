@@ -66,8 +66,8 @@ export const endlessCopy = {
     better: (run: number, best: number) => `This run: ${run} in a row. Your best (${best} in a row) stays on the board.`,
     signedIn: "Signed in.",
     signOut: "Sign out",
-    // sign-in is off (running locally without Clerk) and this browser hasn't joined the daily's leaderboard
-    joinFromDaily: "Join the leaderboard from the daily challenge's results, and your runs will post here too.",
+    // sign-in is off (running locally without Clerk) and this browser has no player from before
+    joinFromDaily: "Sign-in is off on this copy of the site, so runs can't go on the Best streaks board.",
     dialog: {
       title: "Get on the Best streaks board",
       lead: (n: number) => `You got ${n} in a row. Sign in so your streak counts and nobody else can post as you.`,

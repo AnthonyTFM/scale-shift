@@ -32,6 +32,7 @@ function Save({ date, choices }: Props) {
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [reminders, setReminders] = useState<boolean | null>(null);
   const [remindNote, setRemindNote] = useState("");
+  const [error, setError] = useState("");
   const sent = useRef(false);
   const card = useRef<HTMLDivElement>(null);
 
@@ -45,14 +46,21 @@ function Save({ date, choices }: Props) {
         body: JSON.stringify({ player: loadPlayer()?.id ?? "", date, choices, website: "" }),
       });
       const data = (await res.json()) as SubmitResult;
-      if (!data.ok) return setStatus("error");
+      if (!data.ok) {
+        setError(data.error);
+        return setStatus("error");
+      }
       if (data.player) rememberPlayer(data.player);
       setStatus("saved");
       if (!data.duplicate) track("streak_saved");
       // the reminder setting, now that the player surely exists
-      const me = await fetch("/api/leaderboard/me").then((r) => (r.ok ? r.json() : null));
-      setReminders(me?.player?.reminders ?? false);
+      // (left unknown if that fails, rather than shown unticked)
+      const me = await fetch("/api/leaderboard/me")
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null);
+      if (me?.player) setReminders(!!me.player.reminders);
     } catch {
+      setError(t.failed);
       setStatus("error");
     }
   };
@@ -115,8 +123,9 @@ function Save({ date, choices }: Props) {
       title={t.title}
       lead={t.lead}
       failed={failed}
+      // also runs when Continue closes the pop-up on the way to sign-in: only a close by the player ends the flow
       onClose={() => {
-        clearJoinFlow();
+        if (open) clearJoinFlow();
         setOpen(false);
       }}
       onContinue={() => {
@@ -141,7 +150,7 @@ function Save({ date, choices }: Props) {
         <div aria-live="polite">
           {status === "error" ? (
             <p role="alert" className="text-sm font-semibold text-danger">
-              {t.failed}{" "}
+              {error || t.failed}{" "}
               <button type="button" onClick={save} className="min-h-11 font-semibold text-primary hover:underline">
                 {t.retry}
               </button>
@@ -164,7 +173,9 @@ function Save({ date, choices }: Props) {
             <span>{t.remind}</span>
           </label>
         ) : null}
-        {remindNote ? <p className="mt-1 text-xs text-muted">{remindNote}</p> : null}
+        <p role="status" className="mt-1 text-xs text-muted empty:hidden">
+          {remindNote}
+        </p>
         <p className="mt-2 text-xs text-muted">
           {t.signedIn}{" "}
           <button type="button" onClick={() => signOut("/daily")} className="min-h-11 font-semibold text-primary hover:underline">

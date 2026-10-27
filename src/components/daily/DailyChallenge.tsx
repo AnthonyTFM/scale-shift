@@ -21,7 +21,7 @@ import {
 import { SaveStreak } from "./SaveStreak";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "./Matchup";
 import { readChallenge, type Challenge } from "@/lib/challenge";
-import { playerId, rememberPlayer } from "@/lib/player";
+import { rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play } from "@/lib/sound";
