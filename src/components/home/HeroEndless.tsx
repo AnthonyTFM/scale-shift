@@ -85,12 +85,13 @@ export function HeroEndless() {
         {top && top !== "failed" ? (
           <span className="inline-flex items-center gap-1 text-base text-muted" title={top.name}>
             <TrophyIcon className="size-4" />
-            {t.endlessTopLine(top.score)}
+            <span aria-hidden="true">{t.endlessTopLine(top.score)}</span>
+            <span className="sr-only">{t.endlessTopSr(top.score, top.name)}</span>
           </span>
         ) : null}
       </p>
       <div className="mt-auto pt-3">
-        <Link href="/endless" className="btn btn-gold group h-12 w-full px-3 sm:w-auto sm:px-6">
+        <Link href="/endless" aria-label={best ? t.endlessCtaBeatSr(best) : t.endlessCtaLong} className="btn btn-gold group h-12 w-full px-3 sm:w-auto sm:px-6">
           <span className="sm:hidden">{best ? t.endlessCtaBeat(best) : t.endlessCta}</span>
           <span className="hidden sm:inline">{best ? t.endlessCtaBeatLong(best) : t.endlessCtaLong}</span>
           <span aria-hidden="true" className="transition group-hover:translate-x-1">

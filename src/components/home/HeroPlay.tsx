@@ -82,20 +82,29 @@ export function HeroPlay() {
           )}
         </p>
         <div className="mt-auto pt-3">
-          <Link href="/daily" transitionTypes={["to-daily"]} className="btn btn-primary group h-12 w-full px-3 sm:w-auto sm:px-6">
+          <Link
+            href="/daily"
+            transitionTypes={["to-daily"]}
+            aria-label={s?.done ? t.playDoneCtaLong : t.playCtaLong}
+            className="btn btn-primary group h-12 w-full px-3 sm:w-auto sm:px-6"
+          >
             <span className="sm:hidden">{s?.done ? t.playDoneCta : t.playCta}</span>
             <span className="hidden sm:inline">{s?.done ? t.playDoneCtaLong : t.playCtaLong}</span>
             <span aria-hidden="true" className="transition group-hover:translate-x-1">
               →
             </span>
           </Link>
-          {/* after playing: when the next five arrive (announced only once they're ready) */}
-          <p className="mt-1.5 flex min-h-4 items-center gap-1 text-xs font-semibold text-muted" aria-live={left && left.ms < 60_000 ? "polite" : "off"}>
+          {/* after playing: when the next five arrive */}
+          <p className="mt-1.5 flex min-h-4 items-center gap-1 text-xs font-semibold text-muted">
             {s?.done && left ? (
               <>
                 <ClockIcon className="size-3.5" /> {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}
               </>
             ) : null}
+          </p>
+          {/* always in the page, so screen readers hear it the moment the new five are ready (not every minute) */}
+          <p className="sr-only" aria-live="polite">
+            {s?.done && left && left.ms < 60_000 ? t.nextReady : ""}
           </p>
         </div>
       </div>

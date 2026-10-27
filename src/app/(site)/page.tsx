@@ -92,18 +92,20 @@ export default function HomePage() {
               <span className="hidden sm:inline">{home.hub.mission}</span>
             </p>
           </div>
-          <p className="hero-back font-display text-2xl leading-tight text-ink md:text-3xl">{home.hub.welcomeBack}</p>
+          <p aria-hidden="true" className="hero-back font-display text-2xl leading-tight text-ink md:text-3xl">
+            {home.hub.welcomeBack}
+          </p>
           {/* phones: the two games side by side, then the Best streaks board (competition first), yesterday's matchup
               and the map. Wide screens: two columns, each game with its own extra under it: the daily with yesterday's
               matchup, endless with its Best streaks board; the map across the bottom. Each part is rendered once and
               placed by the grid; the page order (and screen readers) follow the phone order */}
-          <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4 lg:items-start">
+          <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
             <HeroPlay />
             <HeroEndless />
-            <div className="col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2">
+            <div className="col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start">
               <HeroLeaderboard />
             </div>
-            <div className="col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2">
+            <div className="col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2 lg:self-start">
               <YesterdayMatchup />
             </div>
           </div>
