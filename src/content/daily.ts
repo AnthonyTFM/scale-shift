@@ -13,6 +13,8 @@ export const dailyCopy = {
   nextIn: "Next five in",
   nextTime: (h: number, m: number) => (h ? `${h}h ${m}m` : m ? `${m}m` : "under a minute"),
   nextReady: "Five new matchups are ready. Load them",
+  // the results header's short version
+  nextReadyShort: "New five ready",
   // phones show this instead, so the first puzzle is on screen without scrolling
   leadShort: "Five matchups a day. Normal maps lie about size. Can you see through them?",
   playedElsewhere: "Played today on another device?",
@@ -166,6 +168,8 @@ export const dailyCopy = {
     // beside Share: endless mode is the next thing to play (the full name is for screen readers)
     endless: "Keep playing: endless mode",
     endlessShort: "Endless",
+    // after "Endless" for screen readers, so the button's name starts with what it shows
+    endlessSr: "mode: keep playing",
     answersToggle: (n: number) => `See the ${n} answers`,
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",

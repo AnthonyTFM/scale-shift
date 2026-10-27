@@ -211,6 +211,7 @@ export function DailyChallenge() {
             : dailyCopy.challengeOld(challenge.name, challenge.day)}
         </p>
       ) : null}
+      <DoneMark finished={finished} />
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
       {/* on phones above the game, where it still fits; on wider screens below it, so both tiles stay on a laptop's first screen */}
       {signInOn && !finished ? (
@@ -253,6 +254,17 @@ export function DailyChallenge() {
 }
 
 // ---------- pieces ----------
+
+/**
+ * The root layout's script marks a finished day before paint (the intro goes, see .daily-done); this keeps that mark in
+ * step with the game shown: a new day after midnight, or /daily reached by a link without a full page load.
+ */
+function DoneMark({ finished }: { finished: boolean }) {
+  useEffect(() => {
+    document.documentElement.classList.toggle("daily-done", finished);
+  }, [finished]);
+  return null;
+}
 
 /**
  * Signing in opens in a window over the page, so the page never reloads: when the player becomes signed in, fetch their
@@ -331,11 +343,14 @@ function Results({
   const verdict = R.verdict(score, total);
   // everyone's scores today (anonymous counts), for "Better than 62% of players today"
   const [crowd, setCrowd] = useState<{ n: number; scores: number[] } | null>(null);
+  // the chart waits for the counts, so it doesn't open on "You" and then jump to "Everyone today"
+  const [crowdChecked, setCrowdChecked] = useState(false);
   useEffect(() => {
     fetch(`/api/plays?date=${round.date}`)
       .then((r) => (r.ok ? (r.json() as Promise<{ n: number; scores: number[] }>) : null))
       .then((c) => c && setCrowd(c))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setCrowdChecked(true));
   }, [round.date]);
 
   // today's anonymous counts by score; they can be up to a minute old: if nobody shares your score yet, your own play
@@ -358,7 +373,17 @@ function Results({
   const showMine = s.played >= 2;
   // the one chart: everyone today when enough played, else your own days; a toggle when both are there
   const [chart, setChart] = useState<"crowd" | "mine" | null>(null);
-  const shown = chart === "crowd" && showCrowd ? "crowd" : chart === "mine" && showMine ? "mine" : showCrowd ? "crowd" : showMine ? "mine" : null;
+  const shown = !crowdChecked
+    ? null
+    : chart === "crowd" && showCrowd
+      ? "crowd"
+      : chart === "mine" && showMine
+        ? "mine"
+        : showCrowd
+          ? "crowd"
+          : showMine
+            ? "mine"
+            : null;
 
   // how many days you've scored 0, 1 … 5
   const spread = [0, 1, 2, 3, 4, 5].map((n) => Object.values(save.days).filter((d) => d.s === n).length);
@@ -486,12 +511,13 @@ function Results({
         </p>
       ) : null}
       {/* the two things to do next: share (the main one: it's how friends find the game) and endless mode */}
-      <div className="mt-5 grid grid-cols-5 gap-2">
-        <button type="button" onClick={share} className="btn btn-primary col-span-3 h-12 px-2">
+      <div className="mt-5 flex gap-2">
+        <button type="button" onClick={share} className="btn btn-primary h-12 min-w-0 flex-1 px-2">
           {R.share}
         </button>
-        <Link href="/endless" onClick={() => track("daily_endless_start")} aria-label={R.endless} className="btn btn-gold col-span-2 h-12 px-2">
-          {R.endlessShort} <span aria-hidden="true">→</span>
+        <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold h-12 shrink-0 px-4">
+          {R.endlessShort}
+          <span className="sr-only"> {R.endlessSr}</span> <span aria-hidden="true">→</span>
         </Link>
       </div>
       {/* the other ways to share, quietly */}
@@ -506,7 +532,7 @@ function Results({
           {R.challenge}
         </button>
       </p>
-      <p aria-live="polite" className="whitespace-pre-line text-center text-sm font-semibold text-green-text empty:hidden">
+      <p aria-live="polite" className="whitespace-pre-line text-center text-sm font-semibold text-green-text">
         {copied}
       </p>
       {shareBox.box}
@@ -541,7 +567,7 @@ function Results({
                     type="button"
                     aria-pressed={shown === k}
                     onClick={() => setChart(k)}
-                    className="min-h-9 rounded-lg px-3 aria-pressed:bg-primary aria-pressed:text-white"
+                    className="min-h-11 rounded-lg px-3 aria-pressed:bg-primary aria-pressed:text-white"
                   >
                     {k === "crowd" ? R.chartEveryone : R.chartYou}
                   </button>
@@ -586,7 +612,7 @@ function Results({
                     href={href}
                     aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`}
                     title={R.dragOnMap}
-                    className="grid size-9 shrink-0 place-items-center rounded-lg text-primary hover:bg-primary-soft"
+                    className="-my-2 grid size-11 shrink-0 place-items-center rounded-lg text-primary hover:bg-primary-soft"
                   >
                     <MapIcon className="size-6" />
                   </Link>
@@ -615,8 +641,8 @@ function Countdown() {
   if (left === null) return null;
   if (left === 0) {
     return (
-      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline">
-        {dailyCopy.nextReady} <span aria-hidden="true">→</span>
+      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline">
+        {dailyCopy.nextReadyShort} <span aria-hidden="true">→</span>
       </button>
     );
   }
