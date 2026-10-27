@@ -6,6 +6,7 @@ import dataVersion from "@/data/data-version.json";
 import dailyVersion from "@/data/daily-version.json";
 import { gapText, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
+import { regionContext } from "@/content/region-context";
 import { formatArea, type AreaUnit } from "@/lib/format";
 import { preferredUnit } from "@/lib/units";
 import { mapUrl } from "@/lib/share";
@@ -360,16 +361,22 @@ function StretchStrip({ options, title }: { options: Question["options"]; title:
 
 /** Short "what was it / where is it today" notes for the historical states in a question. */
 function WhoIsWho({ options }: { options: Question["options"] }) {
-  const notes = options.filter((o) => o.kind === "history" && dailyContext[o.src]);
+  // historical states say what they were and where their land is today; regions say where they are
+  const notes = options.filter((o) => (o.kind === "history" && dailyContext[o.src]) || regionContext[o.n]);
   if (!notes.length) return null;
   return (
     <div className="mt-4 space-y-2 rounded-2xl bg-paper p-3 text-sm ring-1 ring-line">
       {notes.map((o) => {
-        const c = dailyContext[o.src];
+        const c = o.kind === "history" ? dailyContext[o.src] : undefined;
         return (
           <p key={o.id} className="leading-relaxed text-ink-soft">
-            <strong className="text-ink">{o.n}</strong> <span className="text-muted">({o.sub})</span>: {c.what}{" "}
-            <span className="font-semibold text-ink">Today: {c.today}.</span>
+            <strong className="text-ink">{o.n}</strong> <span className="text-muted">({o.sub})</span>: {c ? c.what : regionContext[o.n]}
+            {c ? (
+              <>
+                {" "}
+                <span className="font-semibold text-ink">Today: {c.today}.</span>
+              </>
+            ) : null}
           </p>
         );
       })}
@@ -482,6 +489,8 @@ function TrueArea({ from, to, unit }: { from: number; to: number; unit: AreaUnit
 }
 
 /** The two shapes side by side on the real-size map. */
+/** The two shapes side by side on the map, or null when the map can't draw one of them yet (the "adm1-" regions). */
 export function mapHref(q: Question) {
+  if (q.options.some((o) => o.era.startsWith("adm1-"))) return null;
   return mapUrl({ era: "present", shapes: q.options.map((o, i) => ({ era: o.era, name: o.src, color: i })) });
 }

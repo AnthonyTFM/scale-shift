@@ -415,6 +415,7 @@ function Answer({ q, right }: { q: Question; right: boolean }) {
   const big = q.options[q.answer];
   const small = q.options[1 - q.answer];
   const line = sizeParts(big, small);
+  const href = mapHref(q);
   return (
     <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
       <MarkIcon right={right} className="size-5 translate-y-1" />
@@ -422,13 +423,12 @@ function Answer({ q, right }: { q: Question; right: boolean }) {
         <strong>{line.big}</strong> <span className="text-muted">({big.sub})</span> {line.link} <strong>{line.small}</strong>{" "}
         <span className="text-muted">({small.sub})</span>
       </span>
-      <Link
-        href={mapHref(q)}
-        aria-label={R.dragOnMapSr(nameInSentence(big), nameInSentence(small))}
-        className="col-start-2 font-semibold text-primary hover:underline"
-      >
-        {R.dragOnMap} →
-      </Link>
+      {/* not for a region yet: the map can't draw those */}
+      {href ? (
+        <Link href={href} aria-label={R.dragOnMapSr(nameInSentence(big), nameInSentence(small))} className="col-start-2 font-semibold text-primary hover:underline">
+          {R.dragOnMap} →
+        </Link>
+      ) : null}
     </div>
   );
 }
