@@ -656,29 +656,52 @@ export class MapEngine {
 
   /**
    * Land, borders, claims and state lines come from bitmap tiles drawn once per zoom level, so a frame is just a few
-   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. A tile that is not ready yet is
-   * drawn on the spot, so the map is never shown blank or half drawn; the tiles around the screen are drawn ahead of time.
+   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. The tiles around the screen are
+   * drawn ahead of time. On screen, a tile that is not ready yet is drawn on the spot, but for at most ~10 ms a frame,
+   * middle of the screen first; the rest follow over the next frames. Drawing every tile of a new zoom level in one go
+   * froze a mid-range phone for about 0.9 s on opening the map. Pictures made from the map (`ctx` given: sweeps, saved
+   * images) still draw every tile at once, as they must be complete.
    */
   private drawTiles(c: BaseCache, ctx = this.bctx) {
     const s = this.view.k / c.k;
     const pad = TILE_PAD;
+    const deadline = ctx === this.bctx ? performance.now() + 10 : Infinity;
     let missing = false;
+    let pending = false;
+    let drawn = 0;
     let shown = 0;
+    const onScreen: { ox: number; oy: number; half: number; i: number; j: number; d: number }[] = [];
     for (const [ox, oy] of this.cacheOrigins(c)) {
       const { half, i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 0);
       for (let j = j0; j <= j1; j++)
         for (let i = i0; i <= i1; i++) {
-          const tile = this.tile(c, i, j);
-          const src = (c.size + 2 * pad) * c.dpr;
-          ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
-          shown++;
+          const cx = ox + s * ((i + 0.5) * c.size - half) - this.w / 2;
+          const cy = oy + s * ((j + 0.5) * c.size - half) - this.h / 2;
+          onScreen.push({ ox, oy, half, i, j, d: cx * cx + cy * cy });
         }
       const ring = this.tileRange(c, ox, oy, 1);
       for (let j = ring.j0; j <= ring.j1 && !missing; j++)
         for (let i = ring.i0; i <= ring.i1 && !missing; i++) missing = !c.tiles.has(`${i},${j}`);
     }
+    onScreen.sort((a, b) => a.d - b.d);
+    for (const { ox, oy, half, i, j } of onScreen) {
+      shown++;
+      // ready tiles are always drawn; a missing one only while there's time left this frame (and always the first)
+      if (!c.tiles.has(`${i},${j}`) && drawn > 0 && performance.now() > deadline) {
+        pending = true;
+        continue;
+      }
+      if (!c.tiles.has(`${i},${j}`)) drawn++;
+      const tile = this.tile(c, i, j);
+      const src = (c.size + 2 * pad) * c.dpr;
+      ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
+    }
     c.keep = Math.max(24, shown * 3);
-    if (missing && !this.prefetchTimer) this.prefetchTimer = window.setTimeout(this.prefetch, 0);
+    if (pending) {
+      // the rest next frame (land drawn on top of the sea already painted, so nothing flashes)
+      this.baseDirty = true;
+      this.schedule();
+    } else if (missing && !this.prefetchTimer) this.prefetchTimer = window.setTimeout(this.prefetch, 0);
   }
 
   /** Draw the tiles just off screen between frames (a few ms at a time), so panning finds them ready. */
