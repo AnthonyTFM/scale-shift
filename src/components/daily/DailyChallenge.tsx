@@ -18,11 +18,10 @@ import {
   type DailySave,
   type Question,
 } from "@/lib/daily";
-import { LeaderboardJoin } from "./LeaderboardJoin";
-import { POSTED_EVENT, type Posted } from "./useJoin";
+import { SaveStreak } from "./SaveStreak";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "./Matchup";
 import { readChallenge, type Challenge } from "@/lib/challenge";
-import { playerId, rememberPlayer } from "@/lib/player";
+import { rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play } from "@/lib/sound";
@@ -31,7 +30,6 @@ import type { ShapeFile } from "@/lib/outline";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
-import type { DayBoard } from "@/lib/leaderboard-types";
 import { dailyCopy } from "@/content/daily";
 import { FlameIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
 import { useAccount } from "./SignInProvider";
@@ -95,8 +93,7 @@ function catchUp(g: Game): Game {
   return { ...g, save, choices: saved, step: Math.min(saved.length, g.round.questions.length) };
 }
 
-// results: "If you join #2 of 3" means little until this many have joined today, and "Better than N%" needs this many plays
-const BOARD_MIN = 20;
+// results: "Better than N%" needs this many plays today
 const CROWD_MIN = 30;
 const BETTER_MIN = 30;
 const TOP_MAX = 50;
@@ -325,38 +322,6 @@ function Results({
   const [copied, setCopied] = useState("");
   const shareBox = useShareBox();
   const verdict = R.verdict(score, total);
-  // where today's score sits on today's public board: your own row if you're on it, otherwise where you'd land if you
-  // joined (and says so, so nobody thinks they're already ranked)
-  const [rank, setRank] = useState<{ rank: number; of: number; joined: boolean } | null>(null);
-  // the middle card waits for the board, so it doesn't switch from one stat to another as answers arrive
-  const [boardChecked, setBoardChecked] = useState(false);
-  useEffect(() => {
-    const id = playerId();
-    // once the score is posted, a slower board fetch must not put "If you join" back
-    let joinedNow = false;
-    fetch(`/api/leaderboard?scope=day&date=${round.date}&limit=100${id ? `&player=${id}` : ""}`)
-      .then((r) => (r.ok ? (r.json() as Promise<DayBoard>) : null))
-      .then((b) => {
-        if (!b || joinedNow) return;
-        const mine = b.rows.find((r) => r.me) ?? b.me;
-        setRank(
-          mine
-            ? { rank: mine.rank, of: b.total, joined: true }
-            : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1, joined: false },
-        );
-      })
-      .catch(() => {})
-      .finally(() => setBoardChecked(true));
-    const posted = (e: Event) => {
-      const d = (e as CustomEvent<Posted>).detail;
-      if (d.date !== round.date) return;
-      joinedNow = true;
-      setRank({ rank: d.rank, of: d.total, joined: true });
-    };
-    window.addEventListener(POSTED_EVENT, posted);
-    return () => window.removeEventListener(POSTED_EVENT, posted);
-  }, [round.date, score]);
-
   // everyone's scores today (anonymous counts), for "Better than 62% of players today"
   const [crowd, setCrowd] = useState<{ n: number; scores: number[] } | null>(null);
   useEffect(() => {
@@ -366,12 +331,9 @@ function Results({
       .catch(() => {});
   }, [round.date]);
 
-  // the middle card: your place on the board if you've joined, or where you'd land if enough have joined to mean
-  // something; otherwise how you did against everyone who played today, or failing that how many days you've played
+  // the middle card: how you did against everyone who played today (anonymous counts), or failing that how many days
+  // you've played
   const middle = (() => {
-    if (rank?.joined) return [R.rank, `#${rank.rank}`, R.rankOf(rank.of)] as const;
-    if (!boardChecked) return [R.played, "—", "\u00a0"] as const;
-    if (rank && rank.of >= BOARD_MIN) return [R.rankIfJoined, `#${rank.rank}`, R.rankOf(rank.of)] as const;
     if (crowd && crowd.n >= CROWD_MIN) {
       const counts = [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0);
       // the counts can be up to a minute old: if nobody shares your score yet, your own play isn't in them, so add it
@@ -473,8 +435,8 @@ function Results({
       </Link>
       <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>
 
-      {/* getting on the leaderboard comes next, after the endless button */}
-      <LeaderboardJoin date={round.date} choices={choices} score={score} />
+      {/* saving the streak to an account comes next, after the endless button */}
+      <SaveStreak date={round.date} choices={choices} />
       <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
         {[
           [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
@@ -488,7 +450,7 @@ function Results({
           </div>
         ))}
       </dl>
-      {/* sharing: one compact row, so the leaderboard stays the main call to action; one solid button, two quiet ones */}
+      {/* sharing: one compact row, so saving your streak stays the main call to action; one solid button, two quiet ones */}
       <div className="mt-5 grid grid-cols-3 gap-2">
         <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
           <span className="sm:hidden">{R.shareShort}</span>

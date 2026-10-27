@@ -3,7 +3,7 @@
 export const dailyCopy = {
   eyebrow: "Daily challenge",
   title: "Which is bigger?",
-  lead: "Five matchups a day, the same for everyone. Normal maps puff up land near the poles, so the one that looks bigger often isn't. Go 5 for 5 and climb the leaderboard. New matchups at midnight your time.",
+  lead: "Five matchups a day, the same for everyone. Normal maps puff up land near the poles, so the one that looks bigger often isn't. Go 5 for 5 and keep your streak alive. New matchups at midnight your time.",
   // under the game
   note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your scores and streak are saved in this browser, and in your account if you sign in.",
   // a friend's challenge link: for today's game, or for an older one
@@ -19,19 +19,28 @@ export const dailyCopy = {
   playedElsewhereShort: "Played on another device?",
   signInToSee: "Sign in to see your result",
   signInToSeeShort: "Sign in",
-  // results screen: the leaderboard sign-up waits behind one button
   // shown on the "Sign in" link while the sign-in window downloads
   signInOpening: "Opening sign-in…",
-  joinCta: "Get on the leaderboard",
-  joinHint: "See where you rank.",
-  // the leaderboard page, for someone who played today but isn't on the board yet
-  boardNudge: (score: number, total: number) => `You scored ${score}/${total} today. Post it and see where you rank.`,
-  joinButton: "Join",
-  // the join pop-up: step 1 the 13+ box and sign-in, step 2 the nickname, then where you landed
+  // results screen: daily scores are private (no public board), so signing in is about keeping your streak
+  save: {
+    cta: "Save your streak on every device",
+    hint: "Free sign-in. Your daily scores stay private.",
+    button: "Sign in",
+    title: "Save your streak",
+    lead: "Sign in and your streak and past results follow you to any phone or computer. Daily scores stay private: they never go on a public board.",
+    saving: "Saving your streak…",
+    saved: "Streak saved on every device",
+    savedSub: "Your daily scores are private. Only you see them.",
+    failed: "Couldn't save your score. Check your connection and try again.",
+    retry: "Try again",
+    remind: "Email me when a new daily challenge is up",
+    signedIn: "Signed in.",
+    signOut: "Sign out",
+  },
+  // the sign-in pop-up, shared with endless mode's Best streaks board: step 1 the 13+ box and sign-in, step 2 the
+  // nickname (endless mode only), then where you landed
   joinDialog: {
     step: (n: number) => `Step ${n} of 2`,
-    title: "Get on today's leaderboard",
-    lead: (score: number) => `You scored ${score}/5. Sign in so your score counts and nobody else can post as you.`,
     continue: "Continue with email or Google",
     opening: "Opening sign-in…",
     private: "Sign in with a code we email you, or with Google. Your email is never shown.",
@@ -39,17 +48,12 @@ export const dailyCopy = {
     retry: "Try again",
     notNow: "Not now",
     nameTitle: "Pick a nickname",
-    nameLead: "This is what everyone sees on the leaderboard.",
+    nameLead: "This is what everyone sees on the Best streaks board.",
     nameLabel: "Nickname",
     nameHint: "3 to 16 characters. Not your full real name.",
     remind: "Email me when a new daily challenge is up",
     optional: "(optional; unsubscribe any time with one click)",
-    post: "Post my score",
     posting: "Posting…",
-    doneTitle: (rank: number) => `You're #${rank} today!`,
-    doneLead: (score: number) => `is on today's board with ${score}/5. Five new matchups arrive at midnight.`,
-    duplicate: "Your first score of the day is the one that counts.",
-    back: "Back to my results",
     notYou: "Not you?",
     signOut: "Sign out",
     close: "Close",
@@ -118,11 +122,7 @@ export const dailyCopy = {
     streakPill: (n: number) => `${n}-day streak`,
     streak: "Streak",
     best: (n: number) => `Best ${n}`,
-    rank: "Today's rank",
-    // before you've joined: where your score would land
-    rankIfJoined: "If you join",
-    rankOf: (n: number) => `of ${n} today`,
-    // shown instead of "If you join #2 of 3" while today's board is small, once enough people have played today
+    // once enough people have played today
     betterThan: "Better than",
     betterSub: "of players today",
     // a perfect round can't beat anyone who also got 5: it shows "Top 8% of players today" instead

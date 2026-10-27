@@ -6,7 +6,7 @@ export const endlessCopy = {
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
-  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser, and runs by players on the leaderboard go on the all-time Best streaks board.",
+  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser, and signed-in players' runs go on the all-time Best streaks board.",
   loading: "Loading endless mode",
   failed: "We couldn't load endless mode.",
   retry: "Try again",
@@ -66,8 +66,8 @@ export const endlessCopy = {
     better: (run: number, best: number) => `This run: ${run} in a row. Your best (${best} in a row) stays on the board.`,
     signedIn: "Signed in.",
     signOut: "Sign out",
-    // sign-in is off (running locally without Clerk) and this browser hasn't joined the daily's leaderboard
-    joinFromDaily: "Join the leaderboard from the daily challenge's results, and your runs will post here too.",
+    // sign-in is off (running locally without Clerk) and this browser has no player from before
+    joinFromDaily: "Sign-in is off on this copy of the site, so runs can't go on the Best streaks board.",
     dialog: {
       title: "Get on the Best streaks board",
       lead: (n: number) => `You got ${n} in a row. Sign in so your streak counts and nobody else can post as you.`,
@@ -77,8 +77,7 @@ export const endlessCopy = {
       back: "Back to my run",
       post: "Post my streak",
     },
-    // the leaderboard page's Endless tab
-    tab: "Endless",
+    // the leaderboard page (the Best streaks board)
     allCaption: "Best streaks ever",
     streak: "Streak",
     note: "Your longest run of right answers in endless mode. Ties share a rank; whoever got there first is listed first.",

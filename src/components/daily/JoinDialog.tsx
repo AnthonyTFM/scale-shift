@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { isOffensive } from "@/lib/name-filter";
 import { dailyCopy } from "@/content/daily";
-import { MarkIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { AgeCheck, useAgeOk } from "./AgeCheck";
 import { useAccount } from "./SignInProvider";
 import type { Join } from "./useJoin";
@@ -13,7 +13,7 @@ const t = dailyCopy.joinDialog;
 /** 1: the 13+ box and sign-in; 2: pick a nickname; 3: you're on the board. */
 export type JoinStep = 1 | 2 | 3;
 
-/** The words that differ between boards (the daily's by default; endless mode passes its own). */
+/** The words for the board being joined (endless mode's Best streaks). */
 export type JoinText = {
   title: string;
   lead: string;
@@ -29,20 +29,8 @@ export type JoinText = {
   post: string;
 };
 
-const dailyText = (score: number): JoinText => ({
-  title: t.title,
-  lead: t.lead(score),
-  doneTitle: t.doneTitle,
-  doneLead: t.doneLead,
-  duplicate: t.duplicate,
-  scoreCell: (n) => `${n}/5`,
-  back: t.back,
-  page: "/daily",
-  post: t.post,
-});
-
 /**
- * Set while a player is between step 1 and step 2: the sign-in window opens over the page with this pop-up closed (a
+ * Set while a player is between step 1 and step 2 (or, saving the daily streak, between the sign-in step and coming back): the sign-in window opens over the page with this pop-up closed (a
  * modal pop-up would block it), and a Google sign-in leaves the page entirely. Back signed in, the pop-up reopens at step 2.
  */
 const FLOW = "join-flow";
@@ -78,8 +66,8 @@ export function takeJoinFlow(date: string) {
 }
 
 /**
- * "Get on today's leaderboard" as one pop-up with clear steps, so nobody misses the next one: a bottom sheet on phones, a
- * box in the middle on wider screens.
+ * "Get on the Best streaks board" as one pop-up with clear steps, so nobody misses the next one: a bottom sheet on phones,
+ * a box in the middle on wider screens.
  */
 export function JoinDialog({
   step,
@@ -89,7 +77,7 @@ export function JoinDialog({
   failed,
   join,
   score,
-  text = dailyText(score),
+  text,
 }: {
   step: JoinStep | null;
   /** the score is on the board: show step 3 */
@@ -101,10 +89,45 @@ export function JoinDialog({
   failed: boolean;
   join: Join;
   score: number;
-  text?: JoinText;
+  text: JoinText;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  return (
+    <Sheet step={step} titleId={titleId} onClose={onClose}>
+      {step === 1 ? <SignInStep titleId={titleId} title={text.title} lead={text.lead} steps failed={failed} onContinue={onContinue} onClose={onClose} /> : null}
+      {step === 2 ? <NameStep titleId={titleId} join={join} text={text} onPosted={onPosted} /> : null}
+      {step === 3 ? <DoneStep titleId={titleId} join={join} score={score} text={text} onClose={onClose} /> : null}
+    </Sheet>
+  );
+}
+
+/** The 13+ box and sign-in on their own (saving the daily streak: no nickname, no board). */
+export function SignInSheet({
+  open,
+  title,
+  lead,
+  failed,
+  onContinue,
+  onClose,
+}: {
+  open: boolean;
+  title: string;
+  lead: string;
+  failed: boolean;
+  onContinue: () => void;
+  onClose: () => void;
+}) {
+  const titleId = useId();
+  return (
+    <Sheet step={open ? 1 : null} titleId={titleId} onClose={onClose}>
+      {open ? <SignInStep titleId={titleId} title={title} lead={lead} failed={failed} onContinue={onContinue} onClose={onClose} /> : null}
+    </Sheet>
+  );
+}
+
+/** The pop-up itself, open while `step` is set. */
+function Sheet({ step, titleId, onClose, children }: { step: JoinStep | null; titleId: string; onClose: () => void; children: React.ReactNode }) {
+  const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const d = ref.current;
@@ -126,9 +149,7 @@ export function JoinDialog({
     >
       <div className="relative p-5 pb-7 sm:p-6">
         <div aria-hidden="true" className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-line md:hidden" />
-        {step === 1 ? <SignInStep titleId={titleId} text={text} failed={failed} onContinue={onContinue} onClose={onClose} /> : null}
-        {step === 2 ? <NameStep titleId={titleId} join={join} text={text} onPosted={onPosted} /> : null}
-        {step === 3 ? <DoneStep titleId={titleId} join={join} score={score} text={text} onClose={onClose} /> : null}
+        {children}
         <button
           type="button"
           onClick={onClose}
@@ -158,13 +179,18 @@ function Steps({ at }: { at: 1 | 2 }) {
 
 function SignInStep({
   titleId,
-  text,
+  title,
+  lead,
+  steps = false,
   failed,
   onContinue,
   onClose,
 }: {
   titleId: string;
-  text: JoinText;
+  title: string;
+  lead: string;
+  /** "Step 1 of 2" above the title, when a nickname step follows */
+  steps?: boolean;
   failed: boolean;
   onContinue: () => void;
   onClose: () => void;
@@ -177,11 +203,11 @@ function SignInStep({
 
   return (
     <>
-      <Steps at={1} />
-      <h2 id={titleId} data-start tabIndex={-1} className="mt-2 flex items-center gap-2 pr-10 font-display text-2xl leading-tight outline-none">
-        <TrophyIcon className="size-7" /> {text.title}
+      {steps ? <Steps at={1} /> : null}
+      <h2 id={titleId} data-start tabIndex={-1} className={`${steps ? "mt-2" : ""} flex items-center gap-2 pr-10 font-display text-2xl leading-tight outline-none`}>
+        {steps ? <TrophyIcon className="size-7" /> : <FlameIcon className="size-7" />} {title}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{text.lead}</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{lead}</p>
       <AgeCheck
         id="age-ok-join"
         ok={ageOk}

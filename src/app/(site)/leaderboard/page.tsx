@@ -24,12 +24,12 @@ export default function LeaderboardPage() {
             <p className="sm:hidden">{t.leadShort}</p>
             <p className="hidden sm:block">
               {t.lead.before}
-              <Link href="/daily" className="font-semibold text-primary underline">
-                {t.lead.daily}
-              </Link>
-              {t.lead.middle}
               <Link href="/endless" className="font-semibold text-primary underline">
                 {t.lead.endless}
+              </Link>
+              {t.lead.middle}
+              <Link href="/daily" className="font-semibold text-primary underline">
+                {t.lead.daily}
               </Link>
               {t.lead.after}
             </p>
@@ -40,17 +40,15 @@ export default function LeaderboardPage() {
         <div className="max-w-2xl">
           <SignInProvider>
             <LeaderboardView />
-            {/* below the boards, so on phones the boards start on the first screen */}
+            {/* below the board, so on phones the board starts on the first screen */}
             <div className="mt-6">
               <AccountBar />
             </div>
           </SignInProvider>
           <p className="mt-6 text-xs leading-relaxed text-muted">
-            Scores are checked on our server, and only your first try each day counts (in endless mode, your longest run does). Each email gets one player, and each nickname belongs to the
-            first player who uses it. Emails stay private. Nicknames are public; slurs and offensive names are blocked, and we remove any that slip through.
-            Signed in? &ldquo;Delete my data&rdquo; above removes everything. Otherwise,{" "}
+            {t.rules}
             <Link href="/contact?topic=other" className="underline">
-              contact us
+              {t.contact}
             </Link>
             .
           </p>

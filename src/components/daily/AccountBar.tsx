@@ -59,7 +59,7 @@ function Bar() {
                   Signed in as <strong className="text-ink">{name}</strong>.
                 </>
               ) : name === null ? (
-                "Signed in. Post a daily score to join the board."
+                "Signed in. Finish an endless run to get on the board."
               ) : (
                 "Signed in."
               )}

@@ -80,8 +80,9 @@ export async function POST(request: Request) {
       }
     }
     if (!(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
-    // a brand-new player: the same cap on new players per network as the daily
-    if (!(await store.nameOf(player))) {
+    // a brand-new player: the same cap on new players per network as the daily. A player with no nickname yet who saved
+    // today's daily score was already counted for today by the daily.
+    if (!(await store.nameOf(player)) && !(await store.has(run.date, player))) {
       const n = await store.bumpNetwork(run.date, networkKey(ipOf(request), run.date));
       if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
     }
