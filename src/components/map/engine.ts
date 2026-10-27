@@ -689,7 +689,6 @@ export class MapEngine {
     const pad = TILE_PAD;
     const live = ctx === this.bctx && !this.fullDraw;
     const standIn = this.standIn && this.standIn.layer === c.layer && this.standIn.dpr === c.dpr && c.k >= this.standIn.k * 0.999 ? this.standIn : null;
-    const deadline = live && !this.sweep && (standIn || !this.painted) ? performance.now() + 10 : Infinity;
     let missing = false;
     let pending = false;
     let drawn = 0;
@@ -708,7 +707,28 @@ export class MapEngine {
         for (let i = ring.i0; i <= ring.i1 && !missing; i++) missing = !c.tiles.has(`${i},${j}`);
     }
     onScreen.sort((a, b) => a.d - b.d);
-    if (standIn && deadline !== Infinity && onScreen.some(({ i, j }) => !c.tiles.has(`${i},${j}`))) this.drawStandIn(standIn, ctx);
+    // where the tiles not drawn yet go, on screen
+    const gaps = onScreen
+      .filter(({ i, j }) => !c.tiles.has(`${i},${j}`))
+      .map(({ ox, oy, half, i, j }) => {
+        const x0 = Math.max(0, ox + s * (i * c.size - half));
+        const y0 = Math.max(0, oy + s * (j * c.size - half));
+        return [x0, y0, Math.min(this.w, ox + s * ((i + 1) * c.size - half)) - x0, Math.min(this.h, oy + s * ((j + 1) * c.size - half)) - y0];
+      })
+      .filter(([, , w, h]) => w > 0 && h > 0);
+    // a few tiles a frame only where something shows in the meantime: nothing yet (first opening) or the old level,
+    // if its kept tiles cover every gap (flying to the other side of the world, they don't)
+    const covered = !!standIn && gaps.every(([x, y, w, h]) => this.standInCovers(standIn, x, y, w, h));
+    const deadline = live && !this.sweep && gaps.length && (covered || (!standIn && !this.painted)) ? performance.now() + 10 : Infinity;
+    if (covered && deadline !== Infinity) {
+      // only under the gaps: elsewhere the new tiles' crisp lines would show the old, scaled ones through them
+      ctx.save();
+      ctx.beginPath();
+      for (const [x, y, w, h] of gaps) ctx.rect(x, y, w, h);
+      ctx.clip();
+      this.drawStandIn(standIn, ctx);
+      ctx.restore();
+    }
     for (const { ox, oy, half, i, j } of onScreen) {
       shown++;
       // ready tiles are always drawn; a missing one only while there's time left this frame (and always the first)
@@ -738,6 +758,16 @@ export class MapEngine {
   private dropStandIn() {
     if (this.standIn) this.recycle(...this.standIn.tiles.values());
     this.standIn = null;
+  }
+
+  /** Whether the old zoom level's kept tiles cover a screen rectangle (checked at its corners and middle). */
+  private standInCovers(c: BaseCache, x: number, y: number, w: number, h: number) {
+    const s = this.view.k / c.k;
+    const half = Math.ceil(Math.PI * c.k / 2) * 2;
+    const at = (px: number, py: number) =>
+      this.cacheOrigins(c).some(([ox, oy]) => c.tiles.has(`${Math.floor(((px - ox) / s + half) / c.size)},${Math.floor(((py - oy) / s + half) / c.size)}`));
+    const [x1, y1] = [x + w - 0.5, y + h - 0.5];
+    return at(x + 0.5, y + 0.5) && at(x1, y + 0.5) && at(x + 0.5, y1) && at(x1, y1) && at(x + w / 2, y + h / 2);
   }
 
   /** The old zoom level's tiles that are still kept, scaled to the current view (none are drawn new). */
