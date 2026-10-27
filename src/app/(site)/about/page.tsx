@@ -104,7 +104,8 @@ export default function AboutPage() {
             </a>{" "}
             1:50m country boundaries (public domain), packaged by world-atlas, rolled back to each year with the changes since. Natural
             Earth&apos;s countries and provinces also redraw colonial Africa in 1900 and fix places where the historical source gave land to
-            the wrong country. US states come from the US Census Bureau via us-atlas.
+            the wrong country. The daily game&apos;s states and provinces come from Natural Earth&apos;s 1:10m admin-1 boundaries (public domain). US
+            states come from the US Census Bureau via us-atlas.
           </li>
           <li>
             <strong>Checked against:</strong> the maps from 1900 on were compared with{" "}
