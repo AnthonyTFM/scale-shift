@@ -2,13 +2,17 @@
 
 import { useEffect, useState, ViewTransition } from "react";
 import Link from "next/link";
-import { dayNumber, loadSave, localDateKey, stats } from "@/lib/daily";
+import { dayNumber, loadSave, localDateKey, QUESTIONS_PER_DAY, shiftDate, stats } from "@/lib/daily";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { home } from "@/content/home";
 import { ClockIcon, FlameIcon } from "@/components/site/Icons";
 
-type State = { day: number; done: boolean; score?: number; streak: number; played: number };
+type State = { day: number; done: boolean; score?: number; streak: number; played: number; perfect: number };
+
+// "Only N% went 5 for 5 yesterday" needs this many plays yesterday, and isn't a hook above this share
+const TEASER_MIN = 30;
+const TEASER_MAX = 40;
 
 /** Time until the player's next local midnight, as whole hours and minutes. */
 function untilMidnight() {
@@ -30,7 +34,7 @@ export function HeroPlay() {
       const save = loadSave();
       const rec = save.days[today];
       const st = stats(save, today);
-      setS({ day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: st.streak, played: st.played });
+      setS({ day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: st.streak, played: st.played, perfect: st.perfect });
       setLeft(untilMidnight());
     };
     read();
@@ -42,7 +46,45 @@ export function HeroPlay() {
     };
   }, []);
 
+  // a first-time visitor sees how few people went 5 for 5 yesterday (anonymous counts), instead of empty boxes
+  const [teaser, setTeaser] = useState<number | null>(null);
+  const firstTime = s?.played === 0 && !s.done;
+  useEffect(() => {
+    if (!firstTime) return;
+    fetch(`/api/plays?date=${shiftDate(localDateKey(), -1)}`)
+      .then((r) => (r.ok ? (r.json() as Promise<{ n: number; scores: number[] }>) : null))
+      .then((c) => {
+        if (!c || c.n < TEASER_MIN || !c.scores[QUESTIONS_PER_DAY]) return;
+        const pct = Math.max(1, Math.round((100 * c.scores[QUESTIONS_PER_DAY]) / c.n));
+        if (pct <= TEASER_MAX) setTeaser(pct);
+      })
+      .catch(() => {});
+  }, [firstTime]);
+
   const share = () => open(challengeMessage(s?.score ?? 0), "home");
+  // the two boxes: played today, today's score and the streak; otherwise the streak and perfect days
+  const streakBox = (
+    <div className="rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
+      <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.playStreak}</dt>
+      <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
+        {!s ? null : s.streak ? (
+          <>
+            <FlameIcon className="size-7" />
+            <span aria-hidden="true">{s.streak}</span>
+            <span className="sr-only">{t.playStreakDays(s.streak)}</span>
+          </>
+        ) : (
+          <span className="text-base font-bold text-muted">{t.playNoStreak}</span>
+        )}
+      </dd>
+    </div>
+  );
+  const otherBox = (label: string, value: React.ReactNode) => (
+    <div className="rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
+      <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{label}</dt>
+      <dd className="mt-0.5 flex min-h-9 items-center font-display text-3xl tabular-nums leading-none">{value}</dd>
+    </div>
+  );
 
   return (
     <ViewTransition name="daily-card" share="morph" default="none">
@@ -62,26 +104,30 @@ export function HeroPlay() {
           </Link>
         </h2>
         <p className="mt-1 max-w-md text-muted">{s?.done ? t.playDone(s.score ?? 0) : t.playLead}</p>
-        {/* the same two boxes as the endless card beside it: your streak and how many days you've played */}
+        {/* two boxes, like the endless card beside it, the streak always first. A first visit has nothing to count yet:
+            one box the same height, with a line about yesterday (or a plain invitation), so the card never jumps */}
         <dl className="mt-4 grid grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
-            <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.playStreak}</dt>
-            <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
-              {!s ? null : s.streak ? (
-                <>
-                  <FlameIcon className="size-7" />
-                  <span aria-hidden="true">{s.streak}</span>
-                  <span className="sr-only">{t.playStreakDays(s.streak)}</span>
-                </>
-              ) : (
-                <span className="text-base font-bold text-muted">{t.playNoStreak}</span>
-              )}
-            </dd>
-          </div>
-          <div className="rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
-            <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.playPlayed}</dt>
-            <dd className="mt-0.5 flex min-h-9 items-center font-display text-3xl tabular-nums leading-none">{s ? s.played : null}</dd>
-          </div>
+          {firstTime ? (
+            <div className="col-span-2 rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
+              <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{teaser !== null ? t.playTeaserLabel : t.playNewLabel}</dt>
+              <dd className="mt-0.5 flex min-h-9 items-center text-base font-bold text-ink">{teaser !== null ? t.playTeaser(teaser) : t.playNew}</dd>
+            </div>
+          ) : (
+            <>
+              {streakBox}
+              {s?.done
+                ? otherBox(
+                    t.playToday,
+                    <>
+                      <span aria-hidden="true">
+                        {s.score}/{QUESTIONS_PER_DAY}
+                      </span>
+                      <span className="sr-only">{t.playTodaySr(s.score ?? 0, QUESTIONS_PER_DAY)}</span>
+                    </>,
+                  )
+                : otherBox(t.playPerfect, s ? s.perfect : null)}
+            </>
+          )}
         </dl>
         {/* at the foot of the card, level with the endless card's button beside it */}
         <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">

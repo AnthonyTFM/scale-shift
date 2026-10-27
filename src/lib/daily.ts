@@ -228,7 +228,8 @@ export function mergeDays(days: Record<string, DayRecord>) {
   return merged;
 }
 
-export type Stats = { played: number; average: number; streak: number; best: number };
+/** `perfect`: days with every answer right. */
+export type Stats = { played: number; average: number; streak: number; best: number; perfect: number };
 
 export function stats(save: DailySave, today: string): Stats {
   const finished = Object.keys(save.days)
@@ -246,7 +247,11 @@ export function stats(save: DailySave, today: string): Stats {
     prev = d;
   }
   const total = finished.reduce((sum, d) => sum + (save.days[d].s ?? 0), 0);
-  return { played: finished.length, average: finished.length ? total / finished.length : 0, streak, best };
+  const perfect = finished.filter((d) => save.days[d].s === QUESTIONS_PER_DAY).length;
+  return { played: finished.length, average: finished.length ? total / finished.length : 0, streak, best, perfect };
 }
+
+/** Streak lengths that earn a moment on the results screen (and confetti the day they're reached). */
+export const STREAK_MILESTONES = [3, 7, 14, 30, 50, 100, 365];
 
 export const QUESTIONS_PER_DAY = SLOTS.length;

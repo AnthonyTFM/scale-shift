@@ -122,6 +122,17 @@ export const dailyCopy = {
     streakPill: (n: number) => `${n}-day streak`,
     streak: "Streak",
     best: (n: number) => `Best ${n}`,
+    // the day a streak reaches 3, 7, 14, 30, 50, 100 or 365 days (STREAK_MILESTONES in src/lib/daily.ts)
+    milestone: (n: number) =>
+      ({
+        3: "3 days in a row. It's a habit now!",
+        7: "7 days in a row: a full week of beating the map!",
+        14: "14 days in a row: two weeks strong!",
+        30: "30 days in a row: a whole month!",
+        50: "50 days in a row. Unstoppable!",
+        100: "100 days in a row. Legend!",
+        365: "365 days in a row: a full year!",
+      })[n] ?? `${n} days in a row!`,
     // once enough people have played today
     betterThan: "Better than",
     betterSub: "of players today",

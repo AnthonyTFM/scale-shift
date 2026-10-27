@@ -14,6 +14,7 @@ import {
   loadSave,
   localDateKey,
   stats,
+  STREAK_MILESTONES,
   writeSave,
   type DailySave,
   type Question,
@@ -185,6 +186,11 @@ export function DailyChallenge() {
     const fresh = loadSave(); // keep anything other tabs saved
     const updated: DailySave = { ...fresh, days: { ...fresh.days, [round.date]: { c: next, ...(last ? { s: scoreOf(round, next) } : {}) } } };
     writeSave(updated);
+    // a streak milestone reached today gets its own party (a perfect round already has one)
+    if (last && !perfect && STREAK_MILESTONES.includes(stats(updated, round.date).streak)) {
+      buzz([20, 40, 20, 40, 80]);
+      setTimeout(confetti, 1050);
+    }
     if (last) {
       track("daily_complete", { score: scoreOf(round, next), day: dayNumber(round.date) });
       reportPlay(updated, round.date, scoreOf(round, next));
@@ -405,6 +411,11 @@ function Results({
         </h2>
         <p className="mt-1 text-muted">{verdict}</p>
       </div>
+      {STREAK_MILESTONES.includes(s.streak) && save.days[today]?.s !== undefined ? (
+        <p className="pop-in mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center font-display text-lg text-ink">
+          <FlameIcon className="size-6" /> {R.milestone(s.streak)}
+        </p>
+      ) : null}
       {challenge ? (
         <p className="mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center text-sm font-bold text-ink">
           {score > challenge.score ? <TrophyIcon className="size-5" /> : <TargetIcon className="size-5" />}
