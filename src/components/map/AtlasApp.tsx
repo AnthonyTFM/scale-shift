@@ -7,7 +7,7 @@ import { site } from "@/content/site";
 import { track } from "@/lib/analytics";
 import { claims as allClaims, claimsForEra, loadClaimShapes, unclaimed } from "@/lib/antarctica";
 import { featureAtIn, loadGrid, loadIndex, loadLakes, loadLayer, type IndexRow, type RulersGrid } from "@/lib/data";
-import { eraByKey, eraIndex, eras, snapshotForYear } from "@/lib/eras";
+import { eraByKey, eraIndex, eraYear, eras, snapshotForYear } from "@/lib/eras";
 import type { AreaUnit } from "@/lib/format";
 import { boundsOf, fitView, mergeBounds, placeGeometry } from "@/lib/geo";
 import { MAP_PATH, decodeState, encodeState, type MapState } from "@/lib/share";
@@ -51,11 +51,20 @@ function writeStorage(key: string, value: string) {
 /** Phone-width screens, where the panel starts folded so the map shows first. */
 const isPhone = () => window.matchMedia("(max-width: 639px)").matches;
 
+/** Playing the timeline moves steadily from one era into the next from this year on (earlier, it rests on each map). */
+const STEADY_FROM = 1900;
+const fromSteadyEra = (key: string) => {
+  const e = eraByKey(key);
+  return !!e && eraYear(e) >= STEADY_FROM;
+};
+
 export default function AtlasApp() {
   const mapRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<MapEngine | null>(null);
   const overlaysRef = useRef<Overlay[]>([]);
   const eraRef = useRef<string>(DEFAULT_ERA);
+  /** the play direction the timeline last had (to tell when play starts) */
+  const wasPlaying = useRef<0 | 1 | -1>(0);
 
   const [era, setEra] = useState(DEFAULT_ERA);
   const [loadingEra, setLoadingEra] = useState(true);
@@ -381,14 +390,27 @@ export default function AtlasApp() {
     return () => clearTimeout(t);
   }, [era, overlays, ready]);
 
-  // ---- play through eras, forward or back in time (waits for each era to load and its borders to sweep in) ----
+  // ---- play through eras, forward or back in time. From 1900 on, each era's borders sweep in straight after the last
+  // one's, at a steady pace (the next era loads while they sweep), so the map keeps moving; earlier, it rests a moment on
+  // each map before moving on ----
   useEffect(() => {
+    const engine = engineRef.current;
+    const started = playing !== 0 && wasPlaying.current !== playing;
+    wasPlaying.current = playing;
+    if (!playing) engine?.setSteady(false);
     if (!playing || loadingEra) return;
-    const wait = Math.max(1400, (engineRef.current?.sweepLeft() ?? 0) + 1000);
+    const next = eraIndex(eraRef.current) + playing;
+    const last = next < 0 || next > eras.length - 1;
+    if (!last) loadLayer(eras[next].key).catch(() => {});
+    const steady = !last && fromSteadyEra(eraRef.current) && fromSteadyEra(eras[next].key);
+    // steadily: as this era's sweep ends; with none running, at once when play starts, else after a moment (for readers
+    // who prefer less motion, or when a sweep was skipped because the map was being moved)
+    const left = engine?.sweepLeft() ?? 0;
+    const wait = steady && left > 0 ? left : steady && started ? 0 : Math.max(1400, left + 1000);
     const t = setTimeout(() => {
-      const next = eraIndex(eraRef.current) + playing;
-      if (next < 0 || next > eras.length - 1) setPlaying(0);
-      else changeEra(eras[next].key);
+      if (last) return setPlaying(0);
+      engine?.setSteady(steady);
+      changeEra(eras[next].key);
     }, wait);
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
