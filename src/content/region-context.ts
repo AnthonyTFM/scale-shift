@@ -1,7 +1,8 @@
 // One-line context for the regions in the daily puzzles and endless mode (Canadian provinces, Australian, Mexican,
 // Brazilian and Indian states, Chinese provinces), shown under the matchup so players know where each one is.
-// Keyed by the name in the puzzle pool (see scripts/lib/regions.mjs). Plain words, one sentence, no jargon, and no size
-// words ("largest", "small"): the note shows before the player answers. Disputed regions say who else claims them.
+// Keyed by the name in the puzzle pool (see scripts/lib/regions.mjs). Plain words, no jargon, and no size words
+// ("largest", "small"): the note shows before the player answers. Usually one sentence; disputed and contested regions get
+// two, with the specific facts (who runs it, who claims it, what happened and when), never a vague "it's complicated".
 
 export const regionContext: Record<string, string> = {
   // Canada
@@ -112,17 +113,17 @@ export const regionContext: Record<string, string> = {
   Odisha: "On India's east coast along the Bay of Bengal, known for the Sun Temple at Konark.",
   Maharashtra: "In western India on the Arabian Sea, home to Mumbai and the Bollywood film industry.",
   Telangana: "In southern India, an inland state with the big tech city of Hyderabad as its capital.",
-  "Jammu and Kashmir": "Run by India, with the Kashmir Valley and the city of Srinagar; Pakistan also claims it.",
-  Ladakh: "A high, dry Himalayan land run by India, with the town of Leh; Pakistan and China claim parts of it.",
-  "Arunachal Pradesh": "A mountain state in India's far northeast, run by India; China claims most of it.",
+  "Jammu and Kashmir": "Part of Kashmir, run by India; Pakistan claims it, and the two have fought two wars and a smaller conflict over Kashmir since 1947. India ended its self-rule in 2019.",
+  Ladakh: "A high, dry Himalayan land run by India, split off from Jammu and Kashmir in 2019. Pakistan claims it as part of Kashmir, and Indian and Chinese soldiers died in a clash on its border with China in 2020.",
+  "Arunachal Pradesh": "A mountain state in India's far northeast. China claims most of it as “South Tibet”, and China's army held much of it in the 1962 war before pulling back.",
   "Andhra Pradesh": "On India's southeast coast along the Bay of Bengal, home to the famous Tirupati temple.",
   Karnataka: "In southwest India, home to the tech city of Bengaluru and the ancient ruins of Hampi.",
   Kerala: "A narrow strip on India's southwest coast, famous for palm-lined backwaters and spices.",
   "Tamil Nadu": "At India's southern tip, home to the city of Chennai and many grand Hindu temples.",
 
   // China
-  Xinjiang: "China's far northwest, with the Taklamakan Desert; India also claims Aksai Chin, a high plateau in its southwest.",
-  Tibet: "On the high Tibetan Plateau north of the Himalayas, with Lhasa as its main city; India claims some border areas.",
+  Xinjiang: "China's far northwest, home of the Uyghurs. Since 2017 China has held an estimated million or more Uyghurs and other Muslims in camps, which a 2022 UN report said may amount to crimes against humanity. Aksai Chin, its southwest corner, is also claimed by India.",
+  Tibet: "On the high Tibetan Plateau, with Lhasa as its main city. China's army took control in 1950–51, and the Dalai Lama, Tibet's leader, fled to India in 1959.",
   "Inner Mongolia": "A long strip across northern China, bordering Mongolia and stretching into the Gobi Desert.",
   Qinghai: "On the high Tibetan Plateau in western China, where the Yellow and Yangtze rivers begin.",
   Gansu: "A long, narrow province in northwest China, along the corridor the ancient Silk Road passed through.",
