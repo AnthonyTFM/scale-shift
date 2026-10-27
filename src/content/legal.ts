@@ -1,13 +1,13 @@
 // Privacy policy, terms, the age check at sign-up and "Delete my data". Plain words; a lawyer should review before money.
 import { site } from "./site";
 
-export const legalUpdated = "October 26, 2026";
+export const legalUpdated = "October 27, 2026";
 
 /** Shown before anyone gives us an email (sign-in, the leaderboard, reminders). */
 export const ageCheck = {
   label: "I'm 13 or older",
-  hint: "The leaderboard and emails are for ages 13 and up. Anyone can play without joining.",
-  needed: "Please confirm you're 13 or older to join the leaderboard.",
+  hint: "Signing in and emails are for ages 13 and up. Anyone can play without signing in.",
+  needed: "Please confirm you're 13 or older to sign in.",
   agree: "By joining you agree to our",
   terms: "terms",
   and: "and",
@@ -38,7 +38,7 @@ export const legalLinks: Record<string, string> = {
 
 export const privacy: { title: string; lead: string; description: string; sections: Section[] } = {
   title: "Privacy policy",
-  lead: "Short version: you can play without giving us anything. If you join the leaderboard, we keep your email private, show only your nickname and scores, and delete it all when you ask.",
+  lead: "Short version: you can play without giving us anything. If you sign in, we keep your email private. Only your nickname and best endless streak are ever shown; your daily scores stay private, and we delete it all when you ask.",
   description: `What ${site.name} collects, why, who helps us run it, how long we keep it and how to delete it.`,
   sections: [
     {
@@ -56,7 +56,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
         ["Settings in your browser", "Your area unit, sound on or off, whether you've seen the intro, your daily answers, scores and streak, your endless-mode runs and best streak, your 13+ answer, whether today's game count was sent and, if you join, your player ID and nickname are saved in your browser's local storage. They stay on your device."],
         [
           "Leaderboard and sign-in (optional, ages 13+)",
-          "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email (with Google, Clerk also receives your name and profile photo). We store that email, the nickname you pick, your daily answers and scores, your best endless-mode streaks (and, for three days, the runs you post, so we can check them) and a random player ID. Nicknames, scores and streaks are public. Your email is private: it keeps one player per person, is never shown publicly or sold and only goes to the services below that run the site.",
+          "Only if you join. You sign in with an email code or Google through Clerk, our sign-in provider, which confirms you own the email (with Google, Clerk also receives your name and profile photo). We store that email, the nickname you pick, your daily answers and scores, your best endless-mode streaks (and, for three days, the runs you post, so we can check them) and a random player ID. Your nickname and best endless-mode streak are public, on the Best streaks board. Your daily answers and scores are private: they're saved so your streak follows you to every device, and only you see them. Your email is private: it keeps one player per person, is never shown publicly or sold and only goes to the services below that run the site.",
         ],
         ["Reminder emails (optional)", "Only if you tick the box. We record when you agreed. Once reminders start, we'll send at most one email a day, each with a one-click unsubscribe, and you can turn them off after any daily round."],
         ["Feedback form", "What you type, plus your name and email if you give them, and your browser type so we can reproduce map problems."],
@@ -70,7 +70,7 @@ export const privacy: { title: string; lead: string; description: string; sectio
       id: "why",
       title: "Why we use it",
       paras: [
-        "We use it to run the leaderboard you asked to join (our agreement with you), to send reminders you opted into (your consent, which you can withdraw any time) and to keep the site safe from spam and abuse (our legitimate interest). We never sell your personal information or use or share it for advertising.",
+        "We use it to save your streak and run the Best streaks board you asked to join (our agreement with you), to send reminders you opted into (your consent, which you can withdraw any time) and to keep the site safe from spam and abuse (our legitimate interest). We never sell your personal information or use or share it for advertising.",
       ],
     },
     {
@@ -163,7 +163,7 @@ export const terms: { title: string; lead: string; description: string; sections
       id: "content",
       title: "Our content and the map data",
       paras: [
-        `The site's design, text and code belong to its creators, except the scripts that build the map data, which are offered under GPL-3.0. Map data comes from other projects under their own licenses: the historical borders are from historical-basemaps by André Ourednik under GPL-3.0, and today's borders are from Natural Earth (public domain). Full details are on the About page and in the data license file. You may share links and screenshots of the map with credit to ${site.name}.`,
+        `The site's design, text and code belong to its creators, except the scripts that build the map data, which are offered under GPL-3.0. Map data comes from other projects under their own licenses: the historical borders are from historical-basemaps by André Ourednik under GPL-3.0 (corrected in places from Cliopatria and OpenHistoricalMap), except the maps from 1800 to 1960, which are from Cliopatria by the Seshat Global History Databank under CC BY 4.0 (with dated borders from OpenHistoricalMap, public domain apart from some border lines under CC BY 4.0, and Europe from 1815 to 1914 from HistoGIS, Austrian Academy of Sciences, under CC BY 4.0), and the borders from 1994 to today are from Natural Earth (public domain). Full details are on the About page and in the data license file. You may share links and screenshots of the map with credit to ${site.name}.`,
       ],
     },
     {
