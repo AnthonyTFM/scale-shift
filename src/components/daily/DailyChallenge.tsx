@@ -32,7 +32,7 @@ import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { dailyCopy } from "@/content/daily";
-import { FlameIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
+import { ClockIcon, FlameIcon, MapIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
 import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
@@ -211,6 +211,7 @@ export function DailyChallenge() {
             : dailyCopy.challengeOld(challenge.name, challenge.day)}
         </p>
       ) : null}
+      <DoneMark finished={finished} />
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
       {/* on phones above the game, where it still fits; on wider screens below it, so both tiles stay on a laptop's first screen */}
       {signInOn && !finished ? (
@@ -219,7 +220,7 @@ export function DailyChallenge() {
         </div>
       ) : null}
       {!finished ? <StreakPill save={save} today={today} /> : null}
-      <Progress round={round} choices={choices} step={step} />
+      {!finished ? <Progress round={round} choices={choices} step={step} /> : null}
       {finished ? (
         <Results
           round={round}
@@ -253,6 +254,17 @@ export function DailyChallenge() {
 }
 
 // ---------- pieces ----------
+
+/**
+ * The root layout's script marks a finished day before paint (the intro goes, see .daily-done); this keeps that mark in
+ * step with the game shown: a new day after midnight, or /daily reached by a link without a full page load.
+ */
+function DoneMark({ finished }: { finished: boolean }) {
+  useEffect(() => {
+    document.documentElement.classList.toggle("daily-done", finished);
+  }, [finished]);
+  return null;
+}
 
 /**
  * Signing in opens in a window over the page, so the page never reloads: when the player becomes signed in, fetch their
@@ -331,39 +343,50 @@ function Results({
   const verdict = R.verdict(score, total);
   // everyone's scores today (anonymous counts), for "Better than 62% of players today"
   const [crowd, setCrowd] = useState<{ n: number; scores: number[] } | null>(null);
+  // the chart waits for the counts, so it doesn't open on "You" and then jump to "Everyone today"
+  const [crowdChecked, setCrowdChecked] = useState(false);
   useEffect(() => {
     fetch(`/api/plays?date=${round.date}`)
       .then((r) => (r.ok ? (r.json() as Promise<{ n: number; scores: number[] }>) : null))
       .then((c) => c && setCrowd(c))
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setCrowdChecked(true));
   }, [round.date]);
 
-  // the middle card: how you did against everyone who played today (anonymous counts), or failing that how many days
-  // you've played
   // today's anonymous counts by score; they can be up to a minute old: if nobody shares your score yet, your own play
   // isn't in them, so add it
   const counts = crowd ? [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0) : null;
   if (counts && !counts[score]) counts[score] = 1;
   const crowdN = counts ? counts.reduce((a, b) => a + b, 0) : 0;
-  const middle = (() => {
-    if (counts && crowd && crowd.n >= CROWD_MIN) {
-      const n = crowdN;
-      // only good news: "Better than 8%" after a rough day would sting, and "Top 70%" isn't a boast, so those show
-      // days played instead
-      if (score === total) {
-        const top = Math.ceil((100 * counts[total]) / n);
-        if (top <= TOP_MAX) return [R.topToday, `${top}%`, R.betterSub] as const;
-      } else {
-        const pct = Math.floor((100 * counts.slice(0, score).reduce((a, b) => a + b, 0)) / n);
-        if (pct >= BETTER_MIN) return [R.betterThan, `${pct}%`, R.betterSub] as const;
-      }
+  // how you did against everyone, for the chart's subtitle: only good news ("Better than 8%" after a rough day would
+  // sting, and "Top 70%" isn't a boast)
+  const standing = (() => {
+    if (!counts || !crowd || crowd.n < CROWD_MIN) return null;
+    if (score === total) {
+      const top = Math.ceil((100 * counts[total]) / crowdN);
+      return top <= TOP_MAX ? R.standingTop(top) : null;
     }
-    return [R.played, String(s.played), R.playedSub(s.played)] as const;
+    const pct = Math.floor((100 * counts.slice(0, score).reduce((a, b) => a + b, 0)) / crowdN);
+    return pct >= BETTER_MIN ? R.standingBetter(pct) : null;
   })();
+  const showCrowd = !!counts && crowdN >= SPREAD_MIN;
+  const showMine = s.played >= 2;
+  // the one chart: everyone today when enough played, else your own days; a toggle when both are there
+  const [chart, setChart] = useState<"crowd" | "mine" | null>(null);
+  const shown = !crowdChecked
+    ? null
+    : chart === "crowd" && showCrowd
+      ? "crowd"
+      : chart === "mine" && showMine
+        ? "mine"
+        : showCrowd
+          ? "crowd"
+          : showMine
+            ? "mine"
+            : null;
 
   // how many days you've scored 0, 1 … 5
   const spread = [0, 1, 2, 3, 4, 5].map((n) => Object.values(save.days).filter((d) => d.s === n).length);
-  const most = Math.max(1, ...spread);
 
   const challengeFriend = () => {
     shareBox.share(challengeMessage(score, total, round.date), "results");
@@ -396,26 +419,84 @@ function Results({
     shareBox.share({ kind: "score", url, text }, "results");
   };
 
+  // one bar chart, used for both views: rows from 5 down to 0, your score's row in blue
+  const bars = (values: number[], label: (n: number, v: number) => string, sr: (n: number, v: number) => string, you: boolean) => {
+    const top = Math.max(1, ...values);
+    return (
+      <ol className="mt-2 space-y-1">
+        {values
+          .map((v, n) => (
+            <li key={n} className="flex items-center gap-2 text-sm">
+              <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
+                {n}
+              </span>
+              <span className="sr-only">{sr(n, v)}</span>
+              {/* every row has the same track and the same label slot, so the bars compare fairly */}
+              <span aria-hidden="true" className="flex-1">
+                <span
+                  className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                    !v ? "text-muted" : `min-w-10 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                  }`}
+                  style={v ? { width: `${(v / top) * 100}%` } : undefined}
+                >
+                  {label(n, v)}
+                </span>
+              </span>
+              <span aria-hidden="true" className="w-8 shrink-0 text-xs font-bold text-primary">
+                {you && n === score ? R.crowdYou : null}
+              </span>
+            </li>
+          ))
+          .reverse()}
+      </ol>
+    );
+  };
+  const pctOf = (c: number) => {
+    const exact = (100 * c) / Math.max(1, crowdN);
+    // a handful of plays among hundreds still shows: "<1%", not "0%"
+    return c && exact < 0.5 ? "<1" : String(Math.round(exact));
+  };
+
   return (
     <section
       aria-labelledby="daily-done"
       className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7"
     >
-      <div className="text-center">
+      {/* the day and when the next five arrive, in one line */}
+      <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">Daily #{dayNumber(round.date)}</p>
-        <p aria-hidden="true" className="pop-in mt-1 font-display text-[5.5rem] leading-none text-ink sm:text-8xl">
+        <Countdown />
+      </div>
+      {/* the score beside its title, then one tile per question */}
+      <div className="mt-2 flex items-center justify-center gap-4">
+        <p aria-hidden="true" className="pop-in font-display text-6xl leading-none text-ink sm:text-7xl">
           {score}
           <span className="text-primary">/</span>
           {total}
         </p>
-        <h2 id="daily-done" className="mt-2 font-display text-3xl leading-tight text-ink">
-          <span className="sr-only">{R.scoreSr(score, total)} </span>
-          {R.title(score, total)}
-        </h2>
-        <p className="mt-1 text-muted">{verdict}</p>
+        <div className="min-w-0">
+          <h2 id="daily-done" className="font-display text-2xl leading-tight text-ink sm:text-3xl">
+            <span className="sr-only">{R.scoreSr(score, total)} </span>
+            {R.title(score, total)}
+          </h2>
+          <p className="text-sm leading-snug text-muted">{verdict}</p>
+        </div>
       </div>
+      <ol className="mt-4 flex justify-center gap-2 sm:gap-3">
+        {marks.map((right, i) => (
+          <li
+            key={i}
+            className={`grid size-10 place-items-center rounded-xl sm:size-12 ${
+              right ? "bg-green text-ink shadow-[0_4px_0_0_var(--color-green-shadow)]" : "bg-red text-white shadow-[0_4px_0_0_var(--color-red-shadow)]"
+            }`}
+          >
+            <TickIcon right={right} className="size-5" />
+            <span className="sr-only">{R.markSr(i + 1, right)}</span>
+          </li>
+        ))}
+      </ol>
       {STREAK_MILESTONES.includes(s.streak) && save.days[today]?.s !== undefined ? (
-        <p className="pop-in mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center font-display text-lg text-ink">
+        <p className="pop-in mt-4 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center font-display text-lg text-ink">
           <FlameIcon className="size-6" /> {R.milestone(s.streak)}
         </p>
       ) : null}
@@ -429,158 +510,118 @@ function Results({
               : `${challenge.name} wins this one with ${challenge.score}/5. Get them back tomorrow.`}
         </p>
       ) : null}
-      {/* one pressed tile per question */}
-      <ol className="mt-5 flex justify-center gap-2 sm:gap-3">
-        {marks.map((right, i) => (
-          <li
-            key={i}
-            className={`grid size-12 place-items-center rounded-2xl font-display text-xl sm:size-14 ${
-              right ? "bg-green text-ink shadow-[0_5px_0_0_var(--color-green-shadow)]" : "bg-red text-white shadow-[0_5px_0_0_var(--color-red-shadow)]"
-            }`}
-          >
-            <TickIcon right={right} className="size-6" />
-            <span className="sr-only">{R.markSr(i + 1, right)}</span>
-          </li>
-        ))}
-      </ol>
-      {/* the next thing to play, right under the score: endless mode, while the next daily is on its way */}
-      <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold btn-lg mt-6 w-full">
-        {R.endless} <span aria-hidden="true">→</span>
-      </Link>
-      <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>
+      {/* the two things to do next: share (the main one: it's how friends find the game) and endless mode */}
+      <div className="mt-5 flex gap-2">
+        <button type="button" onClick={share} className="btn btn-primary h-12 min-w-0 flex-1 px-2">
+          {R.share}
+        </button>
+        <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold h-12 shrink-0 px-4">
+          {R.endlessShort}
+          <span className="sr-only"> {R.endlessSr}</span> <span aria-hidden="true">→</span>
+        </Link>
+      </div>
+      {/* the other ways to share, quietly */}
+      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-4 text-sm">
+        <button type="button" onClick={shareImage} className="min-h-11 font-semibold text-primary hover:underline">
+          {R.picture}
+        </button>
+        <span aria-hidden="true" className="text-muted">
+          ·
+        </span>
+        <button type="button" onClick={challengeFriend} className="min-h-11 font-semibold text-primary hover:underline">
+          {R.challenge}
+        </button>
+      </p>
+      <p aria-live="polite" className="whitespace-pre-line text-center text-sm font-semibold text-green-text">
+        {copied}
+      </p>
+      {shareBox.box}
 
-      {/* saving the streak to an account comes next, after the endless button */}
       <SaveStreak date={round.date} choices={choices} />
-      <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
+
+      {/* your numbers in one strip */}
+      <dl className="mt-5 grid grid-cols-3 gap-2 text-center">
         {[
-          [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
-          middle,
+          [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-5" /></span>, R.best(s.best)],
+          [R.played, String(s.played), R.playedSub(s.played)],
           [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
         ].map(([k, v, sub]) => (
-          <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
+          <div key={String(k)} className="flex flex-col rounded-2xl bg-paper px-2 py-2 ring-1 ring-line">
             <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
-            <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
+            <dd className="order-2 font-display text-xl leading-tight text-ink">{v}</dd>
             <dd className="order-3 text-xs text-muted">{sub}</dd>
           </div>
         ))}
       </dl>
-      {/* sharing: one compact row, so saving your streak stays the main call to action; one solid button, two quiet ones */}
-      <div className="mt-5 grid grid-cols-3 gap-2">
-        <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
-          <span className="sm:hidden">{R.shareShort}</span>
-          <span className="hidden sm:inline">{R.share}</span>
-        </button>
-        <button type="button" onClick={shareImage} className="btn btn-white h-12 px-2 text-sm sm:text-base">
-          <span className="sm:hidden">{R.pictureShort}</span>
-          <span className="hidden sm:inline">{R.picture}</span>
-        </button>
-        <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-white h-12 px-2 text-sm sm:text-base">
-          <span className="sm:hidden">{R.challengeShort}</span>
-          <span className="hidden sm:inline">{R.challenge}</span>
-        </button>
-      </div>
-      <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
-        {copied}
-      </p>
-      {shareBox.box}
-      {/* how everyone scored today, from 5 down to 0, your score's bar in blue (anonymous counts, once enough played) */}
-      {counts && crowdN >= SPREAD_MIN ? (
+
+      {/* one chart: everyone today, or your own days; a toggle when both are there */}
+      {shown ? (
         <div className="mt-5">
-          <h3 className="font-display text-lg text-ink">{R.crowdTitle}</h3>
-          <p className="text-sm text-muted">{R.crowdSub(crowdN)}</p>
-          <ol className="mt-2 space-y-1">
-            {counts
-              .map((c, n) => {
-                const exact = (100 * c) / crowdN;
-                // a handful of plays among hundreds still shows: "<1%", not "0%"
-                const pct = c && exact < 0.5 ? "<1" : String(Math.round(exact));
-                const top = Math.max(...counts);
-                return (
-                  <li key={n} className="flex items-center gap-2 text-sm">
-                    <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
-                      {n}
-                    </span>
-                    <span className="sr-only">{R.crowdRow(n, pct, n === score)}</span>
-                    {/* every row has the same track and the same label slot, so the bars compare fairly */}
-                    <span aria-hidden="true" className="flex-1">
-                      <span
-                        className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
-                          !c ? "text-muted" : `min-w-10 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
-                        }`}
-                        style={c ? { width: `${(c / top) * 100}%` } : undefined}
-                      >
-                        {pct}%
-                      </span>
-                    </span>
-                    <span aria-hidden="true" className="w-8 shrink-0 text-xs font-bold text-primary">
-                      {n === score ? R.crowdYou : null}
-                    </span>
-                  </li>
-                );
-              })
-              .reverse()}
-          </ol>
-        </div>
-      ) : null}
-      {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
-      {s.played >= 2 ? (
-        <div className="mt-5">
-          <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
-          <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
-          <ol className="mt-2 space-y-1">
-            {spread
-              .map((days, n) => (
-                <li key={n} className="flex items-center gap-2 text-sm">
-                  <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
-                    {n}
-                  </span>
-                  <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
-                  <span aria-hidden="true" className="flex-1">
-                    <span
-                      className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
-                        !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
-                      }`}
-                      style={days ? { width: `${(days / most) * 100}%` } : undefined}
-                    >
-                      {days}
-                    </span>
-                  </span>
-                </li>
-              ))
-              .reverse()}
-          </ol>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-display text-lg text-ink">{shown === "crowd" ? R.crowdTitle : R.scoresTitle}</h3>
+            {showCrowd && showMine ? (
+              <div role="group" aria-label={R.chartToggle} className="inline-flex rounded-xl border-2 border-line bg-white p-0.5 text-xs font-bold">
+                {(["crowd", "mine"] as const).map((k) => (
+                  <button
+                    key={k}
+                    type="button"
+                    aria-pressed={shown === k}
+                    onClick={() => setChart(k)}
+                    className="min-h-11 rounded-lg px-3 aria-pressed:bg-primary aria-pressed:text-white"
+                  >
+                    {k === "crowd" ? R.chartEveryone : R.chartYou}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          <p className="text-sm text-muted">
+            {shown === "crowd" ? R.crowdSub(crowdN) : R.scoresSub(s.average.toFixed(1))}
+            {shown === "crowd" && standing ? <strong className="font-semibold text-ink"> · {standing}</strong> : null}
+          </p>
+          {shown === "crowd" && counts
+            ? bars(counts, (_, c) => `${pctOf(c)}%`, (n, c) => R.crowdRow(n, pctOf(c), n === score), true)
+            : bars(spread, (_, d) => String(d), (n, d) => R.scoreRow(n, d, n === score), false)}
         </div>
       ) : null}
 
-      <h3 className="mt-7 font-display text-xl text-ink">{R.answers}</h3>
-      <ol className="mt-2 divide-y divide-line">
-        {round.questions.map((q, i) => {
-          const big = q.options[q.answer];
-          const small = q.options[1 - q.answer];
-          const line = sizeParts(big, small);
-          const href = mapHref(q);
-          return (
-            <li key={i} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
-              <MarkIcon right={choices[i] === q.answer} className="size-5 translate-y-1" />
-              <span className="min-w-0 flex-1 text-ink">
-                <strong>{line.big}</strong> <span className="text-muted">({big.sub})</span> {line.link} <strong>{line.small}</strong>{" "}
-                <span className="text-muted">({small.sub})</span>
-              </span>
-              {/* not for a region yet: the map can't draw those */}
-              {href ? (
-                <Link href={href} aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
-                  {R.dragOnMap} →
-                </Link>
-              ) : null}
-            </li>
-          );
-        })}
-      </ol>
-
-      {/* when the next daily arrives */}
-      <div className="mt-4 border-t border-line pt-4 text-center">
-        <Countdown />
-      </div>
+      {/* the answers, one tap away */}
+      <details className="group mt-5 rounded-2xl border-2 border-line">
+        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between px-4 font-display text-lg text-ink [&::-webkit-details-marker]:hidden">
+          {R.answersToggle(total)}
+          <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5 text-primary transition group-open:rotate-90">
+            <path d="M7.5 4.5 13 10l-5.5 5.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </summary>
+        <ol className="divide-y divide-line border-t border-line px-4">
+          {round.questions.map((q, i) => {
+            const big = q.options[q.answer];
+            const small = q.options[1 - q.answer];
+            const line = sizeParts(big, small);
+            const href = mapHref(q);
+            return (
+              <li key={i} className="flex items-start gap-3 py-2.5 text-sm">
+                <MarkIcon right={choices[i] === q.answer} className="mt-0.5 size-5" />
+                <span className="min-w-0 flex-1 text-ink">
+                  <strong>{line.big}</strong> <span className="text-muted">({big.sub})</span> {line.link} <strong>{line.small}</strong>{" "}
+                  <span className="text-muted">({small.sub})</span>
+                </span>
+                {/* not for a region yet: the map can't draw those */}
+                {href ? (
+                  <Link
+                    href={href}
+                    aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`}
+                    title={R.dragOnMap}
+                    className="-my-2 grid size-11 shrink-0 place-items-center rounded-lg text-primary hover:bg-primary-soft"
+                  >
+                    <MapIcon className="size-6" />
+                  </Link>
+                ) : null}
+              </li>
+            );
+          })}
+        </ol>
+      </details>
     </section>
   );
 }
@@ -600,16 +641,17 @@ function Countdown() {
   if (left === null) return null;
   if (left === 0) {
     return (
-      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
-        {dailyCopy.nextReady} <span aria-hidden="true">→</span>
+      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline">
+        {dailyCopy.nextReadyShort} <span aria-hidden="true">→</span>
       </button>
     );
   }
   const t = Math.floor(left / 1000);
   return (
-    <p className="text-sm text-muted">
+    <p className="inline-flex items-center gap-1 text-xs font-semibold text-muted">
+      <ClockIcon className="size-3.5" />
       {dailyCopy.nextIn}{" "}
-      <span className="font-display tabular-nums font-semibold text-ink" suppressHydrationWarning>
+      <span className="tabular-nums text-ink" suppressHydrationWarning>
         {dailyCopy.nextTime(Math.floor(t / 3600), Math.floor((t % 3600) / 60))}
       </span>
     </p>

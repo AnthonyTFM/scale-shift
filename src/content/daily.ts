@@ -13,6 +13,8 @@ export const dailyCopy = {
   nextIn: "Next five in",
   nextTime: (h: number, m: number) => (h ? `${h}h ${m}m` : m ? `${m}m` : "under a minute"),
   nextReady: "Five new matchups are ready. Load them",
+  // the results header's short version
+  nextReadyShort: "New five ready",
   // phones show this instead, so the first puzzle is on screen without scrolling
   leadShort: "Five matchups a day. Normal maps lie about size. Can you see through them?",
   playedElsewhere: "Played today on another device?",
@@ -133,15 +135,16 @@ export const dailyCopy = {
         100: "100 days in a row. Legend!",
         365: "365 days in a row: a full year!",
       })[n] ?? `${n} days in a row!`,
-    // once enough people have played today
-    betterThan: "Better than",
-    betterSub: "of players today",
-    // a perfect round can't beat anyone who also got 5: it shows "Top 8% of players today" instead
-    topToday: "Top",
     played: "Played",
     playedSub: (n: number) => (n === 1 ? "day" : "days"),
-    // the bar chart of your own daily scores
-    // the chart of how everyone scored today (anonymous counts)
+    // the one chart under the stats: everyone's scores today (anonymous counts) or your own days, with a toggle
+    chartToggle: "Whose scores",
+    chartEveryone: "Everyone today",
+    chartYou: "You",
+    // after "48 players so far", once enough have played and it's good news (a perfect round can't beat anyone who
+    // also got 5, so it says "top" instead)
+    standingTop: (pct: number) => `you're in the top ${pct}%`,
+    standingBetter: (pct: number) => `you beat ${pct}%`,
     crowdTitle: "How everyone did today",
     crowdSub: (n: number) => `${n} players so far`,
     crowdRow: (score: number, pct: string, mine: boolean) => `${score} out of 5: ${pct}% of players${mine ? ", including you" : ""}`,
@@ -159,16 +162,15 @@ export const dailyCopy = {
       misses === 0
         ? "Perfect round. Bet the map fools you at least once."
         : `The map fooled me ${misses === 1 ? "once" : misses === 2 ? "twice" : `${misses} times`}. Can you beat it?`,
-    picture: "As a picture",
-    // phones: the three share buttons sit in one row
-    shareShort: "Share",
-    pictureShort: "Picture",
-    challengeShort: "Challenge",
+    // the quieter ways to share, under the Share button
+    picture: "Share a picture",
     challenge: "Challenge a friend",
-    // after the daily: endless mode is the next thing to play
+    // beside Share: endless mode is the next thing to play (the full name is for screen readers)
     endless: "Keep playing: endless mode",
-    endlessLine: "One matchup after another, each a closer call. How far can you get?",
-    answers: "The answers",
+    endlessShort: "Endless",
+    // after "Endless" for screen readers, so the button's name starts with what it shows
+    endlessSr: "mode: keep playing",
+    answersToggle: (n: number) => `See the ${n} answers`,
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",
     pictureFailed: "Couldn't make the picture. Try sharing your score as text instead.",

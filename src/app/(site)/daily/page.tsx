@@ -15,19 +15,22 @@ export const metadata: Metadata = {
 export default function DailyPage() {
   return (
     <>
-      <PageHero
-        center
-        compact
-        game
-        eyebrow={t.eyebrow}
-        title={t.title}
-        lead={
-          <p>
-            <span className="sm:hidden">{t.leadShort}</span>
-            <span className="hidden sm:inline">{t.lead}</span>
-          </p>
-        }
-      />
+      {/* the intro goes once today's round is done: the results come first (see .daily-done in globals.css) */}
+      <div className="daily-intro">
+        <PageHero
+          center
+          compact
+          game
+          eyebrow={t.eyebrow}
+          title={t.title}
+          lead={
+            <p>
+              <span className="sm:hidden">{t.leadShort}</span>
+              <span className="hidden sm:inline">{t.lead}</span>
+            </p>
+          }
+        />
+      </div>
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-6 md:pb-10">
         <div className="mx-auto max-w-2xl">
           {/* the homepage's play card grows into the game */}
@@ -38,9 +41,7 @@ export default function DailyPage() {
               </SignInProvider>
             </div>
           </ViewTransition>
-          <p className="mt-6 text-xs leading-relaxed text-muted">
-            {t.note}
-          </p>
+          <p className="mt-6 text-xs leading-relaxed text-muted">{t.note}</p>
         </div>
       </div>
     </>
