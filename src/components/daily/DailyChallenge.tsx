@@ -467,6 +467,11 @@ function Results({
           </li>
         ))}
       </ol>
+      {/* the next thing to play, right under the score: endless mode, while the next daily is on its way */}
+      <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold btn-lg mt-6 w-full">
+        {R.endless} <span aria-hidden="true">→</span>
+      </Link>
+      <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>
 
       {/* getting on the leaderboard is the first thing after the score */}
       <LeaderboardJoin date={round.date} choices={choices} score={score} />
@@ -553,15 +558,9 @@ function Results({
         })}
       </ol>
 
-      {/* the next thing to play: endless mode, while the next daily is on its way */}
-      <div className="mt-4 border-t border-line pt-4">
-        <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold btn-lg w-full">
-          {R.endless} <span aria-hidden="true">→</span>
-        </Link>
-        <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>
-        <div className="mt-2 text-center">
-          <Countdown />
-        </div>
+      {/* when the next daily arrives */}
+      <div className="mt-4 border-t border-line pt-4 text-center">
+        <Countdown />
       </div>
     </section>
   );

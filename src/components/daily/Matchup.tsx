@@ -105,6 +105,7 @@ export function QuestionCard({
   busy,
   onPick,
   onNext,
+  stuckTop,
 }: {
   /** "Round 2 of 5" */
   eyebrow: string;
@@ -118,6 +119,8 @@ export function QuestionCard({
   busy?: boolean;
   onPick: (i: number) => void;
   onNext: () => void;
+  /** where the page's sticky top ends (the header, plus endless's score bar), in px from the top of the screen */
+  stuckTop?: () => number;
 }) {
   const answered = picked !== undefined;
   const correct = picked === q.answer;
@@ -168,15 +171,15 @@ export function QuestionCard({
         const short = innerHeight <= 500;
         const want = Math.min(
           verdict.bottom + 12 - (innerHeight - bar),
-          verdict.top - (short ? 16 : ROUND_TOP),
-          short ? Infinity : grid.top - ROUND_TOP + 16,
+          verdict.top - (stuckTop?.() ?? (short ? 16 : ROUND_TOP)),
+          short ? Infinity : grid.top - (stuckTop?.() ?? ROUND_TOP) + 16,
         );
         if (want > 0) scrollTo({ top: scrollY + want, behavior: reducedMotion() ? "auto" : "smooth" });
       },
       reducedMotion() ? 0 : 1400,
     );
     return () => clearTimeout(id);
-  }, [answered]);
+  }, [answered, stuckTop]);
 
   return (
     <section
