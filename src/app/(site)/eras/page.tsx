@@ -11,7 +11,7 @@ const THUMB_H = equalAreaHeight(600);
 
 export const metadata: Metadata = {
   title: "Every era: world borders from 2000 BCE to today",
-  description: "Browse 49 snapshots of the world's borders, from 2000 BCE to the present. See the largest states of each era and what changed in between.",
+  description: `Browse ${eras.length} snapshots of the world's borders, from 2000 BCE to the present. See the largest states of each era and what changed in between.`,
   alternates: { canonical: "/eras" },
 };
 
@@ -22,21 +22,24 @@ const groups: { title: string; test: (e: EraMeta) => boolean }[] = [
   { title: "Modern", test: (e) => eraYear(e) >= 1815 },
 ];
 
+// an id without spaces: aria-labelledby reads a space as a list of ids, so "g-Ancient world" labelled nothing
+const groupId = (title: string) => `g-${title.toLowerCase().replace(/\s+/g, "-")}`;
+
 export default function ErasPage() {
   return (
     <>
       <PageHero
-        eyebrow="49 snapshots"
+        eyebrow={`${eras.length} snapshots`}
         title="The world's borders, era by era"
         lead="Each snapshot shows who controlled what at that moment, from Bronze Age kingdoms to today's 190-plus countries. Open any era on the map, or read what changed."
       />
       <div className="mx-auto max-w-6xl space-y-12 px-4 py-12">
         {groups.map((g) => (
-          <section key={g.title} aria-labelledby={`g-${g.title}`}>
-            <h2 id={`g-${g.title}`} className="font-display text-2xl text-ink">
+          <section key={g.title} aria-labelledby={groupId(g.title)}>
+            <h2 id={groupId(g.title)} className="font-display text-2xl text-ink">
               {g.title}
             </h2>
-            {/* two columns on phones too, so the 49 eras aren't one very long scroll */}
+            {/* two columns on phones too, so the eras aren't one very long scroll */}
             <ul className="mt-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
               {eras.filter(g.test).map((e) => (
                 <li key={e.key}>

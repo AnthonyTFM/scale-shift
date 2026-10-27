@@ -55,13 +55,15 @@ const loadShapes = (q: Question) =>
   >;
 
 /** Both shapes side by side at one shared scale, standing on a common baseline; far-off islands are left out. */
-function Pair({ outlines, label, note }: { outlines?: [Outline, Outline]; label: string; note: string }) {
+// the notes under the pictures are printed below them, so the pictures are labelled with their short titles only (a
+// screen reader would otherwise hear each note twice)
+function Pair({ outlines, label }: { outlines?: [Outline, Outline]; label: string }) {
   const drawn = outlines?.map(mainPart);
   const k = drawn ? Math.min(...drawn.map(({ b: [x0, y0, x1, y1] }) => Math.min((W / 2 - 12) / (x1 - x0), (H - 12) / (y1 - y0)))) : 1;
   return (
     <figure className="flex flex-col rounded-xl bg-white p-3 ring-1 ring-line">
       <figcaption className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</figcaption>
-      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full" role="img" aria-label={note || label}>
+      <svg viewBox={`0 0 ${W} ${H}`} className="mt-2 w-full" role="img" aria-label={label}>
         <line x1="4" x2={W - 4} y1={H - 1} y2={H - 1} className="stroke-line" />
         {drawn?.map(({ d, b: [x0, y0, x1, y1] }, i) => {
           const cx = (W / 2) * i + W / 4;
@@ -164,8 +166,8 @@ export function YesterdayMatchup() {
         )}
       </h2>
       <div className="mt-3 grid grid-cols-2 gap-2 sm:gap-3">
-        <Pair outlines={pick?.shapes ? [pick.shapes[0].merc, pick.shapes[1].merc] : undefined} label={t.mapLabel} note={mapNote} />
-        <Pair outlines={pick?.shapes ? [pick.shapes[0].ea, pick.shapes[1].ea] : undefined} label={t.realLabel} note={realNote} />
+        <Pair outlines={pick?.shapes ? [pick.shapes[0].merc, pick.shapes[1].merc] : undefined} label={t.mapLabel} />
+        <Pair outlines={pick?.shapes ? [pick.shapes[0].ea, pick.shapes[1].ea] : undefined} label={t.realLabel} />
       </div>
       {/* the trick in words: what the map shows, then the truth */}
       <p className="mt-3 min-h-[3lh] text-sm leading-relaxed sm:min-h-[2lh]">

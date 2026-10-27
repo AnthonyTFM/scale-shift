@@ -273,7 +273,7 @@ function DayTable({
       {caption ? (
         <caption className="px-4 pt-3 text-left text-xs font-semibold text-muted">{caption}</caption>
       ) : (
-        <caption className="sr-only">Scores for {board.date}</caption>
+        <caption className="sr-only">Scores for {board.date ? prettyDate(board.date) : "all time"}</caption>
       )}
       <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
         <tr>

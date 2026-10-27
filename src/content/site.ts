@@ -57,7 +57,7 @@ export const appCopy = {
     "Most web maps stretch land more and more as it nears the poles. Search for any country or empire, drag it across the map and watch it shrink or grow to its real size. Use the timeline to travel from 2000 BCE to today.",
   introCta: "Start exploring",
   whoRuledTitle: "Who ruled here?",
-  whoRuledHint: "Click anywhere on land to see who controlled it in every era.",
+  whoRuledHint: "Tap or click any land to see who ruled it in every era.",
   shareCta: "Share",
   precision: {
     1: "Approximate borders",

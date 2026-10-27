@@ -18,7 +18,7 @@ type Props = {
   onYear: (year: number) => void;
 };
 
-/** The era label doubles as a "go to year" box: click it, type 1453 or 300 BC, press Enter. */
+/** The era label doubles as a "go to year" box: click it, type 1453 or 300 BCE, press Enter. */
 function YearBox({ label, loading, onYear }: { label?: string; loading: boolean; onYear: (y: number) => void }) {
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
@@ -44,7 +44,7 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
             <path d="m20 20-4.5-4.5" />
           </svg>
         </button>
-        {loading ? <span className="font-sans text-xs font-normal text-panel-muted">loading…</span> : null}
+        {loading ? <span className="font-sans text-xs font-normal text-panel-muted">Loading…</span> : null}
       </p>
     );
   }
@@ -54,7 +54,7 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
       onSubmit={(e) => {
         e.preventDefault();
         const y = parseYear(inputRef.current?.value ?? "");
-        if (y === null) return setError("Try a year like 1453 or 300 BC");
+        if (y === null) return setError("Try a year like 1453 or 300 BCE");
         if (y < -2000) return setError("Our maps start in 2000 BCE");
         if (y > new Date().getFullYear()) return setError("That's in the future");
         setEditing(false);
@@ -69,7 +69,7 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
         ref={inputRef}
         inputMode="text"
         autoComplete="off"
-        placeholder="e.g. 1453 or 300 BC"
+        placeholder="e.g. 1453 or 300 BCE"
         aria-invalid={!!error}
         aria-describedby={error ? "year-error" : undefined}
         onKeyDown={(e) => e.key === "Escape" && setEditing(false)}

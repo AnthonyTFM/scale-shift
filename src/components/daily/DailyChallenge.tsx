@@ -269,7 +269,7 @@ function OnSignIn({ run }: { run: () => void }) {
 
 function Progress({ round, choices, step }: { round: Round; choices: number[]; step: number }) {
   return (
-    <ol id="daily-progress" className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Progress">
+    <ol id="daily-progress" className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Your answers so far">
       {round.questions.map((q, i) => {
         const done = i < choices.length;
         const right = done && choices[i] === q.answer;
@@ -281,7 +281,7 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
               className={`block h-3 rounded-full ${done ? `pop-in ${right ? "bg-green" : "bg-red"}` : current ? "bg-primary" : "bg-beige"}`}
             />
             <span className="sr-only">
-              Question {i + 1}: {done ? (right ? "correct" : "wrong") : current ? "current" : "not answered"}
+              Round {i + 1}: {done ? (right ? "right" : "wrong") : current ? "now" : "not yet"}
             </span>
           </li>
         );

@@ -8,6 +8,7 @@ import { mercatorInflation } from "@/lib/geo";
 import { TakenFormalized } from "@/components/EventCard";
 import { DataNote } from "./InfoSheet";
 import { PALETTE, type Overlay } from "./engine";
+import { PALETTE_NAMES } from "@/lib/palette";
 import { lineageFor, type OverlayStep } from "./overlays";
 
 type Props = {
@@ -76,7 +77,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
                 <button
                   key={c}
                   type="button"
-                  aria-label={`Color ${i + 1}`}
+                  aria-label={PALETTE_NAMES[i] ?? `Color ${i + 1}`}
                   aria-pressed={i === o.color % PALETTE.length}
                   onClick={() => {
                     onColor(i);
@@ -93,7 +94,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
 
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-b border-white/10 pb-3 text-sm">
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-panel-muted">True area</dt>
+          <dt className="text-[11px] uppercase tracking-wide text-panel-muted">Real area</dt>
           <dd className="text-lg font-bold">≈ {formatArea(o.km2, unit)}</dd>
         </div>
         {o.props.pop ? (
@@ -179,7 +180,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
 
       <div className="mt-3 flex flex-wrap gap-2 text-sm">
         <button type="button" onClick={onZoom} className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/15">
-          Zoom to
+          Zoom to it
         </button>
         {o.moved ? (
           <button type="button" onClick={onReset} className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/15">

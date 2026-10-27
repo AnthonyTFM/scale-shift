@@ -82,7 +82,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
         <rect width="36" height="20" fill="url(#key-dis)" opacity="0.7" />
       </Swatch>,
       "Disputed territory",
-      "Click it to see who controls it and who claims it.",
+      "Tap it to see who controls it and who claims it.",
     ]);
   }
 
@@ -143,7 +143,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
             ) : null}
           </ul>
           <p className="mt-2 text-xs leading-relaxed text-panel-muted">
-            Striped wedges show each claim; where stripes cross, claims overlap. Click Antarctica for details.
+            Striped wedges show each claim; where stripes cross, claims overlap. Tap Antarctica for details.
             {treatyInForce(era) ? " All claims have been frozen since the Antarctic Treaty of 1959." : ""}
           </p>
         </>

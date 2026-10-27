@@ -25,7 +25,7 @@ export const endlessCopy = {
   seeRun: "See my run",
   results: {
     eyebrow: "Endless run",
-    inARow: (n: number) => (n === 1 ? "right answer in a row" : "right answers in a row"),
+    inARow: (n: number) => (n === 1 ? "right answer" : "right answers in a row"),
     scoreSr: (n: number, best: boolean) => `You got ${n} in a row${best ? ", a new best" : ""}.`,
     title: (n: number) =>
       n >= 20 ? "Ruler of the world!" : n >= 12 ? "Emperor!" : n >= 7 ? "Empire builder!" : n >= 3 ? "Regional power" : "The map fooled you",
@@ -79,7 +79,7 @@ export const endlessCopy = {
     },
     // the leaderboard page's Endless tab
     tab: "Endless",
-    allCaption: "Best streaks of all time",
+    allCaption: "Best streaks ever",
     streak: "Streak",
     note: "Your longest run of right answers in endless mode. Ties share a rank; whoever got there first is listed first.",
     emptyAll: "No streaks posted yet. Play endless mode to be the first.",
