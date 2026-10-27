@@ -469,3 +469,16 @@ html:has(.atlas-page:not([style*="display: none"])) body {
 html:not(.returning) .hero-back {
   display: none;
 }
+
+/* /daily once today's round is done: the intro goes, so the results come first. Set before paint by the root layout's
+   script for a player coming back; :has() covers finishing the round on the page */
+.daily-done .daily-intro,
+body:has(#daily-done) .daily-intro {
+  /* out of sight, but the page keeps its heading for screen readers */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
