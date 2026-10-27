@@ -95,9 +95,10 @@ type BaseCache = {
 /** A name on the map: where it goes and how it is drawn, plus the shape it names and how big that is on screen. */
 type LabelItem = { text: string; p: [number, number]; size: number; weight: number; tw: number; f?: PolityFeature; sizePx?: number };
 
-/** An era change in progress (see sweep.ts), worked out for one view: moving the map shows the new era straight away. */
+/** An era change in progress (see sweep.ts), worked out for one view and moved with the map if it moves meanwhile. */
 type Sweep = {
   start: number;
+  /** the view it was worked out for: its grid, old picture and names are in that view's pixels */ view: View;
   plan: SweepPlan;
   /** grid cell size, CSS pixels */ cs: number;
   /** the old era's land, borders and lakes as they were on screen (no names) */ old: HTMLCanvasElement;
@@ -302,12 +303,12 @@ export class MapEngine {
     const prev = this.layer;
     const prevCache = this.cache;
     // a new era while a sweep still runs (clicking quickly through the timeline) shows straight away; one that comes as a
-    // sweep ends (the timeline playing on) sweeps in as usual
+    // sweep ends (the timeline playing on) sweeps in as usual, even while the reader pans the map or drags a shape
     const busy = this.sweepLeft() > 0;
     this.sweep = null;
     this.layer = layer;
     this.cache = null;
-    if (prev && layer && prev !== layer && !busy && !this.gesture) this.sweep = this.startSweep(prev, prevCache, layer);
+    if (prev && layer && prev !== layer && !busy) this.sweep = this.startSweep(prev, prevCache, layer);
     if (prevCache) this.recycle(...prevCache.tiles.values());
     this.markBase();
   }
@@ -442,8 +443,7 @@ export class MapEngine {
     this.schedule();
   }
   private viewChanged() {
-    // a sweep is worked out for one view: moving the map shows the new era straight away
-    this.sweep = null;
+    // a sweep in progress carries on, moved with the map (see sweepShift)
     this.lastViewChange = performance.now();
     this.baseDirty = true;
     this.topDirty = true;
@@ -470,6 +470,8 @@ export class MapEngine {
       c.height = Math.round(this.h * this.dpr);
     }
     this.view = clampView(this.view, this.w, this.h);
+    // a sweep's picture of the old era no longer fits a new canvas size
+    this.sweep = null;
     this.viewChanged();
   }
 
@@ -487,8 +489,8 @@ export class MapEngine {
   }
 
   /** Sideways pixel offsets of every copy of the world on screen, the main copy first. Only one copy unless zoomed far out. */
-  private copyShifts() {
-    const size = 2 * Math.PI * this.view.k;
+  private copyShifts(v = this.view) {
+    const size = 2 * Math.PI * v.k;
     const n = Math.max(0, Math.ceil((this.w + size) / 2 / size) - 1);
     const shifts = [0];
     for (let i = 1; i <= n; i++) shifts.push(-i * size, i * size);
@@ -496,11 +498,11 @@ export class MapEngine {
   }
 
   /** Visible lon/lat window, used to skip off-screen shapes. */
-  private visibleBox() {
-    const halfLon = (this.w / 2 / this.view.k) * (180 / Math.PI);
-    const top = latFromMercY(this.view.y + this.h / 2 / this.view.k);
-    const bottom = latFromMercY(this.view.y - this.h / 2 / this.view.k);
-    return { lon: this.view.lon, halfLon, top, bottom };
+  private visibleBox(v = this.view) {
+    const halfLon = (this.w / 2 / v.k) * (180 / Math.PI);
+    const top = latFromMercY(v.y + this.h / 2 / v.k);
+    const bottom = latFromMercY(v.y - this.h / 2 / v.k);
+    return { lon: v.lon, halfLon, top, bottom };
   }
 
   private isVisible(bbox: [number, number, number, number], vb: ReturnType<MapEngine["visibleBox"]>) {
@@ -547,9 +549,9 @@ export class MapEngine {
   }
 
   /** The shapes big enough on screen to be named. */
-  private labelFeats(cache: BaseCache) {
-    const vb = this.visibleBox();
-    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+  private labelFeats(cache: BaseCache, v = this.view) {
+    const vb = this.visibleBox(v);
+    const minDeg = (1.2 / v.k) * (180 / Math.PI);
     return cache.shapes
       .filter((s) => s.f.bbox[2] - s.f.bbox[0] + (s.f.bbox[3] - s.f.bbox[1]) > minDeg && this.isVisible(s.f.bbox, vb))
       .map((s) => s.f);
@@ -835,7 +837,28 @@ export class MapEngine {
     const B = this.ownerGrid(next, cs, gw, gh);
     const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
     const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
-    return { start: performance.now(), plan, cs, old, from: prev, ownersA: A.owners, ownersB: B.owners, fromHighlight, labels: null, steady: this.steady };
+    return {
+      start: performance.now(),
+      view: { ...this.view },
+      plan,
+      cs,
+      old,
+      from: prev,
+      ownersA: A.owners,
+      ownersB: B.owners,
+      fromHighlight,
+      labels: null,
+      steady: this.steady,
+    };
+  }
+
+  /** Where the map has moved since a sweep was worked out: [scale, dx, dy] taking its pixels to today's view's. */
+  private sweepShift(s: Sweep): [number, number, number] {
+    const v = this.view;
+    const k = v.k / s.view.k;
+    const dx = (this.w / 2) * (1 - k) + v.k * normLon(s.view.lon - v.lon) * (Math.PI / 180);
+    const dy = (this.h / 2) * (1 - k) + v.k * (v.y - s.view.y);
+    return [k, dx, dy];
   }
 
   /** The land, borders and lakes one cache draws, screen-sized, without names. */
@@ -893,7 +916,11 @@ export class MapEngine {
     this.drawTiles(cache);
     const area = new Path2D();
     const front = sweepFrame(s.plan, e, s.cs, area);
+    // the old era, the moving border and the names are in the pixels of the view the sweep was worked out for, moved
+    // to where that land is now if the reader has panned or zoomed since (land that came into view shows the new era)
+    const [k, dx, dy] = this.sweepShift(s);
     ctx.save();
+    ctx.transform(k, 0, 0, k, dx, dy);
     ctx.clip(area);
     ctx.drawImage(s.old, 0, 0, this.w, this.h);
     ctx.restore();
@@ -905,8 +932,8 @@ export class MapEngine {
       if (!lines.length) continue;
       ctx.beginPath();
       for (const { pts } of lines) {
-        ctx.moveTo(pts[0], pts[1]);
-        for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
+        ctx.moveTo(k * pts[0] + dx, k * pts[1] + dy);
+        for (let i = 2; i < pts.length; i += 2) ctx.lineTo(k * pts[i] + dx, k * pts[i + 1] + dy);
       }
       ctx.setLineDash(style === 3 ? [] : style === 2 ? [3, 3] : [2, 4]);
       ctx.strokeStyle = style === 1 ? COLORS.borderSoft : COLORS.border;
@@ -917,7 +944,7 @@ export class MapEngine {
     else this.drawHighlight(cache);
     this.drawLines();
     if (this.labels) {
-      this.drawSweepLabels(s, cache, projs, e);
+      this.drawSweepLabels(s, cache, e, [k, dx, dy]);
       for (const proj of projs) this.drawClaimLabels(ctx, proj);
     }
     // on to the next frame; after the last one the map draws normally again, and looks the same
@@ -937,8 +964,8 @@ export class MapEngine {
   }
 
   /** Names during a sweep: each follows the middle of its country, and a renamed country switches name halfway. */
-  private drawSweepLabels(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[], e: number) {
-    const L = (s.labels ??= this.sweepLabels(s, cache, projs));
+  private drawSweepLabels(s: Sweep, cache: BaseCache, e: number, [k, dx, dy]: [number, number, number]) {
+    const L = (s.labels ??= this.sweepLabels(s, cache));
     const sums = shownSums(s.plan, e, L.wanted, L.copyOf, COPIES);
     const NB = s.plan.carries.length;
     const items: LabelItem[] = e < 0.5 ? [...L.staticOld] : [...L.staticNew];
@@ -970,24 +997,29 @@ export class MapEngine {
       const p = p0 && p1 ? [p0[0] + (p1[0] - p0[0]) * e, p0[1] + (p1[1] - p0[1]) * e] : (p0 ?? p1);
       if (p) items.push({ ...it, p: [p[0], p[1]] });
     }
-    this.paintLabels(this.bctx, items);
+    // placed in the pixels of the sweep's view, so moved with the map
+    const moved = k === 1 && !dx && !dy ? items : items.map((it): LabelItem => ({ ...it, p: [k * it.p[0] + dx, k * it.p[1] + dy] }));
+    this.paintLabels(this.bctx, moved);
   }
 
   /** Pairs the names on the old and new maps with what they follow, and finds where that is at the start and the end. */
-  private sweepLabels(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]): SweepLabels {
+  private sweepLabels(s: Sweep, cache: BaseCache): SweepLabels {
     const { plan } = s;
+    // in the view the sweep was worked out for, like its grid
+    const v = s.view;
     const NB = plan.carries.length;
-    const vb = this.visibleBox();
-    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+    const vb = this.visibleBox(v);
+    const minDeg = (1.2 / v.k) * (180 / Math.PI);
     const oldFeats = s.from.features.filter(
       (f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg && this.isVisible(f.bbox, vb),
     );
-    const newFeats = this.labelFeats(cache);
+    const newFeats = this.labelFeats(cache, v);
     const states = this.showStates() ? this.states : null;
     const idA = new Map(s.ownersA.map((f, i) => [f, i]));
     const idB = new Map(s.ownersB.map((f, i) => [f, i]));
-    const size = 2 * Math.PI * this.view.k;
-    const shifts = this.copyShifts();
+    const size = 2 * Math.PI * v.k;
+    const shifts = this.copyShifts(v);
+    const projs = shifts.map((shift) => projectionFor(v, this.w, this.h, shift));
     const byKey = new Map<number, SweepLabel>();
     const track = (code: number, copy: number) => {
       let tr = byKey.get(code * COPIES + copy);
