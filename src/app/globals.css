@@ -379,12 +379,8 @@ html:has(dialog.sheet[open]) {
 .sheet::backdrop {
   background: rgb(29 33 64 / 0.45);
 }
-/* the dashed yardstick fades in once the real shapes have settled */
-.reveal-yard {
-  transition: opacity 0.4s ease 1.2s;
-}
 @media (prefers-reduced-motion: reduce) {
-  .press, .press-card, .btn, .reveal-map, .reveal-true, .reveal-yard { transition: none; }
+  .press, .press-card, .btn, .reveal-map, .reveal-true { transition: none; }
   .pop-in, .reveal-shake, .reveal-win, .sheet[open] { animation: none; }
 }
 
