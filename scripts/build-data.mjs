@@ -277,24 +277,35 @@ const ALPHA2_FIX = { Kosovo: "XK", "Northern Cyprus": null, Somaliland: null, "S
 // CShapes 2.0 (ETH Zurich).
 const FROM_NATURAL_EARTH = new Set([1994, 2000, 2010]);
 
-// ---------- the maps from 1800 to 1880: built without historical-basemaps ----------
+// ---------- the maps from 1800 to 1960: built without historical-basemaps ----------
 // Their base is Cliopatria (CC BY 4.0, see scripts/lib/cliopatria.mjs): the world's polities digitised from historical
-// atlases. OpenHistoricalMap's dated borders and HistoGIS's (Europe, from 1815) are laid over it, as on the later maps.
+// atlases. OpenHistoricalMap's dated borders and HistoGIS's (Europe, from 1815 to 1914) are laid over it.
 // Cliopatria names the empire a polity belongs to ("(British Empire)"); here, the ruler's shape on that map.
-const FROM_CLIOPATRIA = new Set([1800, 1815, 1878, 1880]);
+const FROM_CLIOPATRIA = new Set([1800, 1815, 1878, 1880, 1900, 1914, 1920, 1930, 1938, 1945, 1960]);
+const CLIO_EMPIRES = (uk) => ({ "(British Empire)": uk, "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Portugal", "(French Third Republic)": "France", "(French Fourth Republic)": "France", "(Vichy France)": "France", "(Netherlands)": "Netherlands" });
 const CLIO_RULERS = {
   1800: { "(British Empire)": "Kingdom of Great Britain", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Kingdom of Portugal", "(French Consulate)": "French Republic", "(Kingdom of France)": "French Republic", "(Batavian Republic)": "Batavian Republic" },
   1815: { "(British Empire)": "United Kingdom of Great Britain and Ireland", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "United Kingdom of Portugal, Brazil and the Algarves", "(Bourbon Kingdom of France)": "Kingdom of France", "(Netherlands)": "United Kingdom of the Netherlands" },
   1878: { "(British Empire)": "United Kingdom of Great Britain and Ireland", "(Spanish Empire)": "Spain", "(Portuguese Empire)": "Portugal", "(French Third Republic)": "France", "(Netherlands)": "Netherlands" },
 };
 CLIO_RULERS[1880] = CLIO_RULERS[1878];
+for (const year of [1900, 1914, 1920, 1930]) CLIO_RULERS[year] = CLIO_EMPIRES("United Kingdom of Great Britain and Ireland");
+for (const year of [1938, 1945, 1960]) CLIO_RULERS[year] = CLIO_EMPIRES("United Kingdom");
 // parts of a Cliopatria polity that are a territory of their own, by the box their middle lies in: Cliopatria often
 // groups an empire's scattered pieces under one name (its row for British India also holds the fur-trading posts of
-// North America). `member`: the empire they belong to, where it differs from the row's ("" for none); `years`: only on
-// these maps; `drop`: a piece the empire did not hold, left out
+// North America). `member`: the empire they belong to, where it differs from the row's ("" for none), or `s`: their
+// ruler; `years`: only on these maps; `drop`: a piece the empire did not hold, left out
 const CLIO_PARTS = [
   { from: "British Empire", box: [-170, 30, -50, 75], name: "British trading posts" },
   { from: "British Colonial Empire", box: [-40, -56, -33, -53], name: "South Georgia" },
+  // Papua's islands, and Bass Strait's (Tasmanian)
+  { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "British New Guinea", member: "(British Empire)", years: [1900] },
+  { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "Territory of Papua", s: "Australia", years: [1914, 1920, 1930, 1938, 1945] },
+  { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "Territory of Papua and New Guinea", s: "Australia", years: [1960] },
+  { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Tasmania (UK)", member: "(British Empire)", years: [1900] },
+  { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Australia", s: "", years: [1914, 1920, 1930, 1938, 1945, 1960] },
+  // a strip of the Empty Quarter south of the Trucial coast, which no one held
+  { from: "Kingdom of Great Britain", box: [50, 19, 58, 24.4], drop: true, years: [1900, 1914, 1920, 1930, 1938, 1945, 1960] },
   { from: "British Colonial Empire", box: [99.5, 4.5, 101, 6], name: "Prince of Wales Island", years: [1800, 1815] }, // Penang
   { from: "British Colonial Empire", box: [101.5, 1.8, 103, 3], name: "Malacca", years: [1800] },
   { from: "British Colonial Empire", box: [-61.3, 14.3, -60.7, 15], name: "Martinique", years: [1800] },
@@ -339,10 +350,10 @@ const CLIO_PARTS = [
   { from: "French India", box: [55, -21.5, 56, -20.8], name: "La Réunion", years: [1800] },
   { from: "French India", box: [57, -20.6, 58, -19.9], name: "Isle de France", years: [1800] },
   { from: "British Cape Colony", box: [-14, 6, -10, 10.5], name: "Colony of Sierra Leone" },
-  { from: "British Gold Coast", box: [2.5, 6, 4.6, 7], name: "Lagos Colony" },
+  { from: "British Gold Coast", box: [2.5, 6, 4.6, 7], name: "Lagos Colony", years: [1878, 1880, 1900] },
   { from: "Portuguese Empire", box: [30, -27, 41.5, -10], name: "Portuguese Mozambique" },
   { from: "Kingdom of Portugal", box: [30, -27, 41.5, -10], name: "Portuguese Mozambique" },
-  { from: "Kingdom of Portugal", box: [-32, 32, -16, 40.5], name: "Portugal", years: [1878, 1880] }, // the Azores and Madeira
+  { from: "Kingdom of Portugal", box: [-32, 32, -16, 40.5], name: "Portugal", years: [1878, 1880, 1900] }, // the Azores and Madeira
   { from: "Kingdom of Portugal", box: [11, -18.5, 24, -4.5], name: "Portuguese Angola", years: [1878, 1880] },
   { from: "Portuguese Colonies", box: [122, -10, 127.5, -8], name: "Portuguese Timor" },
   { from: "Spanish Empire", box: [-18.5, 27.5, -13, 29.5], name: "Spain" }, // the Canary Islands
@@ -351,14 +362,14 @@ const CLIO_PARTS = [
   { from: "Spanish Empire", box: [8.3, 3.1, 9.0, 3.9], name: "Fernando Po" },
   { from: "Spanish Empire", box: [116, 4, 127, 21], name: "Captaincy General of the Philippines", years: [1878, 1880] },
   { from: "French India", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "" },
-  { from: "French Africa", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "" },
+  { from: "French Africa", box: [42, -13.5, 46, -11], name: "Comoro sultanates", member: "", years: [1878, 1880] },
   { from: "French Africa", box: [-9, 28, 12, 38], name: "Algeria" },
   { from: "French Africa", box: [-18, 11, -8, 17], name: "Senegal" },
   { from: "French Africa", box: [7, -4, 14, 3], name: "Gabon" },
-  { from: "French Africa", box: [13.5, -6, 17, -2], name: "French Congo" },
-  { from: "French Africa", box: [-4.5, 4.5, -2.5, 6], name: "Grand-Bassam" },
+  { from: "French Africa", box: [13.5, -6, 17, -2], name: "French Congo", years: [1878, 1880, 1900] },
+  { from: "French Africa", box: [-4.5, 4.5, -2.5, 6], name: "Grand-Bassam", years: [1878, 1880] },
   { from: "French Indochina", box: [102, 9.5, 108, 15], name: "Cambodia" },
-  { from: "French Indochina", box: [116, 38, 119, 41], name: "Qing Empire", member: "" }, // the concession at Tianjin
+  { from: "French Indochina", box: [116, 38, 119, 41], name: "Qing Empire", member: "", years: [1878, 1880] }, // the concession at Tianjin
   { from: "French Indochina", box: [163, -23, 169, -19], name: "New Caledonia" },
   { from: "French Indochina", box: [55, -21.5, 56, -20.8], name: "La Réunion" },
   { from: "French Third Republic", box: [-61.3, 14.3, -60.7, 15], name: "Martinique" },
@@ -370,13 +381,79 @@ const CLIO_PARTS = [
   { from: "French Louisiana", box: [-63.2, 17.8, -62.7, 18.3], name: "Colony of Guadeloupe", member: "(French Consulate)" },
   { from: "New Netherland", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Batavian Republic)" },
   { from: "Netherlands Antilles", box: [-58.5, 1.5, -53.5, 6.5], name: "Suriname", member: "(Netherlands)" },
+  // Curaçao and the Windward Islands were one colony, the Netherlands Antilles from 1954
+  { from: "Netherlands Antilles", box: [-70.5, 11.8, -67.8, 12.8], name: "Netherlands Antilles", member: "(Netherlands)", years: [1960] },
+  { from: "Netherlands Antilles", box: [-63.5, 17.3, -62.7, 18.3], name: "Netherlands Antilles", member: "(Netherlands)", years: [1960] },
   { from: "Netherlands Antilles", box: [-70.5, 11.8, -67.8, 12.8], name: "Curaçao", member: "(Netherlands)" },
   { from: "Netherlands Antilles", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Netherlands)" },
+  // the Isle of Pines, left out of Cuba's borders in 1903 until a treaty settled it as Cuban in 1925 (Cuba ran it), and
+  // Hawaii's western islands
+  { from: "United States of America", box: [-83.3, 21.3, -82.3, 22.1], name: "Cuba", s: "", years: [1914, 1920] },
+  { from: "United States of America", box: [-162.5, 21.5, -159.5, 23.5], name: "Hawaii", s: "United States", years: [1914, 1920, 1930, 1938, 1945] },
+  // after the war: Greenland (defended by the United States from 1941) and Mindanao back to their own governments,
+  // Bougainville to New Guinea (OpenHistoricalMap draws it)
+  { from: "United States of America", box: [-75, 59, -10, 84], name: "Greenland", s: "Denmark", years: [1945] },
+  { from: "United States of America", box: [121, 4.5, 127, 10.5], name: "Philippines", s: "", years: [1945] },
+  { from: "United States of America", box: [154, -7.5, 157, -4.5], drop: true, years: [1945] },
+  // Japan's empire after its surrender: the islands it occupied in the war, south of Taiwan, are drawn under their own
+  // rulers (OpenHistoricalMap draws them)
+  { from: "Empire of Japan", box: [90, -15, 170, 23.4], drop: true, years: [1945] },
+  { from: "North Yemen", box: [41.5, 16.3, 42.5, 17.2], name: "Asir", s: "", years: [1920] }, // the Farasan Islands, the Idrisids'
+  { from: "French Africa", box: [43, -13.2, 45.5, -11.2], name: "Comoros", s: "France", years: [1945] }, // part of Madagascar until 1946
+  // France's overseas departments and territories, and Portugal's colonies, which Cliopatria draws as one with them
+  ...[
+    [[-55, 1.5, -51, 6.5], "French Guiana"],
+    [[41, 10.5, 44, 13], "French Somaliland"],
+    [[43, -13.2, 45.5, -11.2], "Comoros"],
+    [[55, -21.5, 56, -20.8], "Réunion"],
+    [[163, -23, 169, -19.5], "New Caledonia"],
+    [[-62, 15.8, -61, 16.6], "Guadeloupe"],
+    [[-61.3, 14.3, -60.7, 15], "Martinique"],
+    [[-56.6, 46.7, -56, 47.2], "Saint Pierre and Miquelon"],
+    [[68, -50, 71, -48], "French Southern and Antarctic Lands"],
+  ].map(([box, name]) => ({ from: "French Fifth Republic", box, name, s: "France", years: [1960] })),
+  ...[
+    [[124, -9.6, 127.5, -8], "Portuguese Timor"],
+    [[6.2, -0.2, 7.6, 1.8], "São Tomé and Príncipe"],
+    [[11.5, -6, 13.2, -4.3], "Angola"], // Cabinda, run as part of Angola from 1956
+  ].map(([box, name]) => ({ from: "Estado Novo", box, name, s: "Portugal", years: [1960] })),
 ];
+/**
+ * Cliopatria's outlines run past the coast here and there. Cut to Natural Earth's land, as the other sources' are, they
+ * leave no strip at sea where a better outline takes the land beside them. A small island the outline covers in good
+ * part is taken whole (Cliopatria's islands can sit a little off); a part with almost no land under it (an island
+ * Natural Earth leaves out) stays as drawn. Cached per year (delete the file to redo it).
+ */
+const ISLAND_KM2 = 5000;
+function cliopatriaOnLand(year, rows) {
+  const file = path.join(CACHE, "cliopatria", `polities-on-land-${year}.json`);
+  if (fs.existsSync(file)) return JSON.parse(fs.readFileSync(file, "utf8"));
+  const land = landWithLakes().map((p) => ({ p, box: boxOfPolys([p]), km2: km2Of([p]) }));
+  const out = rows.map((f) => {
+    const polys = [];
+    for (const p of polysOfGeom(f.geometry)) {
+      const box = boxOfPolys([p]);
+      const whole = [];
+      const cut = [];
+      for (const l of land) {
+        if (!boxesMeet(l.box, box)) continue;
+        const shared = l.km2 <= ISLAND_KM2 ? clipSafely(polygonClipping.intersection, [p], [l.p]) : null;
+        if (shared && km2Of(shared) >= 0.25 * l.km2) whole.push(l.p);
+        else cut.push(l.p);
+      }
+      const on = cut.length ? clipSafely(polygonClipping.intersection, [p], cut) : [];
+      const kept = on ? [...on, ...whole] : null;
+      polys.push(...(kept && km2Of(kept) >= 0.1 * km2Of([p]) ? kept : [p]));
+    }
+    return { ...f, geometry: { type: "MultiPolygon", coordinates: polys } };
+  });
+  fs.writeFileSync(file, JSON.stringify(out));
+  return out;
+}
 const clioRaw = new Map(); // year -> Cliopatria's polities as it gives them, for the territory rules (`clio`)
 /** Cliopatria's polities for a year, in the historical source's form (NAME, SUBJECTO, BORDERPRECISION). */
 async function cliopatriaBase(year) {
-  const rows = await cliopatriaPolities(path.join(CACHE, "cliopatria"), year);
+  const rows = cliopatriaOnLand(year, await cliopatriaPolities(path.join(CACHE, "cliopatria"), year));
   clioRaw.set(year, rows);
   const rulerOf = (memberOf) => CLIO_RULERS[year][memberOf] ?? memberOf.replace(/^\((.*)\)$/, "$1");
   return rows.flatMap((f) => {
@@ -391,7 +468,7 @@ async function cliopatriaBase(year) {
       };
       const got = polys.filter(inBox);
       polys = polys.filter((p) => !inBox(p));
-      const SUBJECTO = "member" in part ? rulerOf(part.member) : props.SUBJECTO;
+      const SUBJECTO = "s" in part ? part.s : "member" in part ? rulerOf(part.member) : props.SUBJECTO;
       if (got.length && !part.drop) out.push({ type: "Feature", properties: { ...props, NAME: part.name, SUBJECTO }, geometry: { type: "MultiPolygon", coordinates: got } });
     }
     if (polys.length) out.push({ type: "Feature", properties: props, geometry: { type: "MultiPolygon", coordinates: polys } });
@@ -644,7 +721,7 @@ const OHM = {
   ],
   1945: [
     [2692206, "Poland", { exact: true }],
-    [2692360, "Austria"],
+    [2692360, "Austria", { props: { w: "Occupied in four zones by the Allies from 1945 until 1955; its provisional government was recognised in October 1945." } }],
     [2877966, "Romania", { exact: true }],
     [2923084, "Yugoslavia"],
     [2878108, "Albania"],
@@ -669,6 +746,9 @@ const OHM = {
     [2692766, "Czechoslovakia", { exact: true }],
     [2878067, "Hungary", { exact: true }],
     FRENCH_MOROCCO,
+    // Berlin's western sectors, inside the Soviet zone (OHM's outline of West Berlin, which keeps the sector lines; the
+    // Soviet sector is set in TERRITORY)
+    [2692239, "Berlin (Western sectors)", { props: { w: "The American, British and French sectors of Berlin, occupied from July 1945; the four powers governed the city together." } }],
   ],
   1960: [
     [2743709, "West Germany"],
@@ -698,12 +778,17 @@ const OHM = {
     [2798802, "Switzerland"],
     [2860482, "Spain"],
     [2905980, "Portugal"],
+    [2692239, "West Berlin", { props: { w: "Held by the United States, Britain and France; tied to West Germany but not part of it in law." } }],
   ],
 };
 // From 1800 to 1880 the OpenHistoricalMap countries are many (over a hundred per map), so they are listed in a file of
 // their own, generated from OHM and checked against Cliopatria (see its _readme). They are laid over the Cliopatria base.
 const OHM_1800S = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "ohm-1800s.json"), "utf8"));
 for (const year of [1800, 1815, 1878, 1880]) OHM[year] = OHM_1800S[year];
+// From 1900 to 1960 the rest of the world's OpenHistoricalMap countries are listed the same way, and laid down before the
+// European ones above (where two overlap, the later one wins)
+const OHM_1900S = JSON.parse(fs.readFileSync(path.join(ROOT, "scripts", "ohm-1900s.json"), "utf8"));
+for (const year of [1900, 1914, 1920, 1930, 1938, 1945, 1960]) OHM[year] = [...OHM_1900S[year].map(([id, n, opt = {}]) => [id, n, { ...opt, parts: anywhere }]), ...(OHM[year] ?? [])];
 // Land between the OpenHistoricalMap states that was a territory of its own: { box, n, props }. Our shapes' pieces
 // there (outside every state) become it.
 const OHM_GAPS = {
@@ -996,12 +1081,13 @@ async function overlayBorders(grouped, year, slivers) {
 // outline (Natural Earth, public domain) is cut out of every shape on the map and given to the country that held it,
 // in the order listed. `ne0`: countries (Natural Earth's names); `ne1`: provinces, "Country/Province"; `pick`: only the
 // parts of those whose middle lies in this lon/lat box; `source`: [year, name], a shape from another snapshot of the
-// historical source, where that border did not change in between. `clio`: Cliopatria's outline of these polities on
-// the map (1800 to 1880). `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
-// (shown approximately). `blank`: the country gets only the land there that no shape holds. `from`: only these shapes
-// lose land, and the country gets only what they lose. `exact`: the
-// country loses whatever it had beyond the new outline. `s`, `w`: ruler and note (null removes one). Slivers left
-// beside the new border go (see dropSlivers).
+// historical source, where that border did not change in between. `clio`: Cliopatria's outline of these polities in
+// the map's year, cut to land. `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
+// (shown approximately). `ohm`: an OpenHistoricalMap relation's outline, by id. `blank`: the country gets only the land
+// there that no shape holds; `fill`: likewise, but land the source leaves unnamed counts as empty. `from`: only these
+// shapes lose land, and the country gets only what they lose. `exact`: the country loses whatever it had beyond the new
+// outline. `subjects`: shapes with at least this share of their land inside the outline are marked as ruled by the
+// country. `s`, `w`: ruler and note (null removes one). Slivers left beside the new border go (see dropSlivers).
 const UK_1930S = "United Kingdom of Great Britain and Ireland";
 const UK_LATER = "United Kingdom";
 const NORTH_YEMEN = ["Sa`dah", "Hajjah", "Al Jawf", "Al Hudaydah", "Ta`izz", "Ma'rib", "Sana'a", "Raymah", "Al Bayda'", "Amran", "Ibb", "Al Mahwit", "Dhamar", "Amanat Al Asimah"].map((p) => `Yemen/${p}`);
@@ -1014,8 +1100,9 @@ const LAUSANNE = (to, year) => [
   // Turkey's borders from the Treaty of Lausanne (1923); the Sèvres treaty of 1920 never took effect. From 1930
   // OpenHistoricalMap draws Turkey, and in 1938 Hatay as a state of its own
   ...(year === 1920 ? [{ to, ne0: ["Turkey"] }] : []),
-  ...(year === 1938 ? [] : [{ to: "Syria (France)", ne1: ["Turkey/Hatay"] }]), // Hatay was French Syria's until 1938
-  { to: "Armenia", ne0: ["Armenia"] }, // the Armenian SSR from December 1920
+  // Hatay was French Syria's until 1938 (in 1920 a sanjak of the State of Aleppo)
+  ...(year === 1938 ? [] : [{ to: year === 1920 ? "State of Aleppo" : "Syria (France)", ne1: ["Turkey/Hatay"], s: "France" }]),
+  ...(year === 1920 ? [{ to: "Armenian SSR", ne0: ["Armenia"] }] : []), // Soviet from December 1920 (later, part of the USSR's outline)
   { to: "Yemen", ne1: NORTH_YEMEN }, // the Mutawakkilite Kingdom of Yemen, independent from 1918
 ];
 const ISLANDS = (uk) => [
@@ -1024,12 +1111,12 @@ const ISLANDS = (uk) => [
 ];
 // colonies whose borders were set before 1914 and are today's
 const COLONIAL_BORDERS = (uk, us) => [
-  { to: "Gambia", ne0: ["Gambia"], exact: true },
-  { to: "Basutoland", ne0: ["Lesotho"], exact: true },
-  { to: "Swaziland", ne0: ["eSwatini"], exact: true },
-  { to: "Brunei", ne0: ["Brunei"], exact: true },
-  { to: "Portuguese Guinea", ne0: ["Guinea-Bissau"], exact: true },
-  { to: "Spanish Guinea", ne0: ["Eq. Guinea"], exact: true },
+  { to: "Gambia", ne0: ["Gambia"], exact: true, s: uk },
+  { to: "Basutoland", ne0: ["Lesotho"], exact: true, s: uk },
+  { to: "Swaziland", ne0: ["eSwatini"], exact: true, s: uk },
+  { to: "Brunei", ne0: ["Brunei"], exact: true, s: uk },
+  { to: "Portuguese Guinea", ne0: ["Guinea-Bissau"], exact: true, s: "Portugal" },
+  { to: "Spanish Guinea", ne0: ["Eq. Guinea"], exact: true, s: "Spain" },
   { to: "Puerto Rico", ne0: ["Puerto Rico"], s: us },
   { to: "Zanzibar", ne1: ZANZIBAR_ISLES, s: uk, w: "A sultanate under British protection from 1890 until 1963." },
 ];
@@ -1057,11 +1144,63 @@ const BRITISH_ISLES = (uk) => [
 // Dutch (from 1945 Indonesian) Borneo: the source's Malaya ran past today's border into it
 const KALIMANTAN = (n) => ({ to: n, ne1: ["Kalimantan Barat", "Kalimantan Timur", "Kalimantan Tengah", "Kalimantan Selatan"].map((p) => `Indonesia/${p}`) });
 const PORTUGUESE_TIMOR = { to: "Portuguese Timor", ne0: ["Timor-Leste"], s: "Portugal" }; // Portuguese until 1975
-const EGYPT_LIBYA = (libya) => [
+const EGYPT_LIBYA = (libya, italy, egypt) => [
   // Egypt and Libya had no agreed border until 1925, when it was set where it is today
-  { to: "Egypt", ne0: ["Egypt"], exact: true },
-  { to: libya, ne0: ["Libya"], exact: true },
+  { to: "Egypt", ne0: ["Egypt"], exact: true, ...egypt },
+  { to: libya, ne0: ["Libya"], exact: true, s: italy },
 ];
+// From 1900 the base (Cliopatria) draws an empire's colonies as one, and OpenHistoricalMap leaves some of them to it:
+// they are set here by today's borders, which are theirs or close to them
+const GREENLAND = { to: "Greenland", ne0: ["Greenland"], s: "Denmark" };
+const GULF = (uk, muscat) => [
+  { to: "Trucial Oman", ne0: ["United Arab Emirates"], s: uk },
+  { to: "Muscat and Oman", ne0: ["Oman"], s: muscat },
+];
+const SOUTH_WEST_AFRICA = (sa) => ({ to: "South West Africa", ne0: ["Namibia"], s: sa, w: "German until 1915, then a League of Nations mandate run by South Africa, which held it until Namibia's independence in 1990." });
+const ALGERIA = (n) => ({ to: n, ne0: ["Algeria"], s: "France" });
+const FRENCH_EQUATORIAL_AFRICA = { to: "French Equatorial Africa", ne0: ["Chad", "Central African Rep.", "Congo", "Gabon"], s: "France" };
+// Natural Earth's Morocco runs south over the Western Sahara as far as the berm (its "W. Sahara" is only the land east
+// of it). The Spanish Sahara was everything south of 27°40′N, the line Spain and France agreed in 1912; from 1900 to
+// 1904, Spain's Río de Oro ended at 26°N. `morocco`: our shape that holds the land first
+const SPANISH_SAHARA = (to, morocco, north = 27.667) => [
+  { to: morocco, ne0: ["W. Sahara"] },
+  { to, poly: [[-17.5, 20.7], [-8.66, 20.7], [-8.66, north], [-17.5, north], [-17.5, 20.7]], from: [morocco], s: "Spain" },
+];
+// Ifni, Spanish from 1934 (Cliopatria's outline of it lies 60 km away): the coast between the Noun and the Bou Sedra and
+// about 25 km inland, approximately
+const IFNI = [[-10.65, 29.05], [-10.1, 29.7], [-9.82, 29.5], [-10.34, 28.87], [-10.65, 29.05]];
+// Morocco, a French protectorate from 1912, with Spain's two zones: the north as Cliopatria draws it, the far south
+// approximately, and Ifni; and the Spanish Sahara
+const SPANISH_ZONES_NOTE = "Spain's protectorate zones in Morocco, in the north and the far south (1912–1956; the southern one until 1958).";
+const SPAIN_IN_AFRICA = (spain, morocco, ifni) => [
+  { to: morocco, ne0: ["Morocco"], s: "France" },
+  { to: "Spanish Morocco", clio: spain, pick: [-6.5, 34.6, -1.9, 36.0], s: "Spain", w: ifni ? `${SPANISH_ZONES_NOTE} With Ifni, Spanish from 1934.` : SPANISH_ZONES_NOTE },
+  { to: "Spanish Morocco", poly: [[-13.4, 27.66], [-8.67, 27.66], [-8.67, 28.65], [-13.4, 28.65], [-13.4, 27.66]], from: [morocco], s: "Spain" },
+  ...(ifni ? [{ to: "Spanish Morocco", poly: IFNI, s: "Spain" }] : []),
+  ...SPANISH_SAHARA("Spanish Sahara", morocco),
+];
+// Where Ecuador's claims ran over land Peru and Colombia held, and Bolivia's over the Chaco Paraguay held: today's
+// borders, near the lines each side held (OpenHistoricalMap draws each country's whole claim)
+const AMAZON_CHACO = [
+  { to: "Peru", ne0: ["Peru"], from: ["Ecuador"] },
+  { to: "Colombia", ne0: ["Colombia"], from: ["Ecuador"] },
+  { to: "Paraguay", ne0: ["Paraguay"], from: ["Bolivia"] },
+];
+// Laos and Cambodia, French protectorates with today's borders from 1907 (Tonkin, Annam and Cochinchina come from
+// OpenHistoricalMap)
+const LAOS_CAMBODIA = [
+  { to: "Laos", ne0: ["Laos"], s: "France", w: "A French protectorate, part of French Indochina." },
+  { to: "Cambodia", ne0: ["Cambodia"], s: "France", w: "A French protectorate under its own kings, part of French Indochina." },
+];
+const TOGO = { to: "Togo", ne0: ["Togo"], exact: true, s: "France", w: "The east of German Togoland, run by France (a League of Nations mandate from 1922); independent in 1960." };
+const RHODESIAS = (uk) => {
+  const w = "Part of the Federation of Rhodesia and Nyasaland (1953–1963).";
+  return [
+    { to: "Northern Rhodesia", ne0: ["Zambia"], s: uk, w },
+    { to: "Southern Rhodesia", ne0: ["Zimbabwe"], s: uk, w: `A self-governing British colony. ${w}` },
+    { to: "Nyasaland", ne0: ["Malawi"], s: uk, w },
+  ];
+};
 const SAUDI = (n) => ({ to: n, ne0: ["Saudi Arabia"], exact: true }); // Ibn Saud took Ha'il in 1921 and al-Jawf in 1922
 const SOUTH_VIETNAM = ["Kon Tum", "Đắk Nông", "Đắk Lắk", "Gia Lai", "Bình Phước", "Tây Ninh", "Long An", "Ðong Tháp", "An Giang", "Kiên Giang", "Sóc Trăng", "Tiền Giang", "Bà Rịa - Vũng Tàu", "Hồ Chí Minh city", "Khánh Hòa", "Cà Mau", "Bạc Liêu", "Hau Giang", "Vĩnh Long", "Trà Vinh", "Bến Tre", "Đông Nam Bộ", "Bình Thuận", "Ninh Thuận", "Phú Yên", "Bình Định", "Quảng Ngãi", "Đà Nẵng", "Quàng Nam", "Thừa Thiên - Huế", "Quảng Trị", "Bình Dương", "Lâm Đồng", "Can Tho"].map((p) => `Vietnam/${p}`);
 const NIGERIA = (states) => states.map((p) => `Nigeria/${p}`);
@@ -1088,7 +1227,811 @@ const CEYLON_COAST = (uk, w) => ({ to: "British Ceylon", ne0: ["Sri Lanka"], fro
 const JAVA = ["Banten", "Jakarta Raya", "Jawa Barat", "Jawa Tengah", "Yogyakarta", "Jawa Timur"].map((p) => `Indonesia/${p}`);
 // the town of Pontianak, which lies just north of Cliopatria's outline of its sultanate
 const PONTIANAK = { to: "Pontianak Kadriyah Sultanate", poly: [[109.1, 0.1], [109.6, 0.1], [109.6, -0.25], [109.1, -0.25], [109.1, 0.1]], blank: true, w: "Founded in 1771 where the Landak joins the Kapuas (shown approximately)." };
+// ---------- before 1800: the historical-basemaps maps, checked against Cliopatria ----------
+// Every map from 2000 BCE to 1783 was compared with Cliopatria (Seshat) for its year. These rules fix what was clearly
+// wrong: a state the source leaves out, draws inside a neighbour or shows after it fell, and broad labels ("minor
+// Hindu kingdoms", "Zhou states", "central Asian khanates") laid over states Cliopatria draws. The renames that go
+// with them are in src/content/data-corrections.json. `from` keeps each change to the shapes named, so no neighbour's
+// border moves with Cliopatria's coarser outline.
+/** A broad shape split into the states Cliopatria draws inside it: [name on the map, Cliopatria's name(s), extra]. */
+const SPLIT = (from, parts) => parts.map(([to, clio, extra]) => ({ to, clio: [clio].flat(), from: [from].flat(), ...extra }));
+/** Land the source leaves blank (or unnamed), given to the state Cliopatria draws there. */
+const FILL = (parts) => parts.map(([to, clio, extra]) => ({ to, clio: [clio].flat(), fill: true, ...extra }));
+// the Tamil kingdoms the source leaves inside a label for all of south India
+const TAMIL = (from) => SPLIT(from, [["Pandya kingdom", "Early Pandyas"], ["Chola kingdom", "Early Cholas"], ["Chera kingdom", "Early Cheras"]]);
+const ZHOU = "Zhou royal domain and minor states";
+// the Deccan states the source labels "minor Hindu kingdoms" (1279, 1300) or "Rajput kingdoms" (1200)
+const DECCAN = (from) =>
+  SPLIT(from, [
+    ["Yadava dynasty", "Yadava Dynasty"],
+    ["Kakatiya dynasty", "Kakatiya Dynasty"],
+    ["Hoysala dynasty", "Hoysala Kingdom"],
+    ["Eastern Ganga dynasty", "Eastern Ganga Kingdom"],
+  ]);
+// Đại Việt split between the Trịnh lords (north, ruling for the Lê emperors) and the Nguyễn lords (south). The source
+// draws all of Vietnam as Đại Việt, so what is left is Champa (renamed in data-corrections), less a sliver in the far
+// north-west and, until 1677, the Mạc rulers' Cao Bằng
+const TRINH_NGUYEN = (year) => [
+  ...SPLIT("Champa", [
+    ["Đại Việt (Trịnh lords)", "Trịnh lords"],
+    ["Đại Việt (Nguyễn lords)", "Nguyễn lords"],
+  ]),
+  { to: "Đại Việt (Trịnh lords)", poly: [[101.5, 21], [104.6, 21], [104.6, 23.6], [101.5, 23.6], [101.5, 21]], from: ["Champa"] },
+  ...(year < 1677
+    ? [{ to: "Mạc dynasty (Cao Bằng)", poly: [[105.2, 22.2], [106.9, 22.2], [106.9, 23.3], [105.2, 23.3], [105.2, 22.2]], from: ["Champa"], w: "The last Mạc rulers held Cao Bằng, under Ming and then Qing protection, until 1677." }]
+    : []),
+];
+// the island of Sicily, which Cliopatria draws as part of the Crown of Aragon
+const SICILY_ISLAND = { to: "Kingdom of Sicily", clio: ["Crown of Aragon"], pick: [12, 36.4, 15.75, 38.5], from: ["Kingdom of Naples"] };
+// Ezo (Hokkaido) and the southern Kurils, Ainu land: the Matsumae domain held only the southern tip
+const EZO = (from) => ({
+  to: "Ainu",
+  poly: [[139.2, 41.9], [139.9, 42.3], [140.95, 41.95], [141.9, 42.2], [143.6, 41.6], [146.8, 43], [151.5, 45.6], [148.5, 46.6], [141.6, 46], [139.2, 43.8], [139.2, 41.9]],
+  from: [from],
+  w: "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.",
+});
+// the steppe, Burma, the Niger and the Baltic around 1500 (the 1492 and 1500 maps draw them alike)
+// Manchuria and the Amur east of the Greater Khingan: Jurchen and Tungusic land, which the source draws inside the Mongol
+// state or the Ming (`from`). With `ming`, the land Cliopatria gives the Ming (Liaodong) goes back to it.
+const JURCHENS = (from, ming) => [
+  {
+    to: "Jurchens and Amur peoples",
+    poly: [[121, 38], [150, 38], [150, 62], [121, 62], [121, 38]],
+    from: [from],
+    w: "Jurchen tribes, which the Ming counted as its frontier guards, and the Tungusic peoples of the Amur. The Ming ruled only Liaodong.",
+  },
+  ...(ming ? [{ to: ming, clio: ["Ming Dynasty"], from: ["Jurchens and Amur peoples"] }] : []),
+];
+// Bukhara's Transoxiana, the Kazakh steppe and Safavid Khorasan, which the source draws inside the Khiva khanate
+const KHIVA = SPLIT("Khiva Khanate", [["Khanate of Bukhara", "Khanate of Bukhara"], ["Kazakh Khanate", "Kazakh Khanate"], ["Safavid Empire", "Safavid Dynasty"]]);
+// Baffin Island and the Hudson Bay coasts, Inuit land: the source labels them T'atsaot'ine, a Dene people of Great Slave Lake
+const INUIT = { to: "Inuit", poly: [[-90, 55], [-55, 55], [-55, 76], [-90, 76], [-90, 55]], from: ["T'atsaot'ine"] };
+// the peoples of the source's 1715 map on the land its 1783 map gives to Rupert's Land beyond the Hudson Bay basin
+const RL_PEOPLES = [
+  "Athabascan",
+  "Sahtu",
+  "Subarctic forest hunter-gatherers",
+  "Montagnais Innu",
+  "Naskapi Innu",
+  "Eyaq",
+  "Shoshoni",
+  "Northern Paiute",
+  "Nez Perce",
+  "Blackfoot",
+  "Yakima",
+  "Kalapuya",
+  "Tenimo",
+  "Cayuse",
+  "Kalispel",
+  "Umatilla",
+  "Assiniboin",
+  "Gros Ventre",
+];
+const AROUND_1500 = (year) => [
+  // Mongolia (the Northern Yuan) and the Kazakh steppe, which the source draws inside the Chagatai Khanate and the White Horde
+  ...SPLIT("Chagatai Khanate", [["Northern Yuan", "Mongol Khanate"]]),
+  ...SPLIT(["Chagatai Khanate", "Turkic nomads"], [["Kazakh Khanate", "Kazakh Khanate"]]),
+  // the rest of the source's Chagatai Khanate, of which only Moghulistan was left: the Ming's, Tibet's and the Timurids'
+  // borderlands, Mongol land north of the Gobi and, east of the Greater Khingan, the Jurchens
+  ...SPLIT("Chagatai Khanate", [[year === 1492 ? "Ming Empire" : "Ming Chinese Empire", "Ming Dynasty"], ["Tibet", "Tibet"], ["Timurid Emirates", "Timurid Empire"]]),
+  ...JURCHENS("Chagatai Khanate"),
+  { to: "Northern Yuan", poly: [[98, 38], [121, 38], [121, 62], [98, 62], [98, 38]], from: ["Chagatai Khanate"] },
+  ...SPLIT("Turkic nomads", [["Khanate of Sibir", "Khanate of Sibir"], ["Nogai Horde", "Nogai Horde"]]),
+  ...SPLIT("Poland-Lithuania", [["Principality of Moldavia", "Principality of Moldavia"]]),
+  ...SPLIT("Manipur and hill peoples", [
+    ["Shan states", "Shan States"],
+    ["Ava Kingdom", "Ava Kingdom"],
+    ["Kingdom of Mrauk U", "Kingdom of Mrauk U"],
+    ["Prome Kingdom", "Prome Kingdom"],
+    ["Lan Na", "Lan Na Kingdom"],
+  ]),
+  // Timbuktu and the middle Niger, Songhai under Sonni Ali and Askia Muhammad
+  ...SPLIT("Mali", [["Songhai", "Songhai Empire"]]),
+  ...SPLIT("Teutonic Knights", [["Livonian Confederation", "Livonian Conference"]]),
+  ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+  EZO("Japan"),
+  ...FILL([["Wattasid Sultanate", "Wattasid dynasty"], ["Mali", "Mali Empire"], ["Alwa", "Alodia"], ...(year === 1500 ? [["Korea", "Joseon"]] : [])]),
+];
+const RUS_1300 = { s: "Khanate of the Golden Horde" };
+const BEFORE_1800 = {
+  [-1500]: [
+    ...SPLIT(["Amorites", "Assyria", "Hurrians", "Hittites", "Canaanite city-states"], [["Mitanni", "Mitanni"]]),
+    ...SPLIT("Amorites", [["Babylonia", "Babylonia"], ["Sealand", "First Sealand Dynasty"]]),
+    // Sinai, Egyptian
+    ...SPLIT("Elamite and Zagros states", [["Egypt", "New Kingdom of Egypt"]]),
+    // Susa and the Zagros foothills, which the source draws inside Babylonia: the Kassites ruled only Mesopotamia
+    { to: "Elam", ne0: ["Iran"], from: ["Babylonia"] },
+    { to: "Elamite and Zagros states", poly: [[45, 32.9], [50, 32.9], [50, 36], [45, 36], [45, 32.9]], from: ["Elam"] },
+  ],
+  [-700]: [
+    // Assyria's provinces: the source draws them as Aramaean, Neo-Hittite and Israelite lands
+    ...SPLIT(["Arameans", "Neo-Hittite states", "Judah"], [["Assyria", "Neo-Assyrian Empire"]]),
+    ...SPLIT("Neo-Hittite states", [["Phrygia", "Phrygia"]]),
+    ...SPLIT("Urnfield cultures", [["Etruscans", "Etruscans"]]),
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Jin", "Jin"], ["Qi", "Qi"], ["Qin", "Qin"], ["Lu", "Lu"], ["Yan", "Yan"]]),
+  ],
+  [-500]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Wu", "Wu"], ["Jin", "Jin"], ["Yue", "Yue"], ["Qi", "Qi"], ["Qin", "Qin"], ["Lu", "Lu"], ["Yan", "Yan"]]),
+    ...FILL([["Scythians", "Scythia"], ["Hadramaut", "Hadhramaut"]]),
+  ],
+  [-400]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Yue"], ["Qi", "Qi"], ["Wei", "Wei"], ["Zhao", "Zhao"], ["Qin", "Qin"], ["Song", "Song"]]),
+    ...FILL([["Hadramaut", "Hadhramaut"], ["Saba", "Sabaeans"]]),
+  ],
+  [-323]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Minyue"], ["Qi", "Qi"], ["Wei", "Wei"], ["Qin", "Qin"], ["Zhao", "Zhao"]]),
+    ...FILL([["Yuezhi", "Yuezhi"], ["Scythians", "Scythia"]]),
+  ],
+  [-300]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Minyue"], ["Qin", "Qin"], ["Qi", "Qi"], ["Wei", "Wei"], ["Zhao", "Zhao"]]),
+    // Kalinga, conquered by Ashoka around 261 BCE
+    ...SPLIT("Mauryan Empire", [["Kalinga", "Kalinga"]]),
+    ...FILL([["Yuezhi", "Yuezhi"], ["Scythians", "Scythia"], ["Colchis", "Colchis"]]),
+  ],
+  [-200]: [
+    ...SPLIT("Armenian and Caucasian kingdoms", [
+      ["Kingdom of Pontus", "Kingdom of Pontus"],
+      ["Media Atropatene", "Atropatene"],
+      ["Kingdom of Cappadocia", "Kingdom of Cappadocia"],
+      ["Galatia", "Galatia"],
+      ["Kingdom of Bithynia", "Kingdom of Bithynia"],
+      ["Paphlagonia", "Paphlagonia"],
+      ["Sophene", "Kingdom of Sophene"],
+    ]),
+    ...TAMIL("Iron Age chieftainships"),
+    // south of the Hindu Kush the source extends Bactria over the Makran coast, Arachosia, the Kabul valley and Gandhara,
+    // which the Greco-Bactrians reached only from about 190 BCE
+    ...SPLIT("Greco-Bactrian Kingdom", [["Seleucid Kingdom", "Seleucid Empire"]]),
+    {
+      to: "Mauryan successor states",
+      poly: [[58, 24], [58, 29.5], [60.5, 30.5], [60.5, 33.2], [62.5, 33.8], [64.5, 34.3], [66.5, 34.6], [68, 34.9], [69.5, 35.4], [71, 35.9], [72.5, 36.4], [74, 36.6], [78, 36.6], [78, 24], [58, 24]],
+      from: ["Greco-Bactrian Kingdom"],
+      w: "The Mauryan Empire's north-west broke away after Ashoka died (about 232 BCE). In 206 BCE Antiochus III met an Indian king of the Kabul valley here, Sophagasenus. Shown approximately.",
+    },
+  ],
+  [-100]: [
+    // Parthia had taken Media (148 BCE) and Mesopotamia (141 BCE): the source still draws them as Seleucid
+    ...SPLIT(["Seleucid Kingdom", "Caucasian kingdoms", "Scythians"], [["Parthia", "Parthian Empire"]]),
+    ...SPLIT("Caucasian kingdoms", [
+      ["Kingdom of Pontus", "Kingdom of Pontus"],
+      ["Armenia", "Kingdom of Armenia"],
+      ["Kingdom of Cappadocia", "Kingdom of Cappadocia"],
+      ["Kingdom of Bithynia", "Kingdom of Bithynia"],
+      ["Sophene", "Kingdom of Sophene"],
+    ]),
+    ...SPLIT("Yuezhi", [["Indo-Greek kingdoms", "Indo-Greeks"], ["Indo-Scythians", "Indo-Scythians"]]),
+    ...SPLIT("Shunga Empire", [["Satavahana Empire", "Satavahana Dynasty"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Xiongnu", "Xiongnu"],
+      ["Jin (Korea)", "Korean Jin"],
+      ["Han Empire", "Gojoseon", { w: "Han commanderies: the Han conquered Gojoseon in 108 BCE." }],
+      ["Cyrenaica", "Cyrenaica"],
+    ]),
+  ],
+  [-1]: [
+    // client kingdoms the source draws inside the Roman Empire
+    ...SPLIT("Roman Empire", [
+      ["Mauretania", "Mauretania", { s: "Roman Empire" }],
+      ["Kingdom of Cappadocia", "Kingdom of Cappadocia", { s: "Roman Empire" }],
+      ["Kingdom of Pontus", "Kingdom of Pontus", { s: "Roman Empire" }],
+    ]),
+    ...SPLIT("Armenia", [["Caucasian Albania", "Caucasian Albania"]]),
+    ...SPLIT("Jinhan", [["Mahan", "Mahan"], ["Byeonhan", "Byeonhan"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Yuezhi", "Yuezhi"],
+      ["Wusun", "Wusun"],
+      ["Dayuan (Ferghana)", "Great Yuan"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Colchis", "Lazica"],
+      ["Bosporian Kingdom", "Cimmerian Bosporus"],
+    ]),
+  ],
+  100: [
+    ...SPLIT("Western Satraps", [["Kushan Empire", "Kushan Empire"], ["Satavahana Empire", "Satavahana Dynasty"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      // the Xianbei took the Xiongnu lands after the Han and their allies broke the northern Xiongnu (89–93)
+      ["Xianbei", ["Xianbei", "Xiongnu"]],
+      ["Funan", "Funan"],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Goths", "Goths"],
+      ["Wusun", "Wusun"],
+    ]),
+  ],
+  200: [
+    // the Kushan Empire at its height, which the source leaves out
+    ...SPLIT(["Western Satraps", "Magadha", "Parthian Empire"], [["Kushan Empire", "Kushan Empire"]]),
+    ...SPLIT("Western Satraps", [["Satavahana Empire", "Satavahana Dynasty"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Kushan Empire", "Kushan Empire"],
+      ["Xianbei", "Xianbei"],
+      ["Funan", "Funan"],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Goths", "Goths"],
+      ["Mahan", "Mahan"],
+      ["Jinhan", "Jinhan"],
+      ["Byeonhan", "Byeonhan"],
+      ["Dongye", "Dongye"],
+      ["Wusun", "Wusun"],
+      ["Bosporian Kingdom", "Cimmerian Bosporus"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Lazica", "Lazica"],
+    ]),
+  ],
+  300: [
+    ...SPLIT("Sasanian Empire", [["Kushano-Sasanians", "Indo-Sasanian Empire"]]),
+    ...SPLIT(["Sasanian Empire", "Western Satraps"], [["Kushan Empire", "Eastern Kushans"]]),
+    ...SPLIT(["Satavahana successor states", "Western Satraps", "Kalinga", "Gangetic kingdoms"], [["Vakataka Kingdom", "Vakataka Kingdom"]]),
+    ...SPLIT("Satavahana successor states", [["Pallava dynasty", "Late Pallava Empire"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Kushano-Sasanians", "Indo-Sasanian Empire"],
+      ["Goths", "Gothia"],
+      ["Funan", "Funan"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Burgundians", "Burgundians"],
+      ["Lâm Ấp (Champa)", "Chámpa"],
+      ["Bosporan Kingdom", "Cimmerian Bosporus", { s: "Roman Empire" }],
+      ["Iberia", "Caucasian Iberia"],
+      ["Franks", "Ripuarian Franks"],
+      ["Lazica", "Lazica"],
+    ]),
+  ],
+  400: [
+    // the source's "Sixteen Kingdoms" is the name of the period, not a state
+    ...SPLIT(["Sixteen Kingdoms", "Jin"], [
+      ["Northern Wei", "Northern Wei"],
+      ["Later Yan", "Later Yan"],
+      ["Later Qin", "Later Qin"],
+      ["Western Qin", "Western Qin"],
+    ]),
+    ...SPLIT("Sasanian Empire", [["Kidarites", "Kidarites"]]),
+    ...SPLIT("Deccan kingdoms", [
+      ["Vakataka Kingdom", "Vakataka Kingdom"],
+      ["Kadamba dynasty", "Kadamba Empire"],
+      ["Pallava dynasty", "Late Pallava Empire"],
+    ]),
+    ...SPLIT("Nubian kingdoms", [["Nobatia", "Nobatia"], ["Makuria", "Makuria"], ["Alwa", "Alodia"]]),
+    ...FILL([
+      ["Northern Wei", "Northern Wei"],
+      ["Kidarites", "Kidarites"],
+      ["Xionites", "Xionites"],
+      ["Funan", "Funan"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Kamarupa", "Kamarupa Kingdom"],
+      ["Champa", "Chámpa"],
+      ["Paekche", "Baekje"],
+      ["Silla", "Silla"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Vandals", "Vandals"],
+    ]),
+  ],
+  500: [
+    // the Hephthalites (and the Alchon Huns in north-west India), which the source leaves out at their height
+    ...SPLIT(["Sasanian Empire", "Gupta Empire"], [["Hephthalite Empire", "White Huns"]]),
+    ...SPLIT("Makuria", [["Nobatia", "Nobatia"]]),
+    ...SPLIT(["Axum", "Makuria"], [["Alwa", "Alodia"]]),
+    ...SPLIT("Silla", [["Koguryo", "Goguryeo"]]),
+    ...FILL([
+      ["Hephthalite Empire", "White Huns"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Kamarupa", "Kamarupa Kingdom"],
+      ["Paekche", "Baekje"],
+      ["Silla", "Silla"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Lazica", "Lazica"],
+      ["Thuringians", "Kingdom of Thuringia"],
+      ["Tarumanagara", "Tarumanagara"],
+    ]),
+  ],
+  600: [
+    ...SPLIT("Hindu kingdoms", [["Maitraka dynasty", "Maitraka Dynasty"], ["Pandya dynasty", "Pandya Dynasty"]]),
+    ...SPLIT("Kent", [
+      ["Mercia", "Kingdom of Mercia"],
+      ["Wessex", "Kingdom of Wessex"],
+      ["East Anglia", "Kingdom of East Anglia"],
+      ["Essex", "Kingdom of Essex"],
+      ["Sussex", "Kingdom of Sussex"],
+      ["Lindsey", "Kingdom of Lindsey"],
+      ["Hwicce", "Hwicce"],
+    ]),
+    ...SPLIT(["Avars", "Frankish Kingdom", "Lombard Kingdom"], [["Duchy of Bavaria", "Bavarians", { s: "Frankish Kingdom" }]]),
+    ...SPLIT("Javanese kingdoms", [["Tarumanagara", "Tarumanagara"]]),
+    ...FILL([
+      ["Western Turkic Khaganate", "Western Göktürks"],
+      ["Avars", "Avar Khaganate"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Ghassanids", "Ghassanids", { s: "Eastern Roman Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Kashmir (Karkota dynasty)", "Karkota Dynasty"],
+      ["Silla", "Silla"],
+      ["Brittonic kingdoms", "Brythons"],
+    ]),
+  ],
+  700: [
+    // Visigothic Spain, eleven years before the Umayyad conquest (711), and Tabaristan, Dabuyid until 760
+    ...SPLIT("Umayyad Caliphate", [["Visigothic Kingdom", "Visigothic Kingdom"], ["Dabuyids (Tabaristan)", "Dabuyid Dynasty"]]),
+    ...SPLIT("Principality of Iberia", [["Lazica", "Kingdom of Lazica", { s: "Eastern Roman Empire" }]]),
+    ...SPLIT("minor states under Indian influence", [["Srivijaya", "Srivijaya"]]),
+    ...SPLIT("Javanese kingdoms", [["Sunda Kingdom", "Sunda Kingdom"], ["Galuh Kingdom", "Galuh Kingdom"]]),
+    ...SPLIT("Kent", [
+      ["Mercia", "Kingdom of Mercia"],
+      ["Wessex", "Kingdom of Wessex"],
+      ["East Anglia", "Kingdom of East Anglia"],
+      ["Northumbria", "Kingdom of Northumbria"],
+    ]),
+    ...SPLIT("Frankish Kingdom", [
+      ["Duchy of Aquitaine", "Aquitaine", { s: "Frankish Kingdom" }],
+      ["Frisian Kingdom", ["Frisia Kingdom", "Magna Frisia"]],
+    ]),
+    ...SPLIT(["Frankish Kingdom", "Avars", "Lombard Kingdom"], [["Duchy of Bavaria", "Bavarians", { s: "Frankish Kingdom" }]]),
+    ...FILL([
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Chen-La", "Chenla"],
+      ["Haripunchai", "Haripuñjaya"],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Dvaravati", "Lavo Kingdom"],
+      ["Northumbria", "Kingdom of Northumbria"],
+      ["Strathclyde", "Strathclyde"],
+      ["Dál Riata", "Dál Riata"],
+    ]),
+  ],
+  800: [
+    ...SPLIT("Mon–Khmer peoples and small states", [["Haripunchai", "Haripuñjaya"], ["Dvaravati", "Lavo Kingdom"], ["Chen-La", "Land Chenla"]]),
+    // western Pannonia, which Charlemagne took from the Avars (791–803)
+    ...SPLIT("Avars", [["Carolingian Empire", "Kingdom of the Franks"]]),
+    ...SPLIT("Aghlabid Emirate", [["Rustamid Imamate", "Rustamid dynasty"]]),
+    ...SPLIT("Idrisid dynasty", [["Barghawata", "Barghawata Conference"]]),
+    ...SPLIT("Abbasid Caliphate", [["Turk Shahis", "Turk Shahis"]]),
+    ...SPLIT("Palas", [["Kamarupa", "Kamarupa Kingdom"]]),
+    ...FILL([
+      ["Kimek–Kipchak confederation", "Kimek-Kipchak confederation"],
+      ["Oghuz Yabgu State", "Oghuz Turks"],
+      ["Karluk Yabgu State", "Qarlugs"],
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Ghana", "Ghana Empire"],
+      ["Kashmir (Karkota dynasty)", "Karkota Dynasty"],
+      ["Unified Silla", "Unified Silla"],
+    ]),
+  ],
+  900: [
+    ...SPLIT("Tibetan kingdoms", [["Kingdom of Qocho", "Qocho Kingdom"], ["Kingdom of Khotan", "Kingdom of Khotan"], ["Ganzhou Uyghur Kingdom", "Ganzhou Kingdom"]]),
+    ...SPLIT("Turkic and Mongolic tribes", [
+      ["Kimek–Kipchak confederation", "Kimek-Kipchak confederation"],
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Oghuz Yabgu State", "Oghuz Turks"],
+    ]),
+    // Khorasan, which the Samanids took from the Saffarid Amr ibn al-Layth in 900
+    ...SPLIT("Saffarids", [["Samanid Empire", "Samanid Empire"]]),
+    ...SPLIT("Abbasid Caliphate", [["Tulunid Emirate", "Tulunids"], ["Kingdom of Armenia", "Bagratid Armenia"]]),
+    ...SPLIT("Aghlabid Emirate", [["Rustamid Imamate", "Rustamid dynasty"]]),
+    ...SPLIT("Idrisid dynasty", [["Barghawata", "Barghawata Conference"]]),
+    ...SPLIT("Khmer Empire", [["Haripunchai", "Haripuñjaya"], ["Lavo", "Lavo Kingdom"]]),
+    ...SPLIT("Great Moravia", [["Duchy of Bohemia", "Duchy of Bohemia"]]),
+    ...SPLIT("Silla", [["Later Baekje", "Hubaekje"]]),
+    ...SPLIT("Chola Empire", [["Pandya state", "Pandya Dynasty"]]),
+    ...SPLIT("Mercia", [["Wessex", "Kingdom of Wessex"]]),
+    ...SPLIT(["Mercia", "Northumbria"], [["Danelaw", "Danelaw"]]),
+    ...SPLIT("Lotharingia", [
+      ["Kingdom of Provence", "Kingdom of Lower Burgundy"],
+      ["Kingdom of Upper Burgundy", "Upper Burgundy"],
+      ["East Francia", "East Franks"],
+    ]),
+    ...SPLIT("Palas", [["Kamarupa", "Kamarupa Kingdom"]]),
+    // Gandhara, the Hindu Shahis' (their capital was Udabhandapura on the Indus), Kashmir and the far south-west, which
+    // the source draws inside the Samanid Empire
+    { to: "Hindu Shahis", poly: [[70.5, 29.8], [75.2, 29.8], [75.2, 35.6], [70.5, 35.6], [70.5, 29.8]], from: ["Samanid Empire"] },
+    ...SPLIT(["Samanid Empire", "Hindu Shahis"], [["Kingdom of Kashmir", "Kashmir"]]),
+    ...SPLIT("Samanid Empire", [["Abbasid Caliphate", "Abbasid Caliphate"]]),
+    // Sistan, Arachosia and Baluchistan stayed with the Saffarids (Amr's grandson Tahir, 900–908): Cliopatria's Samanid
+    // outline covers them, but the Samanids took Sistan only in 911
+    {
+      to: "Saffarids",
+      poly: [[57, 24], [57, 31.8], [60.5, 32.2], [61.5, 33], [64, 33.2], [68, 32.6], [70.5, 32.4], [70.5, 24], [57, 24]],
+      from: ["Samanid Empire"],
+    },
+  ],
+  1000: [
+    // Khorasan, Ghaznavid from 999
+    ...SPLIT("Buwayhid Emirates", [["Ghaznavid Emirate", "Ghaznavid Empire"]]),
+    ...SPLIT("Xixia", [["Ganzhou Uyghur Kingdom", "Ganzhou Kingdom"], ["Kingdom of Qocho", "Qocho Kingdom"]]),
+    ...SPLIT("Hill kingdoms (Manipur, Tripura)", [["Kamarupa", "Kamarupa Kingdom"], ["Chandra dynasty", "Chandra Dynasty"]]),
+    ...SPLIT("Armenia", [["Kingdom of Vaspurakan", "Kingdom of Vaspurakan"]]),
+    ...SPLIT("Rajput kingdoms", [
+      ["Paramara dynasty", "Paramara Dynasty"],
+      ["Chaulukya dynasty", "Chaulukya Dynasty"],
+      ["Chauhans of Shakambhari", "Chauhan Dynasty"],
+      ["Chandela dynasty", "Chandela Kingdom"],
+      ["Pratiharas", "Gurjara-Pratihara Dynasty"],
+    ]),
+    ...FILL([
+      ["Liao", "Liao Dynasty"],
+      ["Kara-Khanid Khanate", "Kara-Khanids"],
+      ["Kingdom of Qocho", "Qocho Kingdom"],
+      ["Kingdom of Khotan", "Kingdom of Khotan"],
+      ["Kingdom of Kashmir", ["Utpala Dynasty", "Kashmir"]],
+      ["Goryeo", "Goryeo"],
+      ["Ghana", "Ghana Empire"],
+      ["Ancestral Puebloans (Chaco)", "Puebloans - Chaco Regional System"],
+    ]),
+  ],
+  1100: [
+    // Khorasan, Seljuk since 1040
+    ...SPLIT("Ghaznavid Emirate", [["Seljuk Empire", "Great Seljuk Empire"]]),
+    ...SPLIT("Rajput kingdoms", [["Ghaznavid Emirate", "Ghaznavid Empire"]]),
+    ...SPLIT("Xixia", [["Kingdom of Qocho", "Qocho Kingdom"]]),
+    ...SPLIT("Oghuz", [["Khwarazm", "Khwarezmid Dynasty", { s: "Seljuk Empire" }]]),
+    // Anatolia after Manzikert (1071), which the source still draws as Byzantine
+    ...SPLIT("Byzantine Empire", [
+      ["Sultanate of Rum", "Sultanate of Rum"],
+      ["Danishmendids", "Danishmendids"],
+      ["Armenian Cilicia", "Armenian Kingdom of Cilicia"],
+      ["Serbia", "Grand Principality of Serbia"],
+      ["Norman Italy", "Norman Italy"],
+    ]),
+    ...SPLIT("Hill kingdoms (Manipur, Tripura)", [["Kamarupa", "Kamarupa Kingdom"]]),
+    // Kashmir, western Tibet, Qocho, Ghazni's lands and Khwarazm, which the source draws inside the Karakhanid khanate
+    ...SPLIT("Karkhanids", [
+      ["Kingdom of Kashmir", "Lohara Dynasty"],
+      ["Tibet", "Tibetans"],
+      ["Kingdom of Qocho", "Qocho Kingdom"],
+      ["Ghaznavid Emirate", "Ghaznavid Empire"],
+      ["Khwarazm", "Khwarezmid Dynasty"],
+    ]),
+    // North Africa west of Egypt, which the source still gives the Fatimids: the Zirids (independent from 1048) and the
+    // Hammadids held the coast, and the Arab tribes who overran the land from the 1050s the rest
+    {
+      to: "Banu Hilal and Banu Sulaym",
+      ne0: ["Libya", "Tunisia", "Algeria"],
+      from: ["Fatimid Caliphate"],
+      w: "Arab tribes who moved west from Egypt in the 1050s and overran Tripolitania and the countryside of Ifriqiya.",
+    },
+    ...SPLIT("Banu Hilal and Banu Sulaym", [["Zirid dynasty", "Zirid dynasty"], ["Hammadid dynasty", "Hammadid Dynasty"]]),
+    // Sri Lanka: Vijayabahu I drove the Cholas out in 1070
+    { to: "Kingdom of Polonnaruwa", ne0: ["Sri Lanka"], from: ["Cholas"] },
+    ...FILL([
+      ["Goryeo", "Goryeo"],
+      ["Ghana", "Ghana Empire"],
+      ["Eastern Ganga dynasty", "Eastern Ganga Kingdom"],
+      ["Ancestral Puebloans (Chaco)", "Puebloans - Chaco Regional System"],
+      ["Takrur", "Takrur"],
+      ["Kanem Empire", "Empire of Kanem"],
+      ["Zagwe dynasty", "Zagwe dynasty"],
+    ]),
+  ],
+  1200: [
+    // northern China, Jin since 1127: the source gives it to the Song
+    ...SPLIT("Southern Song", [["Jin dynasty", "Great Jin"]]),
+    ...SPLIT("Seljuk successor states", [["Ghurid Sultanate", "Ghurid Dynasty"], ["Ayyubid Sultanate", "Ayyubid Sultanate"]]),
+    // Bengal, Sena until 1204, and Khwarazm, which the source leaves out
+    ...SPLIT(["Ghurid Sultanate", "Rajput kingdoms"], [["Sena dynasty", "Sena Dynasty"]]),
+    ...SPLIT(["Ghurid Sultanate", "Kara Khitai Khaganate", "Seljuk successor states"], [["Khwarazmian Empire", "Khwarezmid Dynasty", { s: "Kara Khitai Khaganate" }]]),
+    ...SPLIT("Xixia", [["Kara Khitai Khaganate", "Kara-Khitans"]]),
+    ...SPLIT("Haripunchai", [["Khmer Empire", "Khmer Empire"]]),
+    ...SPLIT("Kingdom of Kashmir", [["Ghurid Sultanate", "Ghurid Dynasty"]]),
+    ...SPLIT("Kediri", [["Bali", "Early Balinese Kingdoms"]]),
+    ...SPLIT("Hill peoples", [["Kingdom of Dali", "Kingdom of Dali"], ["Pagan Kingdom", "Pagan Kingdom"]]),
+    ...SPLIT("Byzantine Empire", [
+      ["Sultanate of Rum", "Sultanate of Rum"],
+      ["Armenian Kingdom of Cilicia", "Armenian Kingdom of Cilicia"],
+      ["Kingdom of Sicily", "Kingdom of Sicily"],
+    ]),
+    ...DECCAN("Rajput kingdoms"),
+    ...SPLIT("Rajput kingdoms", [
+      ["Chaulukya dynasty", "Chaulukya Dynasty"],
+      ["Paramara dynasty", "Paramara Dynasty"],
+      ["Chandela dynasty", "Chandela Kingdom"],
+    ]),
+    ...FILL([["Principality of Jersika", "Principality of Jersika"]]),
+    // North Africa west of Egypt, which the source draws with the Fatimids' old outline: Ifriqiya was Almohad, and the
+    // Banu Ghaniya fought them for Tripolitania and the south with the Arab tribes and the Ayyubid mamluk Qaraqush
+    {
+      to: "Banu Ghaniya and Arab tribes",
+      ne0: ["Libya", "Tunisia", "Algeria"],
+      from: ["Ayyubid Sultanate"],
+      w: "Yahya ibn Ghaniya, heir of the Almoravids, fought the Almohads for Tripolitania and southern Ifriqiya with the Arab tribes and Qaraqush, an Ayyubid mamluk acting on his own. Shown approximately.",
+    },
+    ...SPLIT("Banu Ghaniya and Arab tribes", [["Almohad Caliphate", "Almohad Caliphate"]]),
+    // Sri Lanka, the Polonnaruwa kingdom's: Chola rule there ended in 1070
+    { to: "Kingdom of Polonnaruwa", ne0: ["Sri Lanka"], from: ["Chola Empire"] },
+  ],
+  1279: [...DECCAN("minor Hindu kingdoms"), ...SPLIT("minor Hindu kingdoms", [["Pandya state", "Pandya Empire"]]), ...FILL([["Kanem Empire", "Empire of Kanem"]])],
+  1300: [
+    ...DECCAN("minor Hindu kingdoms"),
+    ...SPLIT("minor Hindu kingdoms", [["Pandya state", "Pandya Empire"]]),
+    // Burma after the fall of Pagan (1287)
+    ...SPLIT("Myinsaing Kingdom", [["Shan states", "Shan States"], ["Hanthawaddy Kingdom", "Hanthawaddy Kingdom"], ["Lan Na", "Lan Na Kingdom"]]),
+    ...SPLIT("Malayu-Dharmasraya", [["Sunda Kingdom", "Sunda Kingdom"]]),
+    ...SPLIT("Sultanate of Rum", [["Armenian Kingdom of Cilicia", "Armenian Kingdom of Cilicia"]]),
+    SICILY_ISLAND,
+    ...SPLIT("Kingdom of Serbia", [["Kingdom of Syrmia", "Kingdom of Syrmia"], ["Banate of Bosnia", "Banate of Bosnia"]]),
+    // the Rus principalities, all paying tribute to the Golden Horde, which the source labels "Ryazan"
+    ...SPLIT("Rus principalities", [
+      ["Grand Principality of Vladimir", "Principality of Vladimir-Suzdal", RUS_1300],
+      ["Principality of Smolensk", "Principality of Smolensk", RUS_1300],
+      ["Kingdom of Galicia–Volhynia", "Galicia-Volhynia", RUS_1300],
+      ["Khanate of the Golden Horde", "Golden Horde"],
+    ]),
+  ],
+  1400: [
+    // the Delhi Sultanate after Timur's sack of Delhi (1398): the source draws the Tughlaq empire at its 1330s height
+    ...SPLIT("Sultanate of Delhi", [
+      ["Bahmani Sultanate", "Bahmani Sultanate"],
+      ["Bengal Sultanate", "Sultanate of Bengal"],
+      ["Vijayanagara Empire", "Vijayanagara Empire"],
+      ["Jaunpur Sultanate", "Jaunpur Sultanate"],
+      ["Samma Sultanate", "Sind-Samma Dynasty"],
+    ]),
+    // Moscow and Lithuania's eastern lands, which the source draws inside the Horde
+    ...SPLIT("Blue Horde", [
+      ["Grand Duchy of Moscow", ["Grand Principality of Moscow", "Principality of Vladimir-Suzdal"], { s: "Blue Horde" }],
+      ["Poland-Lithuania", ["Grand Duchy of Lithuania", "Principality of Smolensk"]],
+    ]),
+    ...SPLIT("Ava Kingdom", [["Shan states", "Shan States"], ["Hanthawaddy Kingdom", "Hanthawaddy Kingdom"], ["Lan Na", "Lan Na Kingdom"]]),
+    ...SPLIT("Ottoman Empire", [["Ramadanids", "Ramadanid Emirate", { s: "Mamluke Sultanate" }]]),
+    ...SPLIT(["Sukhothai", "Đại Việt"], [["Lan Xang", "Lan Xang"]]),
+    SICILY_ISLAND,
+    ...SPLIT("Sinhalese kingdom", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+    // Joseon (1392): the source still draws Korea inside the Mongol state (split into the Ming and the Northern Yuan by
+    // splitMing1400 before these rules)
+    ...SPLIT("Northern Yuan", [["Joseon", "Joseon"]]),
+    // the Ming's Liaodong and its garrisons north of the Wall, Moghulistan's east and the Jurchens beyond Liaodong
+    ...SPLIT("Northern Yuan", [["Ming Empire", "Ming Dynasty"], ["Chagatai Khanate", "Chagatai Khanate"]]),
+    ...JURCHENS("Northern Yuan"),
+  ],
+  1492: [
+    ...AROUND_1500(1492),
+    // the Inca Empire, which the source leaves out of this map: its outline from the 1500 map; the peoples it ruled
+    // keep their names, marked as ruled by it
+    { to: "Inca Empire", source: [1500, "Inca Empire"], fill: true, subjects: 0.6 },
+  ],
+  1500: AROUND_1500(1500),
+  1530: [
+    ...SPLIT("Poland-Lithuania", [["Livonian Confederation", "Livonian Conference"]]),
+    ...SPLIT("Khanate of Bukhara", [["Moghulistan", ["Eastern Moghulistan", "Western Moghulistan"]]]),
+    ...SPLIT("Burmese kingdoms", [["Toungoo dynasty", "First Toungoo Empire"], ["Kingdom of Mrauk U", "Kingdom of Mrauk U"], ["Shan states", "Shan States"]]),
+    ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+    ...KHIVA,
+    // Inner Mongolia, the Mongols', and the lands beyond Liaodong, which the source draws inside the Ming
+    ...SPLIT("Ming Chinese Empire", [["Northern Yuan", "Mongol Khanate"]]),
+    ...JURCHENS("Ming Chinese Empire", "Ming Chinese Empire"),
+    INUIT,
+    ...FILL([
+      ["Moghulistan", "Eastern Moghulistan"],
+      ["Northern Yuan", "Mongol Khanate"],
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Songhai", "Songhai Empire"],
+      ["Mali", "Mali Empire"],
+      ["Sultanate of Brunei", "Sultanate of Brunei"],
+      ["Sultanate of Maguindanao", "Sultanate of Maguindanao"],
+      ["Korea", "Joseon"],
+      ["Kingdom of Kongo", "Kingdom of Kongo"],
+    ]),
+  ],
+  1600: [
+    // Akbar's conquests, which the source labels "Islamic and Hindu states"
+    ...SPLIT("Islamic and Hindu states", [["Mughal Empire", "Mughal Empire"], ["Safavid Empire", "Safavid Dynasty"]]),
+    ...SPLIT("Vijayanagara", [
+      ["Bijapur", "Bijapur Sultanate"],
+      ["Madurai Nayaks", "Nayaks of Madurai", { s: "Vijayanagara" }],
+      ["Mysore", "Kingdom of Mysore", { s: "Vijayanagara" }],
+      ["Thanjavur Nayaks", "Nayaks of Thanjavur", { s: "Vijayanagara" }],
+    ]),
+    ...SPLIT("Ahmadnagar", [["Mughal Empire", "Mughal Empire"], ["Bijapur", "Bijapur Sultanate"], ["Bidar", "Bidar Sultanate"]]),
+    ...TRINH_NGUYEN(1600),
+    ...SPLIT("Champa", [["Laos", "Lan Xang"]]),
+    ...SPLIT("Burmese kingdoms", [["Kingdom of Mrauk U", "Kingdom of Mrauk U"]]),
+    ...SPLIT("Kingdom of Kandy", [["Portuguese Ceylon", "Portuguese Ceylon", { s: "Portugal" }]]),
+    // the source's "central Asian khanates" (renamed "Siberian peoples"): Khalkha, the Chahar (the Northern Yuan khans)
+    // and Tümed Mongols, the Oirats, Yarkent and the Kazakhs. Cliopatria's "Golden Horde" here is Mongolia, Khalkha in
+    // the east and Oirat west of the Altai. The Ming's Inner Mongolia was the Chahar's.
+    ...SPLIT("Ming Chinese Empire", [["Northern Yuan", ["Mongol Khanate", "Golden Horde"]], ["Tümed Mongols", "Tümed"]]),
+    ...SPLIT("Siberian peoples", [
+      ["Khalkha Mongols", "Golden Horde"],
+      ["Northern Yuan", "Mongol Khanate"],
+      ["Tümed Mongols", "Tümed"],
+      ["Yarkent Khanate", ["Eastern Moghulistan", "Western Moghulistan"]],
+      ["Oirats", "Khoshut Khanate"],
+      ["Kazakh Khanate", "Kazakh Khanate"],
+    ]),
+    { to: "Oirats", poly: [[70, 36], [90, 36], [90, 56], [70, 56], [70, 36]], from: ["Khalkha Mongols"] },
+    // Ferghana and the Pamirs, Bukhara's
+    { to: "Khanate of Bukhara", poly: [[69.5, 36.5], [74.5, 36.5], [74.5, 41.5], [69.5, 41.5], [69.5, 36.5]], from: ["Siberian peoples"] },
+    ...KHIVA,
+    ...JURCHENS("Ming Chinese Empire", "Ming Chinese Empire"),
+    INUIT,
+    ...FILL([
+      ["Saadi Sultanate", "Saadi Sultanate"],
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Mali", "Mali Empire"],
+      ["Sultanate of Maguindanao", "Sultanate of Maguindanao"],
+      ["Korea", "Joseon"],
+      ["Kingdom of Kongo", "Kingdom of Kongo"],
+    ]),
+  ],
+  1650: [
+    ...SPLIT("Siberian and Amur peoples", [
+      ["Yarkent Khanate", "Eastern Moghulistan"],
+      ["Dzungar Khanate", "Oirat Confederation"],
+      ["Khoshut Khanate", ["Khoshut Khanate", "Tümed"]],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+      ["Manchu Empire", "Qing Dynasty"],
+      // Cliopatria's "Golden Horde" here is Khalkha Mongolia, which ruled itself until 1691
+      ["Khalkha Mongols", "Golden Horde"],
+    ]),
+    // Badakhshan
+    { to: "Khanate of Bukhara", poly: [[67.5, 35.5], [72.5, 35.5], [72.5, 38.6], [67.5, 38.6], [67.5, 35.5]], from: ["Siberian and Amur peoples"] },
+    // the Southern Ming, still holding the south-west in 1650
+    ...SPLIT("Manchu Empire", [["Southern Ming", "Southern Ming"]]),
+    ...SPLIT("Gondwana kingdoms", [["Mughal Empire", "Mughal Empire"], ["Golkonda", "Golconda Sultanate"]]),
+    ...SPLIT("Vijayanagara", [
+      ["Bijapur", "Bijapur Sultanate"],
+      ["Madurai Nayaks", "Nayaks of Madurai"],
+      ["Mysore", "Kingdom of Mysore"],
+      ["Thanjavur Nayaks", "Nayaks of Thanjavur"],
+    ]),
+    ...TRINH_NGUYEN(1650),
+    ...SPLIT("Champa", [["Laotian states", "Lan Xang"]]),
+    EZO("Tokugawa shogunate"),
+    ...KHIVA,
+    INUIT,
+    // Puerto Rico and Jamaica (English from 1655), which the source draws inside its shapes for Hispaniola and Cuba
+    { to: "Puerto Rico (Spain)", ne0: ["Puerto Rico"], from: ["Hispaniola (Spain)"], s: "Spanish Habsburg" },
+    { to: "Jamaica (Spain)", ne0: ["Jamaica"], from: ["Cuba (Spain)"], s: "Spanish Habsburg" },
+    ...FILL([
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Zaydi Imamate", "Qasimids"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Kingdom of Kongo", "Kingdom of Kongo"],
+      ["Oman", "Yarubid dynasty"],
+      ["Principality of Mingrelia", "Principality of Mingrelia"],
+      ["Kingdom of Imereti", "Kingdom of Imereti"],
+      ["Principality of Abkhazia", "Principality of Abkhazia"],
+    ]),
+  ],
+  1700: [
+    // Khalkha Mongolia (Qing from 1691), the Dzungars and Russia's Siberia, which the source labels "central Asian khanates"
+    ...SPLIT("Kyrgyz", [
+      ["Manchu Empire", "Qing Dynasty"],
+      ["Dzungar Khanate", "Dzungar Khanate"],
+      ["Tsardom of Muscovy", "Tsardom of Russia"],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+    ]),
+    ...SPLIT("Hindu kingdoms", [
+      ["Kingdom of Mysore", "Kingdom of Mysore"],
+      ["Madurai Nayak kingdom", "Nayaks of Madurai"],
+      ["Thanjavur Maratha kingdom", "Thanjavur Maratha Kingdom"],
+    ]),
+    ...TRINH_NGUYEN(1700),
+    ...SPLIT("Champa", [["Laotian states", "Lan Xang"]]),
+    EZO("Tokugawa shogunate"),
+    ...KHIVA,
+    INUIT,
+    // the Caribbean, where the source still draws the Spanish islands of 1650: Jamaica was English from 1655, western
+    // Hispaniola French (Saint-Domingue, ceded in 1697)
+    { to: "Jamaica", ne0: ["Jamaica"], from: ["Cuba (Spain)"], s: "England" },
+    { to: "Saint-Domingue", ne0: ["Haiti"], from: ["Hispaniola (Spain)"], s: "France" },
+    { to: "Puerto Rico (Spain)", ne0: ["Puerto Rico"], from: ["Hispaniola (Spain)"], s: "Spanish Habsburg" },
+    ...FILL([
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Haudenosaunee Confederacy", "Haudenosaunee"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Zaydi Imamate", "Qasimids"],
+      ["Oman", "Yarubid dynasty"],
+      ["Dutch Cape Colony", "Dutch Cape Colony", { s: "Netherlands" }],
+      ["Kingdom of Imereti", "Kingdom of Imereti"],
+      ["Principality of Abkhazia", "Principality of Abkhazia"],
+      ["Principality of Mingrelia", "Principality of Mingrelia"],
+    ]),
+  ],
+  1715: [
+    ...SPLIT("Kyrgyz", [
+      ["Dzungar Khanate", "Dzungar Khanate"],
+      ["Manchu Empire", "Qing Dynasty"],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+      ["Khanate of Kokand", "Khanate of Kokand"],
+    ]),
+    ...TRINH_NGUYEN(1715),
+    // Lan Xang split into three kingdoms in 1707–1713
+    ...SPLIT(["Laotian states", "Champa"], [
+      ["Kingdom of Luang Phrabang", "Kingdom of Luang Phrabang"],
+      ["Kingdom of Vientiane", "Vientiane"],
+      ["Kingdom of Champasak", "Kingdom of Champasak"],
+    ]),
+    EZO("Tokugawa shogunate"),
+    ...KHIVA,
+    ...FILL([
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Zaydi Imamate", "Qasimids"],
+      ["Korea", "Joseon"],
+      ["Oman", "Yarubid dynasty"],
+      ["Asante", "Ashanti Empire"],
+      ["Kingdom of Imereti", "Kingdom of Imereti"],
+      ["Principality of Abkhazia", "Principality of Abkhazia"],
+      ["Principality of Mingrelia", "Principality of Mingrelia"],
+    ]),
+  ],
+  1783: [
+    ...SPLIT("Kazakh Khanate", [
+      ["Khanate of Khiva", "Khanate of Khiva"],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+      ["Khanate of Kokand", "Khanate of Kokand"],
+      ["Caucasian khanates", "Khanates of the Caucasus"],
+      ["Qing Empire", "Qing Dynasty"],
+      ["Russian Empire", "Russian Empire"],
+      ["Persia", "Zand Dynasty"],
+    ]),
+    // Kashmir, Peshawar and Afsharid Khorasan were Durrani; the Sikh misls held the Punjab
+    ...SPLIT(["Himalayan hill states", "Persia"], [["Durrani Empire", "Durrani Empire"]]),
+    ...SPLIT("Himalayan hill states", [["Sikh Confederacy", "Sikh Confederacy"]]),
+    ...SPLIT("Poland", [["Duchy of Courland", "Duchy of Courland", { s: "Poland" }]]),
+    // the Tây Sơn held the south, from Quảng Ngãi down; the Trịnh had taken Phú Xuân (Huế) in 1775
+    ...SPLIT("Đại Việt (Trịnh lords)", [["Tây Sơn dynasty", "Tây Sơn dynasty"]]),
+    { to: "Tây Sơn dynasty", poly: [[102, 8], [110, 8], [110, 15.5], [102, 15.5], [102, 8]], from: ["Đại Việt (Trịnh lords)"] },
+    // Tibet, a Qing protectorate from 1720 with its own government
+    ...SPLIT("Qing Empire", [["Tibet", "Tibet", { s: "Qing Empire" }]]),
+    EZO("Japan"),
+    // the source draws Assam inside Burma, which only invaded it in 1817
+    { ...AHOM, blank: undefined, from: ["Burma"] },
+    // Rupert's Land, the Hudson's Bay Company's charter lands (the Hudson Bay basin), from OpenHistoricalMap. The source
+    // stretches it to the Pacific and California: beyond the basin, the peoples the source's 1715 map draws there come back
+    // and the rest gets broad labels (Quebec's share up to the Hudson Bay watershed, as the Quebec Act of 1774 set it)
+    ...RL_PEOPLES.map((n) => ({ to: n, source: [1715, n], from: ["Rupert's Land"] })),
+    { to: "Dene and Inuit", poly: [[-131, 56.5], [-83.5, 56.5], [-83.5, 72.5], [-131, 72.5], [-131, 56.5]], from: ["Rupert's Land"] },
+    { to: "Pacific Northwest peoples", poly: [[-129, 39.5], [-112.5, 39.5], [-112.5, 54.5], [-129, 54.5], [-129, 39.5]], from: ["Rupert's Land"] },
+    { to: "Athabascan", poly: [[-136, 57], [-128.5, 57], [-128.5, 62], [-136, 62], [-136, 57]], from: ["Rupert's Land"] },
+    { to: "Province of Quebec", poly: [[-77, 47], [-63.5, 47], [-63.5, 56], [-77, 56], [-77, 47]], from: ["Rupert's Land"] },
+    {
+      to: "Rupert's Land",
+      ohm: 2861322,
+      from: ["Rupert's Land", "Dene and Inuit", "Pacific Northwest peoples", "Province of Quebec", "Louisiana (Spain)", ...RL_PEOPLES],
+      s: "Kingdom of Great Britain",
+      w: "Granted to the Hudson's Bay Company in 1670: the lands draining into Hudson Bay. First Nations held the land around its trading posts.",
+    },
+    // South America from OpenHistoricalMap's outlines for 1783: the source draws New Granada with Venezuela, the
+    // Guianas and part of Brazil, Upper Peru inside Peru, and Dutch Suriname as British. Peoples who ruled themselves keep
+    // their land.
+    { to: "Viceroyalty of Brazil", ohm: 2848719, from: ["Viceroyalty of New Granada", "Viceroyalty of Peru"] },
+    // (with Trinidad, attached to Venezuela in 1777)
+    { to: "Captaincy General of Venezuela", ohm: 2842586, from: ["Viceroyalty of New Granada"], s: "Spain" },
+    ...[
+      ["Suriname", 2806842],
+      ["Colony of Berbice", 2848056],
+      ["Colony of Demerara", 2848064],
+      ["Colony of Essequibo", 2848071],
+    ].map(([to, ohm]) => ({ to, ohm, from: ["Suriname", "Viceroyalty of New Granada", "Viceroyalty of Brazil"], s: "Netherlands" })),
+    { to: "Colony of French Guiana", ohm: 2861194, from: ["Suriname", "Viceroyalty of New Granada", "Viceroyalty of Brazil"], s: "France" },
+    { to: "Viceroyalty of the Río de la Plata", ohm: 2860720, from: ["Viceroyalty of Peru", "Paraguay", "Viceroyalty of Brazil"] },
+    { to: "Viceroyalty of Peru", ohm: 2850566, from: ["Viceroyalty of New Granada", "Viceroyalty of the Río de la Plata"] },
+    { to: "Viceroyalty of New Granada", ohm: 2964943, exact: true, from: ["Viceroyalty of New Granada"] },
+    // Saint-Domingue, France's richest colony, which the source leaves unnamed
+    { to: "Saint-Domingue", ne0: ["Haiti"], fill: true, s: "France" },
+    ...FILL([
+      ["Funj", "Funj Sultanate"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Zaydi Imamate", "Qasimids"],
+    ]),
+  ],
+};
+
 const TERRITORY = {
+  ...BEFORE_1800,
   1800: [
     ...MICROSTATES,
     CUTCH,
@@ -1137,12 +2080,15 @@ const TERRITORY = {
     // conquered by 1900 (Samori Touré's empire in 1898, the Ndebele kingdom in 1893). Today's borders were mostly drawn
     // by 1900, between colonies; states still ruling themselves keep their own shapes
     { to: "Morocco", ne0: ["Morocco"] },
-    { to: "Rio De Oro", ne0: ["W. Sahara"], s: "Spain" },
+    ...SPANISH_SAHARA("Rio De Oro", "Morocco", 26),
     { to: "Algeria", ne0: ["Algeria"], s: "France" },
     { to: "Tunisia", ne0: ["Tunisia"], s: "France" },
     { to: "Ottoman Empire", ne0: ["Libya"] }, // Tripolitania and Cyrenaica, Ottoman until 1912
     { to: "Egypt", ne0: ["Egypt"], s: UK_1900S, w: "A khedivate under nominal Ottoman rule, occupied by Britain since 1882." },
     { to: "Anglo-Egyptian Sudan", ne0: ["Sudan", "S. Sudan"], s: UK_1900S, w: "Ruled jointly by Britain and Egypt from 1899, in practice by Britain." },
+    { to: "Lado Enclave", ohm: 2961764, s: "Congo Free State", w: "Leased to King Leopold II for the Congo Free State in 1894; it went back to the Anglo-Egyptian Sudan in 1910, after his death." },
+    // OpenHistoricalMap's Khiva leaves out the oasis of Khiva and Urgench itself, today's Khorezm province
+    { to: "Khanate of Khiva", ne1: ["Uzbekistan/Khorezm"], s: "Russian Empire" },
     { to: "Darfur", ne1: ["Central Darfur", "Southern Darfur", "North Darfur", "Western Darfur", "Eastern Darfur"].map((p) => `Sudan/${p}`), w: "A sultanate restored in 1898. Counted as part of Anglo-Egyptian Sudan, it ran its own affairs until Britain conquered it in 1916." },
     { to: "Ethiopia", ne0: ["Ethiopia"] },
     { to: "Eritrea", ne0: ["Eritrea"], s: "Italy" },
@@ -1172,7 +2118,7 @@ const TERRITORY = {
     { to: "Liberia", ne0: ["Liberia"] },
     { to: "Ivory Coast", ne0: ["Côte d'Ivoire"], s: "France" },
     { to: "Gold Coast", ne0: ["Ghana"], s: UK_1900S, w: "A British colony; Ashanti, occupied in 1896, rose in 1900 and was annexed in 1902." },
-    { to: "Togoland", source: [1914, "Togoland"], s: "Germany" }, // German Togoland's borders were set by 1899
+    { to: "Togoland", ne1: ["Ghana/Volta"], s: "Germany" }, // the south-west of German Togoland, in Ghana today
     { to: "Dahomey", ne0: ["Benin"], s: "France" },
     { to: "Lagos", ne1: NIGERIA(["Lagos", "Ogun", "Oyo", "Osun", "Ondo", "Ekiti"]), s: UK_1900S, w: "The British Colony and Protectorate of Lagos (shown approximately)." },
     { to: "Southern Nigeria", ne1: NIGERIA(["Edo", "Delta", "Bayelsa", "Rivers", "Akwa Ibom", "Cross River", "Abia", "Imo", "Anambra", "Enugu", "Ebonyi"]), s: UK_1900S, w: "A British protectorate from 1900 (shown approximately)." },
@@ -1227,10 +2173,15 @@ const TERRITORY = {
     { to: "Chile", ne0: ["Chile"] }, // Chile took the Atacama coast from Bolivia and Peru in 1879–1884
     { to: "Chile", ne1: ["Peru/Tacna"] }, // held by Chile until 1929
     { to: "Bolivia", ne1: ["Brazil/Acre"] }, // Bolivian until 1903
+    ...AMAZON_CHACO,
   ],
   1914: [
     ...MICROSTATES,
     KALIMANTAN("Netherlands Indies"),
+    ...SPAIN_IN_AFRICA(["Kingdom of Spain"], "Morocco", false),
+    { to: "Mongolia", ne0: ["Mongolia"], w: "The Bogd Khanate, which broke away from China in 1911; it accepted autonomy under Chinese suzerainty in 1915." },
+    { to: "Khanate of Khiva", ne1: ["Uzbekistan/Khorezm"], s: "Russian Empire" }, // the oasis OpenHistoricalMap's Khiva leaves out
+    { to: "Abyssinia", ne0: ["Ethiopia"], from: ["Sultanate of Hobyo"] }, // OpenHistoricalMap's Hobyo runs into the Ogaden
     ADEN(UK_1930S),
     ...BRITISH_ISLES(UK_1930S),
     { to: "British Somaliland", ne0: ["Somaliland"] },
@@ -1244,9 +2195,12 @@ const TERRITORY = {
     { to: "Trinidad and Tobago", ne0: ["Trinidad and Tobago"], s: UK_1930S },
     { to: "Cape Verde", ne0: ["Cabo Verde"], s: "Portugal" },
     { to: "Réunion", ne1: ["France/La Réunion"], s: "France" },
-    ...EGYPT_LIBYA("Libya"),
+    ...EGYPT_LIBYA("Libya", "Kingdom of Italy", { s: UK_1930S, w: "A khedivate under nominal Ottoman rule, occupied by Britain since 1882; a British protectorate from December 1914." }),
     // Chad, Ubangi-Shari and the Congo were French Equatorial Africa from 1910, not French West Africa
     { to: "French Equatorial Africa", ne0: ["Chad", "Central African Rep.", "Congo", "Gabon"], from: ["French West Africa"] },
+    // the Barotseland border set by arbitration in 1905 (OpenHistoricalMap draws the line held before it until 1915)
+    { to: "Angola", ne0: ["Angola"], from: ["Northern Rhodesia"] },
+    ...AMAZON_CHACO,
     ...COLONIAL_BORDERS(UK_1930S, "United States"),
     ...BORNEO(UK_1930S),
     ...KOREA_TAIWAN("Empire of Japan"),
@@ -1260,20 +2214,33 @@ const TERRITORY = {
     KALIMANTAN("Dutch East Indies"),
     ...BRITISH_ISLES(UK_1930S),
     ...LAUSANNE("Ottoman Sultanate", 1920),
+    GREENLAND,
+    ...GULF(UK_1930S, UK_1930S),
+    SOUTH_WEST_AFRICA("Union of South Africa"),
+    ALGERIA("Algeria"),
+    FRENCH_EQUATORIAL_AFRICA,
+    ...SPAIN_IN_AFRICA(["Kingdom of Spain"], "Morocco", false),
     ADEN(UK_1930S),
-    { to: "Mandatory Palestine (GB)", ne0: ["Jordan"] }, // east of the Jordan: part of the British mandate (the emirate from 1921)
-    { to: "Hejaz", ne1: ["Jordan/Aqaba", "Jordan/Ma`an"] }, // Aqaba and Ma'an were held by the Hejaz until 1925
+    { to: "Mandatory Palestine (GB)", ne0: ["Jordan"], s: UK_1930S }, // east of the Jordan: part of the British mandate (the emirate from 1921)
+    { to: "Kingdom of Hejaz", ne1: ["Jordan/Aqaba", "Jordan/Ma`an"] }, // Aqaba and Ma'an were held by the Hejaz until 1925
+    { to: "Khorezm People's Soviet Republic", ne1: ["Uzbekistan/Khorezm"] }, // the oasis OpenHistoricalMap's outline leaves out
+    { to: "Ethiopia", ne0: ["Ethiopia"], from: ["Sultanate of Hobyo", "Majeerteen Sultanate"] }, // OpenHistoricalMap's outlines run into the Ogaden
+    // the Byelorussian SSR of late 1920 was the land around Minsk: the provinces to its east were Soviet Russia's
+    // until 1924 and 1926 (approximately, by today's provinces)
+    { to: "Soviet Russia (RSFSR)", ne1: ["Belarus/Vitebsk", "Belarus/Mogilev", "Belarus/Gomel"], from: ["Byelorussian SSR"] },
+    ...LAOS_CAMBODIA,
+    ...AMAZON_CHACO,
     { to: "Kenya", ne1: JUBALAND },
     { to: "British Cameroons", ne1: SOUTHERN_CAMEROONS, s: UK_1930S }, // a British mandate, never French
     ...ISLANDS(UK_1930S),
     { to: "Bahamas", ne0: ["Bahamas"], s: UK_1930S },
-    ...EGYPT_LIBYA("Libya (IT)"),
+    ...EGYPT_LIBYA("Libya (IT)", "Italy", { s: UK_1930S, w: "A British protectorate from 1914; Britain recognised its independence in 1922." }),
     ...COLONIAL_BORDERS(UK_1930S, "United States"),
     ...BORNEO(UK_1930S),
     ...KOREA_TAIWAN("Empire of Japan"),
     PORTUGUESE_TIMOR,
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true }, // French Togoland; the west was British Togoland, run with the Gold Coast
+    TOGO, // the west was British Togoland, run with the Gold Coast
     { to: "Greece", ne0: ["Greece"] }, // with its Aegean islands, Greek from 1912
     { to: "Dodecanese Islands", ne0: ["Greece"], pick: DODECANESE, s: "Italy" },
     CYPRUS_COLONY(UK_1930S),
@@ -1285,6 +2252,12 @@ const TERRITORY = {
     KALIMANTAN("Dutch East Indies"),
     ...BRITISH_ISLES(UK_1930S),
     ...LAUSANNE("Republic of Turkey", 1930),
+    GREENLAND,
+    ...GULF(UK_1930S, UK_1930S),
+    SOUTH_WEST_AFRICA("Union of South Africa"),
+    ALGERIA("Algeria"),
+    FRENCH_EQUATORIAL_AFRICA,
+    ...SPAIN_IN_AFRICA(["Kingdom of Spain"], "Morocco", false),
     ADEN(UK_1930S),
     { to: "Transjordan", ne0: ["Jordan"], s: UK_1930S }, // an emirate under British mandate, 1921–1946
     { to: "British Cameroons", ne1: SOUTHERN_CAMEROONS, s: UK_1930S },
@@ -1299,7 +2272,9 @@ const TERRITORY = {
     ...KOREA_TAIWAN("Empire of Japan"),
     PORTUGUESE_TIMOR,
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true },
+    TOGO,
+    ...LAOS_CAMBODIA,
+    ...AMAZON_CHACO,
   ],
   1938: [
     ...MICROSTATES,
@@ -1307,6 +2282,11 @@ const TERRITORY = {
     ...BRITISH_ISLES(UK_LATER),
     { to: "Italy", ne0: ["Greece"], pick: DODECANESE }, // the Dodecanese
     ...LAUSANNE("Turkey", 1938),
+    GREENLAND,
+    ...GULF(UK_LATER, UK_LATER),
+    SOUTH_WEST_AFRICA("Union of South Africa"),
+    ALGERIA("Algeria (France)"),
+    ...SPAIN_IN_AFRICA(["Second Spanish Republic", "Spanish Nationalists"], "Morocco (France)", true),
     ADEN(UK_LATER),
     { to: "Transjordan", ne0: ["Jordan"], s: UK_LATER },
     { to: "Iraq", ne0: ["Iraq"] }, // independent from October 1932
@@ -1322,10 +2302,11 @@ const TERRITORY = {
     ...KOREA_TAIWAN("Empire of Japan"),
     PORTUGUESE_TIMOR,
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true },
+    TOGO,
     { to: "Haiti", ne0: ["Haiti"], exact: true }, // the border with the Dominican Republic fixed in 1929–1936
     { to: "Cape Verde", ne0: ["Cabo Verde"], s: "Portugal" },
     { to: "Réunion", ne1: ["France/La Réunion"], s: "France" },
+    ...LAOS_CAMBODIA,
   ],
   1945: [
     ...MICROSTATES,
@@ -1339,6 +2320,35 @@ const TERRITORY = {
     { to: "Germany (Soviet)", ne0: ["Germany"], pick: [11.3, 53.85, 14.5, 54.75] },
     ADEN(UK_LATER),
     PORTUGUESE_TIMOR, // Indonesia was not yet a state
+    GREENLAND,
+    ...GULF(UK_LATER, null),
+    SOUTH_WEST_AFRICA("South Africa"),
+    ALGERIA("Algeria"),
+    ...SPAIN_IN_AFRICA(["Francoist Spain"], "Morocco", true),
+    // French West and Equatorial Africa, by colony
+    ...[["Senegal", "Senegal"], ["Mauritania", "Mauritania"], ["French Sudan", "Mali"], ["Niger", "Niger"], ["French Guinea", "Guinea"], ["Ivory Coast", "Côte d'Ivoire"], ["Dahomey", "Benin"], ["Chad", "Chad"], ["Ubangi-Shari", "Central African Rep."], ["Middle Congo", "Congo"], ["Gabon", "Gabon"]].map(([to, n]) => ({ to, ne0: [n], s: "France" })),
+    // Germany's occupation zones: OpenHistoricalMap draws the American and British ones and Berlin's sectors; the Soviet
+    // zone and the French one by today's states, and the French part of Baden-Württemberg
+    { to: "Germany (Soviet)", ne1: ["Mecklenburg-Vorpommern", "Brandenburg", "Sachsen", "Sachsen-Anhalt", "Thüringen"].map((n) => `Germany/${n}`), s: "USSR" },
+    { to: "Germany (Soviet)", ohm: 2693415 }, // Berlin's Soviet sector (OHM's East Berlin)
+    { to: "Germany (France)", ne1: ["Germany/Rheinland-Pfalz", "Germany/Saarland"], s: "France" },
+    { to: "Germany (France)", ne1: ["Germany/Baden-Württemberg"], from: ["France", "French Fourth Republic"], s: "France" },
+    // East Asia after Japan's surrender
+    { to: "Japan (USA)", ne0: ["Japan"], s: "United States", w: "Occupied by the Allies, chiefly the United States, from September 1945 until 1952." },
+    // what OpenHistoricalMap's Empire of Japan of late 1945 still holds beyond Japan: the Kwantung peninsula, taken by
+    // the Soviet army, and the Pacific islands of Japan's mandate, taken by the United States
+    { to: "Kwantung (USSR)", poly: [[120.8, 38.6], [122.9, 38.6], [122.9, 39.5], [120.8, 39.5], [120.8, 38.6]], from: ["Empire of Japan"], s: "USSR", w: "The Kwantung Leased Territory, Japanese from 1905, taken by the Soviet army in August 1945. The Soviet Union kept Port Arthur as a naval base until 1955." },
+    { to: "Pacific Islands (USA)", poly: [[130, 0], [172, 0], [172, 22], [130, 22], [130, 0]], from: ["Empire of Japan"], s: "United States", w: "Japan's League of Nations mandate, taken by the United States in 1944–45; a UN trust territory under US rule from 1947." },
+    { to: "USSR", ne1: ["Russia/Sakhalin"] }, // southern Sakhalin and the Kurils, taken by the Soviet Union in August 1945
+    { to: "Taiwan", ne0: ["Taiwan"], s: "China", w: "A Japanese colony from 1895; run by the Republic of China from October 1945." },
+    { to: "French Indochina", ne0: ["Vietnam"], s: "France", w: "Under Japanese control from 1940. In September 1945 Ho Chi Minh declared Vietnam independent in Hanoi while British and French troops retook the south; war with France followed in 1946." },
+    { to: "Laos", ne0: ["Laos"], s: "France" },
+    // Thailand gave back the Malay states and the Shan lands Japan had given it in 1943 after the war, but held the
+    // land it took from French Indochina in 1941 until November 1946
+    { to: "Thailand", ne1: ["Laos/Xaignabouri"] },
+    { to: "British Malaya", ne1: ["Malaysia/Kedah", "Malaysia/Perlis", "Malaysia/Kelantan", "Malaysia/Terengganu"], from: ["Thailand"] },
+    { to: "Burma", ne1: ["Myanmar/Shan"], from: ["Thailand"] },
+    { to: "Netherlands New Guinea", ne1: ["Indonesia/Papua", "Indonesia/Papua Barat"], s: "Netherlands" },
     // Upper Volta was split between its neighbours from 1932 to 1947 (approximately, by today's provinces)
     { to: "Ivory Coast", ne0: ["Burkina Faso"] },
     { to: "Niger", ne1: ["Gourma", "Gnagna", "Tapoa", "Komondjari", "Kompienga", "Séno", "Yagha", "Oudalan", "Soum"].map((p) => `Burkina Faso/${p}`) },
@@ -1353,7 +2363,7 @@ const TERRITORY = {
     ...COLONIAL_BORDERS(UK_LATER, "United States"),
     ...BORNEO(UK_LATER),
     HAWAII("United States"),
-    { to: "Togo", ne0: ["Togo"], exact: true },
+    TOGO,
     { to: "Haiti", ne0: ["Haiti"], exact: true },
     { to: "Dominion of Newfoundland", ne1: ["Canada/Newfoundland and Labrador"], s: UK_LATER }, // part of Canada only from 1949
     { to: "Cape Verde", ne0: ["Cabo Verde"], s: "Portugal" },
@@ -1367,7 +2377,17 @@ const TERRITORY = {
     { to: "USSR", ne0: ["Estonia", "Latvia", "Lithuania"] },
     ADEN(UK_LATER),
     { to: "Jordan", ne0: ["Palestine"], pick: [34.8, 31.2, 35.7, 32.7] }, // the West Bank, annexed by Jordan in 1950
-    { to: "Egypt", ne0: ["Palestine"], pick: [34.1, 31.1, 34.7, 31.7] }, // Gaza, held by Egypt from 1948 to 1967
+    ...GULF(UK_LATER, null),
+    SOUTH_WEST_AFRICA("South Africa"),
+    ALGERIA("Algeria"),
+    ...SPANISH_SAHARA("Spanish Sahara", "Morocco"),
+    { to: "Ifni", poly: IFNI, s: "Spain", w: "Spanish from 1934 until it was returned to Morocco in 1969." },
+    { to: "Eritrea", ne0: ["Eritrea"], s: "Ethiopia", w: "Federated with Ethiopia from 1952 as an autonomous unit; Ethiopia annexed it in 1962." },
+    ...RHODESIAS(UK_LATER),
+    { to: "Angola", ne0: ["Angola"], s: "Portugal" },
+    { to: "Mozambique", ne0: ["Mozambique"], s: "Portugal" },
+    { to: "East Germany", ohm: 2693415 }, // East Berlin, its capital (the Western powers held it to be the Soviet sector)
+    { to: "United Arab Republic", ne0: ["Palestine"], pick: [34.1, 31.1, 34.7, 31.7] }, // Gaza, held by Egypt from 1948 to 1967
     { to: "British Cameroons", ne1: SOUTHERN_CAMEROONS, s: UK_LATER }, // a British trust territory until October 1961
     ...ISLANDS(UK_LATER),
     { to: "Yemen", ne1: NORTH_YEMEN, exact: true },
@@ -1418,6 +2438,7 @@ function sourceShape(year, name) {
 }
 let admin1Cache = null;
 let countries50 = null;
+const ohmForRules = new Map(); // OpenHistoricalMap relation id -> its land, for the territory rules (`ohm`)
 const ADMIN1_COUNTRY = { "United Republic of Tanzania": "Tanzania", "Republic of the Congo": "Congo", "Democratic Republic of the Congo": "Dem. Rep. Congo" };
 const polysOfFeature = (f) => fixWinding(f.geometry)?.coordinates ?? [];
 /**
@@ -1481,6 +2502,7 @@ function territoryUnits(rule, year) {
     take(found.flatMap(polysOfFeature));
   }
   if (rule.poly) take(onLandOnly([[rule.poly]]));
+  if (rule.ohm) take(ohmForRules.get(rule.ohm) ?? []);
   return out;
 }
 function applyTerritory(grouped, year, slivers) {
@@ -1500,7 +2522,8 @@ function applyTerritory(grouped, year, slivers) {
     const held = []; // with `blank`: the land the shapes there hold
     for (const f of grouped) {
       if (!f.geometry.coordinates.length || !boxesMeet(boxOfPolys(f.geometry.coordinates), box)) continue;
-      if (rule.blank) {
+      // `fill`: a shape the source leaves unnamed gives way too
+      if (rule.blank || (rule.fill && f.properties.n)) {
         held.push(...f.geometry.coordinates);
         continue;
       }
@@ -1513,12 +2536,19 @@ function applyTerritory(grouped, year, slivers) {
       if (rule.exact && f.properties.n === rule.to) dropSlivers(f, before, Infinity, box, slivers, true);
       else dropSlivers(f, before, was, box, slivers);
     }
-    const give = rule.from ? taken : rule.blank && held.length ? (clipSafely(polygonClipping.difference, polys, held) ?? []) : polys;
+    const give = rule.from ? taken : (rule.blank || rule.fill) && held.length ? (clipSafely(polygonClipping.difference, polys, held) ?? []) : polys;
     if (!give.length) continue;
     let f = grouped.find((g) => g.properties.n === rule.to);
     if (f) f.geometry.coordinates = f.geometry.coordinates.length ? (clipSafely(polygonClipping.union, f.geometry.coordinates, give) ?? [...f.geometry.coordinates, ...give]) : give;
     else grouped.push((f = { type: "Feature", properties: { n: rule.to, b: 3 }, geometry: { type: "MultiPolygon", coordinates: give } }));
     setProps(f, { ...("s" in rule ? { s: rule.s || null } : {}), ...(rule.w ? { w: rule.w } : {}) });
+    // `subjects`: the shapes with at least this share of their land inside the outline keep their names, ruled by it
+    if (rule.subjects)
+      for (const g of grouped) {
+        if (g === f || !g.properties.n || g.properties.s || !boxesMeet(boxOfPolys(g.geometry.coordinates), box)) continue;
+        const inside = clipSafely(polygonClipping.intersection, g.geometry.coordinates, polys);
+        if (inside && km2Of(inside) >= rule.subjects * km2Of(g.geometry.coordinates)) g.properties.s = rule.to;
+      }
   }
   for (let i = grouped.length - 1; i >= 0; i--) {
     const g = fixWinding({ type: "MultiPolygon", coordinates: grouped[i].geometry.coordinates });
@@ -1611,13 +2641,9 @@ function touchesShape(patch, features) {
 // In these snapshots the source draws land but leaves its name blank, so it showed as "not mapped". The unnamed pieces
 // lying in that country today get the country's name back (joining its shape, for islands); the outline is the source's own.
 // `today` + `box`: the piece lies in a different country today (Tasmania, in Australia), inside this lon/lat box.
-// `s`: who ruled it, as for the source's own colonies (colonies take their ruler's colour).
-const TASMANIA = [143.5, -44, 149, -39.5];
-const TASMANIA_NOTE = "The source leaves Tasmania unnamed in this snapshot. It was the British colony of Tasmania until federation in 1901, so it is named like the mainland colonies.";
-const UNNAMED = [
-  // like the mainland colonies, ruled by the United Kingdom (the maps before 1900 are drawn from other sources)
-  { n: "Tasmania (UK)", years: [1900], today: "Australia", box: TASMANIA, s: "United Kingdom of Great Britain and Ireland", note: TASMANIA_NOTE },
-];
+// `s`: who ruled it, as for the source's own colonies (colonies take their ruler's colour). None at present: the one
+// case, Tasmania in 1900, is now drawn from other sources.
+const UNNAMED = [];
 
 /** Splits the pieces of an unnamed source shape that belong to a country in UNNAMED into shapes of their own. */
 function nameUnnamed(geometry, b, year, features, found) {
@@ -1773,10 +2799,17 @@ async function main() {
     const grouped = groupByName(features);
     const slivers = []; // thin pieces new borders cut off our shapes, left blank for the coast fill
     if (HISTOGIS[entry.year] || OHM[entry.year]) await overlayBorders(grouped, entry.year, slivers);
-    if (TERRITORY[entry.year]) applyTerritory(grouped, entry.year, slivers);
+    if (entry.year === 1400) splitMing1400(grouped);
+    if (TERRITORY[entry.year]) {
+      const ids = TERRITORY[entry.year].filter((rule) => rule.ohm).map((rule) => rule.ohm);
+      if (ids.length) for (const rel of await ohmRelations(path.join(CACHE, "ohm"), ids)) ohmForRules.set(rel.id, onLandOnly(rel.polys));
+      // the maps before 1800 use Cliopatria only for these rules
+      if (!clioRaw.has(entry.year) && TERRITORY[entry.year].some((rule) => rule.clio))
+        clioRaw.set(entry.year, cliopatriaOnLand(entry.year, await cliopatriaPolities(path.join(CACHE, "cliopatria"), entry.year)));
+      applyTerritory(grouped, entry.year, slivers);
+    }
     if (entry.year >= 1800) matchRulers(grouped);
     splitSvalbard(grouped, entry.year);
-    if (entry.year === 1400) splitMing1400(grouped);
     for (const f of grouped) {
       f.properties.a = Math.round(km2(f.geometry));
       if (f.properties.n) f.properties.l = labelPoint(f.geometry);
