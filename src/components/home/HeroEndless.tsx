@@ -6,7 +6,8 @@ import { loadEndless } from "@/lib/endless";
 import { home } from "@/content/home";
 import { FlameIcon, TrophyIcon } from "@/components/site/Icons";
 
-type Top = { name: string; score: number } | null;
+/** The best streak ever: unknown while loading, null when the board is empty, "failed" when it couldn't be reached. */
+type Top = { name: string; score: number } | null | "failed";
 
 // read here, not imported from the game, so the homepage doesn't load the game's code
 const reducedMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -48,7 +49,10 @@ export function HeroEndless() {
     fetch("/api/endless?scope=all&limit=1", { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
       .then((d: { rows?: { name: string; score: number }[] }) => setTop(d.rows?.[0] ?? null))
-      .catch(() => setTop(null));
+      .catch(() => {
+        // leaving the page cancels the request: that isn't a failure to show
+        if (!ctrl.signal.aborted) setTop("failed");
+      });
     return () => {
       window.removeEventListener("focus", read);
       ctrl.abort();
@@ -56,12 +60,13 @@ export function HeroEndless() {
   }, []);
 
   return (
-    <div className="flex flex-col rounded-card bg-[linear-gradient(160deg,var(--color-gold-soft),#ffe7a8)] p-5 text-ink shadow-float ring-1 ring-gold/70 md:px-6 md:py-5">
+    <div className="flex flex-col rounded-card bg-[linear-gradient(160deg,var(--color-gold-soft),var(--color-gold-pale))] p-5 text-ink shadow-float ring-1 ring-gold/70 md:px-6 md:py-5">
       <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-ink-soft">
         <FlameIcon className="flame-flicker size-5" /> {t.endlessEyebrow}
       </p>
       <h2 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
         <Link href="/endless" className="hover:underline">
+          <span className="sr-only">{t.endlessEyebrow}: </span>
           {t.endlessTitle}
         </Link>
       </h2>
@@ -86,7 +91,9 @@ export function HeroEndless() {
         <div className="rounded-2xl bg-white/80 px-3 py-2.5 ring-1 ring-gold/50">
           <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.endlessTop}</dt>
           <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
-            {top === undefined ? null : top ? (
+            {top === undefined ? null : top === "failed" ? (
+              <span className="text-base font-bold text-muted">{t.endlessTopFailed}</span>
+            ) : top ? (
               <>
                 <TrophyIcon className="size-7" />
                 <span aria-hidden="true">
@@ -98,7 +105,10 @@ export function HeroEndless() {
               <span className="text-base font-bold text-muted">{t.endlessTopNone}</span>
             )}
           </dd>
-          {top ? <dd className="mt-1 truncate text-xs font-semibold text-muted">{t.endlessTopBy(top.name)}</dd> : null}
+          {/* always there, so the card doesn't grow when the name arrives */}
+          <dd className="mt-1 min-h-4 truncate text-xs font-semibold text-muted" title={top && top !== "failed" ? top.name : undefined}>
+            {top && top !== "failed" ? t.endlessTopBy(top.name) : null}
+          </dd>
         </div>
       </dl>
       <div className="mt-auto pt-4">

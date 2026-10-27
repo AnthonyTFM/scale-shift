@@ -46,6 +46,7 @@
   /* soft tints for status pills and notices (green: made official, gold: by force, red: disputed or an error) */
   --color-green-soft: #ebf9f1;
   --color-gold-soft: #fff4d1;
+  --color-gold-pale: #ffe7a8;
   --color-red-soft: #fdeceb;
   /* the edge of text inputs and dropdowns: dark enough to see (3:1 against white) */
   --color-line-strong: #9c8c70;
@@ -436,7 +437,8 @@ html:has(.atlas-page:not([style*="display: none"])) body {
 }
 .flame-flicker {
   transform-origin: 50% 90%;
-  animation: flame-flicker 1.6s ease-in-out infinite;
+  /* three flickers, then still: anything moving for more than 5 seconds needs a way to stop it (WCAG 2.2.2) */
+  animation: flame-flicker 1.6s ease-in-out 3;
 }
 @media (prefers-reduced-motion: reduce) {
   .globe-float,

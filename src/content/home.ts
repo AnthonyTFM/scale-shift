@@ -43,6 +43,11 @@ export const home = {
     playCta: "Play today's game",
     playDone: (score: number) => `You scored ${score}/5 today.`,
     playDay: "Daily challenge",
+    // the daily card's two numbers, from this browser
+    playStreak: "Your streak",
+    playStreakDays: (n: number) => `${n} ${n === 1 ? "day" : "days"} in a row`,
+    playNoStreak: "Start today",
+    playPlayed: "Games played",
     playDoneCta: "See today's answers",
     // the endless card beside today's game (src/components/home/HeroEndless.tsx)
     endlessEyebrow: "Endless mode",
@@ -53,6 +58,8 @@ export const home = {
     endlessTop: "#1 streak ever",
     endlessTopBy: (name: string) => `by ${name}`,
     endlessTopNone: "Be the first",
+    // the Best streaks board couldn't be reached
+    endlessTopFailed: "Unavailable",
     endlessCta: "Play endless",
     endlessCtaBeat: (n: number) => `Beat your ${n}`,
     endlessSr: (n: number) => `${n} in a row`,

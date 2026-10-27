@@ -8,7 +8,7 @@ import { useShareBox } from "@/components/site/ShareBox";
 import { home } from "@/content/home";
 import { ClockIcon, FlameIcon } from "@/components/site/Icons";
 
-type State = { day: number; done: boolean; score?: number; streak: number };
+type State = { day: number; done: boolean; score?: number; streak: number; played: number };
 
 /** Time until the player's next local midnight, as whole hours and minutes. */
 function untilMidnight() {
@@ -29,7 +29,8 @@ export function HeroPlay() {
       const today = localDateKey();
       const save = loadSave();
       const rec = save.days[today];
-      setS({ day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: stats(save, today).streak });
+      const st = stats(save, today);
+      setS({ day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: st.streak, played: st.played });
       setLeft(untilMidnight());
     };
     read();
@@ -53,18 +54,35 @@ export function HeroPlay() {
               <span className="hidden sm:inline">{t.playDay} </span>#{s.day}
             </p>
           ) : null}
-          {s?.streak ? (
-            <p className="ml-auto inline-flex items-center gap-1 rounded-full bg-card px-2.5 py-1 text-xs font-bold ring-1 ring-line">
-              <FlameIcon className="size-4" /> {s.streak}-day streak
-            </p>
-          ) : null}
         </div>
         <h2 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
           <Link href="/daily" transitionTypes={["to-daily"]} className="hover:underline">
+            <span className="sr-only">{t.playEyebrow}: </span>
             {t.playTitle}
           </Link>
         </h2>
         <p className="mt-1 max-w-md text-muted">{s?.done ? t.playDone(s.score ?? 0) : t.playLead}</p>
+        {/* the same two boxes as the endless card beside it: your streak and how many days you've played */}
+        <dl className="mt-4 grid grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
+            <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.playStreak}</dt>
+            <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
+              {!s ? null : s.streak ? (
+                <>
+                  <FlameIcon className="size-7" />
+                  <span aria-hidden="true">{s.streak}</span>
+                  <span className="sr-only">{t.playStreakDays(s.streak)}</span>
+                </>
+              ) : (
+                <span className="text-base font-bold text-muted">{t.playNoStreak}</span>
+              )}
+            </dd>
+          </div>
+          <div className="rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
+            <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.playPlayed}</dt>
+            <dd className="mt-0.5 flex min-h-9 items-center font-display text-3xl tabular-nums leading-none">{s ? s.played : null}</dd>
+          </div>
+        </dl>
         {/* at the foot of the card, level with the endless card's button beside it */}
         <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
           <Link
