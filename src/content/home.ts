@@ -38,47 +38,39 @@ export const home = {
   // the phone bar on era pages, before today's game is played
   stickyPlay: "Play today's five",
 
-  // the game-first hero: today's game, yesterday's matchup and the map card over a floating globe, then the leaderboard
+  // the game-first hero: the two game tiles, yesterday's matchup, the Best streaks board and the map card over a floating globe
   hub: {
     mission:
       `Most web maps puff up land near the poles, so the places you know best are drawn the wrong size. ${site.name} shows nearly every country and empire at its real size, across 4,000 years of borders.`,
-    // phones show this one line instead of `mission`, so the games start on the first screen
+    // phones show this one line instead of `mission` on a first visit, so the games start on the first screen
     missionShort: "Normal web maps get sizes wrong. Can you tell what's really bigger?",
-    playEyebrow: "Today's game",
+    // returning players (anyone who has played here) see this one line instead of the big headline and `mission`
+    welcomeBack: "Welcome back. The map is still lying.",
+    // the two game tiles at the top (src/components/home/HeroPlay.tsx and HeroEndless.tsx): one stat line each
+    playEyebrow: (day: number) => `Daily #${day}`,
     playTitle: "Which is bigger?",
-    playLead: "Five matchups, about two minutes. The map will try to fool you.",
-    playCta: "Play today's five",
-    playDone: (score: number) => `You scored ${score}/5 today.`,
-    playDay: "Daily challenge",
-    // the daily card's two numbers, from this browser
-    playStreak: "Your streak",
-    playStreakDays: (n: number) => `${n} ${n === 1 ? "day" : "days"} in a row`,
-    playNoStreak: "Start today",
-    // played today: today's score in the first box
-    playToday: "Today",
-    playTodaySr: (score: number, total: number) => `${score} out of ${total}`,
-    // not played yet today: days with all five right
-    playPerfect: "Perfect days",
-    // a first visit, one box instead of two: yesterday's anonymous counts once enough played, else an invitation
-    playTeaserLabel: "Yesterday",
-    playTeaser: (pct: number) => `Only ${pct}% went 5 for 5. Can you?`,
-    playNewLabel: "New here?",
-    playNew: "Start your streak today",
-    playDoneCta: "See today's results",
-    // the endless card beside today's game (src/components/home/HeroEndless.tsx)
-    endlessEyebrow: "Endless mode",
+    playNew: "5 matchups · 2 min",
+    playStreakSr: (n: number) => `${n}-day streak`,
+    playTodaySr: (score: number, total: number) => `${score} out of ${total} today`,
+    playToday: "today",
+    playPerfect: (n: number) => `${n} perfect`,
+    playNoStreak: "Start a streak",
+    playCta: "Play",
+    playCtaLong: "Play today's five",
+    playDoneCta: "Results",
+    playDoneCtaLong: "See today's results",
+    endlessEyebrow: "Endless",
     endlessTitle: "How long can you last?",
-    endlessLead: "Closer and closer matchups, until your first miss.",
-    endlessYourBest: "Your best",
-    endlessNoBest: "No run yet",
-    endlessTop: "#1 streak ever",
-    endlessTopBy: (name: string) => `by ${name}`,
-    endlessTopNone: "Be the first",
-    // the Best streaks board couldn't be reached
-    endlessTopFailed: "Unavailable",
-    endlessCta: "Play endless",
-    endlessCtaBeat: (n: number) => `Beat your ${n} in a row`,
-    endlessSr: (n: number) => `${n} in a row`,
+    endlessNew: "Until your first miss",
+    endlessBestSr: (n: number) => `Your best: ${n} in a row`,
+    endlessTopLine: (n: number) => `#1: ${n}`,
+    endlessTopSr: (n: number, name: string) => `Best ever: ${n} in a row, by ${name}`,
+    endlessCta: "Play",
+    endlessCtaLong: "Play endless",
+    endlessCtaBeat: (n: number) => `Beat ${n}`,
+    endlessCtaBeatLong: (n: number) => `Beat your ${n} in a row`,
+    // the button's name for screen readers: starts with the short label on phones ("Beat 12"), as WCAG 2.5.3 asks
+    endlessCtaBeatSr: (n: number) => `Beat ${n}, your best run in endless mode`,
     mapEyebrow: "The real-size map",
     mapTitle: "Drag any country anywhere",
     mapLead: "Drag Russia to the equator and watch it shrink. Any country, any era.",
@@ -96,7 +88,6 @@ export const home = {
     boardFailed: "Couldn't load the leaderboard. Try again in a minute.",
     nextIn: (h: number, m: number) => `Next five in ${h ? `${h}h ${m}m` : `${m}m`}`,
     nextReady: "Five new matchups are ready",
-    challengeCta: "Challenge a friend",
     spotWaiting: "Your spot is waiting",
     spotPlay: "Play now",
   },

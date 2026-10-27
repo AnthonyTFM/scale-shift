@@ -34,7 +34,7 @@ function CountUp({ to }: { to: number }) {
   return <>{v}</>;
 }
 
-/** The hero's second card, beside today's game: endless mode, your best streak and the best ever. */
+/** Endless mode's tile at the top of the homepage, beside the daily's: your best streak, the best ever and one button. */
 export function HeroEndless() {
   const t = home.hub;
   // your best lives in this browser; the best ever comes from the Best streaks board
@@ -60,64 +60,46 @@ export function HeroEndless() {
   }, []);
 
   return (
-    <div className="flex flex-col rounded-card bg-[linear-gradient(160deg,var(--color-gold-soft),var(--color-gold-pale))] p-5 text-ink shadow-float ring-1 ring-gold/70 md:px-6 md:py-5">
-      <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wide text-ink-soft">
-        <FlameIcon className="flame-flicker size-5" /> {t.endlessEyebrow}
+    <div className="flex flex-col rounded-card bg-[linear-gradient(160deg,var(--color-gold-soft),var(--color-gold-pale))] p-4 text-ink shadow-float ring-1 ring-gold/70 sm:p-5">
+      <p className="flex min-h-4 items-center gap-1 text-xs font-bold uppercase tracking-wide text-ink-soft">
+        <FlameIcon className="flame-flicker size-4" /> {t.endlessEyebrow}
       </p>
-      <h2 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
+      <h2 className="mt-1 font-display text-xl leading-tight sm:text-2xl md:text-3xl">
         <Link href="/endless" className="hover:underline">
-          <span className="sr-only">{t.endlessEyebrow}: </span>
           {t.endlessTitle}
         </Link>
       </h2>
-      <p className="mt-1 max-w-md text-ink-soft">{t.endlessLead}</p>
-      <dl className="mt-4 grid grid-cols-2 gap-3">
-        <div className="rounded-2xl bg-white/80 px-3 py-2.5 ring-1 ring-gold/50">
-          <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.endlessYourBest}</dt>
-          <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
-            {best === null ? null : best > 0 ? (
-              <>
-                <FlameIcon className="flame-flicker size-7" tier={flameTier(best)} />
-                <span aria-hidden="true">
-                  <CountUp to={best} />
-                </span>
-                <span className="sr-only">{t.endlessSr(best)}</span>
-              </>
-            ) : (
-              <span className="text-base font-bold text-muted">{t.endlessNoBest}</span>
-            )}
-          </dd>
-        </div>
-        <div className="rounded-2xl bg-white/80 px-3 py-2.5 ring-1 ring-gold/50">
-          <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{t.endlessTop}</dt>
-          <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
-            {top === undefined ? null : top === "failed" ? (
-              <span className="text-base font-bold text-muted">{t.endlessTopFailed}</span>
-            ) : top ? (
-              <>
-                <TrophyIcon className="size-7" />
-                <span aria-hidden="true">
-                  <CountUp to={top.score} />
-                </span>
-                <span className="sr-only">{t.endlessSr(top.score)}</span>
-              </>
-            ) : (
-              <span className="text-base font-bold text-muted">{t.endlessTopNone}</span>
-            )}
-          </dd>
-          {/* always there, so the card doesn't grow when the name arrives */}
-          <dd className="mt-1 min-h-4 truncate text-xs font-semibold text-muted" title={top && top !== "failed" ? top.name : undefined}>
-            {top && top !== "failed" ? t.endlessTopBy(top.name) : null}
-          </dd>
-        </div>
-      </dl>
-      <div className="mt-auto pt-4">
-        <Link href="/endless" className="btn btn-gold btn-lg group">
-          {best ? t.endlessCtaBeat(best) : t.endlessCta}
+      {/* one line: your best and the best ever (or what the game is, before your first run) */}
+      <p className="mt-2 flex min-h-7 flex-wrap items-center gap-x-2.5 font-display text-lg tabular-nums leading-tight sm:text-xl">
+        {best === null ? null : best > 0 ? (
+          <span className="inline-flex items-center gap-1">
+            <FlameIcon className="flame-flicker size-5" tier={flameTier(best)} />
+            <span aria-hidden="true">
+              <CountUp to={best} />
+            </span>
+            <span className="sr-only">{t.endlessBestSr(best)}</span>
+          </span>
+        ) : (
+          <span className="text-base text-muted">{t.endlessNew}</span>
+        )}
+        {top && top !== "failed" ? (
+          <span className="inline-flex items-center gap-1 text-base text-muted" title={top.name}>
+            <TrophyIcon className="size-4" />
+            <span aria-hidden="true">{t.endlessTopLine(top.score)}</span>
+            <span className="sr-only">{t.endlessTopSr(top.score, top.name)}</span>
+          </span>
+        ) : null}
+      </p>
+      <div className="mt-auto pt-3">
+        <Link href="/endless" aria-label={best ? t.endlessCtaBeatSr(best) : t.endlessCtaLong} className="btn btn-gold group h-12 w-full px-3 sm:w-auto sm:px-6">
+          <span className="sm:hidden">{best ? t.endlessCtaBeat(best) : t.endlessCta}</span>
+          <span className="hidden sm:inline">{best ? t.endlessCtaBeatLong(best) : t.endlessCtaLong}</span>
           <span aria-hidden="true" className="transition group-hover:translate-x-1">
             →
           </span>
         </Link>
+        {/* the same height as the daily tile's countdown line, so the two tiles match */}
+        <p className="mt-1.5 min-h-4" aria-hidden="true" />
       </div>
     </div>
   );

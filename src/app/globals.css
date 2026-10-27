@@ -451,3 +451,21 @@ html:has(.atlas-page:not([style*="display: none"])) body {
     animation: none !important;
   }
 }
+
+/* the homepage headline: the big claim on a first visit, a one-line greeting once you've played (class set before paint
+   by the root layout's script) */
+.returning .hero-new p {
+  display: none;
+}
+/* the page keeps its one heading for screen readers (and the site check); only its look gives way to the greeting */
+.returning .hero-new h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+html:not(.returning) .hero-back {
+  display: none;
+}
