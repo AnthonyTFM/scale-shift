@@ -127,7 +127,7 @@ export function ShareDialog({ open, url, title, onClose, onDownload }: Props) {
               }}
               className="flex h-10 w-full items-center justify-center rounded-lg border border-line text-sm font-semibold hover:bg-slate-50 disabled:opacity-50"
             >
-              {busy ? "Saving…" : "Download PNG"}
+              {busy ? "Saving…" : "Save as picture"}
             </button>
           </li>
         </ul>

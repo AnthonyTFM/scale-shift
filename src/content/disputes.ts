@@ -55,7 +55,7 @@ export const disputes: Dispute[] = [
     taken: 1967,
     formalStatus: "Israeli law extended in 1981; UN Security Council Resolution 497 declared it null and void. The US recognized Israeli sovereignty in 2019.",
     summary:
-      "Israel captured it from Syria in the 1967 Six-Day War. A 1974 disengagement agreement set up a UN-patrolled buffer zone between the two sides. After Assad's fall in December 2024, Israeli forces moved into the buffer zone and positions beyond it, and were still there in 2026; UN reports call this a violation of the 1974 agreement, while Israel says it needs them for security. The source data draws the Golan inside Israel's de facto border.",
+      "Israel captured it from Syria in the 1967 Six-Day War. A 1974 disengagement agreement set up a UN-patrolled buffer zone between the two sides. After Assad's fall in December 2024, Israeli forces moved into the buffer zone and positions beyond it, and were still there in 2026; UN reports call this a violation of the 1974 agreement, while Israel says it needs them for security. The source data draws the Golan inside the border Israel actually holds.",
     polities: ["Israel", "Syria"],
   },
   {
@@ -166,7 +166,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "Declared independence on May 18, 1991. Israel recognized it on December 26, 2025, the first UN member to do so; Somalia, the African Union and the EU reject the move.",
     summary:
-      "It has functioned as a de facto state for over three decades, with its own currency, army and elections. Since 2023 it has lost Las Anod and parts of the Sool, Sanaag and Cayn regions to SSC-Khatumo, which Somalia recognized as a federal member state in 2025.",
+      "It has worked as a state in practice for over three decades, with its own currency, army and elections. Since 2023 it has lost Las Anod and parts of the Sool, Sanaag and Cayn regions to SSC-Khatumo, which Somalia recognized as a federal member state in 2025.",
     polities: ["Somaliland", "Somalia"],
   },
   {
@@ -193,7 +193,7 @@ export const disputes: Dispute[] = [
     taken: 1992,
     formalStatus: "Not recognized by any UN member.",
     summary:
-      "A strip of land east of the Dniester River. It declared itself a separate republic on September 2, 1990, and has been de facto independent since the March–July 1992 war. About 1,500 Russian troops remain there, against Moldova's wishes.",
+      "A strip of land east of the Dniester River. It declared itself a separate republic on September 2, 1990, and has been independent in practice since the March–July 1992 war. About 1,500 Russian troops remain there, against Moldova's wishes.",
     polities: ["Moldova"],
   },
   {

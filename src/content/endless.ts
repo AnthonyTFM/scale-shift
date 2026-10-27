@@ -6,7 +6,7 @@ export const endlessCopy = {
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
-  note: "Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few percent. Your best run is saved in this browser, and runs by players on the leaderboard go on the all-time Best streaks board.",
+  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser, and runs by players on the leaderboard go on the all-time Best streaks board.",
   loading: "Loading endless mode",
   failed: "We couldn't load endless mode.",
   retry: "Try again",
@@ -41,7 +41,7 @@ export const endlessCopy = {
     shareShort: "Share",
     // the daily challenge, before and after today's is played
     dailyPlay: "Play today's five",
-    dailyDone: "Today's results",
+    dailyDone: "See today's results",
     // the shared text: "Border Drift Endless · 14 in a row", the grid, then a dare for whoever sees it
     shareHead: (site: string, n: number) => `${site} Endless · ${n} in a row`,
     shareMore: (n: number) => `+${n} more`,

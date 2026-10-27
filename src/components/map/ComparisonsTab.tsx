@@ -11,7 +11,7 @@ export function ComparisonsTab({ onPick, activeId }: { onPick: (p: Preset) => vo
         className="block rounded-xl bg-accent p-3 text-panel transition hover:bg-accent-strong"
       >
         <span className="block text-sm font-bold">Daily challenge: which is bigger?</span>
-        <span className="mt-0.5 block text-xs leading-relaxed text-panel/80">Five new size puzzles every day. Keep your streak going →</span>
+        <span className="mt-0.5 block text-xs leading-relaxed text-panel/80">Five new matchups every day. Can you go 5 for 5? →</span>
       </Link>
       {(Object.keys(presetCategories) as (keyof typeof presetCategories)[]).map((cat) => (
         <section key={cat} aria-labelledby={`cmp-${cat}`}>

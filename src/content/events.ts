@@ -136,7 +136,7 @@ export const events: TerritoryEvent[] = [
     lat: 32.5,
     polities: ["Empire of Alexander", "Seleucid Kingdom", "Ptolemaic Kingdom"],
     summary:
-      "The Partition of Babylon (323 BCE) and Triparadisus (321 or 320 BCE; historians disagree) assign satrapies to the generals. Decades of war follow before the Ptolemaic, Seleucid and Antigonid kingdoms settle.",
+      "The Partition of Babylon (323 BCE) and Triparadisus (321 or 320 BCE; historians disagree) hand out provinces to the generals. Decades of war follow before the Ptolemaic, Seleucid and Antigonid kingdoms settle.",
   },
   {
     id: "seleucus-maurya-treaty",
@@ -357,7 +357,7 @@ export const events: TerritoryEvent[] = [
     lat: 47.2,
     polities: ["Mongol Empire", "Mongols"],
     summary:
-      "The Mongol conquests that follow create the largest contiguous land empire in history and kill millions of people (totals are debated). Whole cities are destroyed: at Baghdad in 1258, Hülegü himself claimed over 200,000 dead. By 1260 the empire has split into four khanates.",
+      "The Mongol conquests that follow create the biggest unbroken land empire the world has ever seen and kill millions of people (totals are debated). Whole cities are destroyed: at Baghdad in 1258, Hülegü himself claimed over 200,000 dead. By 1260 the empire has split into four khanates.",
   },
   {
     id: "yuan-conquers-song",
@@ -652,7 +652,7 @@ export const events: TerritoryEvent[] = [
     lat: -33.86,
     polities: ["Australia"],
     summary:
-      "The First Fleet lands at Sydney Cove. Britain claimed the land without any treaty with Aboriginal nations. Frontier wars follow: the University of Newcastle's massacre map records over 400 massacres from 1788 to 1930, killing more than 10,000 people, almost all of them Aboriginal and Torres Strait Islander people. The 1992 Mabo decision rejected the doctrine that the land had been terra nullius.",
+      "The First Fleet lands at Sydney Cove. Britain claimed the land without any treaty with Aboriginal nations. Frontier wars follow: the University of Newcastle's massacre map records over 400 massacres from 1788 to 1930, killing more than 10,000 people, almost all of them Aboriginal and Torres Strait Islander people. The 1992 Mabo decision rejected the idea that the land had belonged to nobody (terra nullius).",
   },
   {
     id: "louisiana-purchase",
@@ -896,7 +896,7 @@ export const events: TerritoryEvent[] = [
     lat: 45.42,
     polities: ["Canada"],
     summary:
-      "Four provinces confederate. Rupert's Land is bought from the Hudson's Bay Company (1870) without consulting the First Nations and Métis who live there, which sparks the Red River Resistance. With British Columbia (1871) and Newfoundland (1949), Canada becomes the world's second-largest country.",
+      "Four provinces join together. Rupert's Land is bought from the Hudson's Bay Company (1870) without consulting the First Nations and Métis who live there, which sparks the Red River Resistance. With British Columbia (1871) and Newfoundland (1949), Canada becomes the world's second-largest country.",
   },
   {
     id: "german-unification",
@@ -1374,7 +1374,7 @@ export const events: TerritoryEvent[] = [
   },
   {
     id: "eritrea",
-    title: "Eritrea: de facto independent 1991, official 1993",
+    title: "Eritrea: self-ruled 1991, official 1993",
     taken: 1991,
     formalized: 1993,
     formalizedBy: "UN-monitored referendum",
@@ -1746,9 +1746,9 @@ export const eventTypeLabels: Record<EventType, string> = {
   independence: "Independence",
   unification: "Unification",
   partition: "Partition",
-  dissolution: "Dissolution",
+  dissolution: "Breakup",
   colonization: "Colonization",
-  cession: "Cession",
+  cession: "Handover",
 };
 
 export const statusLabels = {

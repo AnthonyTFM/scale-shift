@@ -110,7 +110,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
           </div>
         ) : o.props.e ? (
           <div>
-            <dt className="text-[11px] uppercase tracking-wide text-panel-muted">Incl. subject lands</dt>
+            <dt className="text-[11px] uppercase tracking-wide text-panel-muted">With lands it controlled</dt>
             <dd className="text-lg font-bold">≈ {formatArea(o.props.e, unit)}</dd>
           </div>
         ) : null}
@@ -118,7 +118,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
           {appCopy.precision[o.props.b] ?? appCopy.precision[1]}
           {o.hiddenParts ? ` · ${o.hiddenParts} far-off part${o.hiddenParts > 1 ? "s" : ""} hidden (full area ${formatArea(o.props.a, unit)})` : ""}
           {o.moved && Math.abs(looks - 1) > 0.05
-            ? ` · drawn ${looks > 1 ? `${looks.toFixed(1)}× bigger` : `${(1 / looks).toFixed(1)}× smaller`} than at home`
+            ? ` · drawn ${looks > 1 ? `${looks.toFixed(1)}× bigger` : `${(1 / looks).toFixed(1)}× smaller`} here than in its real spot`
             : ""}
         </div>
       </dl>

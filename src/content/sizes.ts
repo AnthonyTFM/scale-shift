@@ -42,7 +42,7 @@ export const sizes = {
     mild: (Name: string, area: string, like: string, x: string) =>
       `${Name} covers ${area}, ${like}. A normal web map draws it about ${x} times too big: not much, but enough to make it look bigger than countries nearer the equator.`,
     right: (Name: string, area: string, like: string) =>
-      `${Name} covers ${area}, ${like}. It sits close to the equator, where normal web maps barely stretch land, so they show it at about its real size, and make countries farther from the equator look bigger than it.`,
+      `${Name} covers ${area}, ${like}. It sits near the equator, where normal web maps barely stretch land, so they draw it close to its real size, while countries farther north or south look bigger than they are.`,
   },
   picture: { map: "On a normal web map", real: "At real size", alt: (a: string, b: string) => `${a} and ${b}, first as a normal web map draws them, then at real size.` },
   mapCta: (a: string, b: string) => `Compare ${a} with ${b} on the real-size map`,

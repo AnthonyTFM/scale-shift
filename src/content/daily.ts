@@ -3,7 +3,16 @@
 export const dailyCopy = {
   eyebrow: "Daily challenge",
   title: "Which is bigger?",
-  lead: "Five matchups a day, the same for everyone. Normal web maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the leaderboard. New matchups at midnight your time.",
+  lead: "Five matchups a day, the same for everyone. Normal maps puff up land near the poles, so the one that looks bigger often isn't. Go 5 for 5 and climb the leaderboard. New matchups at midnight your time.",
+  // under the game
+  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your scores and streak are saved in this browser, and in your account if you sign in.",
+  // a friend's challenge link: for today's game, or for an older one
+  challengeToday: (name: string, score: number) => `${name} scored ${score}/5 on today's challenge. Can you beat it?`,
+  challengeOld: (name: string, day: number) => `${name} sent you Daily #${day}. That one's gone, but today's is ready: play it and send your score back.`,
+  // the countdown under the results, to the next daily
+  nextIn: "Next five in",
+  nextTime: (h: number, m: number) => `${h}h ${m}m`,
+  nextReady: "Five new matchups are ready. Load them",
   // phones show this instead, so the first puzzle is on screen without scrolling
   leadShort: "Five matchups a day. Normal maps lie about size. Can you see through them?",
   playedElsewhere: "Played today on another device?",
@@ -38,7 +47,7 @@ export const dailyCopy = {
     post: "Post my score",
     posting: "Posting…",
     doneTitle: (rank: number) => `You're #${rank} today!`,
-    doneLead: (score: number) => `is on today's board with ${score}/5. A new five arrives at midnight.`,
+    doneLead: (score: number) => `is on today's board with ${score}/5. Five new matchups arrive at midnight.`,
     duplicate: "Your first score of the day is the one that counts.",
     back: "Back to my results",
     notYou: "Not you?",
@@ -48,7 +57,7 @@ export const dailyCopy = {
   // the reveal after each answer
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
-    ask: "Sized the way a normal web map shows them. Tap the bigger one.",
+    ask: "Drawn the way a normal web map shows them. Tap the one that's bigger in real life.",
     // after the answer, in place of `ask`: which drawing is which, and tapping a tile plays the shrink again
     watch: "Pale: size on a normal map. Solid: real size. Tap to replay.",
     right: "You got it!",
@@ -96,13 +105,15 @@ export const dailyCopy = {
       score === total ? "Emperor!" : score === total - 1 ? "Empire builder!" : score === total - 2 ? "Regional power" : "The map fooled you",
     verdict: (score: number, total: number) =>
       score === total
-        ? "Perfect. Mercator can't fool you."
+        ? "Perfect. No map can fool you."
         : score >= total - 1
           ? "Sharp eye. One got past you."
           : score >= 3
             ? "Not bad. The map tricked you twice."
-            : "Tricky round. New questions tomorrow.",
+            : "The map won this one. Five new matchups tomorrow.",
     scoreSr: (score: number, total: number) => `You got ${score} out of ${total}.`,
+    // screen-reader text for each tile in the row of answers
+    markSr: (n: number, right: boolean) => `Round ${n}: ${right ? "right" : "wrong"}`,
     // above the progress bar while playing, for players with a streak going
     streakPill: (n: number) => `${n}-day streak`,
     streak: "Streak",
@@ -140,10 +151,10 @@ export const dailyCopy = {
     challenge: "Challenge a friend",
     // after the daily: endless mode is the next thing to play
     endless: "Keep playing: endless mode",
-    endlessLine: "One matchup after another, closer the further you go. How far can you get?",
+    endlessLine: "One matchup after another, each a closer call. How far can you get?",
     answers: "The answers",
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",
-    pictureFailed: "Couldn't make the picture. Try Share my score instead.",
+    pictureFailed: "Couldn't make the picture. Try sharing your score as text instead.",
   },
 };

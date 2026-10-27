@@ -254,7 +254,7 @@ export default function TeachersPage() {
                 Open the map
               </Link>
               <Link href="/daily" className="btn btn-white">
-                Today&apos;s challenge
+                Play today&apos;s five
               </Link>
             </p>
           </Section>
