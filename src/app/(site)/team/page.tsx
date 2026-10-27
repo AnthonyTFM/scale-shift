@@ -47,29 +47,28 @@ export default function TeamPage() {
 function MakerCard({ maker: m }: { maker: Maker }) {
   return (
     <article aria-labelledby={`maker-${m.id}`} className="card flex h-full flex-col p-5 sm:p-6">
-      <div className="flex items-center gap-4">
-        {m.photo ? (
-          // eslint-disable-next-line @next/next/no-img-element -- one small WebP, already sized for the card
-          <img
-            src={m.photo.src}
-            alt={m.photo.alt}
-            width={800}
-            height={800}
-            loading="lazy"
-            decoding="async"
-            className="size-24 shrink-0 rounded-2xl bg-tile object-cover ring-1 ring-line sm:size-28"
-          />
-        ) : (
-          <div aria-hidden="true" className="grid size-24 shrink-0 place-items-center rounded-2xl bg-tile ring-1 ring-line sm:size-28">
-            <MapIcon className="size-10 opacity-60" />
-          </div>
-        )}
-        <div className="min-w-0">
-          <h3 id={`maker-${m.id}`} className="font-display text-2xl leading-tight text-ink">
-            {m.name}
-          </h3>
-          <p className="mt-1 text-sm font-bold text-primary">{m.role}</p>
+      {/* the photo on top, then who they are, then their story */}
+      {m.photo ? (
+        // eslint-disable-next-line @next/next/no-img-element -- one small WebP, already sized for the card
+        <img
+          src={m.photo.src}
+          alt={m.photo.alt}
+          width={800}
+          height={800}
+          loading="lazy"
+          decoding="async"
+          className="mx-auto size-48 rounded-3xl bg-tile object-cover ring-1 ring-line sm:size-56"
+        />
+      ) : (
+        <div aria-hidden="true" className="mx-auto grid size-48 place-items-center rounded-3xl bg-tile ring-1 ring-line sm:size-56">
+          <MapIcon className="size-14 opacity-60" />
         </div>
+      )}
+      <div className="mt-4 text-center">
+        <h3 id={`maker-${m.id}`} className="font-display text-2xl leading-tight text-ink">
+          {m.name}
+        </h3>
+        <p className="mt-1 text-sm font-bold text-primary">{m.role}</p>
       </div>
       {m.bio.length ? (
         m.bio.map((p) => (
