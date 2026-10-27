@@ -54,8 +54,8 @@ export function HeroPlay() {
     fetch(`/api/plays?date=${shiftDate(localDateKey(), -1)}`)
       .then((r) => (r.ok ? (r.json() as Promise<{ n: number; scores: number[] }>) : null))
       .then((c) => {
-        if (!c || c.n < TEASER_MIN) return;
-        const pct = Math.round((100 * (c.scores[QUESTIONS_PER_DAY] ?? 0)) / c.n);
+        if (!c || c.n < TEASER_MIN || !c.scores[QUESTIONS_PER_DAY]) return;
+        const pct = Math.max(1, Math.round((100 * c.scores[QUESTIONS_PER_DAY]) / c.n));
         if (pct <= TEASER_MAX) setTeaser(pct);
       })
       .catch(() => {});
@@ -104,35 +104,31 @@ export function HeroPlay() {
           </Link>
         </h2>
         <p className="mt-1 max-w-md text-muted">{s?.done ? t.playDone(s.score ?? 0) : t.playLead}</p>
-        {/* two boxes, like the endless card beside it. A first visit has nothing to count yet: a line about yesterday
-            instead (or nothing, if too few played) */}
-        {firstTime ? (
-          teaser !== null ? (
-            <p className="mt-4 rounded-2xl bg-paper px-3 py-2.5 text-sm font-semibold text-ink ring-1 ring-line">{t.playTeaser(teaser)}</p>
-          ) : null
-        ) : (
-          <dl className="mt-4 grid grid-cols-2 gap-3">
-            {s?.done ? (
-              <>
-                {otherBox(
-                  t.playToday,
-                  <>
-                    <span aria-hidden="true">
-                      {s.score}/{QUESTIONS_PER_DAY}
-                    </span>
-                    <span className="sr-only">{t.playTodaySr(s.score ?? 0, QUESTIONS_PER_DAY)}</span>
-                  </>,
-                )}
-                {streakBox}
-              </>
-            ) : (
-              <>
-                {streakBox}
-                {otherBox(t.playPerfect, s ? s.perfect : null)}
-              </>
-            )}
-          </dl>
-        )}
+        {/* two boxes, like the endless card beside it, the streak always first. A first visit has nothing to count yet:
+            one box the same height, with a line about yesterday (or a plain invitation), so the card never jumps */}
+        <dl className="mt-4 grid grid-cols-2 gap-3">
+          {firstTime ? (
+            <div className="col-span-2 rounded-2xl bg-paper px-3 py-2.5 ring-1 ring-line">
+              <dt className="text-xs font-bold uppercase tracking-wide text-ink-soft">{teaser !== null ? t.playTeaserLabel : t.playNewLabel}</dt>
+              <dd className="mt-0.5 flex min-h-9 items-center text-base font-bold text-ink">{teaser !== null ? t.playTeaser(teaser) : t.playNew}</dd>
+            </div>
+          ) : (
+            <>
+              {streakBox}
+              {s?.done
+                ? otherBox(
+                    t.playToday,
+                    <>
+                      <span aria-hidden="true">
+                        {s.score}/{QUESTIONS_PER_DAY}
+                      </span>
+                      <span className="sr-only">{t.playTodaySr(s.score ?? 0, QUESTIONS_PER_DAY)}</span>
+                    </>,
+                  )
+                : otherBox(t.playPerfect, s ? s.perfect : null)}
+            </>
+          )}
+        </dl>
         {/* at the foot of the card, level with the endless card's button beside it */}
         <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
           <Link

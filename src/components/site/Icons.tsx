@@ -13,7 +13,6 @@ export function TrophyIcon({ className = "size-6" }: IconProps) {
   );
 }
 
-/** Flame: the streak count. */
 /** Flame colours, hotter as an endless run goes on (see flameTier): orange, then white-gold, then blue. */
 const FLAMES = [
   { body: "#FF8A3D", edge: "#D93A2B", core: "#FFC233" },
@@ -24,6 +23,7 @@ const FLAMES = [
 /** Which flame an endless streak earns: 10 in a row burns white-gold, 25 burns blue. */
 export const flameTier = (streak: number) => (streak >= 25 ? 2 : streak >= 10 ? 1 : 0);
 
+/** Flame: the streak count (`tier` picks a hotter flame for long endless runs). */
 export function FlameIcon({ className = "size-6", tier = 0 }: IconProps & { tier?: number }) {
   const f = FLAMES[tier] ?? FLAMES[0];
   return (
