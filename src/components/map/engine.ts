@@ -106,6 +106,7 @@ type Sweep = {
   ownersB: (PolityFeature | null)[];
   /** the old era's highlighted country, shown until halfway */ fromHighlight: PolityFeature | null;
   /** names moving with their countries, worked out on the first frame */ labels: SweepLabels | null;
+  /** at a steady pace (the timeline playing on into the next era), not easing in and out */ steady: boolean;
 };
 
 /** A name that follows its country through a sweep, in one copy of the world. */
@@ -217,6 +218,8 @@ export class MapEngine {
   private cache: BaseCache | null = null;
   /** the border sweep into the era just shown, while it runs */
   private sweep: Sweep | null = null;
+  /** while the timeline plays on through the eras: the next sweep runs at a steady pace, straight on from the last */
+  private steady = false;
   /** reused for the old era's picture in each sweep */
   private sweepCanvas: HTMLCanvasElement | null = null;
   private tilePool: HTMLCanvasElement[] = [];
@@ -298,8 +301,9 @@ export class MapEngine {
   setLayer(layer: Layer | null) {
     const prev = this.layer;
     const prevCache = this.cache;
-    // a new era while a sweep still runs (clicking quickly through the timeline) shows straight away
-    const busy = !!this.sweep;
+    // a new era while a sweep still runs (clicking quickly through the timeline) shows straight away; one that comes as a
+    // sweep ends (the timeline playing on) sweeps in as usual
+    const busy = this.sweepLeft() > 0;
     this.sweep = null;
     this.layer = layer;
     this.cache = null;
@@ -311,6 +315,11 @@ export class MapEngine {
   /** How long the border sweep now running has left, in ms (0 when none). */
   sweepLeft() {
     return this.sweep ? Math.max(0, SWEEP_MS - (performance.now() - this.sweep.start)) : 0;
+  }
+  /** Whether the next sweep runs at a steady pace instead of easing in and out: while the timeline plays on, so the
+   * borders never slow to a stop between eras. A sweep already running keeps its pace. */
+  setSteady(on: boolean) {
+    this.steady = on;
   }
   setStates(states: Layer | null) {
     this.states = states;
@@ -826,7 +835,7 @@ export class MapEngine {
     const B = this.ownerGrid(next, cs, gw, gh);
     const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
     const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
-    return { start: performance.now(), plan, cs, old, from: prev, ownersA: A.owners, ownersB: B.owners, fromHighlight, labels: null };
+    return { start: performance.now(), plan, cs, old, from: prev, ownersA: A.owners, ownersB: B.owners, fromHighlight, labels: null, steady: this.steady };
   }
 
   /** The land, borders and lakes one cache draws, screen-sized, without names. */
@@ -880,7 +889,7 @@ export class MapEngine {
   private drawSweep(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]) {
     const ctx = this.bctx;
     const t = Math.min(1, (performance.now() - s.start) / SWEEP_MS);
-    const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+    const e = s.steady ? t : t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
     this.drawTiles(cache);
     const area = new Path2D();
     const front = sweepFrame(s.plan, e, s.cs, area);

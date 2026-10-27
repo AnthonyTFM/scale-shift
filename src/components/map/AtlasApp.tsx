@@ -56,6 +56,8 @@ export default function AtlasApp() {
   const engineRef = useRef<MapEngine | null>(null);
   const overlaysRef = useRef<Overlay[]>([]);
   const eraRef = useRef<string>(DEFAULT_ERA);
+  /** the play direction the timeline last had (to tell when play starts) */
+  const wasPlaying = useRef<0 | 1 | -1>(0);
 
   const [era, setEra] = useState(DEFAULT_ERA);
   const [loadingEra, setLoadingEra] = useState(true);
@@ -381,15 +383,28 @@ export default function AtlasApp() {
     return () => clearTimeout(t);
   }, [era, overlays, ready]);
 
-  // ---- play through eras, forward or back in time (waits for each era to load and its borders to sweep in) ----
+  // ---- play through eras, forward or back in time: each era's borders sweep in straight after the last one's, at a
+  // steady pace (the next era loads while they sweep), so the map keeps moving until the last era ----
   useEffect(() => {
+    const engine = engineRef.current;
+    const started = playing !== 0 && wasPlaying.current !== playing;
+    wasPlaying.current = playing;
+    if (!playing) engine?.setSteady(false);
     if (!playing || loadingEra) return;
-    const wait = Math.max(1400, (engineRef.current?.sweepLeft() ?? 0) + 1000);
-    const t = setTimeout(() => {
-      const next = eraIndex(eraRef.current) + playing;
-      if (next < 0 || next > eras.length - 1) setPlaying(0);
-      else changeEra(eras[next].key);
-    }, wait);
+    const next = eraIndex(eraRef.current) + playing;
+    const last = next < 0 || next > eras.length - 1;
+    if (!last) loadLayer(eras[next].key).catch(() => {});
+    // as this era's sweep ends; with none running, at once when play starts, else after a moment (for readers who prefer
+    // less motion, or when a sweep was skipped because the map was being moved)
+    const left = engine?.sweepLeft() ?? 0;
+    const t = setTimeout(
+      () => {
+        if (last) return setPlaying(0);
+        engine?.setSteady(true);
+        changeEra(eras[next].key);
+      },
+      left > 0 ? left : started ? 0 : 1400,
+    );
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
 
