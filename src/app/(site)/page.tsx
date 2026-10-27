@@ -6,12 +6,13 @@ import { events } from "@/content/events";
 import { site } from "@/content/site";
 import { eras } from "@/lib/eras";
 import { HeroPlay } from "@/components/home/HeroPlay";
+import { HeroEndless } from "@/components/home/HeroEndless";
 import { HeroLeaderboard } from "@/components/home/HeroLeaderboard";
 import { LegacyMapRedirect } from "@/components/home/LegacyMapRedirect";
 import { JsonLd } from "@/components/site/PageHero";
 import { GlobeLazy } from "@/components/home/GlobeLazy";
 import { YesterdayMatchup } from "@/components/home/YesterdayMatchup";
-import { BookIcon, ColumnsIcon, DisputeIcon, FlameIcon, MapIcon, TimelineIcon, TrophyIcon } from "@/components/site/Icons";
+import { BookIcon, ColumnsIcon, DisputeIcon, MapIcon, TimelineIcon, TrophyIcon } from "@/components/site/Icons";
 import { home } from "@/content/home";
 
 export const metadata: Metadata = {
@@ -22,7 +23,6 @@ export const metadata: Metadata = {
 
 const x = home.explore;
 const places = [
-  { href: "/endless", Icon: FlameIcon, title: x.endlessTitle, line: x.endless },
   { href: "/leaderboard", Icon: TrophyIcon, title: "Leaderboard", line: x.leaderboard },
   { href: "/eras", Icon: ColumnsIcon, title: "Eras", line: x.eras(eras.length) },
   { href: "/timeline", Icon: TimelineIcon, title: "Timeline", line: x.timeline(events.length) },
@@ -62,8 +62,8 @@ export default function HomePage() {
         }}
       />
 
-      {/* Hero: today's game and yesterday's matchup side by side (the trick before you play), the map under the game,
-          all over a slowly turning globe */}
+      {/* Hero: the two games side by side (today's five and endless mode), then the map and yesterday's matchup (the
+          trick before you play), all over a slowly turning globe */}
       <section data-hero className="relative isolate overflow-hidden bg-paper text-ink">
         <div className="pointer-events-none absolute inset-0 -z-10">
           {/* positioned with left/top, not translate: Chrome counted the translate-centred float as a layout shift */}
@@ -85,13 +85,15 @@ export default function HomePage() {
             )}
           </h1>
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">{home.hub.mission}</p>
-          {/* phones: game, yesterday's matchup, map. Wide screens: game and map on the left, the matchup on the right */}
-          <div className="mt-6 grid gap-4 lg:grid-cols-2 lg:items-start">
-            <div className="grid gap-4">
-              <HeroPlay />
-              <div className="hidden lg:block">
-                <MapCard />
-              </div>
+          {/* phones: today's game, endless, yesterday's matchup, map. Wide screens: the two games side by side, then the map
+              on the left and the matchup on the right */}
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <HeroPlay />
+            <HeroEndless />
+          </div>
+          <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start">
+            <div className="hidden lg:block">
+              <MapCard />
             </div>
             <YesterdayMatchup />
             <div className="lg:hidden">
