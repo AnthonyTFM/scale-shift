@@ -1379,12 +1379,12 @@ const BEFORE_1800 = {
       ["Sophene", "Kingdom of Sophene"],
     ]),
     ...TAMIL("Iron Age chieftainships"),
-    // south of the Hindu Kush the source extends Bactria over Arachosia, the Kabul valley and Gandhara, which the
-    // Greco-Bactrians conquered only from about 190 BCE
+    // south of the Hindu Kush the source extends Bactria over the Makran coast, Arachosia, the Kabul valley and Gandhara,
+    // which the Greco-Bactrians reached only from about 190 BCE
     ...SPLIT("Greco-Bactrian Kingdom", [["Seleucid Kingdom", "Seleucid Empire"]]),
     {
       to: "Mauryan successor states",
-      poly: [[60.5, 24], [60.5, 33.2], [62.5, 33.8], [64.5, 34.3], [66.5, 34.6], [68, 34.9], [69.5, 35.4], [71, 35.9], [72.5, 36.4], [74, 36.6], [78, 36.6], [78, 24], [60.5, 24]],
+      poly: [[58, 24], [58, 29.5], [60.5, 30.5], [60.5, 33.2], [62.5, 33.8], [64.5, 34.3], [66.5, 34.6], [68, 34.9], [69.5, 35.4], [71, 35.9], [72.5, 36.4], [74, 36.6], [78, 36.6], [78, 24], [58, 24]],
       from: ["Greco-Bactrian Kingdom"],
       w: "The Mauryan Empire's north-west broke away after Ashoka died (about 232 BCE). In 206 BCE Antiochus III met an Indian king of the Kabul valley here, Sophagasenus. Shown approximately.",
     },
@@ -1634,6 +1634,13 @@ const BEFORE_1800 = {
     { to: "Hindu Shahis", poly: [[70.5, 29.8], [75.2, 29.8], [75.2, 35.6], [70.5, 35.6], [70.5, 29.8]], from: ["Samanid Empire"] },
     ...SPLIT(["Samanid Empire", "Hindu Shahis"], [["Kingdom of Kashmir", "Kashmir"]]),
     ...SPLIT("Samanid Empire", [["Abbasid Caliphate", "Abbasid Caliphate"]]),
+    // Sistan, Arachosia and Baluchistan stayed with the Saffarids (Amr's grandson Tahir, 900–908): Cliopatria's Samanid
+    // outline covers them, but the Samanids took Sistan only in 911
+    {
+      to: "Saffarids",
+      poly: [[57, 24], [57, 31.8], [60.5, 32.2], [61.5, 33], [64, 33.2], [68, 32.6], [70.5, 32.4], [70.5, 24], [57, 24]],
+      from: ["Samanid Empire"],
+    },
   ],
   1000: [
     // Khorasan, Ghaznavid from 999
