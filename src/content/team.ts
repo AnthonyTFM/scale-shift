@@ -1,5 +1,7 @@
 // Words for the "Meet the makers" page (/team). Change copy here, not in the page.
 // Each maker writes (and approves) their own card, in their own words.
+// Photos are square headshots on the same soft grey studio background (#e9eaee to #c9ccd4, top to bottom), so the
+// cards match.
 
 export type Maker = {
   id: string;
