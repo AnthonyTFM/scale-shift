@@ -7,7 +7,7 @@ import { site } from "@/content/site";
 import { track } from "@/lib/analytics";
 import { claims as allClaims, claimsForEra, loadClaimShapes, unclaimed } from "@/lib/antarctica";
 import { featureAtIn, loadGrid, loadIndex, loadLakes, loadLayer, type IndexRow, type RulersGrid } from "@/lib/data";
-import { eraByKey, eraIndex, eraYear, eras, snapshotForYear } from "@/lib/eras";
+import { eraByKey, eraIndex, eras, snapshotForYear } from "@/lib/eras";
 import type { AreaUnit } from "@/lib/format";
 import { boundsOf, fitView, mergeBounds, placeGeometry } from "@/lib/geo";
 import { MAP_PATH, decodeState, encodeState, type MapState } from "@/lib/share";
@@ -50,13 +50,6 @@ function writeStorage(key: string, value: string) {
 
 /** Phone-width screens, where the panel starts folded so the map shows first. */
 const isPhone = () => window.matchMedia("(max-width: 639px)").matches;
-
-/** Playing the timeline moves steadily from one era into the next from this year on (earlier, it rests on each map). */
-const STEADY_FROM = 1900;
-const fromSteadyEra = (key: string) => {
-  const e = eraByKey(key);
-  return !!e && eraYear(e) >= STEADY_FROM;
-};
 
 export default function AtlasApp() {
   const mapRef = useRef<HTMLDivElement>(null);
@@ -390,9 +383,8 @@ export default function AtlasApp() {
     return () => clearTimeout(t);
   }, [era, overlays, ready]);
 
-  // ---- play through eras, forward or back in time. From 1900 on, each era's borders sweep in straight after the last
-  // one's, at a steady pace (the next era loads while they sweep), so the map keeps moving; earlier, it rests a moment on
-  // each map before moving on ----
+  // ---- play through eras, forward or back in time: each era's borders sweep in straight after the last one's, at a
+  // steady pace (the next era loads while they sweep), so the map keeps moving until the last era ----
   useEffect(() => {
     const engine = engineRef.current;
     const started = playing !== 0 && wasPlaying.current !== playing;
@@ -402,16 +394,17 @@ export default function AtlasApp() {
     const next = eraIndex(eraRef.current) + playing;
     const last = next < 0 || next > eras.length - 1;
     if (!last) loadLayer(eras[next].key).catch(() => {});
-    const steady = !last && fromSteadyEra(eraRef.current) && fromSteadyEra(eras[next].key);
-    // steadily: as this era's sweep ends; with none running, at once when play starts, else after a moment (for readers
-    // who prefer less motion, or when a sweep was skipped because the map was being moved)
+    // as this era's sweep ends; with none running, at once when play starts, else after a moment (for readers who prefer
+    // less motion, or when a sweep was skipped because the map was being moved)
     const left = engine?.sweepLeft() ?? 0;
-    const wait = steady && left > 0 ? left : steady && started ? 0 : Math.max(1400, left + 1000);
-    const t = setTimeout(() => {
-      if (last) return setPlaying(0);
-      engine?.setSteady(steady);
-      changeEra(eras[next].key);
-    }, wait);
+    const t = setTimeout(
+      () => {
+        if (last) return setPlaying(0);
+        engine?.setSteady(true);
+        changeEra(eras[next].key);
+      },
+      left > 0 ? left : started ? 0 : 1400,
+    );
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
 
