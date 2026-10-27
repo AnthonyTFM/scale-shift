@@ -74,6 +74,15 @@ function upTo(run: Run, count: number) {
   return run.questions[count - 1];
 }
 
+/**
+ * The shapes in the next ten rounds, never to be used as a yardstick (it would give those rounds away). A run's rounds
+ * are the same whenever they're built, so building them early changes nothing.
+ */
+function comingUp(run: Run) {
+  upTo(run, run.step + 11);
+  return run.questions.slice(run.step + 1, run.step + 11).flatMap((x) => x.options.map((o) => o.id));
+}
+
 /** The run in progress in this browser (after a reload), the results of one that just ended, or a new one. */
 async function prepare(fresh: boolean): Promise<Run> {
   const save = loadEndless();
@@ -250,6 +259,7 @@ export function EndlessGame() {
           onPick={answer}
           onNext={next}
           stuckTop={stuckTop}
+          exclude={comingUp(run)}
         />
       )}
     </div>
