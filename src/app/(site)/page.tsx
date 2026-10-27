@@ -79,29 +79,36 @@ export default function HomePage() {
           <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#fff8ec_0%,rgba(255,248,236,0.88)_38%,rgba(255,248,236,0)_62%)] lg:block" />
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 md:pb-12 md:pt-9">
-          {/* games first: the headline, then today's five and endless mode side by side, then the Best streaks board (the
-              competition), with yesterday's matchup (the proof, small) and the map beside it. Phones: one column in that
-              order */}
-          <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
-            {home.title.split(home.titleAccent).flatMap((part, i) =>
-              i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
-            )}
-          </h1>
-          {/* phones get one line, so the games start on the first screen */}
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">
-            <span className="sm:hidden">{home.hub.missionShort}</span>
-            <span className="hidden sm:inline">{home.hub.mission}</span>
-          </p>
-          <div className="mt-5 grid gap-4 md:mt-6 md:grid-cols-2">
+          {/* games first. A first visit gets the big claim; anyone who has played gets one line (see .returning) */}
+          <div className="hero-new">
+            <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
+              {home.title.split(home.titleAccent).flatMap((part, i) =>
+                i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
+              )}
+            </h1>
+            {/* phones get one line, so the games start on the first screen */}
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">
+              <span className="sm:hidden">{home.hub.missionShort}</span>
+              <span className="hidden sm:inline">{home.hub.mission}</span>
+            </p>
+          </div>
+          <p className="hero-back font-display text-2xl leading-tight text-ink md:text-3xl">{home.hub.welcomeBack}</p>
+          {/* phones: the two games side by side, then the Best streaks board (competition first), yesterday's matchup
+              and the map. Wide screens: two columns, each game with its own extra under it: the daily with yesterday's
+              matchup, endless with its Best streaks board; the map across the bottom. Each part is rendered once and
+              placed by the grid; the page order (and screen readers) follow the phone order */}
+          <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4 lg:items-start">
             <HeroPlay />
             <HeroEndless />
-          </div>
-          <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start">
-            <HeroLeaderboard />
-            <div className="grid gap-4">
-              <YesterdayMatchup />
-              <MapCard />
+            <div className="col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2">
+              <HeroLeaderboard />
             </div>
+            <div className="col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2">
+              <YesterdayMatchup />
+            </div>
+          </div>
+          <div className="mt-4">
+            <MapCard />
           </div>
         </div>
       </section>

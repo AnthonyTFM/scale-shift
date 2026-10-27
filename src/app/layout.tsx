@@ -30,11 +30,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${bricolage.variable} antialiased`} suppressHydrationWarning>
       <head>
-        {/* Runs before first paint: returning visitors and shared map links skip the map's intro card.
+        {/* Runs before first paint: returning visitors and shared map links skip the map's intro card, and anyone who has
+            played a game here gets the homepage's short greeting instead of the big headline (no jump on load).
             Kept in the root layout (rendered once, on the server) because React won't run scripts it renders in the browser. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{if(localStorage.getItem("atlas-intro-seen")==="1"||location.hash.length>2)document.documentElement.classList.add("intro-seen")}catch(e){}`,
+            __html: `try{var h=document.documentElement;if(localStorage.getItem("atlas-intro-seen")==="1"||location.hash.length>2)h.classList.add("intro-seen");var d=JSON.parse(localStorage.getItem("atlas-daily-v2")||"null"),e=JSON.parse(localStorage.getItem("atlas-endless-v1")||"null");if((d&&d.days&&Object.keys(d.days).length)||(e&&(e.runs||e.best)))h.classList.add("returning")}catch(e){}`,
           }}
         />
       </head>
