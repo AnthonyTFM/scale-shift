@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { site } from "@/content/site";
 import { endlessCopy as t } from "@/content/endless";
@@ -113,6 +113,9 @@ export function EndlessGame() {
   // set when the player moves on, so the next question (or the results) takes focus; not on first load
   const advanced = useRef(false);
   const top = useRef<HTMLDivElement>(null);
+  // the score bar, pinned under the header: after an answer, the reveal scrolls in below it, not under it
+  const hud = useRef<HTMLDivElement>(null);
+  const stuckTop = useCallback(() => (hud.current?.getBoundingClientRect().bottom ?? ROUND_TOP) + 8, []);
   // the next round's drawings, fetched while the current one is played
   const nextShapes = useRef<{ key: string; shapes: Promise<Record<string, ShapeFile>> } | null>(null);
 
@@ -214,21 +217,7 @@ export function EndlessGame() {
 
   return (
     <div ref={top} className="flex flex-col">
-      {run.done ? null : (
-        <>
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <Pill>
-              <FlameIcon className="size-5" />
-              {t.streak(streak)}
-            </Pill>
-            <Pill>
-              <TrophyIcon className="size-5" />
-              {t.best(best)}
-            </Pill>
-          </div>
-          <Levels level={level} />
-        </>
-      )}
+      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} />}
       {run.done ? (
         <Results
           run={run}
@@ -251,30 +240,44 @@ export function EndlessGame() {
           busy={busy}
           onPick={answer}
           onNext={next}
+          stuckTop={stuckTop}
         />
       )}
     </div>
   );
 }
 
-function Pill({ children }: { children: React.ReactNode }) {
+/**
+ * The run at a glance, pinned under the site header while playing, so anyone who looks (or tunes in to a stream) sees
+ * the streak, the best and the level straight away: a big streak, the best, five level bars and the rules in one line.
+ */
+function ScoreBar({ ref, streak, best, level }: { ref: React.Ref<HTMLDivElement>; streak: number; best: number; level: number }) {
   return (
-    <span className="inline-flex min-h-9 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-sm font-bold text-ink shadow-[0_3px_0_0_var(--color-line)]">
-      {children}
-    </span>
-  );
-}
-
-/** Five bars, one per level, filled up to the current one. Same height as the daily's progress bar. */
-function Levels({ level }: { level: number }) {
-  return (
-    <div className="mb-3 sm:mb-4">
-      <ol className="grid grid-cols-5 gap-1.5 sm:gap-2" aria-hidden="true">
+    <div
+      ref={ref}
+      data-score-bar
+      className="sticky top-16 z-20 -mx-4 mb-3 border-b border-line bg-paper/95 px-4 pb-2.5 pt-2 backdrop-blur [@media(max-height:500px)]:top-0 sm:mx-0 sm:mb-4 sm:rounded-[22px] sm:border-2 sm:px-4"
+    >
+      <div className="flex items-center justify-between gap-3">
+        <p className="flex items-center gap-1.5 text-ink">
+          <FlameIcon className="size-7" />
+          <span className="font-display text-4xl leading-none tabular-nums">{streak}</span>
+          <span className="text-sm font-bold text-muted">{t.hudStreak}</span>
+        </p>
+        <p className="flex items-center gap-1.5 text-ink">
+          <TrophyIcon className="size-6" />
+          <span className="text-sm font-bold text-muted">{t.hudBest}</span>
+          <span className="font-display text-2xl leading-none tabular-nums">{best}</span>
+        </p>
+      </div>
+      <ol className="mt-2 grid grid-cols-5 gap-1.5 sm:gap-2" aria-hidden="true">
         {LEVELS.map((_, i) => (
-          <li key={i} className={`block h-3 rounded-full ${i < level ? "bg-green" : i === level ? "pop-in bg-primary" : "bg-beige"}`} />
+          <li key={i} className={`block h-2.5 rounded-full ${i < level ? "bg-green" : i === level ? "pop-in bg-primary" : "bg-beige"}`} />
         ))}
       </ol>
       <p className="sr-only">{t.levelSr(level + 1, LEVELS.length, t.levels[level])}</p>
+      {/* on phones held sideways the bar keeps to one row of numbers and the level bars, so the game fits */}
+      <p className="mt-1.5 text-center text-xs font-semibold text-ink-soft [@media(max-height:500px)]:hidden">{t.rules}</p>
     </div>
   );
 }
@@ -339,6 +342,11 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
         <p className="mt-1 text-muted">{R.verdict(streak + 1)}</p>
       </div>
 
+      {/* straight back in: the first thing under the score, so a run restarts in one tap */}
+      <button type="button" onClick={onAgain} className="btn btn-gold btn-lg mt-5 w-full">
+        {R.playAgain} <span aria-hidden="true">→</span>
+      </button>
+
       <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
         {[
           [R.best, best, R.bestSub],
@@ -357,9 +365,6 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
       {/* the run goes on the Best streaks board if the server handed it out (and at least one answer was right) */}
       {run.token && streak > 0 ? <EndlessJoin seed={run.seed} token={run.token} choices={run.choices} streak={streak} /> : null}
 
-      <button type="button" onClick={onAgain} className="btn btn-gold btn-lg mt-5 w-full">
-        {R.playAgain} <span aria-hidden="true">→</span>
-      </button>
       {/* a run that missed the first matchup has nothing to share: just the daily */}
       <div className={`mt-3 grid gap-2 ${streak > 0 ? "grid-cols-2" : ""}`}>
         {streak > 0 ? (

@@ -59,11 +59,15 @@ export async function loadShapes(questions: Question[]): Promise<Record<string, 
 }
 
 /** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
-export function Skeleton({ label, pills }: { label: string; /** room for a row of pills above the bar (endless mode) */ pills?: boolean }) {
+export function Skeleton({ label, pills }: { label: string; /** room for endless mode's score bar instead of the dots */ pills?: boolean }) {
   return (
     <div aria-busy="true" aria-label={label}>
-      {pills ? <div aria-hidden="true" className="mb-2 h-9" /> : null}
-      <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
+      {pills ? (
+        // the score bar's height: its rules line wraps on the narrowest phones, and is hidden on phones held sideways
+        <div aria-hidden="true" className="mb-3 h-[111px] min-[360px]:h-[95px] sm:mb-4 [@media(max-height:500px)]:h-[71px]" />
+      ) : (
+        <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
+      )}
       <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6 [@media(min-width:768px)_and_(max-height:820px)]:min-h-[476px]">
         <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
         <div className="mt-5 grid grid-cols-2 gap-3">
@@ -105,6 +109,7 @@ export function QuestionCard({
   busy,
   onPick,
   onNext,
+  stuckTop,
 }: {
   /** "Round 2 of 5" */
   eyebrow: string;
@@ -118,6 +123,8 @@ export function QuestionCard({
   busy?: boolean;
   onPick: (i: number) => void;
   onNext: () => void;
+  /** where the page's sticky top ends (the header, plus endless's score bar), in px from the top of the screen */
+  stuckTop?: () => number;
 }) {
   const answered = picked !== undefined;
   const correct = picked === q.answer;
@@ -168,15 +175,15 @@ export function QuestionCard({
         const short = innerHeight <= 500;
         const want = Math.min(
           verdict.bottom + 12 - (innerHeight - bar),
-          verdict.top - (short ? 16 : ROUND_TOP),
-          short ? Infinity : grid.top - ROUND_TOP + 16,
+          verdict.top - (stuckTop?.() ?? (short ? 16 : ROUND_TOP)),
+          short ? Infinity : grid.top - (stuckTop ? stuckTop() + 8 : ROUND_TOP - 16),
         );
         if (want > 0) scrollTo({ top: scrollY + want, behavior: reducedMotion() ? "auto" : "smooth" });
       },
       reducedMotion() ? 0 : 1400,
     );
     return () => clearTimeout(id);
-  }, [answered]);
+  }, [answered, stuckTop]);
 
   return (
     <section
@@ -287,7 +294,7 @@ export function QuestionCard({
         // tap; the fade above it shows the reveal carries on underneath
         <div
           ref={barRef}
-          className="sticky bottom-0 z-20 -mx-4 mt-6 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
+          className="sticky bottom-0 z-30 -mx-4 mt-6 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
         >
           <button
             ref={nextRef}

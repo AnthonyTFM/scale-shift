@@ -3,9 +3,6 @@
 export const endlessCopy = {
   eyebrow: "Endless mode",
   title: "How far can you go?",
-  lead: "One matchup after another, and the further you go, the closer they get. Get one wrong and the run is over.",
-  // phones show this instead, so the first matchup is on screen without scrolling
-  leadShort: "The further you go, the closer they get. One miss ends the run.",
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
@@ -17,8 +14,10 @@ export const endlessCopy = {
   levels: ["Warm-up", "Getting closer", "Tricky", "Close calls", "Razor thin"],
   levelSr: (n: number, total: number, name: string) => `Level ${n} of ${total}: ${name}`,
   round: (n: number, level: string) => `Round ${n} · ${level}`,
-  streak: (n: number) => `${n} in a row`,
-  best: (n: number) => `Best ${n}`,
+  // the score bar that stays on screen while playing: big streak, best, level, and the rules in one line
+  hudStreak: "in a row",
+  hudBest: "Best",
+  rules: "Pick the one that's bigger in real life. One miss ends the run.",
   right: "You got it!",
   wrong: "Not quite! Run over.",
   next: "Next round",
