@@ -28,7 +28,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "Annexation not recognized by most UN members. UN General Assembly Resolution 68/262 (March 27, 2014; 100 votes to 11, with 58 abstentions) affirmed Ukraine's borders.",
     summary:
-      "Unmarked Russian troops seized Crimea's parliament on February 27, 2014. After a 'referendum' held under Russian military control on March 16, Russia declared Crimea annexed on March 18. Russia says Crimeans chose to join it; Ukraine and most of the world call it an illegal annexation. This map draws Crimea as its own hatched shape, not as part of either country.",
+      "Unmarked Russian troops seized Crimea's parliament on February 27, 2014. After a 'referendum' held under Russian military control on March 16, Russia declared Crimea annexed on March 18. Russia says Crimeans chose to join it; Ukraine and most of the world call it an illegal annexation. This map draws Crimea as its own striped shape, not as part of either country.",
     polities: ["Crimea", "Russia", "Ukraine"],
   },
   {

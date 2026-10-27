@@ -165,7 +165,7 @@ export function DailyChallenge() {
       </div>
     );
   }
-  if (!game) return <Skeleton label="Loading today's challenge" />;
+  if (!game) return <Skeleton label="Loading today's five" />;
   const { round, today, save, choices, step } = game;
 
   const answer = (choice: number) => {

@@ -91,7 +91,7 @@ export const home = {
     you: "(you)",
     // the leaderboard couldn't be reached
     boardFailed: "Couldn't load the leaderboard. Try again in a minute.",
-    nextIn: (h: number, m: number) => `Next five in ${h}h ${m}m`,
+    nextIn: (h: number, m: number) => `Next five in ${h ? `${h}h ${m}m` : `${m}m`}`,
     nextReady: "Five new matchups are ready",
     challengeCta: "Challenge a friend",
     spotWaiting: "Your spot is waiting",

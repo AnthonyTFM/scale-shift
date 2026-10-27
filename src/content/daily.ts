@@ -11,7 +11,7 @@ export const dailyCopy = {
   challengeOld: (name: string, day: number) => `${name} sent you Daily #${day}. That one's gone, but today's is ready: play it and send your score back.`,
   // the countdown under the results, to the next daily
   nextIn: "Next five in",
-  nextTime: (h: number, m: number) => `${h}h ${m}m`,
+  nextTime: (h: number, m: number) => (h ? `${h}h ${m}m` : m ? `${m}m` : "under a minute"),
   nextReady: "Five new matchups are ready. Load them",
   // phones show this instead, so the first puzzle is on screen without scrolling
   leadShort: "Five matchups a day. Normal maps lie about size. Can you see through them?",
@@ -57,7 +57,7 @@ export const dailyCopy = {
   // the reveal after each answer
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
-    ask: "Drawn the way a normal web map shows them. Tap the one that's bigger in real life.",
+    ask: "Drawn the way a normal web map shows them. Don't trust your eyes.",
     // after the answer, in place of `ask`: which drawing is which, and tapping a tile plays the shrink again
     watch: "Pale: size on a normal map. Solid: real size. Tap to replay.",
     right: "You got it!",
