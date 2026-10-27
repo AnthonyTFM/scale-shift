@@ -94,8 +94,9 @@ function catchUp(g: Game): Game {
   return { ...g, save, choices: saved, step: Math.min(saved.length, g.round.questions.length) };
 }
 
-// results: "Better than N%" needs this many plays today
+// results: "Better than N%" needs this many plays today, and the chart of how everyone scored this many
 const CROWD_MIN = 30;
+const SPREAD_MIN = 10;
 const BETTER_MIN = 30;
 const TOP_MAX = 50;
 
@@ -339,12 +340,14 @@ function Results({
 
   // the middle card: how you did against everyone who played today (anonymous counts), or failing that how many days
   // you've played
+  // today's anonymous counts by score; they can be up to a minute old: if nobody shares your score yet, your own play
+  // isn't in them, so add it
+  const counts = crowd ? [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0) : null;
+  if (counts && !counts[score]) counts[score] = 1;
+  const crowdN = counts ? counts.reduce((a, b) => a + b, 0) : 0;
   const middle = (() => {
-    if (crowd && crowd.n >= CROWD_MIN) {
-      const counts = [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0);
-      // the counts can be up to a minute old: if nobody shares your score yet, your own play isn't in them, so add it
-      if (!counts[score]) counts[score] = 1;
-      const n = counts.reduce((a, b) => a + b, 0);
+    if (counts && crowd && crowd.n >= CROWD_MIN) {
+      const n = crowdN;
       // only good news: "Better than 8%" after a rough day would sting, and "Top 70%" isn't a boast, so those show
       // days played instead
       if (score === total) {
@@ -480,6 +483,45 @@ function Results({
         {copied}
       </p>
       {shareBox.box}
+      {/* how everyone scored today, from 5 down to 0, your score's bar in blue (anonymous counts, once enough played) */}
+      {counts && crowdN >= SPREAD_MIN ? (
+        <div className="mt-5">
+          <h3 className="font-display text-lg text-ink">{R.crowdTitle}</h3>
+          <p className="text-sm text-muted">{R.crowdSub(crowdN)}</p>
+          <ol className="mt-2 space-y-1">
+            {counts
+              .map((c, n) => {
+                const exact = (100 * c) / crowdN;
+                // a handful of plays among hundreds still shows: "<1%", not "0%"
+                const pct = c && exact < 0.5 ? "<1" : String(Math.round(exact));
+                const top = Math.max(...counts);
+                return (
+                  <li key={n} className="flex items-center gap-2 text-sm">
+                    <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
+                      {n}
+                    </span>
+                    <span className="sr-only">{R.crowdRow(n, pct, n === score)}</span>
+                    {/* every row has the same track and the same label slot, so the bars compare fairly */}
+                    <span aria-hidden="true" className="flex-1">
+                      <span
+                        className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                          !c ? "text-muted" : `min-w-10 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                        }`}
+                        style={c ? { width: `${(c / top) * 100}%` } : undefined}
+                      >
+                        {pct}%
+                      </span>
+                    </span>
+                    <span aria-hidden="true" className="w-8 shrink-0 text-xs font-bold text-primary">
+                      {n === score ? R.crowdYou : null}
+                    </span>
+                  </li>
+                );
+              })
+              .reverse()}
+          </ol>
+        </div>
+      ) : null}
       {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
       {s.played >= 2 ? (
         <div className="mt-5">
