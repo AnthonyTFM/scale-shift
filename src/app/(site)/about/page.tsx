@@ -66,8 +66,9 @@ export default function AboutPage() {
               historical-basemaps
             </a>{" "}
             by André Ourednik and contributors (GPL-3.0). Each feature carries a border-precision rating, which we show on the map as solid
-            (precise) or dashed (approximate) lines. Our processed copies stay under the same license (see the{" "}
-            <a href="/data/LICENSE.txt">data license</a>).
+            (precise) or dashed (approximate) lines. Where it leaves a state out, draws it inside a neighbour or keeps it after it fell, we
+            redraw the state from Cliopatria (below), whose outlines also fill land it leaves blank. Our processed copies stay under the same
+            license (see the <a href="/data/LICENSE.txt">data license</a>).
           </li>
           <li>
             <strong>1800 to 1960:</strong>{" "}
@@ -109,7 +110,8 @@ export default function AboutPage() {
             <a href="https://icr.ethz.ch/data/cshapes/" rel="noopener noreferrer">
               CShapes 2.0
             </a>{" "}
-            (ETH Zurich), the academic standard for country borders since 1886, to find and correct errors.
+            (ETH Zurich), the academic standard for country borders since 1886, to find and correct errors. Each map before 1800 was
+            compared with Cliopatria for its year.
           </li>
           <li>
             <strong>Flags:</strong>{" "}

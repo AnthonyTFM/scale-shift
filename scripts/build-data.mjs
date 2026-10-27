@@ -1081,12 +1081,13 @@ async function overlayBorders(grouped, year, slivers) {
 // outline (Natural Earth, public domain) is cut out of every shape on the map and given to the country that held it,
 // in the order listed. `ne0`: countries (Natural Earth's names); `ne1`: provinces, "Country/Province"; `pick`: only the
 // parts of those whose middle lies in this lon/lat box; `source`: [year, name], a shape from another snapshot of the
-// historical source, where that border did not change in between. `clio`: Cliopatria's outline of these polities on
-// the map (1800 to 1960). `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
+// historical source, where that border did not change in between. `clio`: Cliopatria's outline of these polities in
+// the map's year, cut to land. `poly`: a lon/lat outline, clipped to land, for a border that follows no present-day one
 // (shown approximately). `ohm`: an OpenHistoricalMap relation's outline, by id. `blank`: the country gets only the land
-// there that no shape holds. `from`: only these shapes lose land, and the country gets only what they lose. `exact`: the
-// country loses whatever it had beyond the new outline. `s`, `w`: ruler and note (null removes one). Slivers left
-// beside the new border go (see dropSlivers).
+// there that no shape holds; `fill`: likewise, but land the source leaves unnamed counts as empty. `from`: only these
+// shapes lose land, and the country gets only what they lose. `exact`: the country loses whatever it had beyond the new
+// outline. `subjects`: shapes with at least this share of their land inside the outline are marked as ruled by the
+// country. `s`, `w`: ruler and note (null removes one). Slivers left beside the new border go (see dropSlivers).
 const UK_1930S = "United Kingdom of Great Britain and Ireland";
 const UK_LATER = "United Kingdom";
 const NORTH_YEMEN = ["Sa`dah", "Hajjah", "Al Jawf", "Al Hudaydah", "Ta`izz", "Ma'rib", "Sana'a", "Raymah", "Al Bayda'", "Amran", "Ibb", "Al Mahwit", "Dhamar", "Amanat Al Asimah"].map((p) => `Yemen/${p}`);
@@ -1226,7 +1227,643 @@ const CEYLON_COAST = (uk, w) => ({ to: "British Ceylon", ne0: ["Sri Lanka"], fro
 const JAVA = ["Banten", "Jakarta Raya", "Jawa Barat", "Jawa Tengah", "Yogyakarta", "Jawa Timur"].map((p) => `Indonesia/${p}`);
 // the town of Pontianak, which lies just north of Cliopatria's outline of its sultanate
 const PONTIANAK = { to: "Pontianak Kadriyah Sultanate", poly: [[109.1, 0.1], [109.6, 0.1], [109.6, -0.25], [109.1, -0.25], [109.1, 0.1]], blank: true, w: "Founded in 1771 where the Landak joins the Kapuas (shown approximately)." };
+// ---------- before 1800: the historical-basemaps maps, checked against Cliopatria ----------
+// Every map from 2000 BCE to 1783 was compared with Cliopatria (Seshat) for its year. These rules fix what was clearly
+// wrong: a state the source leaves out, draws inside a neighbour or shows after it fell, and broad labels ("minor
+// Hindu kingdoms", "Zhou states", "central Asian khanates") laid over states Cliopatria draws. The renames that go
+// with them are in src/content/data-corrections.json. `from` keeps each change to the shapes named, so no neighbour's
+// border moves with Cliopatria's coarser outline.
+/** A broad shape split into the states Cliopatria draws inside it: [name on the map, Cliopatria's name(s), extra]. */
+const SPLIT = (from, parts) => parts.map(([to, clio, extra]) => ({ to, clio: [clio].flat(), from: [from].flat(), ...extra }));
+/** Land the source leaves blank (or unnamed), given to the state Cliopatria draws there. */
+const FILL = (parts) => parts.map(([to, clio, extra]) => ({ to, clio: [clio].flat(), fill: true, ...extra }));
+// the Tamil kingdoms the source leaves inside a label for all of south India
+const TAMIL = (from) => SPLIT(from, [["Pandya kingdom", "Early Pandyas"], ["Chola kingdom", "Early Cholas"], ["Chera kingdom", "Early Cheras"]]);
+const ZHOU = "Zhou royal domain and minor states";
+// the Deccan states the source labels "minor Hindu kingdoms" (1279, 1300) or "Rajput kingdoms" (1200)
+const DECCAN = (from) =>
+  SPLIT(from, [
+    ["Yadava dynasty", "Yadava Dynasty"],
+    ["Kakatiya dynasty", "Kakatiya Dynasty"],
+    ["Hoysala dynasty", "Hoysala Kingdom"],
+    ["Eastern Ganga dynasty", "Eastern Ganga Kingdom"],
+  ]);
+// Đại Việt split between the Trịnh lords (north, ruling for the Lê emperors) and the Nguyễn lords (south). The source
+// draws all of Vietnam as Đại Việt, so what is left is Champa (renamed in data-corrections), less a sliver in the far
+// north-west and, until 1677, the Mạc rulers' Cao Bằng
+const TRINH_NGUYEN = (year) => [
+  ...SPLIT("Champa", [
+    ["Đại Việt (Trịnh lords)", "Trịnh lords"],
+    ["Đại Việt (Nguyễn lords)", "Nguyễn lords"],
+  ]),
+  { to: "Đại Việt (Trịnh lords)", poly: [[101.5, 21], [104.6, 21], [104.6, 23.6], [101.5, 23.6], [101.5, 21]], from: ["Champa"] },
+  ...(year < 1677
+    ? [{ to: "Mạc dynasty (Cao Bằng)", poly: [[105.2, 22.2], [106.9, 22.2], [106.9, 23.3], [105.2, 23.3], [105.2, 22.2]], from: ["Champa"], w: "The last Mạc rulers held Cao Bằng, under Ming and then Qing protection, until 1677." }]
+    : []),
+];
+// the island of Sicily, which Cliopatria draws as part of the Crown of Aragon
+const SICILY_ISLAND = { to: "Kingdom of Sicily", clio: ["Crown of Aragon"], pick: [12, 36.4, 15.75, 38.5], from: ["Kingdom of Naples"] };
+// Ezo (Hokkaido) and the southern Kurils, Ainu land: the Matsumae domain held only the southern tip
+const EZO = (from) => ({
+  to: "Ainu",
+  poly: [[139.2, 41.9], [139.9, 42.3], [140.95, 41.95], [141.9, 42.2], [143.6, 41.6], [146.8, 43], [151.5, 45.6], [148.5, 46.6], [141.6, 46], [139.2, 43.8], [139.2, 41.9]],
+  from: [from],
+  w: "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.",
+});
+// the steppe, Burma, the Niger and the Baltic around 1500 (the 1492 and 1500 maps draw them alike)
+const AROUND_1500 = (year) => [
+  // Mongolia (the Northern Yuan) and the Kazakh steppe, which the source draws inside the Chagatai Khanate and the White Horde
+  ...SPLIT("Chagatai Khanate", [["Northern Yuan", "Mongol Khanate"]]),
+  ...SPLIT(["Chagatai Khanate", "Turkic nomads"], [["Kazakh Khanate", "Kazakh Khanate"]]),
+  ...SPLIT("Turkic nomads", [["Khanate of Sibir", "Khanate of Sibir"], ["Nogai Horde", "Nogai Horde"]]),
+  ...SPLIT("Poland-Lithuania", [["Principality of Moldavia", "Principality of Moldavia"]]),
+  ...SPLIT("Manipur and hill peoples", [
+    ["Shan states", "Shan States"],
+    ["Ava Kingdom", "Ava Kingdom"],
+    ["Kingdom of Mrauk U", "Kingdom of Mrauk U"],
+    ["Prome Kingdom", "Prome Kingdom"],
+    ["Lan Na", "Lan Na Kingdom"],
+  ]),
+  // Timbuktu and the middle Niger, Songhai under Sonni Ali and Askia Muhammad
+  ...SPLIT("Mali", [["Songhai", "Songhai Empire"]]),
+  ...SPLIT("Teutonic Knights", [["Livonian Confederation", "Livonian Conference"]]),
+  ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+  EZO("Japan"),
+  ...FILL([["Wattasid Sultanate", "Wattasid dynasty"], ["Mali", "Mali Empire"], ["Alwa", "Alodia"], ...(year === 1500 ? [["Korea", "Joseon"]] : [])]),
+];
+const RUS_1300 = { s: "Khanate of the Golden Horde" };
+const BEFORE_1800 = {
+  [-1500]: [
+    ...SPLIT(["Amorites", "Assyria", "Hurrians", "Hittites", "Canaanite city-states"], [["Mitanni", "Mitanni"]]),
+    ...SPLIT("Amorites", [["Babylonia", "Babylonia"], ["Sealand", "First Sealand Dynasty"]]),
+    // Sinai, Egyptian
+    ...SPLIT("Elamite and Zagros states", [["Egypt", "New Kingdom of Egypt"]]),
+  ],
+  [-700]: [
+    // Assyria's provinces: the source draws them as Aramaean, Neo-Hittite and Israelite lands
+    ...SPLIT(["Arameans", "Neo-Hittite states", "Judah"], [["Assyria", "Neo-Assyrian Empire"]]),
+    ...SPLIT("Neo-Hittite states", [["Phrygia", "Phrygia"]]),
+    ...SPLIT("Urnfield cultures", [["Etruscans", "Etruscans"]]),
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Jin", "Jin"], ["Qi", "Qi"], ["Qin", "Qin"], ["Lu", "Lu"], ["Yan", "Yan"]]),
+  ],
+  [-500]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Wu", "Wu"], ["Jin", "Jin"], ["Yue", "Yue"], ["Qi", "Qi"], ["Qin", "Qin"], ["Lu", "Lu"], ["Yan", "Yan"]]),
+    ...FILL([["Scythians", "Scythia"], ["Hadramaut", "Hadhramaut"]]),
+  ],
+  [-400]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Yue"], ["Qi", "Qi"], ["Wei", "Wei"], ["Zhao", "Zhao"], ["Qin", "Qin"], ["Song", "Song"]]),
+    ...FILL([["Hadramaut", "Hadhramaut"], ["Saba", "Sabaeans"]]),
+  ],
+  [-323]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Minyue"], ["Qi", "Qi"], ["Wei", "Wei"], ["Qin", "Qin"], ["Zhao", "Zhao"]]),
+    ...FILL([["Yuezhi", "Yuezhi"], ["Scythians", "Scythia"]]),
+  ],
+  [-300]: [
+    ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Minyue"], ["Qin", "Qin"], ["Qi", "Qi"], ["Wei", "Wei"], ["Zhao", "Zhao"]]),
+    // Kalinga, conquered by Ashoka around 261 BCE
+    ...SPLIT("Mauryan Empire", [["Kalinga", "Kalinga"]]),
+    ...FILL([["Yuezhi", "Yuezhi"], ["Scythians", "Scythia"], ["Colchis", "Colchis"]]),
+  ],
+  [-200]: [
+    ...SPLIT("Armenian and Caucasian kingdoms", [
+      ["Kingdom of Pontus", "Kingdom of Pontus"],
+      ["Media Atropatene", "Atropatene"],
+      ["Kingdom of Cappadocia", "Kingdom of Cappadocia"],
+      ["Galatia", "Galatia"],
+      ["Kingdom of Bithynia", "Kingdom of Bithynia"],
+      ["Paphlagonia", "Paphlagonia"],
+      ["Sophene", "Kingdom of Sophene"],
+    ]),
+    ...TAMIL("Iron Age chieftainships"),
+  ],
+  [-100]: [
+    // Parthia had taken Media (148 BCE) and Mesopotamia (141 BCE): the source still draws them as Seleucid
+    ...SPLIT(["Seleucid Kingdom", "Caucasian kingdoms", "Scythians"], [["Parthia", "Parthian Empire"]]),
+    ...SPLIT("Caucasian kingdoms", [
+      ["Kingdom of Pontus", "Kingdom of Pontus"],
+      ["Armenia", "Kingdom of Armenia"],
+      ["Kingdom of Cappadocia", "Kingdom of Cappadocia"],
+      ["Kingdom of Bithynia", "Kingdom of Bithynia"],
+      ["Sophene", "Kingdom of Sophene"],
+    ]),
+    ...SPLIT("Yuezhi", [["Indo-Greek kingdoms", "Indo-Greeks"], ["Indo-Scythians", "Indo-Scythians"]]),
+    ...SPLIT("Shunga Empire", [["Satavahana Empire", "Satavahana Dynasty"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Xiongnu", "Xiongnu"],
+      ["Jin (Korea)", "Korean Jin"],
+      ["Han Empire", "Gojoseon", { w: "Han commanderies: the Han conquered Gojoseon in 108 BCE." }],
+      ["Cyrenaica", "Cyrenaica"],
+    ]),
+  ],
+  [-1]: [
+    // client kingdoms the source draws inside the Roman Empire
+    ...SPLIT("Roman Empire", [
+      ["Mauretania", "Mauretania", { s: "Roman Empire" }],
+      ["Kingdom of Cappadocia", "Kingdom of Cappadocia", { s: "Roman Empire" }],
+      ["Kingdom of Pontus", "Kingdom of Pontus", { s: "Roman Empire" }],
+    ]),
+    ...SPLIT("Armenia", [["Caucasian Albania", "Caucasian Albania"]]),
+    ...SPLIT("Jinhan", [["Mahan", "Mahan"], ["Byeonhan", "Byeonhan"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Yuezhi", "Yuezhi"],
+      ["Wusun", "Wusun"],
+      ["Dayuan (Ferghana)", "Great Yuan"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Colchis", "Lazica"],
+      ["Bosporian Kingdom", "Cimmerian Bosporus"],
+    ]),
+  ],
+  100: [
+    ...SPLIT("Western Satraps", [["Kushan Empire", "Kushan Empire"], ["Satavahana Empire", "Satavahana Dynasty"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      // the Xianbei took the Xiongnu lands after the Han and their allies broke the northern Xiongnu (89–93)
+      ["Xianbei", ["Xianbei", "Xiongnu"]],
+      ["Funan", "Funan"],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Goths", "Goths"],
+      ["Wusun", "Wusun"],
+    ]),
+  ],
+  200: [
+    // the Kushan Empire at its height, which the source leaves out
+    ...SPLIT(["Western Satraps", "Magadha", "Parthian Empire"], [["Kushan Empire", "Kushan Empire"]]),
+    ...SPLIT("Western Satraps", [["Satavahana Empire", "Satavahana Dynasty"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Kushan Empire", "Kushan Empire"],
+      ["Xianbei", "Xianbei"],
+      ["Funan", "Funan"],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Goths", "Goths"],
+      ["Mahan", "Mahan"],
+      ["Jinhan", "Jinhan"],
+      ["Byeonhan", "Byeonhan"],
+      ["Dongye", "Dongye"],
+      ["Wusun", "Wusun"],
+      ["Bosporian Kingdom", "Cimmerian Bosporus"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Lazica", "Lazica"],
+    ]),
+  ],
+  300: [
+    ...SPLIT("Sasanian Empire", [["Kushano-Sasanians", "Indo-Sasanian Empire"]]),
+    ...SPLIT(["Sasanian Empire", "Western Satraps"], [["Kushan Empire", "Eastern Kushans"]]),
+    ...SPLIT(["Satavahana successor states", "Western Satraps", "Kalinga", "Gangetic kingdoms"], [["Vakataka Kingdom", "Vakataka Kingdom"]]),
+    ...SPLIT("Satavahana successor states", [["Pallava dynasty", "Late Pallava Empire"]]),
+    ...TAMIL("Hindu kingdoms"),
+    ...FILL([
+      ["Kushano-Sasanians", "Indo-Sasanian Empire"],
+      ["Goths", "Gothia"],
+      ["Funan", "Funan"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Burgundians", "Burgundians"],
+      ["Lâm Ấp (Champa)", "Chámpa"],
+      ["Bosporan Kingdom", "Cimmerian Bosporus", { s: "Roman Empire" }],
+      ["Iberia", "Caucasian Iberia"],
+      ["Franks", "Ripuarian Franks"],
+      ["Lazica", "Lazica"],
+    ]),
+  ],
+  400: [
+    // the source's "Sixteen Kingdoms" is the name of the period, not a state
+    ...SPLIT(["Sixteen Kingdoms", "Jin"], [
+      ["Northern Wei", "Northern Wei"],
+      ["Later Yan", "Later Yan"],
+      ["Later Qin", "Later Qin"],
+      ["Western Qin", "Western Qin"],
+    ]),
+    ...SPLIT("Sasanian Empire", [["Kidarites", "Kidarites"]]),
+    ...SPLIT("Deccan kingdoms", [
+      ["Vakataka Kingdom", "Vakataka Kingdom"],
+      ["Kadamba dynasty", "Kadamba Empire"],
+      ["Pallava dynasty", "Late Pallava Empire"],
+    ]),
+    ...SPLIT("Nubian kingdoms", [["Nobatia", "Nobatia"], ["Makuria", "Makuria"], ["Alwa", "Alodia"]]),
+    ...FILL([
+      ["Northern Wei", "Northern Wei"],
+      ["Kidarites", "Kidarites"],
+      ["Xionites", "Xionites"],
+      ["Funan", "Funan"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Kamarupa", "Kamarupa Kingdom"],
+      ["Champa", "Chámpa"],
+      ["Paekche", "Baekje"],
+      ["Silla", "Silla"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Vandals", "Vandals"],
+    ]),
+  ],
+  500: [
+    // the Hephthalites (and the Alchon Huns in north-west India), which the source leaves out at their height
+    ...SPLIT(["Sasanian Empire", "Gupta Empire"], [["Hephthalite Empire", "White Huns"]]),
+    ...SPLIT("Makuria", [["Nobatia", "Nobatia"]]),
+    ...SPLIT(["Axum", "Makuria"], [["Alwa", "Alodia"]]),
+    ...SPLIT("Silla", [["Koguryo", "Goguryeo"]]),
+    ...FILL([
+      ["Hephthalite Empire", "White Huns"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Kamarupa", "Kamarupa Kingdom"],
+      ["Paekche", "Baekje"],
+      ["Silla", "Silla"],
+      ["Iberia", "Caucasian Iberia"],
+      ["Lazica", "Lazica"],
+      ["Thuringians", "Kingdom of Thuringia"],
+      ["Tarumanagara", "Tarumanagara"],
+    ]),
+  ],
+  600: [
+    ...SPLIT("Hindu kingdoms", [["Maitraka dynasty", "Maitraka Dynasty"], ["Pandya dynasty", "Pandya Dynasty"]]),
+    ...SPLIT("Kent", [
+      ["Mercia", "Kingdom of Mercia"],
+      ["Wessex", "Kingdom of Wessex"],
+      ["East Anglia", "Kingdom of East Anglia"],
+      ["Essex", "Kingdom of Essex"],
+      ["Sussex", "Kingdom of Sussex"],
+      ["Lindsey", "Kingdom of Lindsey"],
+      ["Hwicce", "Hwicce"],
+    ]),
+    ...SPLIT(["Avars", "Frankish Kingdom", "Lombard Kingdom"], [["Duchy of Bavaria", "Bavarians", { s: "Frankish Kingdom" }]]),
+    ...SPLIT("Javanese kingdoms", [["Tarumanagara", "Tarumanagara"]]),
+    ...FILL([
+      ["Western Turkic Khaganate", "Western Göktürks"],
+      ["Avars", "Avar Khaganate"],
+      ["Tuyuhun", "Tuyuhun"],
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Lakhmids", "Lakhmid Kingdom", { s: "Sasanian Empire" }],
+      ["Ghassanids", "Ghassanids", { s: "Eastern Roman Empire" }],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Kashmir (Karkota dynasty)", "Karkota Dynasty"],
+      ["Silla", "Silla"],
+      ["Brittonic kingdoms", "Brythons"],
+    ]),
+  ],
+  700: [
+    // Visigothic Spain, eleven years before the Umayyad conquest (711), and Tabaristan, Dabuyid until 760
+    ...SPLIT("Umayyad Caliphate", [["Visigothic Kingdom", "Visigothic Kingdom"], ["Dabuyids (Tabaristan)", "Dabuyid Dynasty"]]),
+    ...SPLIT("Principality of Iberia", [["Lazica", "Kingdom of Lazica", { s: "Eastern Roman Empire" }]]),
+    ...SPLIT("minor states under Indian influence", [["Srivijaya", "Srivijaya"]]),
+    ...SPLIT("Javanese kingdoms", [["Sunda Kingdom", "Sunda Kingdom"], ["Galuh Kingdom", "Galuh Kingdom"]]),
+    ...SPLIT("Kent", [
+      ["Mercia", "Kingdom of Mercia"],
+      ["Wessex", "Kingdom of Wessex"],
+      ["East Anglia", "Kingdom of East Anglia"],
+      ["Northumbria", "Kingdom of Northumbria"],
+    ]),
+    ...SPLIT("Frankish Kingdom", [
+      ["Duchy of Aquitaine", "Aquitaine", { s: "Frankish Kingdom" }],
+      ["Frisian Kingdom", ["Frisia Kingdom", "Magna Frisia"]],
+    ]),
+    ...SPLIT(["Frankish Kingdom", "Avars", "Lombard Kingdom"], [["Duchy of Bavaria", "Bavarians", { s: "Frankish Kingdom" }]]),
+    ...FILL([
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Chen-La", "Chenla"],
+      ["Haripunchai", "Haripuñjaya"],
+      ["Pyu city-states", "Pyu City-States"],
+      ["Dvaravati", "Lavo Kingdom"],
+      ["Northumbria", "Kingdom of Northumbria"],
+      ["Strathclyde", "Strathclyde"],
+      ["Dál Riata", "Dál Riata"],
+    ]),
+  ],
+  800: [
+    ...SPLIT("Mon–Khmer peoples and small states", [["Haripunchai", "Haripuñjaya"], ["Dvaravati", "Lavo Kingdom"], ["Chen-La", "Land Chenla"]]),
+    // western Pannonia, which Charlemagne took from the Avars (791–803)
+    ...SPLIT("Avars", [["Carolingian Empire", "Kingdom of the Franks"]]),
+    ...SPLIT("Aghlabid Emirate", [["Rustamid Imamate", "Rustamid dynasty"]]),
+    ...SPLIT("Idrisid dynasty", [["Barghawata", "Barghawata Conference"]]),
+    ...SPLIT("Abbasid Caliphate", [["Turk Shahis", "Turk Shahis"]]),
+    ...SPLIT("Palas", [["Kamarupa", "Kamarupa Kingdom"]]),
+    ...FILL([
+      ["Kimek–Kipchak confederation", "Kimek-Kipchak confederation"],
+      ["Oghuz Yabgu State", "Oghuz Turks"],
+      ["Karluk Yabgu State", "Qarlugs"],
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Ghana", "Ghana Empire"],
+      ["Kashmir (Karkota dynasty)", "Karkota Dynasty"],
+      ["Unified Silla", "Unified Silla"],
+    ]),
+  ],
+  900: [
+    ...SPLIT("Tibetan kingdoms", [["Kingdom of Qocho", "Qocho Kingdom"], ["Kingdom of Khotan", "Kingdom of Khotan"], ["Ganzhou Uyghur Kingdom", "Ganzhou Kingdom"]]),
+    ...SPLIT("Turkic and Mongolic tribes", [
+      ["Kimek–Kipchak confederation", "Kimek-Kipchak confederation"],
+      ["Yenisei Kyrgyz", "Yenisei Kyrgyz"],
+      ["Oghuz Yabgu State", "Oghuz Turks"],
+    ]),
+    // Khorasan, which the Samanids took from the Saffarid Amr ibn al-Layth in 900
+    ...SPLIT("Saffarids", [["Samanid Empire", "Samanid Empire"]]),
+    ...SPLIT("Abbasid Caliphate", [["Tulunid Emirate", "Tulunids"], ["Kingdom of Armenia", "Bagratid Armenia"]]),
+    ...SPLIT("Aghlabid Emirate", [["Rustamid Imamate", "Rustamid dynasty"]]),
+    ...SPLIT("Idrisid dynasty", [["Barghawata", "Barghawata Conference"]]),
+    ...SPLIT("Khmer Empire", [["Haripunchai", "Haripuñjaya"], ["Lavo", "Lavo Kingdom"]]),
+    ...SPLIT("Great Moravia", [["Duchy of Bohemia", "Duchy of Bohemia"]]),
+    ...SPLIT("Silla", [["Later Baekje", "Hubaekje"]]),
+    ...SPLIT("Chola Empire", [["Pandya state", "Pandya Dynasty"]]),
+    ...SPLIT("Mercia", [["Wessex", "Kingdom of Wessex"]]),
+    ...SPLIT(["Mercia", "Northumbria"], [["Danelaw", "Danelaw"]]),
+    ...SPLIT("Lotharingia", [
+      ["Kingdom of Provence", "Kingdom of Lower Burgundy"],
+      ["Kingdom of Upper Burgundy", "Upper Burgundy"],
+      ["East Francia", "East Franks"],
+    ]),
+    ...SPLIT("Palas", [["Kamarupa", "Kamarupa Kingdom"]]),
+  ],
+  1000: [
+    // Khorasan, Ghaznavid from 999
+    ...SPLIT("Buwayhid Emirates", [["Ghaznavid Emirate", "Ghaznavid Empire"]]),
+    ...SPLIT("Xixia", [["Ganzhou Uyghur Kingdom", "Ganzhou Kingdom"], ["Kingdom of Qocho", "Qocho Kingdom"]]),
+    ...SPLIT("Hill kingdoms (Manipur, Tripura)", [["Kamarupa", "Kamarupa Kingdom"], ["Chandra dynasty", "Chandra Dynasty"]]),
+    ...SPLIT("Armenia", [["Kingdom of Vaspurakan", "Kingdom of Vaspurakan"]]),
+    ...SPLIT("Rajput kingdoms", [
+      ["Paramara dynasty", "Paramara Dynasty"],
+      ["Chaulukya dynasty", "Chaulukya Dynasty"],
+      ["Chauhans of Shakambhari", "Chauhan Dynasty"],
+      ["Chandela dynasty", "Chandela Kingdom"],
+      ["Pratiharas", "Gurjara-Pratihara Dynasty"],
+    ]),
+    ...FILL([
+      ["Liao", "Liao Dynasty"],
+      ["Kara-Khanid Khanate", "Kara-Khanids"],
+      ["Kingdom of Qocho", "Qocho Kingdom"],
+      ["Kingdom of Khotan", "Kingdom of Khotan"],
+      ["Kingdom of Kashmir", ["Utpala Dynasty", "Kashmir"]],
+      ["Goryeo", "Goryeo"],
+      ["Ghana", "Ghana Empire"],
+      ["Ancestral Puebloans (Chaco)", "Puebloans - Chaco Regional System"],
+    ]),
+  ],
+  1100: [
+    // Khorasan, Seljuk since 1040
+    ...SPLIT("Ghaznavid Emirate", [["Seljuk Empire", "Great Seljuk Empire"]]),
+    ...SPLIT("Rajput kingdoms", [["Ghaznavid Emirate", "Ghaznavid Empire"]]),
+    ...SPLIT("Xixia", [["Kingdom of Qocho", "Qocho Kingdom"]]),
+    ...SPLIT("Oghuz", [["Khwarazm", "Khwarezmid Dynasty", { s: "Seljuk Empire" }]]),
+    // Anatolia after Manzikert (1071), which the source still draws as Byzantine
+    ...SPLIT("Byzantine Empire", [
+      ["Sultanate of Rum", "Sultanate of Rum"],
+      ["Danishmendids", "Danishmendids"],
+      ["Armenian Cilicia", "Armenian Kingdom of Cilicia"],
+      ["Serbia", "Grand Principality of Serbia"],
+      ["Norman Italy", "Norman Italy"],
+    ]),
+    ...SPLIT("Hill kingdoms (Manipur, Tripura)", [["Kamarupa", "Kamarupa Kingdom"]]),
+    ...FILL([
+      ["Goryeo", "Goryeo"],
+      ["Ghana", "Ghana Empire"],
+      ["Eastern Ganga dynasty", "Eastern Ganga Kingdom"],
+      ["Ancestral Puebloans (Chaco)", "Puebloans - Chaco Regional System"],
+      ["Takrur", "Takrur"],
+      ["Kanem Empire", "Empire of Kanem"],
+      ["Zagwe dynasty", "Zagwe dynasty"],
+    ]),
+  ],
+  1200: [
+    // northern China, Jin since 1127: the source gives it to the Song
+    ...SPLIT("Southern Song", [["Jin dynasty", "Great Jin"]]),
+    ...SPLIT("Seljuk successor states", [["Ghurid Sultanate", "Ghurid Dynasty"], ["Ayyubid Sultanate", "Ayyubid Sultanate"]]),
+    // Bengal, Sena until 1204, and Khwarazm, which the source leaves out
+    ...SPLIT(["Ghurid Sultanate", "Rajput kingdoms"], [["Sena dynasty", "Sena Dynasty"]]),
+    ...SPLIT(["Ghurid Sultanate", "Kara Khitai Khaganate", "Seljuk successor states"], [["Khwarazmian Empire", "Khwarezmid Dynasty", { s: "Kara Khitai Khaganate" }]]),
+    ...SPLIT("Xixia", [["Kara Khitai Khaganate", "Kara-Khitans"]]),
+    ...SPLIT("Haripunchai", [["Khmer Empire", "Khmer Empire"]]),
+    ...SPLIT("Kingdom of Kashmir", [["Ghurid Sultanate", "Ghurid Dynasty"]]),
+    ...SPLIT("Kediri", [["Bali", "Early Balinese Kingdoms"]]),
+    ...SPLIT("Hill peoples", [["Kingdom of Dali", "Kingdom of Dali"], ["Pagan Kingdom", "Pagan Kingdom"]]),
+    ...SPLIT("Byzantine Empire", [
+      ["Sultanate of Rum", "Sultanate of Rum"],
+      ["Armenian Kingdom of Cilicia", "Armenian Kingdom of Cilicia"],
+      ["Kingdom of Sicily", "Kingdom of Sicily"],
+    ]),
+    ...DECCAN("Rajput kingdoms"),
+    ...SPLIT("Rajput kingdoms", [
+      ["Chaulukya dynasty", "Chaulukya Dynasty"],
+      ["Paramara dynasty", "Paramara Dynasty"],
+      ["Chandela dynasty", "Chandela Kingdom"],
+    ]),
+    ...FILL([["Principality of Jersika", "Principality of Jersika"]]),
+  ],
+  1279: [...DECCAN("minor Hindu kingdoms"), ...SPLIT("minor Hindu kingdoms", [["Pandya state", "Pandya Empire"]]), ...FILL([["Kanem Empire", "Empire of Kanem"]])],
+  1300: [
+    ...DECCAN("minor Hindu kingdoms"),
+    ...SPLIT("minor Hindu kingdoms", [["Pandya state", "Pandya Empire"]]),
+    // Burma after the fall of Pagan (1287)
+    ...SPLIT("Myinsaing Kingdom", [["Shan states", "Shan States"], ["Hanthawaddy Kingdom", "Hanthawaddy Kingdom"], ["Lan Na", "Lan Na Kingdom"]]),
+    ...SPLIT("Malayu-Dharmasraya", [["Sunda Kingdom", "Sunda Kingdom"]]),
+    ...SPLIT("Sultanate of Rum", [["Armenian Kingdom of Cilicia", "Armenian Kingdom of Cilicia"]]),
+    SICILY_ISLAND,
+    ...SPLIT("Kingdom of Serbia", [["Kingdom of Syrmia", "Kingdom of Syrmia"], ["Banate of Bosnia", "Banate of Bosnia"]]),
+    // the Rus principalities, all paying tribute to the Golden Horde, which the source labels "Ryazan"
+    ...SPLIT("Rus principalities", [
+      ["Grand Principality of Vladimir", "Principality of Vladimir-Suzdal", RUS_1300],
+      ["Principality of Smolensk", "Principality of Smolensk", RUS_1300],
+      ["Kingdom of Galicia–Volhynia", "Galicia-Volhynia", RUS_1300],
+      ["Khanate of the Golden Horde", "Golden Horde"],
+    ]),
+  ],
+  1400: [
+    // the Delhi Sultanate after Timur's sack of Delhi (1398): the source draws the Tughlaq empire at its 1330s height
+    ...SPLIT("Sultanate of Delhi", [
+      ["Bahmani Sultanate", "Bahmani Sultanate"],
+      ["Bengal Sultanate", "Sultanate of Bengal"],
+      ["Vijayanagara Empire", "Vijayanagara Empire"],
+      ["Jaunpur Sultanate", "Jaunpur Sultanate"],
+      ["Samma Sultanate", "Sind-Samma Dynasty"],
+    ]),
+    // Moscow and Lithuania's eastern lands, which the source draws inside the Horde
+    ...SPLIT("Blue Horde", [
+      ["Grand Duchy of Moscow", ["Grand Principality of Moscow", "Principality of Vladimir-Suzdal"], { s: "Blue Horde" }],
+      ["Poland-Lithuania", ["Grand Duchy of Lithuania", "Principality of Smolensk"]],
+    ]),
+    ...SPLIT("Ava Kingdom", [["Shan states", "Shan States"], ["Hanthawaddy Kingdom", "Hanthawaddy Kingdom"], ["Lan Na", "Lan Na Kingdom"]]),
+    ...SPLIT("Ottoman Empire", [["Ramadanids", "Ramadanid Emirate", { s: "Mamluke Sultanate" }]]),
+    ...SPLIT(["Sukhothai", "Đại Việt"], [["Lan Xang", "Lan Xang"]]),
+    SICILY_ISLAND,
+    ...SPLIT("Sinhalese kingdom", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+    // Joseon (1392): the source still draws Korea inside the Mongol state
+    ...SPLIT("Great Khanate", [["Joseon", "Joseon"]]),
+  ],
+  1492: [
+    ...AROUND_1500(1492),
+    // the Inca Empire, which the source leaves out of this map: its outline from the 1500 map; the peoples it ruled
+    // keep their names, marked as ruled by it
+    { to: "Inca Empire", source: [1500, "Inca Empire"], fill: true, subjects: 0.6 },
+  ],
+  1500: AROUND_1500(1500),
+  1530: [
+    ...SPLIT("Poland-Lithuania", [["Livonian Confederation", "Livonian Conference"]]),
+    ...SPLIT("Khanate of Bukhara", [["Moghulistan", ["Eastern Moghulistan", "Western Moghulistan"]]]),
+    ...SPLIT("Burmese kingdoms", [["Toungoo dynasty", "First Toungoo Empire"], ["Kingdom of Mrauk U", "Kingdom of Mrauk U"], ["Shan states", "Shan States"]]),
+    ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+    ...FILL([
+      ["Moghulistan", "Eastern Moghulistan"],
+      ["Northern Yuan", "Mongol Khanate"],
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Songhai", "Songhai Empire"],
+      ["Mali", "Mali Empire"],
+      ["Sultanate of Brunei", "Sultanate of Brunei"],
+      ["Sultanate of Maguindanao", "Sultanate of Maguindanao"],
+      ["Korea", "Joseon"],
+      ["Kingdom of Kongo", "Kingdom of Kongo"],
+    ]),
+  ],
+  1600: [
+    // Akbar's conquests, which the source labels "Islamic and Hindu states"
+    ...SPLIT("Islamic and Hindu states", [["Mughal Empire", "Mughal Empire"], ["Safavid Empire", "Safavid Dynasty"]]),
+    ...SPLIT("Vijayanagara", [
+      ["Bijapur", "Bijapur Sultanate"],
+      ["Madurai Nayaks", "Nayaks of Madurai", { s: "Vijayanagara" }],
+      ["Mysore", "Kingdom of Mysore", { s: "Vijayanagara" }],
+      ["Thanjavur Nayaks", "Nayaks of Thanjavur", { s: "Vijayanagara" }],
+    ]),
+    ...SPLIT("Ahmadnagar", [["Mughal Empire", "Mughal Empire"], ["Bijapur", "Bijapur Sultanate"], ["Bidar", "Bidar Sultanate"]]),
+    ...TRINH_NGUYEN(1600),
+    ...SPLIT("Champa", [["Laos", "Lan Xang"]]),
+    ...SPLIT("Burmese kingdoms", [["Kingdom of Mrauk U", "Kingdom of Mrauk U"]]),
+    ...SPLIT("Kingdom of Kandy", [["Portuguese Ceylon", "Portuguese Ceylon", { s: "Portugal" }]]),
+    ...FILL([
+      ["Saadi Sultanate", "Saadi Sultanate"],
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Mali", "Mali Empire"],
+      ["Sultanate of Maguindanao", "Sultanate of Maguindanao"],
+      ["Korea", "Joseon"],
+      ["Kingdom of Kongo", "Kingdom of Kongo"],
+    ]),
+  ],
+  1650: [
+    ...SPLIT("Siberian and Amur peoples", [
+      ["Yarkent Khanate", "Eastern Moghulistan"],
+      ["Dzungar Khanate", "Oirat Confederation"],
+      ["Khoshut Khanate", ["Khoshut Khanate", "Tümed"]],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+      ["Manchu Empire", "Qing Dynasty"],
+      // Cliopatria's "Golden Horde" here is Khalkha Mongolia, which ruled itself until 1691
+      ["Khalkha Mongols", "Golden Horde"],
+    ]),
+    // Badakhshan
+    { to: "Khanate of Bukhara", poly: [[67.5, 35.5], [72.5, 35.5], [72.5, 38.6], [67.5, 38.6], [67.5, 35.5]], from: ["Siberian and Amur peoples"] },
+    // the Southern Ming, still holding the south-west in 1650
+    ...SPLIT("Manchu Empire", [["Southern Ming", "Southern Ming"]]),
+    ...SPLIT("Gondwana kingdoms", [["Mughal Empire", "Mughal Empire"], ["Golkonda", "Golconda Sultanate"]]),
+    ...SPLIT("Vijayanagara", [
+      ["Bijapur", "Bijapur Sultanate"],
+      ["Madurai Nayaks", "Nayaks of Madurai"],
+      ["Mysore", "Kingdom of Mysore"],
+      ["Thanjavur Nayaks", "Nayaks of Thanjavur"],
+    ]),
+    ...TRINH_NGUYEN(1650),
+    ...SPLIT("Champa", [["Laotian states", "Lan Xang"]]),
+    EZO("Tokugawa shogunate"),
+    ...FILL([
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Zaydi Imamate", "Qasimids"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Kingdom of Kongo", "Kingdom of Kongo"],
+      ["Oman", "Yarubid dynasty"],
+      ["Principality of Mingrelia", "Principality of Mingrelia"],
+      ["Kingdom of Imereti", "Kingdom of Imereti"],
+      ["Principality of Abkhazia", "Principality of Abkhazia"],
+    ]),
+  ],
+  1700: [
+    // Khalkha Mongolia (Qing from 1691), the Dzungars and Russia's Siberia, which the source labels "central Asian khanates"
+    ...SPLIT("Kyrgyz", [
+      ["Manchu Empire", "Qing Dynasty"],
+      ["Dzungar Khanate", "Dzungar Khanate"],
+      ["Tsardom of Muscovy", "Tsardom of Russia"],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+    ]),
+    ...SPLIT("Hindu kingdoms", [
+      ["Kingdom of Mysore", "Kingdom of Mysore"],
+      ["Madurai Nayak kingdom", "Nayaks of Madurai"],
+      ["Thanjavur Maratha kingdom", "Thanjavur Maratha Kingdom"],
+    ]),
+    ...TRINH_NGUYEN(1700),
+    ...SPLIT("Champa", [["Laotian states", "Lan Xang"]]),
+    EZO("Tokugawa shogunate"),
+    ...FILL([
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Haudenosaunee Confederacy", "Haudenosaunee"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Zaydi Imamate", "Qasimids"],
+      ["Oman", "Yarubid dynasty"],
+      ["Dutch Cape Colony", "Dutch Cape Colony", { s: "Netherlands" }],
+      ["Kingdom of Imereti", "Kingdom of Imereti"],
+      ["Principality of Abkhazia", "Principality of Abkhazia"],
+      ["Principality of Mingrelia", "Principality of Mingrelia"],
+    ]),
+  ],
+  1715: [
+    ...SPLIT("Kyrgyz", [
+      ["Dzungar Khanate", "Dzungar Khanate"],
+      ["Manchu Empire", "Qing Dynasty"],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+      ["Khanate of Kokand", "Khanate of Kokand"],
+    ]),
+    ...TRINH_NGUYEN(1715),
+    // Lan Xang split into three kingdoms in 1707–1713
+    ...SPLIT(["Laotian states", "Champa"], [
+      ["Kingdom of Luang Phrabang", "Kingdom of Luang Phrabang"],
+      ["Kingdom of Vientiane", "Vientiane"],
+      ["Kingdom of Champasak", "Kingdom of Champasak"],
+    ]),
+    EZO("Tokugawa shogunate"),
+    ...FILL([
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Zaydi Imamate", "Qasimids"],
+      ["Korea", "Joseon"],
+      ["Oman", "Yarubid dynasty"],
+      ["Asante", "Ashanti Empire"],
+      ["Kingdom of Imereti", "Kingdom of Imereti"],
+      ["Principality of Abkhazia", "Principality of Abkhazia"],
+      ["Principality of Mingrelia", "Principality of Mingrelia"],
+    ]),
+  ],
+  1783: [
+    ...SPLIT("Kazakh Khanate", [
+      ["Khanate of Khiva", "Khanate of Khiva"],
+      ["Khanate of Bukhara", "Khanate of Bukhara"],
+      ["Khanate of Kokand", "Khanate of Kokand"],
+      ["Caucasian khanates", "Khanates of the Caucasus"],
+      ["Qing Empire", "Qing Dynasty"],
+      ["Russian Empire", "Russian Empire"],
+      ["Persia", "Zand Dynasty"],
+    ]),
+    // Kashmir, Peshawar and Afsharid Khorasan were Durrani; the Sikh misls held the Punjab
+    ...SPLIT(["Himalayan hill states", "Persia"], [["Durrani Empire", "Durrani Empire"]]),
+    ...SPLIT("Himalayan hill states", [["Sikh Confederacy", "Sikh Confederacy"]]),
+    ...SPLIT("Poland", [["Duchy of Courland", "Duchy of Courland", { s: "Poland" }]]),
+    // the Tây Sơn held the south, from Quảng Ngãi down; the Trịnh had taken Phú Xuân (Huế) in 1775
+    ...SPLIT("Đại Việt (Trịnh lords)", [["Tây Sơn dynasty", "Tây Sơn dynasty"]]),
+    { to: "Tây Sơn dynasty", poly: [[102, 8], [110, 8], [110, 15.5], [102, 15.5], [102, 8]], from: ["Đại Việt (Trịnh lords)"] },
+    // Tibet, a Qing protectorate from 1720 with its own government
+    ...SPLIT("Qing Empire", [["Tibet", "Tibet", { s: "Qing Empire" }]]),
+    EZO("Japan"),
+    // the source draws Assam inside Burma, which only invaded it in 1817
+    { ...AHOM, blank: undefined, from: ["Burma"] },
+    ...FILL([
+      ["Funj", "Funj Sultanate"],
+      ["Wadai Sultanate", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Zaydi Imamate", "Qasimids"],
+    ]),
+  ],
+};
+
 const TERRITORY = {
+  ...BEFORE_1800,
   1800: [
     ...MICROSTATES,
     CUTCH,
@@ -1717,7 +2354,8 @@ function applyTerritory(grouped, year, slivers) {
     const held = []; // with `blank`: the land the shapes there hold
     for (const f of grouped) {
       if (!f.geometry.coordinates.length || !boxesMeet(boxOfPolys(f.geometry.coordinates), box)) continue;
-      if (rule.blank) {
+      // `fill`: a shape the source leaves unnamed gives way too
+      if (rule.blank || (rule.fill && f.properties.n)) {
         held.push(...f.geometry.coordinates);
         continue;
       }
@@ -1730,12 +2368,19 @@ function applyTerritory(grouped, year, slivers) {
       if (rule.exact && f.properties.n === rule.to) dropSlivers(f, before, Infinity, box, slivers, true);
       else dropSlivers(f, before, was, box, slivers);
     }
-    const give = rule.from ? taken : rule.blank && held.length ? (clipSafely(polygonClipping.difference, polys, held) ?? []) : polys;
+    const give = rule.from ? taken : (rule.blank || rule.fill) && held.length ? (clipSafely(polygonClipping.difference, polys, held) ?? []) : polys;
     if (!give.length) continue;
     let f = grouped.find((g) => g.properties.n === rule.to);
     if (f) f.geometry.coordinates = f.geometry.coordinates.length ? (clipSafely(polygonClipping.union, f.geometry.coordinates, give) ?? [...f.geometry.coordinates, ...give]) : give;
     else grouped.push((f = { type: "Feature", properties: { n: rule.to, b: 3 }, geometry: { type: "MultiPolygon", coordinates: give } }));
     setProps(f, { ...("s" in rule ? { s: rule.s || null } : {}), ...(rule.w ? { w: rule.w } : {}) });
+    // `subjects`: the shapes with at least this share of their land inside the outline keep their names, ruled by it
+    if (rule.subjects)
+      for (const g of grouped) {
+        if (g === f || !g.properties.n || g.properties.s || !boxesMeet(boxOfPolys(g.geometry.coordinates), box)) continue;
+        const inside = clipSafely(polygonClipping.intersection, g.geometry.coordinates, polys);
+        if (inside && km2Of(inside) >= rule.subjects * km2Of(g.geometry.coordinates)) g.properties.s = rule.to;
+      }
   }
   for (let i = grouped.length - 1; i >= 0; i--) {
     const g = fixWinding({ type: "MultiPolygon", coordinates: grouped[i].geometry.coordinates });
@@ -1989,6 +2634,9 @@ async function main() {
     if (TERRITORY[entry.year]) {
       const ids = TERRITORY[entry.year].filter((rule) => rule.ohm).map((rule) => rule.ohm);
       if (ids.length) for (const rel of await ohmRelations(path.join(CACHE, "ohm"), ids)) ohmForRules.set(rel.id, onLandOnly(rel.polys));
+      // the maps before 1800 use Cliopatria only for these rules
+      if (!clioRaw.has(entry.year) && TERRITORY[entry.year].some((rule) => rule.clio))
+        clioRaw.set(entry.year, cliopatriaOnLand(entry.year, await cliopatriaPolities(path.join(CACHE, "cliopatria"), entry.year)));
       applyTerritory(grouped, entry.year, slivers);
     }
     if (entry.year >= 1800) matchRulers(grouped);

@@ -74,7 +74,7 @@ export const teachers = {
   cite: {
     title: "Sources and how to cite",
     paras: [
-      "Historical borders come from the historical-basemaps project (GPL-3.0), except the maps from 1800 to 1960, which come from Cliopatria (Seshat Global History Databank, CC BY 4.0) with dated borders from OpenHistoricalMap (public domain, with some lines under CC BY 4.0), and in Europe from 1815 to 1914 from HistoGIS (Austrian Academy of Sciences, CC BY 4.0); the maps from 1994 on and present-day borders come from Natural Earth (public domain). Areas are calculated from those outlines.",
+      "Historical borders come from the historical-basemaps project (GPL-3.0), corrected in places from Cliopatria, except the maps from 1800 to 1960, which come from Cliopatria (Seshat Global History Databank, CC BY 4.0) with dated borders from OpenHistoricalMap (public domain, with some lines under CC BY 4.0), and in Europe from 1815 to 1914 from HistoGIS (Austrian Academy of Sciences, CC BY 4.0); the maps from 1994 on and present-day borders come from Natural Earth (public domain). Areas are calculated from those outlines.",
       "Historical borders are approximate, especially before about 1650: many states had no fixed frontier. Each era page says how precise its borders are.",
     ],
     citeLabel: "Suggested citation",
