@@ -1,11 +1,11 @@
 // Words for the "Meet the makers" page (/team). Change copy here, not in the page.
-// Each maker approves their own card before it changes.
+// Each maker writes (and approves) their own card, in their own words.
 
 export type Maker = {
   id: string;
   name: string;
   role: string;
-  /** a photo in /public/team (4:5), or none yet */
+  /** a square photo in /public/team, or none yet */
   photo?: { src: string; alt: string };
   bio: string[];
   facts: { label: string; text: string }[];
@@ -14,21 +14,16 @@ export type Maker = {
 
 export const teamCopy = {
   metaTitle: "Meet the makers",
-  metaDescription:
-    "Border Drift is made by Anthony Bell and Evan, friends since grade school who love to travel. How a 3 a.m. talk about Antarctica turned into a game.",
-  eyebrow: "Meet the makers",
-  title: "Two friends, one honest map",
-  lead: "Border Drift is made by two friends who love to travel and wanted a better way to see the world we live in.",
-  storyTitle: "How it started",
-  story: [
-    "It started at 3 a.m. Anthony and Evan, best friends since early grade school, were deep in a conversation about Antarctica and a dozen other tangents. Then one of them asked: why isn't all of this in one place? And why isn't it a game?",
-    "They split the work evenly. Anthony designs the games and the look of the site, and Evan builds the borders behind the map, 4,000 years of them.",
-  ],
+  metaDescription: "Border Drift is made by Anthony Bell and Evan, two friends who love to travel and wanted a better way to see the world.",
+  eyebrow: "About us",
+  title: "Meet the makers",
+  // the shared "how we came up with Border Drift" story goes here once both makers have answered
+  lead: "The two friends behind Border Drift.",
+  makersTitle: "The makers",
   nextTitle: "What's next",
-  next: "We'd love Border Drift to end up in classrooms: a fun, accurate way for teachers to show world history, and a game that teaches kids how big the world really is.",
+  next: "Our hope is that Border Drift ends up in schools, helping teachers teach world history accurately, and becomes a popular game that teaches kids more about the world.",
   teachers: "For teachers",
   play: "Play today's five",
-  makersTitle: "The makers",
   comingSoon: "Bio coming soon.",
   mottoSr: "Motto",
 };
@@ -37,23 +32,26 @@ export const makers: Maker[] = [
   {
     id: "anthony",
     name: "Anthony Bell",
-    role: "Designs the games and the look of the site",
-    photo: { src: "/team/anthony.webp", alt: "Anthony in a parking garage, arms crossed, next to a car covered in fake grass" },
+    role: "Game and UI design",
+    photo: { src: "/team/anthony.webp", alt: "Anthony Bell" },
     bio: [
-      "Anthony designs the games and everything you tap. Away from the map he's a fitness coach, an EDM junkie and a traveller.",
-      "His family is Macedonian, so his favourite thing on the site is watching Alexander the Great's empire spread from Macedon to Egypt and India, then fall apart.",
+      "I design the games and the interface of Border Drift. What I'm proudest of is how Evan's ideas and mine came together into something that is both a fun game and a real learning tool. Evan and I both love to travel the world, and Border Drift is our way of understanding the world we live in.",
+      "Outside of Border Drift, I'm a fitness coach and an EDM junkie. My family's heritage is Macedonian, so my favorite feature is watching empires grow and fall over time, especially Alexander the Great's, which stretched from Macedon to Egypt and India.",
     ],
     facts: [
-      { label: "Map fact", text: "Madagascar is bigger than Spain, Germany, Japan or the UK, and even edges out Ukraine. Most maps never tell you." },
-      { label: "Fun fact", text: "He loves clouds." },
-      { label: "Best endless streak", text: "7 in a row" },
+      {
+        label: "Favorite \"the map lies\" fact",
+        text: "Madagascar puts a lot of countries that people think are big to shame. It's larger than Spain, Germany, Japan or the UK.",
+      },
+      { label: "Best endless streak", text: "7 in a row. It gets pretty difficult!" },
+      { label: "Fun fact", text: "I love clouds." },
     ],
     motto: "If the sky's the limit, shoot for the stars.",
   },
   {
     id: "evan",
     name: "Evan",
-    role: "Builds the borders and the map",
+    role: "Maps and historical borders",
     bio: [],
     facts: [],
   },

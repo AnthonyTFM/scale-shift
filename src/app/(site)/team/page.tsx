@@ -15,19 +15,8 @@ export default function TeamPage() {
     <>
       <PageHero eyebrow={t.eyebrow} title={t.title} lead={<p>{t.lead}</p>} />
       <div className="mx-auto max-w-6xl px-4 py-10">
-        <section aria-labelledby="story" className="card max-w-3xl p-5 sm:p-6">
-          <h2 id="story" className="font-display text-2xl text-ink">
-            {t.storyTitle}
-          </h2>
-          {t.story.map((p) => (
-            <p key={p.slice(0, 20)} className="mt-3 leading-relaxed text-ink-soft">
-              {p}
-            </p>
-          ))}
-        </section>
-
-        <h2 className="mt-12 font-display text-2xl text-ink">{t.makersTitle}</h2>
-        <ul className="mt-4 grid gap-5 md:grid-cols-2">
+        <h2 className="sr-only">{t.makersTitle}</h2>
+        <ul className="grid gap-6 md:grid-cols-2">
           {makers.map((m) => (
             <li key={m.id}>
               <MakerCard maker={m} />
@@ -54,58 +43,58 @@ export default function TeamPage() {
   );
 }
 
-/** One maker: a photo (or a map tile until there is one), name, role, a short bio, a few facts and a motto. */
+/** One maker: a square photo (or a map tile until there is one), name, role, a short bio, a few facts and a motto. */
 function MakerCard({ maker: m }: { maker: Maker }) {
   return (
-    <article aria-labelledby={`maker-${m.id}`} className="card flex h-full flex-col overflow-hidden">
-      {m.photo ? (
-        // eslint-disable-next-line @next/next/no-img-element -- one small WebP, already sized for the card
-        <img
-          src={m.photo.src}
-          alt={m.photo.alt}
-          width={640}
-          height={800}
-          loading="lazy"
-          decoding="async"
-          // tall on phones, wider from sm up; kept to the left and the top of the photo, where the person is
-          className="aspect-[4/5] w-full bg-tile object-cover object-[0%_8%] sm:aspect-[5/4]"
-        />
-      ) : (
-        <div aria-hidden="true" className="grid aspect-[4/5] w-full place-items-center bg-tile sm:aspect-[5/4]">
-          <MapIcon className="size-16 opacity-60" />
-        </div>
-      )}
-      <div className="flex flex-1 flex-col p-5">
-        <h3 id={`maker-${m.id}`} className="font-display text-2xl leading-tight text-ink">
-          {m.name}
-        </h3>
-        <p className="mt-0.5 text-sm font-bold text-primary">{m.role}</p>
-        {m.bio.length ? (
-          m.bio.map((p) => (
-            <p key={p.slice(0, 20)} className="mt-3 text-sm leading-relaxed text-ink-soft">
-              {p}
-            </p>
-          ))
+    <article aria-labelledby={`maker-${m.id}`} className="card flex h-full flex-col p-5 sm:p-6">
+      <div className="flex items-center gap-4">
+        {m.photo ? (
+          // eslint-disable-next-line @next/next/no-img-element -- one small WebP, already sized for the card
+          <img
+            src={m.photo.src}
+            alt={m.photo.alt}
+            width={800}
+            height={800}
+            loading="lazy"
+            decoding="async"
+            className="size-24 shrink-0 rounded-2xl bg-tile object-cover ring-1 ring-line sm:size-28"
+          />
         ) : (
-          <p className="mt-3 text-sm text-muted">{t.comingSoon}</p>
+          <div aria-hidden="true" className="grid size-24 shrink-0 place-items-center rounded-2xl bg-tile ring-1 ring-line sm:size-28">
+            <MapIcon className="size-10 opacity-60" />
+          </div>
         )}
-        {m.facts.length ? (
-          <dl className="mt-4 space-y-2 text-sm">
-            {m.facts.map((f) => (
-              <div key={f.label} className="rounded-xl bg-paper px-3 py-2">
-                <dt className="text-xs font-bold uppercase tracking-wide text-muted">{f.label}</dt>
-                <dd className="text-ink">{f.text}</dd>
-              </div>
-            ))}
-          </dl>
-        ) : null}
-        {m.motto ? (
-          <blockquote className="mt-4 border-l-4 border-gold pl-3 font-semibold italic text-ink">
-            <span className="sr-only">{t.mottoSr}: </span>&ldquo;{m.motto}&rdquo;
-          </blockquote>
-        ) : null}
+        <div className="min-w-0">
+          <h3 id={`maker-${m.id}`} className="font-display text-2xl leading-tight text-ink">
+            {m.name}
+          </h3>
+          <p className="mt-1 text-sm font-bold text-primary">{m.role}</p>
+        </div>
       </div>
+      {m.bio.length ? (
+        m.bio.map((p) => (
+          <p key={p.slice(0, 20)} className="mt-4 leading-relaxed text-ink-soft">
+            {p}
+          </p>
+        ))
+      ) : (
+        <p className="mt-4 text-muted">{t.comingSoon}</p>
+      )}
+      {m.facts.length ? (
+        <dl className="mt-5 space-y-2 text-sm">
+          {m.facts.map((f) => (
+            <div key={f.label} className="rounded-xl bg-paper px-3 py-2">
+              <dt className="text-xs font-bold uppercase tracking-wide text-muted">{f.label}</dt>
+              <dd className="mt-0.5 text-ink">{f.text}</dd>
+            </div>
+          ))}
+        </dl>
+      ) : null}
+      {m.motto ? (
+        <blockquote className="mt-5 border-l-4 border-gold pl-3 font-semibold italic text-ink">
+          <span className="sr-only">{t.mottoSr}: </span>&ldquo;{m.motto}&rdquo;
+        </blockquote>
+      ) : null}
     </article>
   );
 }
-
