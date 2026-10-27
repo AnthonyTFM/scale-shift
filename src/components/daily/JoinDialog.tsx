@@ -3,7 +3,7 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { isOffensive } from "@/lib/name-filter";
 import { dailyCopy } from "@/content/daily";
-import { MarkIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { AgeCheck, useAgeOk } from "./AgeCheck";
 import { useAccount } from "./SignInProvider";
 import type { Join } from "./useJoin";
@@ -13,8 +13,24 @@ const t = dailyCopy.joinDialog;
 /** 1: the 13+ box and sign-in; 2: pick a nickname; 3: you're on the board. */
 export type JoinStep = 1 | 2 | 3;
 
+/** The words for the board being joined (endless mode's Best streaks). */
+export type JoinText = {
+  title: string;
+  lead: string;
+  doneTitle: (rank: number) => string;
+  doneLead: (score: number) => string;
+  duplicate: string;
+  /** a board row's score: "4/5", or a streak */
+  scoreCell: (score: number) => string;
+  back: string;
+  /** where "Sign out" lands */
+  page: string;
+  /** the nickname step's button */
+  post: string;
+};
+
 /**
- * Set while a player is between step 1 and step 2: the sign-in window opens over the page with this pop-up closed (a
+ * Set while a player is between step 1 and step 2 (or, saving the daily streak, between the sign-in step and coming back): the sign-in window opens over the page with this pop-up closed (a
  * modal pop-up would block it), and a Google sign-in leaves the page entirely. Back signed in, the pop-up reopens at step 2.
  */
 const FLOW = "join-flow";
@@ -50,8 +66,8 @@ export function takeJoinFlow(date: string) {
 }
 
 /**
- * "Get on today's leaderboard" as one pop-up with clear steps, so nobody misses the next one: a bottom sheet on phones, a
- * box in the middle on wider screens.
+ * "Get on the Best streaks board" as one pop-up with clear steps, so nobody misses the next one: a bottom sheet on phones,
+ * a box in the middle on wider screens.
  */
 export function JoinDialog({
   step,
@@ -61,6 +77,7 @@ export function JoinDialog({
   failed,
   join,
   score,
+  text,
 }: {
   step: JoinStep | null;
   /** the score is on the board: show step 3 */
@@ -72,9 +89,45 @@ export function JoinDialog({
   failed: boolean;
   join: Join;
   score: number;
+  text: JoinText;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  return (
+    <Sheet step={step} titleId={titleId} onClose={onClose}>
+      {step === 1 ? <SignInStep titleId={titleId} title={text.title} lead={text.lead} steps failed={failed} onContinue={onContinue} onClose={onClose} /> : null}
+      {step === 2 ? <NameStep titleId={titleId} join={join} text={text} onPosted={onPosted} /> : null}
+      {step === 3 ? <DoneStep titleId={titleId} join={join} score={score} text={text} onClose={onClose} /> : null}
+    </Sheet>
+  );
+}
+
+/** The 13+ box and sign-in on their own (saving the daily streak: no nickname, no board). */
+export function SignInSheet({
+  open,
+  title,
+  lead,
+  failed,
+  onContinue,
+  onClose,
+}: {
+  open: boolean;
+  title: string;
+  lead: string;
+  failed: boolean;
+  onContinue: () => void;
+  onClose: () => void;
+}) {
+  const titleId = useId();
+  return (
+    <Sheet step={open ? 1 : null} titleId={titleId} onClose={onClose}>
+      {open ? <SignInStep titleId={titleId} title={title} lead={lead} failed={failed} onContinue={onContinue} onClose={onClose} /> : null}
+    </Sheet>
+  );
+}
+
+/** The pop-up itself, open while `step` is set. */
+function Sheet({ step, titleId, onClose, children }: { step: JoinStep | null; titleId: string; onClose: () => void; children: React.ReactNode }) {
+  const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const d = ref.current;
@@ -96,9 +149,7 @@ export function JoinDialog({
     >
       <div className="relative p-5 pb-7 sm:p-6">
         <div aria-hidden="true" className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-line md:hidden" />
-        {step === 1 ? <SignInStep titleId={titleId} score={score} failed={failed} onContinue={onContinue} onClose={onClose} /> : null}
-        {step === 2 ? <NameStep titleId={titleId} join={join} onPosted={onPosted} /> : null}
-        {step === 3 ? <DoneStep titleId={titleId} join={join} score={score} onClose={onClose} /> : null}
+        {children}
         <button
           type="button"
           onClick={onClose}
@@ -128,13 +179,18 @@ function Steps({ at }: { at: 1 | 2 }) {
 
 function SignInStep({
   titleId,
-  score,
+  title,
+  lead,
+  steps = false,
   failed,
   onContinue,
   onClose,
 }: {
   titleId: string;
-  score: number;
+  title: string;
+  lead: string;
+  /** "Step 1 of 2" above the title, when a nickname step follows */
+  steps?: boolean;
   failed: boolean;
   onContinue: () => void;
   onClose: () => void;
@@ -147,11 +203,11 @@ function SignInStep({
 
   return (
     <>
-      <Steps at={1} />
-      <h2 id={titleId} data-start tabIndex={-1} className="mt-2 flex items-center gap-2 pr-10 font-display text-2xl leading-tight outline-none">
-        <TrophyIcon className="size-7" /> {t.title}
+      {steps ? <Steps at={1} /> : null}
+      <h2 id={titleId} data-start tabIndex={-1} className={`${steps ? "mt-2" : ""} flex items-center gap-2 pr-10 font-display text-2xl leading-tight outline-none`}>
+        {steps ? <TrophyIcon className="size-7" /> : <FlameIcon className="size-7" />} {title}
       </h2>
-      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{t.lead(score)}</p>
+      <p className="mt-2 text-sm leading-relaxed text-ink-soft">{lead}</p>
       <AgeCheck
         id="age-ok-join"
         ok={ageOk}
@@ -187,7 +243,7 @@ function SignInStep({
   );
 }
 
-function NameStep({ titleId, join, onPosted }: { titleId: string; join: Join; onPosted: () => void }) {
+function NameStep({ titleId, join, text, onPosted }: { titleId: string; join: Join; text: JoinText; onPosted: () => void }) {
   const { status, setStatus, error, setError, submit } = join;
   const { signOut } = useAccount();
   const nameRef = useRef<HTMLInputElement>(null);
@@ -240,11 +296,11 @@ function NameStep({ titleId, join, onPosted }: { titleId: string; join: Join; on
         ) : null}
       </div>
       <button type="submit" disabled={status === "sending"} className="btn btn-gold btn-lg mt-5 w-full">
-        {status === "sending" ? t.posting : t.post}
+        {status === "sending" ? t.posting : text.post}
       </button>
       <p className="mt-3 text-center text-xs text-muted">
         {t.notYou}{" "}
-        <button type="button" onClick={() => signOut("/daily")} className="min-h-11 font-semibold text-primary hover:underline">
+        <button type="button" onClick={() => signOut(text.page)} className="min-h-11 font-semibold text-primary hover:underline">
           {t.signOut}
         </button>
       </p>
@@ -252,14 +308,14 @@ function NameStep({ titleId, join, onPosted }: { titleId: string; join: Join; on
   );
 }
 
-function DoneStep({ titleId, join, score, onClose }: { titleId: string; join: Join; score: number; onClose: () => void }) {
+function DoneStep({ titleId, join, score, text, onClose }: { titleId: string; join: Join; score: number; text: JoinText; onClose: () => void }) {
   const { me, result, top, status, error, submit } = join;
   // back from Google with a nickname, the score is still being posted: say so, and offer a retry if it fails
   if (!result)
     return (
       <div className="text-center">
         <h2 id={titleId} data-start tabIndex={-1} className="mt-2 px-8 font-display text-2xl leading-tight outline-none">
-          {t.title}
+          {text.title}
         </h2>
         <div aria-live="polite">
           {status === "error" ? (
@@ -280,18 +336,19 @@ function DoneStep({ titleId, join, score, onClose }: { titleId: string; join: Jo
       </div>
     );
   const rows = top?.rows ?? [];
-  // the top three, plus your own row if you're further down
-  const shown = [...rows.slice(0, 3), ...rows.filter((r) => r.me && r.rank > 3)];
+  // the top three, plus your own row if you're further down (in the top five, or below it)
+  const mine = rows.find((r) => r.me) ?? top?.me;
+  const shown = [...rows.slice(0, 3), ...(mine && mine.rank > 3 ? [mine] : [])];
   return (
     <div className="text-center">
       <MarkIcon right className="mx-auto size-12" />
       <h2 id={titleId} data-start tabIndex={-1} className="mt-3 font-display text-3xl leading-tight outline-none">
-        {t.doneTitle(result.rank)}
+        {text.doneTitle(result.rank)}
       </h2>
       <p className="mt-2 text-ink-soft">
-        <strong className="text-ink">{me?.name}</strong> {t.doneLead(result.score ?? score)}
+        <strong className="text-ink">{me?.name}</strong> {text.doneLead(result.score ?? score)}
       </p>
-      {result.duplicate ? <p className="mt-1 text-sm text-muted">{t.duplicate}</p> : null}
+      {result.duplicate ? <p className="mt-1 text-sm text-muted">{text.duplicate}</p> : null}
       {shown.length ? (
         <ol className="mt-4 space-y-1 text-left text-sm">
           {shown.map((r) => (
@@ -301,13 +358,13 @@ function DoneStep({ titleId, join, score, onClose }: { titleId: string; join: Jo
                 {r.name}
                 {r.me ? <span className="font-normal text-muted"> (you)</span> : null}
               </span>
-              <span className="font-display tabular-nums">{r.score}/5</span>
+              <span className="font-display tabular-nums">{text.scoreCell(r.score)}</span>
             </li>
           ))}
         </ol>
       ) : null}
       <button type="button" onClick={onClose} className="btn btn-primary btn-lg mt-5 w-full">
-        {t.back}
+        {text.back}
       </button>
     </div>
   );

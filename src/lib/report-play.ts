@@ -29,12 +29,17 @@ function send(p: Payload) {
     });
 }
 
+// the day already counted from this page, for when storage is blocked (it can't remember across visits then)
+let sentHere: string | null = null;
+
 export function reportPlay(save: DailySave, date: string, score: number) {
+  if (sentHere === date) return;
+  sentHere = date;
   try {
     if (localStorage.getItem(SENT) === date) return;
     localStorage.setItem(SENT, date);
   } catch {
-    // storage blocked: still count it
+    // storage blocked: still count it, once per page
   }
   const finished = Object.keys(save.days)
     .filter((d) => typeof save.days[d].s === "number" && d <= date)

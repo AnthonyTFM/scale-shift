@@ -46,6 +46,7 @@
   /* soft tints for status pills and notices (green: made official, gold: by force, red: disputed or an error) */
   --color-green-soft: #ebf9f1;
   --color-gold-soft: #fff4d1;
+  --color-gold-pale: #ffe7a8;
   --color-red-soft: #fdeceb;
   /* the edge of text inputs and dropdowns: dark enough to see (3:1 against white) */
   --color-line-strong: #9c8c70;
@@ -362,6 +363,16 @@ body {
   .sheet[open] { animation-name: sheet-in; }
 }
 /* the page behind the pop-up doesn't scroll */
+/* endless mode: the header and the score bar cover the top of the screen, so focused items scroll in below them */
+html:has([data-score-bar]) {
+  scroll-padding-top: 190px;
+}
+@media (max-height: 500px) {
+  html:has([data-score-bar]) {
+    scroll-padding-top: 90px;
+  }
+}
+
 html:has(dialog.sheet[open]) {
   overflow: hidden;
 }
@@ -411,8 +422,27 @@ html:has(.atlas-page:not([style*="display: none"])) body {
 .globe-float {
   animation: globe-float 9s ease-in-out infinite;
 }
+/* the homepage's endless card: its flame flickers */
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.06, 0.96) rotate(-3deg);
+  }
+  60% {
+    transform: scale(0.97, 1.05) rotate(2deg);
+  }
+}
+.flame-flicker {
+  transform-origin: 50% 90%;
+  /* three flickers, then still: anything moving for more than 5 seconds needs a way to stop it (WCAG 2.2.2) */
+  animation: flame-flicker 1.6s ease-in-out 3;
+}
 @media (prefers-reduced-motion: reduce) {
-  .globe-float {
+  .globe-float,
+  .flame-flicker {
     animation: none;
   }
   ::view-transition-group(*),
@@ -420,4 +450,22 @@ html:has(.atlas-page:not([style*="display: none"])) body {
   ::view-transition-new(*) {
     animation: none !important;
   }
+}
+
+/* the homepage headline: the big claim on a first visit, a one-line greeting once you've played (class set before paint
+   by the root layout's script) */
+.returning .hero-new p {
+  display: none;
+}
+/* the page keeps its one heading for screen readers (and the site check); only its look gives way to the greeting */
+.returning .hero-new h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+html:not(.returning) .hero-back {
+  display: none;
 }

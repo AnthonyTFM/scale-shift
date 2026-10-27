@@ -9,7 +9,7 @@ import { claims as allClaims, claimsForEra, loadClaimShapes, unclaimed } from "@
 import { featureAtIn, loadGrid, loadIndex, loadLakes, loadLayer, type IndexRow, type RulersGrid } from "@/lib/data";
 import { eraByKey, eraIndex, eras, snapshotForYear } from "@/lib/eras";
 import type { AreaUnit } from "@/lib/format";
-import { boundsOf, fitView, mergeBounds, placeGeometry } from "@/lib/geo";
+import { boundsOf, fitView, mergeBounds, panBy, placeGeometry } from "@/lib/geo";
 import { MAP_PATH, decodeState, encodeState, type MapState } from "@/lib/share";
 import { SiteMenu } from "@/components/site/SiteMenu";
 import { ChangesPanel } from "./ChangesPanel";
@@ -53,9 +53,17 @@ const isPhone = () => window.matchMedia("(max-width: 639px)").matches;
 
 export default function AtlasApp() {
   const mapRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const controlsRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const phoneBarRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<MapEngine | null>(null);
   const overlaysRef = useRef<Overlay[]>([]);
   const eraRef = useRef<string>(DEFAULT_ERA);
+  /** the play direction the timeline last had (to tell when play starts) */
+  const wasPlaying = useRef<0 | 1 | -1>(0);
 
   const [era, setEra] = useState(DEFAULT_ERA);
   const [loadingEra, setLoadingEra] = useState(true);
@@ -81,6 +89,11 @@ export default function AtlasApp() {
   const [index, setIndex] = useState<IndexRow[] | null>(null);
   const [grid, setGrid] = useState<RulersGrid | null>(null);
   const [ready, setReady] = useState(false);
+  /** phones: how far above the screen's bottom the sheets, the selected-shape bar and the toast start (above the timeline
+   * and its year note) */
+  const [stackBottom, setStackBottom] = useState(124);
+  /** bumped after a search pick, to move keyboard focus to the picked shape */
+  const [focusAsk, setFocusAsk] = useState(0);
 
   useEffect(() => {
     overlaysRef.current = overlays;
@@ -120,7 +133,18 @@ export default function AtlasApp() {
     const box = mergeBounds(boxes);
     if (!box) return;
     const { w, h } = engine.getSize();
-    engine.setView(fitView(box, w, h, w < 640 ? 0.12 : 0.2), true);
+    // frame the shapes in the part of the map nothing covers: right of the side panel's column (on phones, where the
+    // panel spans the screen and stays folded, below its search box), left of the controls and above the timeline
+    const panel = panelRef.current?.getBoundingClientRect();
+    const phone = isPhone();
+    const left = panel && !phone ? panel.right + 8 : 0;
+    const top = phone ? (searchRef.current?.getBoundingClientRect().bottom ?? 0) + 8 : 0;
+    const right = Math.max(left + 120, (controlsRef.current?.getBoundingClientRect().left ?? w) - 8);
+    // on phones the selected-shape bar will sit above the timeline too
+    const bottom = Math.max(top + 120, (timelineRef.current?.getBoundingClientRect().top ?? h) - 8 - (phone ? 64 : 0));
+    const v = fitView(box, right - left, bottom - top, phone ? 0.12 : 0.2);
+    // fitView centres the shapes; move them to the middle of the free area
+    engine.setView(panBy(v, (left + right) / 2 - w / 2, (top + bottom) / 2 - h / 2, w, h), true);
   }, []);
 
   const nextColor = (list: Overlay[]) => {
@@ -381,15 +405,28 @@ export default function AtlasApp() {
     return () => clearTimeout(t);
   }, [era, overlays, ready]);
 
-  // ---- play through eras, forward or back in time (waits for each era to load and its borders to sweep in) ----
+  // ---- play through eras, forward or back in time: each era's borders sweep in straight after the last one's, at a
+  // steady pace (the next era loads while they sweep), so the map keeps moving until the last era ----
   useEffect(() => {
+    const engine = engineRef.current;
+    const started = playing !== 0 && wasPlaying.current !== playing;
+    wasPlaying.current = playing;
+    if (!playing) engine?.setSteady(false);
     if (!playing || loadingEra) return;
-    const wait = Math.max(1400, (engineRef.current?.sweepLeft() ?? 0) + 1000);
-    const t = setTimeout(() => {
-      const next = eraIndex(eraRef.current) + playing;
-      if (next < 0 || next > eras.length - 1) setPlaying(0);
-      else changeEra(eras[next].key);
-    }, wait);
+    const next = eraIndex(eraRef.current) + playing;
+    const last = next < 0 || next > eras.length - 1;
+    if (!last) loadLayer(eras[next].key).catch(() => {});
+    // as this era's sweep ends; with none running, at once when play starts, else after a moment (for readers who prefer
+    // less motion, or when a sweep was skipped because the map was being moved)
+    const left = engine?.sweepLeft() ?? 0;
+    const t = setTimeout(
+      () => {
+        if (last) return setPlaying(0);
+        engine?.setSteady(true);
+        changeEra(eras[next].key);
+      },
+      left > 0 ? left : started ? 0 : 1400,
+    );
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
 
@@ -417,8 +454,23 @@ export default function AtlasApp() {
     if (selected && !index) needIndex();
   }, [selected, index, needIndex]);
 
-  const onPick = (p: SearchPick) => {
-    addShape(p.name, p.era);
+  // phones: keep the bottom column clear of the timeline, which grows when the year note opens
+  useEffect(() => {
+    const el = timelineRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setStackBottom(el.offsetHeight + 20));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // after a search pick, keyboard focus moves to the shape's card (the bar at the bottom on phones) instead of the page
+  useEffect(() => {
+    if (focusAsk) (cardRef.current ?? phoneBarRef.current)?.focus();
+  }, [focusAsk]);
+
+  const onPick = async (p: SearchPick) => {
+    await addShape(p.name, p.era);
+    setFocusAsk((n) => n + 1);
   };
 
   const openShare = () => {
@@ -443,7 +495,7 @@ export default function AtlasApp() {
     if (!blob) return;
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `${shareTitle.replace(/[^\w]+/g, "-").toLowerCase() || "scale-shift"}.png`;
+    a.download = `${(shareTitle.replace(/[^\w]+/g, "-") || site.name.replace(/[^\w]+/g, "-")).toLowerCase()}.png`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   };
@@ -463,7 +515,12 @@ export default function AtlasApp() {
     else if (e.key === "-" || e.key === "_") engine.zoomBy(1 / 1.5);
     else if (o && (e.key === "[" || e.key === "]")) update(o.id, { rot: o.rot + (e.key === "]" ? 5 : -5), moved: true });
     else if (o && (e.key === "Delete" || e.key === "Backspace")) removeShape(o.id);
-    else if (e.key === "Escape") {
+    else if (e.key === "Enter" || e.key === " ") {
+      // "Who ruled here?" for the place under the crosshair, at the centre of the map
+      e.preventDefault();
+      const at = engine.center();
+      openPlace(at, eraRef.current, engine.featureAt(at[0], at[1]));
+    } else if (e.key === "Escape") {
       setSelected(null);
       setInfo(null);
     }
@@ -481,14 +538,27 @@ export default function AtlasApp() {
         tabIndex={0}
         role="application"
         aria-roledescription="map"
-        aria-label={`Map of the world in ${eraMeta?.label}. Arrow keys pan, plus and minus zoom. With a shape selected, arrow keys move it, square brackets rotate it and Delete removes it.`}
+        aria-label={`Map of the world in ${eraMeta?.label}. Arrow keys pan, plus and minus zoom, and Enter shows who ruled the place at the centre. With a shape selected, arrow keys move it, square brackets rotate it and Delete removes it.`}
         onKeyDown={onMapKey}
-        className="absolute inset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-focus"
+        className="peer absolute inset-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-focus"
       />
+      {/* keyboard focus on the map: the place Enter asks about */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 32 32"
+        className="pointer-events-none absolute left-1/2 top-1/2 z-10 hidden size-8 -translate-x-1/2 -translate-y-1/2 text-panel drop-shadow peer-focus-visible:block"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+      >
+        <path d="M16 3v9M16 20v9M3 16h9M20 16h9" />
+        <circle cx="16" cy="16" r="1.5" fill="currentColor" />
+      </svg>
 
       {/* Panel (parity with the reference: title, search, selected shape, units, links) */}
       <aside className="pointer-events-none absolute left-3 top-3 z-20 flex focus-within:z-40 max-h-[calc(100dvh-120px)] w-[calc(100vw-80px)] max-w-[380px] flex-col sm:max-h-[calc(100dvh-130px)]">
-        <div className="pointer-events-auto flex min-h-0 flex-col rounded-2xl bg-panel text-panel-text shadow-float">
+        <div ref={panelRef} className="pointer-events-auto flex min-h-0 flex-col rounded-2xl bg-panel text-panel-text shadow-float">
           <div className="flex items-center gap-2 px-3 pb-1 pt-1.5 sm:px-4 sm:pb-3 sm:pt-3">
             <Link href="/" className="font-display text-lg font-bold tracking-tight sm:text-2xl">
               {site.name}
@@ -507,7 +577,7 @@ export default function AtlasApp() {
               </svg>
             </button>
           </div>
-          <div className="px-3 pb-2 sm:px-4 sm:pb-3">
+          <div ref={searchRef} className="px-3 pb-2 sm:px-4 sm:pb-3">
             <SearchBox index={index} onNeedIndex={needIndex} currentEra={era} unit={unit} onPick={onPick} />
           </div>
           {panelOpen ? (
@@ -566,23 +636,31 @@ export default function AtlasApp() {
                   ))}
                 </ul>
               ) : (
-                <p className="text-sm text-panel-muted">Search for a country or empire, or click any land to see who ruled it.</p>
+                <p className="text-sm text-panel-muted">Search for a country or empire, or tap any land to see who ruled it.</p>
               )}
               {selectedOverlay ? (
-                <ShapeCard
-                  overlay={selectedOverlay}
-                  steps={steps}
-                  unit={unit}
-                  onRemove={() => removeShape(selectedOverlay.id)}
-                  onColor={(c) => update(selectedOverlay.id, { color: c })}
-                  onStep={(s) => stepShape(selectedOverlay, s)}
-                  onReset={() =>
-                    update(selectedOverlay.id, { lon: selectedOverlay.origin[0], lat: selectedOverlay.origin[1], rot: 0, moved: false })
-                  }
-                  onZoom={() => fitTo([selectedOverlay])}
-                />
+                <div
+                  ref={cardRef}
+                  tabIndex={-1}
+                  role="group"
+                  aria-label={`${selectedOverlay.name}, selected`}
+                  className="rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus"
+                >
+                  <ShapeCard
+                    overlay={selectedOverlay}
+                    steps={steps}
+                    unit={unit}
+                    onRemove={() => removeShape(selectedOverlay.id)}
+                    onColor={(c) => update(selectedOverlay.id, { color: c })}
+                    onStep={(s) => stepShape(selectedOverlay, s)}
+                    onReset={() =>
+                      update(selectedOverlay.id, { lon: selectedOverlay.origin[0], lat: selectedOverlay.origin[1], rot: 0, moved: false })
+                    }
+                    onZoom={() => fitTo([selectedOverlay])}
+                  />
+                </div>
               ) : overlays.length ? (
-                <p className="text-xs text-panel-muted">Drag a shape to compare. Click it for details and its border history.</p>
+                <p className="text-xs text-panel-muted">Drag a shape to compare. Tap it for details and its border history.</p>
               ) : null}
               <div className="flex items-center justify-between gap-2">
                 <div role="group" aria-label="Area units" className="flex rounded-full bg-white/10 p-1 text-xs font-semibold">
@@ -622,7 +700,7 @@ export default function AtlasApp() {
       </aside>
 
       {/* Right-hand controls */}
-      <div className="absolute right-3 top-3 z-20 flex flex-col items-end gap-2">
+      <div ref={controlsRef} className="absolute right-3 top-3 z-20 flex flex-col items-end gap-2">
         {/* phones: Home sits under the menu so it stays clear of the search panel */}
         <div className="flex flex-col-reverse items-end gap-2 sm:flex-row">
           <Link
@@ -706,77 +784,107 @@ export default function AtlasApp() {
         </button>
       </div>
 
-      {/* Place / dispute / changes panel */}
-      {info || changesOpen || keyOpen ? (
-        <div className="absolute inset-x-3 bottom-[124px] z-30 max-h-[48dvh] overflow-y-auto rounded-2xl sm:inset-x-auto sm:bottom-auto sm:right-16 sm:top-[120px] sm:max-h-[calc(100dvh-250px)] sm:w-[380px]">
-          {keyOpen ? (
-            <MapKey era={era} onClose={() => setKeyOpen(false)} />
-          ) : changesOpen ? (
-            <ChangesPanel
-              era={era}
-              unit={unit}
-              onClose={() => setChangesOpen(false)}
-              onFocus={(lon, lat) => engineRef.current?.flyTo(lon, lat)}
-            />
-          ) : info ? (
-            <InfoSheet
-              info={info}
-              grid={grid}
-              unit={unit}
-              currentEra={era}
-              onClose={() => {
-                setInfo(null);
-                engineRef.current?.setHighlight(null, null);
+      {/* Phones: the place, changes or key sheet, the selected-shape bar, the toast and the compass share one column above
+          the timeline (and its year note), so none covers another. From sm up the column drops out (sm:contents) and each
+          keeps its own place. */}
+      <div
+        className="pointer-events-none absolute inset-x-3 z-30 flex flex-col-reverse gap-2 sm:contents"
+        style={{ bottom: stackBottom }}
+      >
+        {/* Place / dispute / changes panel (on phones it stops short of the right-hand buttons, as the search panel does) */}
+        {info || changesOpen || keyOpen ? (
+          <div className="pointer-events-auto mr-[52px] max-h-[48dvh] overflow-y-auto rounded-2xl sm:absolute sm:right-16 sm:top-[120px] sm:z-30 sm:mr-0 sm:max-h-[calc(100dvh-250px)] sm:w-[380px]">
+            {keyOpen ? (
+              <MapKey era={era} onClose={() => setKeyOpen(false)} />
+            ) : changesOpen ? (
+              <ChangesPanel
+                era={era}
+                unit={unit}
+                onClose={() => setChangesOpen(false)}
+                onFocus={(lon, lat) => engineRef.current?.flyTo(lon, lat)}
+              />
+            ) : info ? (
+              <InfoSheet
+                info={info}
+                grid={grid}
+                unit={unit}
+                currentEra={era}
+                onClose={() => {
+                  setInfo(null);
+                  engineRef.current?.setHighlight(null, null);
+                }}
+                onAdd={(name, eraKey) => addShape(name, eraKey)}
+                onEra={changeEra}
+              />
+            ) : null}
+          </div>
+        ) : null}
+
+        {/* Phones: the panel is folded, so show what's selected with quick actions */}
+        {phoneBar ? (
+          <div
+            ref={phoneBarRef}
+            tabIndex={-1}
+            role="group"
+            aria-label={`${phoneBar.name} selected`}
+            className="pointer-events-auto flex items-center gap-2 rounded-2xl bg-panel p-2 pl-3 text-panel-text shadow-float focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:hidden"
+          >
+            <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: PALETTE[phoneBar.color % PALETTE.length] }} />
+            <span className="min-w-0 flex-1 truncate text-sm font-bold">{phoneBar.name}</span>
+            <button
+              type="button"
+              onClick={() => {
+                setTab("explore");
+                setPanelOpen(true);
               }}
-              onAdd={(name, eraKey) => addShape(name, eraKey)}
-              onEra={changeEra}
-            />
+              className="h-10 rounded-lg bg-white/10 px-3 text-sm font-semibold"
+            >
+              Edit
+            </button>
+            <button type="button" onClick={() => removeShape(phoneBar.id)} className="h-10 rounded-lg bg-rose-500/20 px-3 text-sm font-semibold text-rose-100">
+              Remove
+            </button>
+            <button type="button" onClick={() => setSelected(null)} aria-label="Deselect" className="grid size-10 place-items-center rounded-lg hover:bg-white/10">
+              <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M6 6l12 12M18 6 6 18" />
+              </svg>
+            </button>
+          </div>
+        ) : null}
+
+        <div aria-live="polite" className="flex justify-center sm:pointer-events-none sm:absolute sm:inset-x-0 sm:bottom-[124px] sm:z-50 sm:px-3">
+          {toast ? (
+            <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-panel px-4 py-2 text-sm text-white shadow-float">
+              <span>{toast.msg}</span>
+              {toast.undo ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.undo?.();
+                    setToast(null);
+                  }}
+                  className="font-bold text-accent underline"
+                >
+                  Undo
+                </button>
+              ) : null}
+            </div>
           ) : null}
         </div>
-      ) : null}
 
-      {/* Phones: the panel is folded, so show what's selected with quick actions */}
-      {phoneBar ? (
+        {/* Compass rose (rotation), like the reference; hidden on phones while a sheet or the open panel needs the room */}
         <div
-          role="group"
-          aria-label={`${phoneBar.name} selected`}
-          className="absolute inset-x-3 bottom-[124px] z-30 flex items-center gap-2 rounded-2xl bg-panel p-2 pl-3 text-panel-text shadow-float sm:hidden"
+          className={`pointer-events-auto self-start sm:absolute sm:bottom-4 sm:left-3 sm:z-10 ${info || changesOpen || keyOpen || panelOpen ? "hidden sm:block" : ""}`}
         >
-          <span aria-hidden="true" className="size-3 shrink-0 rounded-full" style={{ background: PALETTE[phoneBar.color % PALETTE.length] }} />
-          <span className="min-w-0 flex-1 truncate text-sm font-bold">{phoneBar.name}</span>
-          <button
-            type="button"
-            onClick={() => {
-              setTab("explore");
-              setPanelOpen(true);
-            }}
-            className="h-10 rounded-lg bg-white/10 px-3 text-sm font-semibold"
-          >
-            Edit
-          </button>
-          <button type="button" onClick={() => removeShape(phoneBar.id)} className="h-10 rounded-lg bg-rose-500/20 px-3 text-sm font-semibold text-rose-100">
-            Remove
-          </button>
-          <button type="button" onClick={() => setSelected(null)} aria-label="Deselect" className="grid size-10 place-items-center rounded-lg hover:bg-white/10">
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M6 6l12 12M18 6 6 18" />
-            </svg>
-          </button>
+          <Compass
+            rotation={selectedOverlay ? Math.round(((selectedOverlay.rot % 360) + 540) % 360 - 180) : null}
+            onRotate={(deg) => selectedOverlay && update(selectedOverlay.id, { rot: deg, moved: true })}
+          />
         </div>
-      ) : null}
-
-      {/* Compass rose (rotation), like the reference */}
-      <div
-        className={`absolute left-3 z-10 sm:bottom-4 ${phoneBar ? "bottom-[188px]" : "bottom-[124px]"} ${info || changesOpen || keyOpen ? "hidden sm:block" : ""}`}
-      >
-        <Compass
-          rotation={selectedOverlay ? Math.round(((selectedOverlay.rot % 360) + 540) % 360 - 180) : null}
-          onRotate={(deg) => selectedOverlay && update(selectedOverlay.id, { rot: deg, moved: true })}
-        />
       </div>
 
       {/* Timeline */}
-      <div className="pointer-events-none absolute inset-x-3 bottom-3 z-20 mx-auto max-w-3xl">
+      <div ref={timelineRef} className="pointer-events-none absolute inset-x-3 bottom-3 z-20 mx-auto max-w-3xl">
         {yearAsked && yearAsked.era === era ? (
           <YearNote
             year={yearAsked.year}
@@ -834,26 +942,6 @@ export default function AtlasApp() {
           </div>
         </div>
       ) : null}
-
-      <div aria-live="polite" className="pointer-events-none absolute inset-x-0 bottom-[124px] z-50 flex justify-center px-3">
-        {toast ? (
-          <div className="pointer-events-auto flex items-center gap-3 rounded-full bg-panel px-4 py-2 text-sm text-white shadow-float">
-            <span>{toast.msg}</span>
-            {toast.undo ? (
-              <button
-                type="button"
-                onClick={() => {
-                  toast.undo?.();
-                  setToast(null);
-                }}
-                className="font-bold text-accent underline"
-              >
-                Undo
-              </button>
-            ) : null}
-          </div>
-        ) : null}
-      </div>
 
       <ShareDialog open={shareOpen} url={shareUrl} title={shareTitle} onClose={() => setShareOpen(false)} onDownload={download} />
     </div>

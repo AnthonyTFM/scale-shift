@@ -1,31 +1,37 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { DayBoard, SubmitResult } from "@/lib/leaderboard-types";
+import type { DayBoard, EndlessBoard, SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, rememberPlayer } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { useAccount } from "./SignInProvider";
 
 export type Me = { id: string; name: string | null; reminders: boolean } | null;
 
-/** Fired on window once today's score is on the board, so the results card can show the real rank. */
-export const POSTED_EVENT = "lb-posted";
-export type Posted = { date: string; rank: number; total: number };
-export const announcePosted = (detail: Posted) => window.dispatchEvent(new CustomEvent<Posted>(POSTED_EVENT, { detail }));
-export type Join = ReturnType<typeof useJoin>;
+export type Join = ReturnType<typeof useJoinTo>;
+
+/** Where a result is posted, what goes with it, and the board to show afterwards. */
+export type JoinTarget<R extends SubmitResult = SubmitResult> = {
+  endpoint: string;
+  payload: Record<string, unknown>;
+  /** the board's top five, with this player marked */
+  board: (player: string) => string;
+  onPosted?: (result: Extract<R, { ok: true }>) => void;
+};
 
 /**
- * Getting today's score on the leaderboard with sign-in on: who the signed-in player is, posting the score (a returning
- * player's posts straight away), the reminder emails and today's top five. Shared by the results card and the join pop-up.
+ * Getting a result on a leaderboard with sign-in on: who the signed-in player is, posting the result (a returning
+ * player's posts straight away), the reminder emails and the board's top five. Shared by endless mode's results card and
+ * its join pop-up. (Daily scores are private: see SaveStreak.)
  */
-export function useJoin(date: string, choices: number[]) {
+export function useJoinTo<R extends SubmitResult = SubmitResult>(target: JoinTarget<R>) {
   const { isLoaded, isSignedIn } = useAccount();
   const [me, setMe] = useState<Me | undefined>(undefined);
   const [editing, setEditing] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
-  const [result, setResult] = useState<Extract<SubmitResult, { ok: true }> | null>(null);
-  const [top, setTop] = useState<DayBoard | null>(null);
+  const [result, setResult] = useState<Extract<R, { ok: true }> | null>(null);
+  const [top, setTop] = useState<DayBoard | EndlessBoard | null>(null);
   const [remindNote, setRemindNote] = useState("");
   const sent = useRef(false);
 
@@ -52,18 +58,18 @@ export function useJoin(date: string, choices: number[]) {
     }
   };
 
-  /** Post today's score under this nickname; resolves true once it's on the board. */
+  /** Post the result under this nickname; resolves true once it's on the board. */
   const submit = async (name: string, reminders?: boolean) => {
     setStatus("sending");
     setError("");
     try {
-      const res = await fetch("/api/leaderboard", {
+      const res = await fetch(target.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         // `player` only matters for a brand-new player: it keeps the scores this browser already posted
-        body: JSON.stringify({ player: loadPlayer()?.id ?? "", name, date, choices, website: "" }),
+        body: JSON.stringify({ player: loadPlayer()?.id ?? "", name, ...target.payload, website: "" }),
       });
-      const data = (await res.json()) as SubmitResult;
+      const data = (await res.json()) as R;
       if (!data.ok) {
         setStatus("error");
         setError(data.error);
@@ -72,13 +78,13 @@ export function useJoin(date: string, choices: number[]) {
       }
       if (data.player) rememberPlayer(data.player);
       setMe((m) => ({ id: data.player?.id ?? m?.id ?? "", name, reminders: m?.reminders ?? false }));
-      setResult(data);
+      setResult(data as Extract<R, { ok: true }>);
       setStatus("done");
       setEditing(false);
-      if (!data.duplicate) track("leaderboard_join", { rank: data.rank });
-      announcePosted({ date, rank: data.rank, total: data.total });
+      if (!data.duplicate) track("leaderboard_join", { rank: data.rank, board: target.endpoint });
+      target.onPosted?.(data as Extract<R, { ok: true }>);
       if (reminders) await saveReminders(true);
-      const board = await fetch(`/api/leaderboard?scope=day&date=${date}&limit=5&player=${data.player?.id ?? ""}`).then((r) => (r.ok ? r.json() : null));
+      const board = await fetch(target.board(data.player?.id ?? "")).then((r) => (r.ok ? r.json() : null));
       setTop(board);
       return true;
     } catch {

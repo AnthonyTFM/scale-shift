@@ -8,7 +8,7 @@ import { dailyCopy as t } from "@/content/daily";
 export const metadata: Metadata = {
   title: "Daily challenge: which is bigger?",
   description:
-    "Five new size puzzles every day. Web maps make some countries and empires look far bigger than they are. Can you tell which is really bigger?",
+    "Five new matchups every day. Web maps make some countries and empires look far bigger than they are. Can you tell which is really bigger?",
   alternates: { canonical: "/daily" },
 };
 
@@ -18,6 +18,7 @@ export default function DailyPage() {
       <PageHero
         center
         compact
+        game
         eyebrow={t.eyebrow}
         title={t.title}
         lead={
@@ -38,8 +39,7 @@ export default function DailyPage() {
             </div>
           </ViewTransition>
           <p className="mt-6 text-xs leading-relaxed text-muted">
-            Areas are calculated from our map outlines (historical states at the snapshot shown), so they can differ from official figures by a few
-            percent. Your scores and streak are saved in this browser, and on your account if you sign in.
+            {t.note}
           </p>
         </div>
       </div>

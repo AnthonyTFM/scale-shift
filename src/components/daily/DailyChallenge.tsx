@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import dataVersion from "@/data/data-version.json";
 import { site } from "@/content/site";
 import { track } from "@/lib/analytics";
 import { reportPlay, retryPendingPlay } from "@/lib/report-play";
@@ -10,79 +9,45 @@ import {
   buildQuestions,
   dayNumber,
   mergeDays,
-  explain,
   nameInSentence,
   sizeParts,
   loadSave,
   localDateKey,
   stats,
+  STREAK_MILESTONES,
   writeSave,
   type DailySave,
-  type PoolEntry,
   type Question,
 } from "@/lib/daily";
-import { dailyContext } from "@/content/daily-context";
-import { LeaderboardJoin } from "./LeaderboardJoin";
-import { POSTED_EVENT, type Posted } from "./useJoin";
-import { formatBoth } from "@/lib/format";
-import { mapUrl } from "@/lib/share";
+import { SaveStreak } from "./SaveStreak";
+import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "./Matchup";
 import { readChallenge, type Challenge } from "@/lib/challenge";
-import { playerId, rememberPlayer } from "@/lib/player";
+import { rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { PlayedElsewhere } from "./PlayedElsewhere";
-import { play, setSound, soundOn } from "@/lib/sound";
+import { play } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
-import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
+import type { ShapeFile } from "@/lib/outline";
 import { resultImage } from "@/lib/result-image";
 import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
-import type { DayBoard } from "@/lib/leaderboard-types";
 import { dailyCopy } from "@/content/daily";
-import { FlameIcon, MarkIcon, SpeakerIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
 import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
 const R = dailyCopy.results;
-const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
-// where a new round lines up: just under the sticky site header
-const ROUND_TOP = 88;
-// square tiles, a little flatter on short laptop screens so both shapes fit on the first screen (the drawing stays centred
-// at its own proportions)
-const TILE = "aspect-square [@media(min-width:768px)_and_(max-height:820px)]:aspect-[5/4]";
-
 
 type Round = {
-  /** date key for the daily round, null for practice */
-  date: string | null;
+  /** the puzzle's date key */
+  date: string;
   questions: Question[];
   shapes: Record<string, ShapeFile>;
 };
 
-// the two shapes on the game tiles: bright fills (they are drawings, not text)
-const COLORS = ["#FF5B4A", "#2F6BFF"];
-const V = `?v=${dataVersion.v}`;
-
-let poolPromise: Promise<PoolEntry[]> | null = null;
-const loadPool = () =>
-  (poolPromise ??= fetch(`/data/daily/index.json${V}`).then((r) => {
-    if (!r.ok) throw new Error("pool");
-    return r.json();
-  }));
-
-async function loadRound(seed: string, date: string | null): Promise<Round> {
-  const pool = await loadPool();
-  const questions = buildQuestions(pool, seed);
-  const ids = [...new Set(questions.flatMap((q) => q.options.map((o) => o.id)))];
-  const files = await Promise.all(
-    ids.map((id) =>
-      fetch(`/data/daily/shapes/${id}.json${V}`).then((r) => {
-        if (!r.ok) throw new Error(id);
-        return r.json() as Promise<ShapeFile>;
-      }),
-    ),
-  );
-  const entry = new Map(questions.flatMap((q) => q.options).map((o) => [o.id, o]));
-  return { date, questions, shapes: Object.fromEntries(ids.map((id, i) => [id, withMapDrawing(files[i], entry.get(id)!)])) };
+async function loadRound(date: string): Promise<Round> {
+  const questions = buildQuestions(await loadPool(), date);
+  return { date, questions, shapes: await loadShapes(questions) };
 }
 
 const scoreOf = (round: Round, choices: number[]) => choices.filter((c, i) => round.questions[i]?.answer === c).length;
@@ -102,38 +67,36 @@ function syncAccount(setGame: React.Dispatch<React.SetStateAction<Game | null>>)
     .catch(() => {});
 }
 
-/** Load today's round (or a fresh practice round) and any saved progress for today. */
-async function prepare(practice: boolean): Promise<Game> {
+/** Load today's round and any saved progress for it. */
+async function prepare(): Promise<Game> {
   const today = localDateKey();
-  const round = await loadRound(practice ? `practice-${Date.now()}` : today, practice ? null : today);
+  const round = await loadRound(today);
   const save = loadSave();
-  const choices = practice ? [] : (save.days[today]?.c ?? []);
+  const choices = save.days[today]?.c ?? [];
   return { round, today, save, choices, step: Math.min(choices.length, round.questions.length) };
 }
 
 /** Show the leaderboard's result for this round in place of whatever this browser had (they're the first try). */
 function official(g: Game, save: DailySave): Game {
-  const rec = g.round.date ? save.days[g.round.date] : undefined;
+  const rec = save.days[g.round.date];
   if (!rec || typeof rec.s !== "number") return { ...g, save };
   return { ...g, save, choices: rec.c, step: g.round.questions.length };
 }
 
 /**
  * Today's progress lives in this browser's storage, shared by all its tabs. If another tab has answered more of today's
- * questions, take its answers (the first answer to each question counts, as on the leaderboard). Practice rounds are
- * per tab and left alone.
+ * questions, take its answers (the first answer to each question counts, as on the leaderboard).
  */
 function catchUp(g: Game): Game {
-  if (!g.round.date) return g;
   const save = loadSave();
   const saved = save.days[g.round.date]?.c ?? [];
   if (saved.length <= g.choices.length) return g;
   return { ...g, save, choices: saved, step: Math.min(saved.length, g.round.questions.length) };
 }
 
-// results: "If you join #2 of 3" means little until this many have joined today, and "Better than N%" needs this many plays
-const BOARD_MIN = 20;
+// results: "Better than N%" needs this many plays today, and the chart of how everyone scored this many
 const CROWD_MIN = 30;
+const SPREAD_MIN = 10;
 const BETTER_MIN = 30;
 const TOP_MAX = 50;
 
@@ -144,9 +107,6 @@ export function DailyChallenge() {
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   // set when the player moves on, so the next question (or the results) takes focus; not on first load
   const advanced = useRef(false);
-  // the top of the game (progress bar), where a new round starts
-  const gameTop = useRef<HTMLDivElement>(null);
-  const restarted = useRef(false);
 
   useEffect(() => {
     if (!advanced.current) return;
@@ -157,15 +117,11 @@ export function DailyChallenge() {
     // a new round is still loading: keep waiting for its first question
     if (!heading || !card) return;
     advanced.current = false;
-    const behavior = reducedMotion() ? "auto" : "smooth";
-    if (restarted.current && gameTop.current) {
-      // a new round: line up the progress bar under the header (the page changed height while it loaded)
-      restarted.current = false;
-      scrollTo({ top: Math.max(0, gameTop.current.getBoundingClientRect().top + scrollY - ROUND_TOP), behavior });
-    } else {
-      const top = card.getBoundingClientRect().top;
-      if (top < 72) scrollTo({ top: top + scrollY - 80, behavior });
-    }
+    // line up the progress bar above the card (not the card itself) just under the header, so it stays in view (near the
+    // top of the screen on phones held sideways, where the header doesn't stick)
+    const top = (document.getElementById("daily-progress") ?? card).getBoundingClientRect().top;
+    const at = innerHeight <= 500 ? 8 : ROUND_TOP;
+    if (top < at - 16) scrollTo({ top: top + scrollY - at, behavior: reducedMotion() ? "auto" : "smooth" });
     heading.setAttribute("tabindex", "-1");
     heading.focus({ preventScroll: true });
   }, [game?.step]);
@@ -176,7 +132,7 @@ export function DailyChallenge() {
   useEffect(() => {
     const c = readChallenge(location.hash);
     if (c) queueMicrotask(() => setChallenge(c));
-    prepare(false)
+    prepare()
       .then(setGame)
       .catch(() => setFailed(true));
     // another tab answered: show its progress here too, so tabs never disagree (or let today be played twice)
@@ -191,18 +147,9 @@ export function DailyChallenge() {
     };
   }, []);
 
-  const start = (practice: boolean) => {
-    // a new round starts at the top of the game, not down where the results' buttons were
-    if (gameTop.current) {
-      const y = gameTop.current.getBoundingClientRect().top + scrollY - ROUND_TOP;
-      scrollTo({ top: Math.max(0, y), behavior: reducedMotion() ? "auto" : "smooth" });
-    }
-    advanced.current = true;
-    restarted.current = true;
+  const retry = () => {
     setFailed(false);
-    setGame(null);
-    if (practice) track("daily_practice_start");
-    prepare(practice)
+    prepare()
       .then(setGame)
       .catch(() => setFailed(true));
   };
@@ -211,13 +158,13 @@ export function DailyChallenge() {
     return (
       <div role="alert" className="rounded-[22px] border-2 border-line bg-white p-6 text-center">
         <p className="font-semibold">We couldn&apos;t load the challenge.</p>
-        <button type="button" onClick={() => start(false)} className="btn btn-primary mt-3 h-12">
+        <button type="button" onClick={retry} className="btn btn-primary mt-3 h-12">
           Try again
         </button>
       </div>
     );
   }
-  if (!game) return <Skeleton />;
+  if (!game) return <Skeleton label="Loading today's five" />;
   const { round, today, save, choices, step } = game;
 
   const answer = (choice: number) => {
@@ -227,7 +174,7 @@ export function DailyChallenge() {
     if (caught !== game) return setGame(caught);
     const next = [...choices, choice];
     const q = round.questions[step];
-    track("daily_answer", { n: step + 1, correct: q.answer === choice, practice: !round.date });
+    track("daily_answer", { n: step + 1, correct: q.answer === choice });
     const last = next.length >= round.questions.length;
     const perfect = last && scoreOf(round, next) === round.questions.length;
     play(q.answer !== choice ? "wrong" : perfect ? "perfect" : "right");
@@ -237,40 +184,41 @@ export function DailyChallenge() {
       buzz([20, 40, 20, 40, 80]);
       setTimeout(confetti, 1050);
     }
-    let updated = save;
-    if (round.date) {
-      const fresh = loadSave(); // keep anything other tabs saved
-      const done = next.length >= round.questions.length;
-      updated = { ...fresh, days: { ...fresh.days, [round.date]: { c: next, ...(done ? { s: scoreOf(round, next) } : {}) } } };
-      writeSave(updated);
-      if (done) {
-        track("daily_complete", { score: scoreOf(round, next), day: dayNumber(round.date) });
-        reportPlay(updated, round.date, scoreOf(round, next));
-      }
+    const fresh = loadSave(); // keep anything other tabs saved
+    const updated: DailySave = { ...fresh, days: { ...fresh.days, [round.date]: { c: next, ...(last ? { s: scoreOf(round, next) } : {}) } } };
+    writeSave(updated);
+    // a streak milestone reached today gets its own party (a perfect round already has one)
+    if (last && !perfect && STREAK_MILESTONES.includes(stats(updated, round.date).streak)) {
+      buzz([20, 40, 20, 40, 80]);
+      setTimeout(confetti, 1050);
+    }
+    if (last) {
+      track("daily_complete", { score: scoreOf(round, next), day: dayNumber(round.date) });
+      reportPlay(updated, round.date, scoreOf(round, next));
     }
     setGame({ ...game, choices: next, save: updated });
   };
 
   const finished = step >= round.questions.length;
-  const todayNo = round.date ? dayNumber(round.date) : null;
+  const todayNo = dayNumber(round.date);
   return (
-    <div ref={gameTop} className="flex flex-col">
-      {challenge && todayNo && !finished ? (
+    <div className="flex flex-col">
+      {challenge && !finished ? (
         <p className="mb-3 flex items-start gap-2 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
           <TargetIcon className="size-5" />
           {challenge.day === todayNo
-            ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
-            : `${challenge.name} sent you Daily #${challenge.day}, but this is today's. Play it and send your score back.`}
+            ? dailyCopy.challengeToday(challenge.name, challenge.score)
+            : dailyCopy.challengeOld(challenge.name, challenge.day)}
         </p>
       ) : null}
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
       {/* on phones above the game, where it still fits; on wider screens below it, so both tiles stay on a laptop's first screen */}
-      {signInOn && !finished && round.date ? (
+      {signInOn && !finished ? (
         <div className="md:order-last md:mt-4">
           <PlayedElsewhere />
         </div>
       ) : null}
-      {!finished && round.date ? <StreakPill save={save} today={today} /> : null}
+      {!finished ? <StreakPill save={save} today={today} /> : null}
       <Progress round={round} choices={choices} step={step} />
       {finished ? (
         <Results
@@ -278,20 +226,21 @@ export function DailyChallenge() {
           choices={choices}
           save={save}
           today={today}
-          challenge={challenge && round.date && challenge.day === dayNumber(round.date) ? challenge : null}
-          onPractice={() => start(true)}
-          onToday={() => start(false)}
+          challenge={challenge && challenge.day === todayNo ? challenge : null}
         />
       ) : (
         <QuestionCard
-          key={`${round.date ?? "practice"}-${step}`}
-          n={step}
-          total={round.questions.length}
+          key={`${round.date}-${step}`}
+          eyebrow={reveal.round(step + 1, round.questions.length)}
           q={round.questions[step]}
           shapes={round.shapes}
           picked={choices[step]}
-          perfect={choices.length === round.questions.length && scoreOf(round, choices) === round.questions.length}
-          practice={!round.date}
+          verdict={(correct) =>
+            choices.length === round.questions.length && scoreOf(round, choices) === round.questions.length ? reveal.perfect : correct ? reveal.right : reveal.wrong
+          }
+          nextLabel={step + 1 < round.questions.length ? reveal.next : reveal.seeResults}
+          // never measure against a shape still to come today: it would give that question away
+          exclude={round.questions.flatMap((x) => x.options.map((o) => o.id))}
           onPick={answer}
           onNext={() => {
             advanced.current = true;
@@ -322,25 +271,9 @@ function OnSignIn({ run }: { run: () => void }) {
   return null;
 }
 
-/** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
-function Skeleton() {
-  return (
-    <div aria-busy="true" aria-label="Loading today's challenge">
-      <div aria-hidden="true" className="mb-3 h-3 sm:mb-4" />
-      <div className="min-h-[calc(50vw+208px)] rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:min-h-[540px] sm:p-6 [@media(min-width:768px)_and_(max-height:820px)]:min-h-[476px]">
-        <div className="h-5 w-1/2 animate-pulse rounded-full bg-beige" />
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
-          <div className={`${TILE} animate-pulse rounded-2xl bg-tile`} />
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function Progress({ round, choices, step }: { round: Round; choices: number[]; step: number }) {
   return (
-    <ol className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Progress">
+    <ol id="daily-progress" className="mb-3 grid grid-cols-5 gap-1.5 sm:mb-4 sm:gap-2" aria-label="Your answers so far">
       {round.questions.map((q, i) => {
         const done = i < choices.length;
         const right = done && choices[i] === q.answer;
@@ -352,7 +285,7 @@ function Progress({ round, choices, step }: { round: Round; choices: number[]; s
               className={`block h-3 rounded-full ${done ? `pop-in ${right ? "bg-green" : "bg-red"}` : current ? "bg-primary" : "bg-beige"}`}
             />
             <span className="sr-only">
-              Question {i + 1}: {done ? (right ? "correct" : "wrong") : current ? "current" : "not answered"}
+              Round {i + 1}: {done ? (right ? "right" : "wrong") : current ? "now" : "not yet"}
             </span>
           </li>
         );
@@ -375,310 +308,18 @@ function StreakPill({ save, today }: { save: DailySave; today: string }) {
   );
 }
 
-/** Sound effects on or off (on by default). */
-function SoundToggle() {
-  // on by default, so the first paint already says "Sound on" for almost everyone
-  const [on, setOn] = useState(true);
-  useEffect(() => queueMicrotask(() => setOn(soundOn())), []);
-  return (
-    <button
-      type="button"
-      aria-pressed={on}
-      onClick={() => {
-        setSound(!on);
-        setOn(!on);
-      }}
-      className="inline-flex h-11 items-center gap-1.5 rounded-full border-2 border-line bg-white px-3 text-xs font-bold text-ink-soft hover:text-ink"
-    >
-      <SpeakerIcon on={on} /> Sound
-    </button>
-  );
-}
-
-function QuestionCard({
-  n,
-  total,
-  q,
-  shapes,
-  picked,
-  perfect,
-  practice,
-  onPick,
-  onNext,
-}: {
-  n: number;
-  total: number;
-  q: Question;
-  shapes: Record<string, ShapeFile>;
-  picked: number | undefined;
-  /** this was the last question and every answer was right */
-  perfect: boolean;
-  practice: boolean;
-  onPick: (i: number) => void;
-  onNext: () => void;
-}) {
-  const answered = picked !== undefined;
-  const correct = picked === q.answer;
-  const nextRef = useRef<HTMLButtonElement>(null);
-  // one shared scale per view for both tiles, so the two drawings compare fairly
-  const spanOf = (view: "merc" | "ea") => Math.max(...q.options.map((o) => size(shapes[o.id][view]))) * 1.12;
-  const spans = { merc: spanOf("merc"), ea: spanOf("ea") };
-
-  const lines = explain(q);
-
-  useEffect(() => {
-    if (!answered) return;
-    // keyboard users land on "Next"; preventScroll keeps the page where it is (the reveal is the thing to watch)
-    nextRef.current?.focus({ preventScroll: true });
-    // once the shapes have settled, bring the explanation and "Next" into view on short screens
-    const id = setTimeout(
-      () => nextRef.current?.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" }),
-      reducedMotion() ? 0 : 1400,
-    );
-    return () => clearTimeout(id);
-  }, [answered]);
-
-  return (
-    <section
-      aria-labelledby="daily-q"
-      className="rounded-[22px] border-2 border-line bg-white px-4 pb-5 pt-4 shadow-[0_8px_0_0_var(--color-line)] sm:p-6"
-    >
-      <div className="flex items-center justify-between gap-2">
-        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">
-          {practice ? `${reveal.practice} · ` : ""}
-          {reveal.round(n + 1, total)}
-        </p>
-        <SoundToggle />
-      </div>
-      <h2 id="daily-q" className="mt-1 text-center font-display text-[1.7rem] leading-[1.1] text-ink sm:text-4xl">
-        {q.prompt}
-      </h2>
-      <p className="mt-1.5 text-center text-sm text-muted">{answered ? reveal.legend : reveal.ask}</p>
-
-      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
-        {q.options.map((o, i) => {
-          const isAnswer = i === q.answer;
-          const look = !answered
-            ? "hover:border-primary"
-            : isAnswer
-              ? "reveal-win border-green [--press-shadow:var(--color-green-shadow)]"
-              : picked === i
-                ? "reveal-shake border-red [--press-shadow:var(--color-red-shadow)]"
-                : "opacity-70";
-          const inflate = o.m / o.a;
-          const x = (r: number) => (r >= 10 ? String(Math.round(r)) : r.toFixed(1));
-          const mapNote = inflate >= 1.15 ? reveal.mapTooBig(x(inflate)) : inflate <= 0.87 ? reveal.mapTooSmall(x(1 / inflate)) : reveal.mapAboutRight;
-          return (
-            <button
-              key={o.id}
-              type="button"
-              disabled={answered}
-              onClick={() => onPick(i)}
-              aria-label={answered ? undefined : `${o.n}, ${o.sub}`}
-              className={`press-card relative flex min-w-0 flex-col rounded-[20px] p-2 text-left disabled:cursor-default sm:p-3 ${look}`}
-            >
-              {answered && (isAnswer || picked === i) ? (
-                <span
-                  className={`pop-in absolute -top-3.5 right-2 z-10 rounded-full px-3 py-1 text-[11px] font-extrabold uppercase tracking-wider text-white ${isAnswer ? "reveal-late bg-green-text" : "bg-red"}`}
-                >
-                  {isAnswer ? reveal.bigger : reveal.yourPick}
-                </span>
-              ) : null}
-              <RevealTile map={shapes[o.id].merc} real={shapes[o.id].ea} spans={spans} revealed={answered} color={COLORS[i]} />
-              <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
-              <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
-              {answered ? (
-                <>
-                  <TrueArea from={o.m} to={o.a} />
-                  <span
-                    className={`pop-in reveal-late mt-1.5 block w-fit rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-tight text-ink ${inflate >= 1.15 ? "bg-gold-soft" : "bg-beige"}`}
-                  >
-                    {mapNote}
-                  </span>
-                </>
-              ) : null}
-            </button>
-          );
-        })}
-        {/* the gold VS coin between the cards */}
-        <span
-          aria-hidden="true"
-          className="pointer-events-none absolute left-1/2 top-[38%] z-10 grid size-12 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full border-4 border-white bg-gold font-display text-sm text-ink shadow-[0_4px_0_0_var(--color-gold-shadow)]"
-        >
-          {reveal.vs}
-        </span>
-      </div>
-
-      <WhoIsWho options={q.options} />
-
-      {/* the verdict, read out by screen readers: soft green when you're right, soft red when the map fooled you */}
-      <div aria-live="polite">
-        {answered ? (
-          <div
-            className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
-          >
-            <p className="flex items-center gap-2.5 font-display text-2xl leading-tight">
-              <span
-                aria-hidden="true"
-                className={`grid size-8 shrink-0 place-items-center rounded-full text-base text-white ${correct ? "bg-green-text" : "bg-danger"}`}
-              >
-                <TickIcon right={correct} className="size-4" />
-              </span>
-              {perfect ? reveal.perfect : correct ? reveal.right : reveal.wrong}
-            </p>
-            <p className="mt-2 font-semibold leading-snug">{lines[0]}</p>
-            {lines.slice(1).map((line) => (
-              <p key={line} className="mt-1.5 text-sm leading-relaxed text-ink-soft">
-                {line}
-              </p>
-            ))}
-          </div>
-        ) : null}
-      </div>
-      {answered ? (
-        <button ref={nextRef} type="button" onClick={onNext} className="btn btn-primary btn-lg mt-4 w-full">
-          {n + 1 < total ? reveal.next : reveal.seeResults} <span aria-hidden="true">→</span>
-        </button>
-      ) : null}
-    </section>
-  );
-}
-
-/** Short "what was it / where is it today" notes for the historical states in a question. */
-function WhoIsWho({ options }: { options: Question["options"] }) {
-  const notes = options.filter((o) => o.kind === "history" && dailyContext[o.src]);
-  if (!notes.length) return null;
-  return (
-    <div className="mt-4 space-y-2 rounded-2xl bg-paper p-3 text-sm ring-1 ring-line">
-      {notes.map((o) => {
-        const c = dailyContext[o.src];
-        return (
-          <p key={o.id} className="leading-relaxed text-ink-soft">
-            <strong className="text-ink">{o.n}</strong> <span className="text-muted">({o.sub})</span>: {c.what}{" "}
-            <span className="font-semibold text-ink">Today: {c.today}.</span>
-          </p>
-        );
-      })}
-    </div>
-  );
-}
-
-// framed and drawn on the main landmass, so far-off islands don't shrink a country to a speck
-const size = (o: Outline) => {
-  const [x0, y0, x1, y1] = mainBox(o);
-  return Math.max(x1 - x0, y1 - y0);
-};
-
-/** One outline centred in a 100 × 100 tile, at the tile's shared scale. */
-function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: boolean }) {
-  const { d, b: [x0, y0, x1, y1] } = mainPart(outline);
-  const k = 100 / span;
-  const tiny = size(outline) < span * 0.06;
-  return (
-    <>
-      <path
-        d={d}
-        transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
-        fill={ghost ? "none" : color}
-        fillOpacity={0.88}
-        stroke={color}
-        strokeWidth={ghost ? 1.5 : 1}
-        strokeDasharray={ghost ? "4 3" : undefined}
-        vectorEffect="non-scaling-stroke"
-        fillRule="evenodd"
-        strokeLinejoin="round"
-      />
-      {tiny && !ghost ? <circle cx={50} cy={50} r={8} fill="none" stroke={color} strokeWidth={1.2} /> : null}
-    </>
-  );
-}
-
-/**
- * The shrink reveal: before answering, the shape as a normal map draws it. On answering, it grows or shrinks to the size
- * it really is next to the other shape, then the true outline fades in, with a dashed trace of the map's version left behind
- * so the difference stays visible.
- */
-function RevealTile({
-  map,
-  real,
-  spans,
-  revealed,
-  color,
-}: {
-  map: Outline;
-  real: Outline;
-  spans: { merc: number; ea: number };
-  revealed: boolean;
-  color: string;
-}) {
-  const area = (o: Outline, span: number) => {
-    const [x0, y0, x1, y1] = mainBox(o);
-    return ((x1 - x0) * (y1 - y0)) / (span * span);
-  };
-  const grow = Math.sqrt(area(real, spans.ea) / Math.max(area(map, spans.merc), 1e-9)) || 1;
-  return (
-    <svg viewBox="0 0 100 100" className={`${TILE} w-full rounded-2xl bg-tile`} aria-hidden="true">
-      <g className="reveal-map" style={{ transform: revealed ? `scale(${grow})` : "scale(1)", opacity: revealed ? 0 : 1 }}>
-        <Shape outline={map} span={spans.merc} color={color} />
-      </g>
-      <g className="reveal-true" style={{ opacity: revealed ? 0.55 : 0 }}>
-        <Shape outline={map} span={spans.merc} color={color} ghost />
-      </g>
-      <g className="reveal-true" style={{ opacity: revealed ? 1 : 0 }}>
-        <Shape outline={real} span={spans.ea} color={color} />
-      </g>
-    </svg>
-  );
-}
-
-/** The real area, counting down (or up) from the size the map makes it look, as the shapes change size. */
-function TrueArea({ from, to }: { from: number; to: number }) {
-  const [v, setV] = useState(from);
-  useEffect(() => {
-    if (reducedMotion()) {
-      const id = requestAnimationFrame(() => setV(to));
-      return () => cancelAnimationFrame(id);
-    }
-    const start = performance.now() + 150;
-    let id = 0;
-    const tick = (now: number) => {
-      const t = Math.min(1, Math.max(0, (now - start) / 1000));
-      const ease = 1 - Math.pow(1 - t, 3);
-      setV(from + (to - from) * ease);
-      if (t < 1) id = requestAnimationFrame(tick);
-    };
-    id = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(id);
-  }, [from, to]);
-  const [km, mi] = formatBoth(v).replace(")", "").split(" (");
-  return (
-    <span className="mt-1.5 block tabular-nums">
-      <span className="block font-display text-base text-ink">{km}</span>
-      <span className="block text-xs text-muted">{mi}</span>
-    </span>
-  );
-}
-
-function mapHref(q: Question) {
-  return mapUrl({ era: "present", shapes: q.options.map((o, i) => ({ era: o.era, name: o.src, color: i })) });
-}
-
 function Results({
   round,
   choices,
   save,
   today,
   challenge,
-  onPractice,
-  onToday,
 }: {
   round: Round;
   choices: number[];
   save: DailySave;
   today: string;
   challenge: Challenge | null;
-  onPractice: () => void;
-  onToday: () => void;
 }) {
   const score = scoreOf(round, choices);
   const total = round.questions.length;
@@ -688,60 +329,25 @@ function Results({
   const [copied, setCopied] = useState("");
   const shareBox = useShareBox();
   const verdict = R.verdict(score, total);
-  // where today's score sits on today's public board: your own row if you're on it, otherwise where you'd land if you
-  // joined (and says so, so nobody thinks they're already ranked)
-  const [rank, setRank] = useState<{ rank: number; of: number; joined: boolean } | null>(null);
-  // the middle card waits for the board, so it doesn't switch from one stat to another as answers arrive
-  const [boardChecked, setBoardChecked] = useState(false);
-  useEffect(() => {
-    if (!round.date) return;
-    const id = playerId();
-    // once the score is posted, a slower board fetch must not put "If you join" back
-    let joinedNow = false;
-    fetch(`/api/leaderboard?scope=day&date=${round.date}&limit=100${id ? `&player=${id}` : ""}`)
-      .then((r) => (r.ok ? (r.json() as Promise<DayBoard>) : null))
-      .then((b) => {
-        if (!b || joinedNow) return;
-        const mine = b.rows.find((r) => r.me) ?? b.me;
-        setRank(
-          mine
-            ? { rank: mine.rank, of: b.total, joined: true }
-            : { rank: 1 + b.rows.filter((r) => r.score > score).length, of: b.total + 1, joined: false },
-        );
-      })
-      .catch(() => {})
-      .finally(() => setBoardChecked(true));
-    const posted = (e: Event) => {
-      const d = (e as CustomEvent<Posted>).detail;
-      if (d.date !== round.date) return;
-      joinedNow = true;
-      setRank({ rank: d.rank, of: d.total, joined: true });
-    };
-    window.addEventListener(POSTED_EVENT, posted);
-    return () => window.removeEventListener(POSTED_EVENT, posted);
-  }, [round.date, score]);
-
   // everyone's scores today (anonymous counts), for "Better than 62% of players today"
   const [crowd, setCrowd] = useState<{ n: number; scores: number[] } | null>(null);
   useEffect(() => {
-    if (!round.date) return;
     fetch(`/api/plays?date=${round.date}`)
       .then((r) => (r.ok ? (r.json() as Promise<{ n: number; scores: number[] }>) : null))
       .then((c) => c && setCrowd(c))
       .catch(() => {});
   }, [round.date]);
 
-  // the middle card: your place on the board if you've joined, or where you'd land if enough have joined to mean
-  // something; otherwise how you did against everyone who played today, or failing that how many days you've played
+  // the middle card: how you did against everyone who played today (anonymous counts), or failing that how many days
+  // you've played
+  // today's anonymous counts by score; they can be up to a minute old: if nobody shares your score yet, your own play
+  // isn't in them, so add it
+  const counts = crowd ? [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0) : null;
+  if (counts && !counts[score]) counts[score] = 1;
+  const crowdN = counts ? counts.reduce((a, b) => a + b, 0) : 0;
   const middle = (() => {
-    if (rank?.joined) return [R.rank, `#${rank.rank}`, R.rankOf(rank.of)] as const;
-    if (!boardChecked) return [R.played, "—", "\u00a0"] as const;
-    if (rank && rank.of >= BOARD_MIN) return [R.rankIfJoined, `#${rank.rank}`, R.rankOf(rank.of)] as const;
-    if (crowd && crowd.n >= CROWD_MIN) {
-      const counts = [0, 1, 2, 3, 4, 5].map((k) => crowd.scores[k] ?? 0);
-      // the counts can be up to a minute old: if nobody shares your score yet, your own play isn't in them, so add it
-      if (!counts[score]) counts[score] = 1;
-      const n = counts.reduce((a, b) => a + b, 0);
+    if (counts && crowd && crowd.n >= CROWD_MIN) {
+      const n = crowdN;
       // only good news: "Better than 8%" after a rough day would sting, and "Top 70%" isn't a boast, so those show
       // days played instead
       if (score === total) {
@@ -760,11 +366,10 @@ function Results({
   const most = Math.max(1, ...spread);
 
   const challengeFriend = () => {
-    if (round.date) shareBox.share(challengeMessage(score, total, round.date), "results");
+    shareBox.share(challengeMessage(score, total, round.date), "results");
   };
 
   const shareImage = async () => {
-    if (!round.date) return;
     track("daily_share_image", { score });
     const blob = await resultImage({ day: dayNumber(round.date), score, marks, title: R.title(score, total), verdict, streak: s.streak });
     if (!blob) return setCopied(R.pictureFailed);
@@ -797,7 +402,7 @@ function Results({
       className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7"
     >
       <div className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">{round.date ? `Daily #${dayNumber(round.date)}` : R.practiceRound}</p>
+        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">Daily #{dayNumber(round.date)}</p>
         <p aria-hidden="true" className="pop-in mt-1 font-display text-[5.5rem] leading-none text-ink sm:text-8xl">
           {score}
           <span className="text-primary">/</span>
@@ -809,6 +414,11 @@ function Results({
         </h2>
         <p className="mt-1 text-muted">{verdict}</p>
       </div>
+      {STREAK_MILESTONES.includes(s.streak) && save.days[today]?.s !== undefined ? (
+        <p className="pop-in mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center font-display text-lg text-ink">
+          <FlameIcon className="size-6" /> {R.milestone(s.streak)}
+        </p>
+      ) : null}
       {challenge ? (
         <p className="mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center text-sm font-bold text-ink">
           {score > challenge.score ? <TrophyIcon className="size-5" /> : <TargetIcon className="size-5" />}
@@ -829,89 +439,118 @@ function Results({
             }`}
           >
             <TickIcon right={right} className="size-6" />
-            <span className="sr-only">
-              Question {i + 1}: {right ? "correct" : "wrong"}
-            </span>
+            <span className="sr-only">{R.markSr(i + 1, right)}</span>
           </li>
         ))}
       </ol>
+      {/* the next thing to play, right under the score: endless mode, while the next daily is on its way */}
+      <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold btn-lg mt-6 w-full">
+        {R.endless} <span aria-hidden="true">→</span>
+      </Link>
+      <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>
 
-      {round.date ? (
-        <>
-          {/* getting on the leaderboard is the first thing after the score */}
-          <LeaderboardJoin date={round.date} choices={choices} score={score} />
-          <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
-            {[
-              [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
-              middle,
-              [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
-            ].map(([k, v, sub]) => (
-              <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
-                <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
-                <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
-                <dd className="order-3 text-xs text-muted">{sub}</dd>
-              </div>
-            ))}
-          </dl>
-          {/* sharing: one compact row, so the leaderboard stays the main call to action */}
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
-              <span className="sm:hidden">{R.shareShort}</span>
-              <span className="hidden sm:inline">{R.share}</span>
-            </button>
-            <button type="button" onClick={shareImage} className="btn btn-white h-12 px-2 text-sm sm:text-base">
-              <span className="sm:hidden">{R.pictureShort}</span>
-              <span className="hidden sm:inline">{R.picture}</span>
-            </button>
-            <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-red h-12 px-2 text-sm sm:text-base">
-              <span className="sm:hidden">{R.challengeShort}</span>
-              <span className="hidden sm:inline">{R.challenge}</span>
-            </button>
+      {/* saving the streak to an account comes next, after the endless button */}
+      <SaveStreak date={round.date} choices={choices} />
+      <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
+        {[
+          [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-6" /></span>, R.best(s.best)],
+          middle,
+          [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
+        ].map(([k, v, sub]) => (
+          <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
+            <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
+            <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
+            <dd className="order-3 text-xs text-muted">{sub}</dd>
           </div>
-          <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
-            {copied}
-          </p>
-          {shareBox.box}
-          {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
-          {s.played >= 2 ? (
-            <div className="mt-5">
-              <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
-              <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
-              <ol className="mt-2 space-y-1">
-                {spread
-                  .map((days, n) => (
-                    <li key={n} className="flex items-center gap-2 text-sm">
-                      <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
-                        {n}
+        ))}
+      </dl>
+      {/* sharing: one compact row, so saving your streak stays the main call to action; one solid button, two quiet ones */}
+      <div className="mt-5 grid grid-cols-3 gap-2">
+        <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
+          <span className="sm:hidden">{R.shareShort}</span>
+          <span className="hidden sm:inline">{R.share}</span>
+        </button>
+        <button type="button" onClick={shareImage} className="btn btn-white h-12 px-2 text-sm sm:text-base">
+          <span className="sm:hidden">{R.pictureShort}</span>
+          <span className="hidden sm:inline">{R.picture}</span>
+        </button>
+        <button type="button" onClick={challengeFriend} aria-label={R.challenge} className="btn btn-white h-12 px-2 text-sm sm:text-base">
+          <span className="sm:hidden">{R.challengeShort}</span>
+          <span className="hidden sm:inline">{R.challenge}</span>
+        </button>
+      </div>
+      <p aria-live="polite" className="mt-1 whitespace-pre-line text-center text-sm font-semibold text-green-text">
+        {copied}
+      </p>
+      {shareBox.box}
+      {/* how everyone scored today, from 5 down to 0, your score's bar in blue (anonymous counts, once enough played) */}
+      {counts && crowdN >= SPREAD_MIN ? (
+        <div className="mt-5">
+          <h3 className="font-display text-lg text-ink">{R.crowdTitle}</h3>
+          <p className="text-sm text-muted">{R.crowdSub(crowdN)}</p>
+          <ol className="mt-2 space-y-1">
+            {counts
+              .map((c, n) => {
+                const exact = (100 * c) / crowdN;
+                // a handful of plays among hundreds still shows: "<1%", not "0%"
+                const pct = c && exact < 0.5 ? "<1" : String(Math.round(exact));
+                const top = Math.max(...counts);
+                return (
+                  <li key={n} className="flex items-center gap-2 text-sm">
+                    <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
+                      {n}
+                    </span>
+                    <span className="sr-only">{R.crowdRow(n, pct, n === score)}</span>
+                    {/* every row has the same track and the same label slot, so the bars compare fairly */}
+                    <span aria-hidden="true" className="flex-1">
+                      <span
+                        className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                          !c ? "text-muted" : `min-w-10 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                        }`}
+                        style={c ? { width: `${(c / top) * 100}%` } : undefined}
+                      >
+                        {pct}%
                       </span>
-                      <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
-                      <span aria-hidden="true" className="flex-1">
-                        <span
-                          className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
-                            !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
-                          }`}
-                          style={days ? { width: `${(days / most) * 100}%` } : undefined}
-                        >
-                          {days}
-                        </span>
-                      </span>
-                    </li>
-                  ))
-                  .reverse()}
-              </ol>
-            </div>
-          ) : null}
-        </>
-      ) : (
-        <div className="mt-6 grid gap-2 sm:grid-cols-2">
-          <button type="button" onClick={onPractice} className="btn btn-primary btn-lg">
-            {R.anotherPractice}
-          </button>
-          <button type="button" onClick={onToday} className="btn btn-white btn-lg">
-            {R.backToToday}
-          </button>
+                    </span>
+                    <span aria-hidden="true" className="w-8 shrink-0 text-xs font-bold text-primary">
+                      {n === score ? R.crowdYou : null}
+                    </span>
+                  </li>
+                );
+              })
+              .reverse()}
+          </ol>
         </div>
-      )}
+      ) : null}
+      {/* your own scores so far, from 5 down to 0, today's bar in blue (from the second day: one bar says nothing) */}
+      {s.played >= 2 ? (
+        <div className="mt-5">
+          <h3 className="font-display text-lg text-ink">{R.scoresTitle}</h3>
+          <p className="text-sm text-muted">{R.scoresSub(s.average.toFixed(1))}</p>
+          <ol className="mt-2 space-y-1">
+            {spread
+              .map((days, n) => (
+                <li key={n} className="flex items-center gap-2 text-sm">
+                  <span className="w-3 text-right font-bold text-ink" aria-hidden="true">
+                    {n}
+                  </span>
+                  <span className="sr-only">{R.scoreRow(n, days, n === score)}</span>
+                  <span aria-hidden="true" className="flex-1">
+                    <span
+                      className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
+                        !days ? "text-muted" : `min-w-7 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
+                      }`}
+                      style={days ? { width: `${(days / most) * 100}%` } : undefined}
+                    >
+                      {days}
+                    </span>
+                  </span>
+                </li>
+              ))
+              .reverse()}
+          </ol>
+        </div>
+      ) : null}
 
       <h3 className="mt-7 font-display text-xl text-ink">{R.answers}</h3>
       <ol className="mt-2 divide-y divide-line">
@@ -919,6 +558,7 @@ function Results({
           const big = q.options[q.answer];
           const small = q.options[1 - q.answer];
           const line = sizeParts(big, small);
+          const href = mapHref(q);
           return (
             <li key={i} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
               <MarkIcon right={choices[i] === q.answer} className="size-5 translate-y-1" />
@@ -926,24 +566,21 @@ function Results({
                 <strong>{line.big}</strong> <span className="text-muted">({big.sub})</span> {line.link} <strong>{line.small}</strong>{" "}
                 <span className="text-muted">({small.sub})</span>
               </span>
-              <Link href={mapHref(q)} aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
-                {R.dragOnMap} →
-              </Link>
+              {/* not for a region yet: the map can't draw those */}
+              {href ? (
+                <Link href={href} aria-label={`Compare the sizes of ${nameInSentence(big)} and ${nameInSentence(small)} on the map`} className="col-start-2 font-semibold text-primary hover:underline">
+                  {R.dragOnMap} →
+                </Link>
+              ) : null}
             </li>
           );
         })}
       </ol>
 
-      {round.date ? (
-        <div className="mt-4 border-t border-line pt-4">
-          <button type="button" onClick={onPractice} className="btn btn-gold btn-lg w-full">
-            {R.practice} <span aria-hidden="true">→</span>
-          </button>
-          <div className="mt-2 text-center">
-            <Countdown />
-          </div>
-        </div>
-      ) : null}
+      {/* when the next daily arrives */}
+      <div className="mt-4 border-t border-line pt-4 text-center">
+        <Countdown />
+      </div>
     </section>
   );
 }
@@ -964,17 +601,16 @@ function Countdown() {
   if (left === 0) {
     return (
       <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
-        A new challenge is ready. Load it →
+        {dailyCopy.nextReady} <span aria-hidden="true">→</span>
       </button>
     );
   }
   const t = Math.floor(left / 1000);
-  const p = (n: number) => String(n).padStart(2, "0");
   return (
     <p className="text-sm text-muted">
-      Next challenge in{" "}
+      {dailyCopy.nextIn}{" "}
       <span className="font-display tabular-nums font-semibold text-ink" suppressHydrationWarning>
-        {p(Math.floor(t / 3600))}:{p(Math.floor((t % 3600) / 60))}:{p(t % 60)}
+        {dailyCopy.nextTime(Math.floor(t / 3600), Math.floor((t % 3600) / 60))}
       </span>
     </p>
   );

@@ -2,8 +2,11 @@ import { readFileSync } from "node:fs";
 import type { NextConfig } from "next";
 
 const dataVersion = (JSON.parse(readFileSync("./src/data/data-version.json", "utf8")) as { v: string }).v;
+const dailyVersion = (JSON.parse(readFileSync("./src/data/daily-version.json", "utf8")) as { v: string }).v;
+// the same stamp as POOL_V in src/lib/pool-version.ts, so the preloaded puzzle list is the one the page fetches
+const poolV = `?v=${dataVersion}.${dailyVersion}`;
 // pages with the world-map band at the top (PageHero). A new page with a PageHero needs adding here.
-const HERO_PAGES = "about|contact|daily|disputes|eras|how-it-works|leaderboard|privacy|size|teachers|terms|timeline|unsubscribed";
+const HERO_PAGES = "about|contact|daily|disputes|endless|eras|how-it-works|leaderboard|privacy|size|teachers|terms|timeline|unsubscribed";
 const worldBand = { key: "Link", value: "</world.svg>; rel=preload; as=image; fetchpriority=high" };
 // only on the page itself: the router's prefetch requests (sent with an RSC header) would apply them on other pages
 const pageOnly = { missing: [{ type: "header" as const, key: "rsc" }] };
@@ -49,7 +52,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Link",
-            value: `</globe-still.svg>; rel=preload; as=image; fetchpriority=high, </data/globe.json>; rel=preload; as=fetch; crossorigin=anonymous, </data/daily/index.json?v=${dataVersion}>; rel=preload; as=fetch; crossorigin=anonymous`,
+            value: `</globe-still.svg>; rel=preload; as=image; fetchpriority=high, </data/globe.json>; rel=preload; as=fetch; crossorigin=anonymous, </data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous`,
           },
         ],
       },
@@ -58,10 +61,10 @@ const nextConfig: NextConfig = {
       { source: "/size/:slug", ...pageOnly, headers: [worldBand] },
       { source: "/unsubscribed/error", ...pageOnly, headers: [worldBand] },
       {
-        // the daily game can't start until its puzzle list arrives: fetch it with the page, not after the scripts
-        source: "/daily",
+        // the games can't start until the puzzle list arrives: fetch it with the page, not after the scripts
+        source: "/:page(daily|endless)",
         ...pageOnly,
-        headers: [{ key: "Link", value: `</world.svg>; rel=preload; as=image; fetchpriority=high, </data/daily/index.json?v=${dataVersion}>; rel=preload; as=fetch; crossorigin=anonymous` }],
+        headers: [{ key: "Link", value: `</world.svg>; rel=preload; as=image; fetchpriority=high, </data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous` }],
       },
       {
         source: "/:file(world.svg|globe-still.svg)",

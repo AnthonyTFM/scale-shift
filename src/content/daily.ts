@@ -3,26 +3,44 @@
 export const dailyCopy = {
   eyebrow: "Daily challenge",
   title: "Which is bigger?",
-  lead: "Five matchups a day, the same for everyone. Normal maps stretch land near the poles, so your eyes will lie to you. Go 5 for 5 and climb the leaderboard. New matchups at midnight your time.",
+  lead: "Five matchups a day, the same for everyone. Normal maps puff up land near the poles, so the one that looks bigger often isn't. Go 5 for 5 and keep your streak alive. New matchups at midnight your time.",
+  // under the game
+  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your scores and streak are saved in this browser, and in your account if you sign in.",
+  // a friend's challenge link: for today's game, or for an older one
+  challengeToday: (name: string, score: number) => `${name} scored ${score}/5 on today's challenge. Can you beat it?`,
+  challengeOld: (name: string, day: number) => `${name} sent you Daily #${day}. That one's gone, but today's is ready: play it and send your score back.`,
+  // the countdown under the results, to the next daily
+  nextIn: "Next five in",
+  nextTime: (h: number, m: number) => (h ? `${h}h ${m}m` : m ? `${m}m` : "under a minute"),
+  nextReady: "Five new matchups are ready. Load them",
   // phones show this instead, so the first puzzle is on screen without scrolling
   leadShort: "Five matchups a day. Normal maps lie about size. Can you see through them?",
   playedElsewhere: "Played today on another device?",
   playedElsewhereShort: "Played on another device?",
   signInToSee: "Sign in to see your result",
   signInToSeeShort: "Sign in",
-  // results screen: the leaderboard sign-up waits behind one button
   // shown on the "Sign in" link while the sign-in window downloads
   signInOpening: "Opening sign-in…",
-  joinCta: "Get on the leaderboard",
-  joinHint: "See where you rank.",
-  // the leaderboard page, for someone who played today but isn't on the board yet
-  boardNudge: (score: number, total: number) => `You scored ${score}/${total} today. Post it and see where you rank.`,
-  joinButton: "Join",
-  // the join pop-up: step 1 the 13+ box and sign-in, step 2 the nickname, then where you landed
+  // results screen: daily scores are private (no public board), so signing in is about keeping your streak
+  save: {
+    cta: "Save your streak on every device",
+    hint: "Free sign-in. Your daily scores stay private.",
+    button: "Sign in",
+    title: "Save your streak",
+    lead: "Sign in and your streak and past results follow you to any phone or computer. Daily scores stay private: they never go on a public board.",
+    saving: "Saving your streak…",
+    saved: "Streak saved on every device",
+    savedSub: "Your daily scores are private. Only you see them.",
+    failed: "Couldn't save your score. Check your connection and try again.",
+    retry: "Try again",
+    remind: "Email me when a new daily challenge is up",
+    signedIn: "Signed in.",
+    signOut: "Sign out",
+  },
+  // the sign-in pop-up, shared with endless mode's Best streaks board: step 1 the 13+ box and sign-in, step 2 the
+  // nickname (endless mode only), then where you landed
   joinDialog: {
     step: (n: number) => `Step ${n} of 2`,
-    title: "Get on today's leaderboard",
-    lead: (score: number) => `You scored ${score}/5. Sign in so your score counts and nobody else can post as you.`,
     continue: "Continue with email or Google",
     opening: "Opening sign-in…",
     private: "Sign in with a code we email you, or with Google. Your email is never shown.",
@@ -30,17 +48,12 @@ export const dailyCopy = {
     retry: "Try again",
     notNow: "Not now",
     nameTitle: "Pick a nickname",
-    nameLead: "This is what everyone sees on the leaderboard.",
+    nameLead: "This is what everyone sees on the Best streaks board.",
     nameLabel: "Nickname",
     nameHint: "3 to 16 characters. Not your full real name.",
     remind: "Email me when a new daily challenge is up",
     optional: "(optional; unsubscribe any time with one click)",
-    post: "Post my score",
     posting: "Posting…",
-    doneTitle: (rank: number) => `You're #${rank} today!`,
-    doneLead: (score: number) => `is on today's board with ${score}/5. A new five arrives at midnight.`,
-    duplicate: "Your first score of the day is the one that counts.",
-    back: "Back to my results",
     notYou: "Not you?",
     signOut: "Sign out",
     close: "Close",
@@ -48,18 +61,44 @@ export const dailyCopy = {
   // the reveal after each answer
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
-    practice: "Practice",
-    ask: "Sized the way a normal web map shows them. Tap the bigger one.",
-    // the tiles compare the two shapes with each other (one scale per view), so the legend says "compare", not "size"
-    legend: "Dashed: how the two compare on a web map. Solid: how they really compare.",
+    ask: "Drawn the way a normal web map shows them. Don't trust your eyes.",
+    // after the answer, in place of `ask`: which drawing is which, and tapping a tile plays the shrink again
+    watch: "Pale: size on a normal map. Solid: real size. Tap to replay.",
     right: "You got it!",
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
     next: "Next round",
     seeResults: "See my results",
-    mapTooBig: (x: string) => `Map: ${x}× too big`,
-    mapTooSmall: (x: string) => `Map: ${x}× too small`,
-    mapAboutRight: "Map: about right",
+    // under each name once answered: the result in plain words
+    biggerBy: (gap: string) => `${gap} bigger`,
+    smaller: "Smaller",
+    // the strip in the verdict: how far each place is from the equator, and how much a web map stretches it
+    // the strip's title: the map showed the smaller one as bigger (fooled you / misleads), or it didn't
+    stretchTitle: "Why the map fooled you",
+    stretchTitleRight: "Why the map misleads",
+    stretchTitleHonest: "How a web map stretches these two",
+    stretchTitleBoth: "Both near the equator: web maps get these about right",
+    equator: "Equator",
+    pole: "Pole",
+    stretchRow: (lat: number, stretch: string) => `${lat}°, ${stretch}`,
+    drawnTooBig: (x: string) => `map ${x}× too big`,
+    drawnAboutRight: "map about right",
+    stretchNote: "The farther from the equator, the more a web map blows land up.",
+    // after the answer: each shape's size next to a familiar place, in words
+    forScale: (name: string) => `For scale: ${name}`,
+    scaleSame: (name: string) => `about the same size as ${name}`,
+    scaleTimes: (x: string, name: string) => `about ${x}× the size of ${name}`,
+    scaleFraction: (part: string, name: string) => `about ${part} the size of ${name}`,
+    scalePercent: (pct: number, name: string) => (pct < 1 ? `less than 1% the size of ${name}` : `about ${pct}% the size of ${name}`),
+    fractions: [
+      [3 / 4, "three-quarters"],
+      [2 / 3, "two-thirds"],
+      [1 / 2, "half"],
+      [1 / 3, "a third"],
+      [1 / 4, "a quarter"],
+      [1 / 5, "a fifth"],
+      [1 / 10, "a tenth"],
+    ] as [number, string][],
     bigger: "Bigger",
     yourPick: "Your pick",
     vs: "VS",
@@ -70,23 +109,31 @@ export const dailyCopy = {
       score === total ? "Emperor!" : score === total - 1 ? "Empire builder!" : score === total - 2 ? "Regional power" : "The map fooled you",
     verdict: (score: number, total: number) =>
       score === total
-        ? "Perfect. Mercator can't fool you."
+        ? "Perfect. No map can fool you."
         : score >= total - 1
           ? "Sharp eye. One got past you."
           : score >= 3
             ? "Not bad. The map tricked you twice."
-            : "Tricky round. New questions tomorrow.",
+            : "The map won this one. Five new matchups tomorrow.",
     scoreSr: (score: number, total: number) => `You got ${score} out of ${total}.`,
+    // screen-reader text for each tile in the row of answers
+    markSr: (n: number, right: boolean) => `Round ${n}: ${right ? "right" : "wrong"}`,
     // above the progress bar while playing, for players with a streak going
     streakPill: (n: number) => `${n}-day streak`,
-    practiceRound: "Practice round",
     streak: "Streak",
     best: (n: number) => `Best ${n}`,
-    rank: "Today's rank",
-    // before you've joined: where your score would land
-    rankIfJoined: "If you join",
-    rankOf: (n: number) => `of ${n} today`,
-    // shown instead of "If you join #2 of 3" while today's board is small, once enough people have played today
+    // the day a streak reaches 3, 7, 14, 30, 50, 100 or 365 days (STREAK_MILESTONES in src/lib/daily.ts)
+    milestone: (n: number) =>
+      ({
+        3: "3 days in a row. It's a habit now!",
+        7: "7 days in a row: a full week of beating the map!",
+        14: "14 days in a row: two weeks strong!",
+        30: "30 days in a row: a whole month!",
+        50: "50 days in a row. Unstoppable!",
+        100: "100 days in a row. Legend!",
+        365: "365 days in a row: a full year!",
+      })[n] ?? `${n} days in a row!`,
+    // once enough people have played today
     betterThan: "Better than",
     betterSub: "of players today",
     // a perfect round can't beat anyone who also got 5: it shows "Top 8% of players today" instead
@@ -94,6 +141,11 @@ export const dailyCopy = {
     played: "Played",
     playedSub: (n: number) => (n === 1 ? "day" : "days"),
     // the bar chart of your own daily scores
+    // the chart of how everyone scored today (anonymous counts)
+    crowdTitle: "How everyone did today",
+    crowdSub: (n: number) => `${n} players so far`,
+    crowdRow: (score: number, pct: string, mine: boolean) => `${score} out of 5: ${pct}% of players${mine ? ", including you" : ""}`,
+    crowdYou: "You",
     scoresTitle: "Your scores",
     scoresSub: (avg: string) => `Average ${avg} out of 5`,
     scoreRow: (score: number, days: number, today: boolean) => `${score} out of 5: ${days} ${days === 1 ? "day" : "days"}${today ? ", including today" : ""}`,
@@ -113,12 +165,12 @@ export const dailyCopy = {
     pictureShort: "Picture",
     challengeShort: "Challenge",
     challenge: "Challenge a friend",
-    practice: "Play more rounds for fun",
-    anotherPractice: "Another practice round",
-    backToToday: "Back to today's results",
+    // after the daily: endless mode is the next thing to play
+    endless: "Keep playing: endless mode",
+    endlessLine: "One matchup after another, each a closer call. How far can you get?",
     answers: "The answers",
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",
-    pictureFailed: "Couldn't make the picture. Try Share my score instead.",
+    pictureFailed: "Couldn't make the picture. Try sharing your score as text instead.",
   },
 };

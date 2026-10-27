@@ -7,17 +7,23 @@ export const lineages: { label: string; names: string[] }[] = [
   { label: "United States", names: ["British American colonies", "United States of America", "United States"] },
   {
     label: "Russia",
-    names: ["Principality of Novgorod", "Novgorod", "Tsardom of Muscovy", "Russian Empire", "Soviet Russia (RSFSR)", "USSR", "Russia"],
+    names: ["Principality of Novgorod", "Novgorod", "Grand Duchy of Moscow", "Tsardom of Muscovy", "Russian Empire", "Soviet Russia (RSFSR)", "USSR", "Russia"],
   },
   {
     label: "China",
     names: [
+      "Shang",
+      "Zhou",
       "Zhou states",
       "Qin",
       "Han Empire",
       "Han",
+      "Jin",
+      "Toba Wei",
+      "Sui Empire",
       "Tang Empire",
       "Song Empire",
+      "Great Khanate",
       "Ming Empire",
       "Ming Chinese Empire",
       "Post-Ming Warlords",
@@ -44,7 +50,7 @@ export const lineages: { label: string; names: string[] }[] = [
   { label: "India", names: ["Mauryan Empire", "Gupta Empire", "Sultanate of Delhi", "Mughal Empire", "British Raj", "India"] },
   {
     label: "Iran",
-    names: ["Achaemenid Empire", "Seleucid Kingdom", "Parthia", "Parthian Empire", "Persia", "Safavid Empire", "Iran"],
+    names: ["Achaemenid Empire", "Seleucid Kingdom", "Parthia", "Parthian Empire", "Sasanian Empire", "Persia", "Safavid Empire", "Iran"],
   },
   { label: "Spain", names: ["Castilla", "Castile", "Castille", "Spain"] },
   { label: "Mexico", names: ["Aztec Empire", "Viceroyalty of New Spain", "Mexico"] },
@@ -53,7 +59,7 @@ export const lineages: { label: string; names: string[] }[] = [
     names: ["Portuguese Brazil", "Viceroyalty of Brazil", "Empire of Brazil", "Brazil"],
   },
   { label: "Indonesia", names: ["Dutch East Indies", "Netherlands Indies", "Indonesia"] },
-  { label: "Mongolia", names: ["Mongols", "Mongol Empire", "Mongolia"] },
+  { label: "Mongolia", names: ["Mongols", "Mongol Empire", "Great Khanate", "Northern Yuan", "Mongolia"] },
   {
     label: "Japan",
     names: [

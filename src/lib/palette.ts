@@ -3,3 +3,5 @@ export const POLITICAL = ["#F6C28B", "#F29E8E", "#F5D671", "#B6D98A", "#8DD0B8",
 
 /** Colours for the shapes people add to the map (and the matching homepage bars). */
 export const PALETTE = ["#E8366B", "#2F6FDE", "#E89A00", "#12976F", "#8A4FFF", "#E2561F", "#0A97A8", "#8C5A2B"];
+/** The same colours by name, for screen readers (the colour picker on a shape's card). */
+export const PALETTE_NAMES = ["Pink", "Blue", "Amber", "Green", "Purple", "Orange", "Teal", "Brown"];

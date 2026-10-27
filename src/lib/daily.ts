@@ -29,7 +29,7 @@ export type Question = {
   answer: 0 | 1;
 };
 
-type QuestionKind = "trap" | "close" | "state" | "history" | "history2";
+export type QuestionKind = "trap" | "close" | "state" | "history" | "history2";
 
 /** Day 1 of the challenge. Day numbers count from here. */
 export const LAUNCH = "2026-10-19";
@@ -74,7 +74,8 @@ function hash(s: string) {
   return h >>> 0;
 }
 
-function rng(seed: string) {
+/** A repeatable random number generator: the same seed always gives the same numbers. */
+export function rng(seed: string) {
   let a = hash(seed);
   return () => {
     a = (a + 0x6d2b79f5) | 0;
@@ -86,7 +87,10 @@ function rng(seed: string) {
 
 // ---------- question building ----------
 
-const ratio = (x: PoolEntry, y: PoolEntry) => Math.max(x.a, y.a) / Math.min(x.a, y.a);
+/** A region of another country (a Canadian province, a Chinese province...), as opposed to a US state. */
+export const isRegion = (e: Pick<PoolEntry, "era">) => e.era.startsWith("adm1-");
+
+export const ratio = (x: PoolEntry, y: PoolEntry) => Math.max(x.a, y.a) / Math.min(x.a, y.a);
 
 /** Rules each question type must meet: [first pick, second pick, does the pair qualify?] */
 const RULES: Record<QuestionKind, [(e: PoolEntry) => boolean, (e: PoolEntry) => boolean, (x: PoolEntry, y: PoolEntry) => boolean]> = {
@@ -106,23 +110,28 @@ const RULES: Record<QuestionKind, [(e: PoolEntry) => boolean, (e: PoolEntry) => 
   history2: [(e) => e.kind === "history", (e) => e.kind === "history", (x, y) => x.era !== y.era && ratio(x, y) >= 1.1 && ratio(x, y) <= 2],
 };
 
-function pick<T>(list: T[], r: () => number) {
+export function pick<T>(list: T[], r: () => number) {
   return list[Math.floor(r() * list.length)];
 }
 
-/** The day's five questions. `seed` is the date key, or anything else for a practice round. */
+/** The day's five questions. `seed` is the date key (any other seed draws from the whole pool). */
 export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[] {
-  // a dated round only uses shapes that were in the pool that day (practice rounds use everything)
+  // a dated round only uses shapes that were in the pool that day
   const dated = /^\d{4}-\d{2}-\d{2}$/.test(seed);
   const pool = allShapes.filter((e) => !e.since || !dated || e.since <= seed);
   const r = rng(`atlas-daily:${seed}`);
   const used = new Set<string>();
   const out: Question[] = [];
+  // once regions of other countries are in the pool (from Oct 29), the "state" round is a US state half the time and a
+  // region the other half, so familiar US states don't vanish under 136 regions. Before that the pool has no regions and
+  // this draws nothing from the random numbers, so every earlier day keeps its questions.
+  const hasRegions = pool.some(isRegion);
   for (const kind of SLOTS) {
     const [firstOk, secondOk, pairOk] = RULES[kind];
+    const half = kind === "state" && hasRegions ? (r() < 0.5 ? (e: PoolEntry) => !isRegion(e) : isRegion) : () => true;
     for (let attempt = 0; attempt < 60; attempt++) {
       const first = pick(
-        pool.filter((e) => firstOk(e) && !used.has(e.id)),
+        pool.filter((e) => firstOk(e) && half(e) && !used.has(e.id)),
         r,
       );
       if (!first) break;
@@ -142,7 +151,14 @@ export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[]
 
 // ---------- explanations ----------
 
-const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
+/** "2.1" or "12" for a ratio, as the game writes it. */
+export const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
+
+/** How much bigger one place is than another: "1.6×", or for close calls (under 1.2×) "12%". */
+export function gapText(big: PoolEntry, small: PoolEntry) {
+  const r = big.a / small.a;
+  return r < 1.2 ? `${Math.round((r - 1) * 100)}%` : `${times(r)}×`;
+}
 
 /** How many times too big a shape is drawn on a web map. */
 export const stretch = (e: PoolEntry) => e.m / e.a;
@@ -150,9 +166,10 @@ export const stretch = (e: PoolEntry) => e.m / e.a;
 // historical places named like countries or regions, which read without "the"
 const NO_ARTICLE =
   /^(Alexander|Austria-Hungary|British North America|Kievan Rus)|^(Assyria|Babylonia|Bactria|Magadha|Qajar Persia|Ptolemaic Egypt|Rhodesia|Denmark-Norway|Sweden–Norway|French (West|Equatorial) Africa|French Indochina|German (Kamerun|South-West Africa)|Rupert's Land)(?=$| \()/;
-const NEEDS_ARTICLE = /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon)/;
+const NEEDS_ARTICLE =
+  /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon|Northern Territory|Northwest Territories|Federal District|State of Mexico)/;
 
-/** Name as it reads mid-sentence: "the Roman Empire", "the United States", "the contiguous United States", "Brazil". */
+/** Name as it reads mid-sentence: "the Roman Empire", "the United States", "Brazil". */
 export function nameInSentence(e: Pick<PoolEntry, "n" | "kind">) {
   if (e.n.startsWith("Contiguous ")) return `the contiguous ${e.n.slice(11)}`;
   const the = e.kind === "history" ? !NO_ARTICLE.test(e.n) : NEEDS_ARTICLE.test(e.n);
@@ -163,38 +180,14 @@ export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** The pieces of "The Roman Empire was 1.8× the size of Brazil." / "Brazil is 12% bigger than Peru." */
 export function sizeParts(big: PoolEntry, small: PoolEntry) {
-  const r = big.a / small.a;
   const verb = big.kind === "history" ? "was" : "is";
-  const gap = r < 1.2 ? `${Math.round((r - 1) * 100)}% bigger than` : `${times(r)}× the size of`;
+  const gap = big.a / small.a < 1.2 ? `${gapText(big, small)} bigger than` : `${gapText(big, small)} the size of`;
   return { big: capitalize(nameInSentence(big)), link: `${verb} ${gap}`, small: nameInSentence(small) };
 }
 
 export function sizeLine(big: PoolEntry, small: PoolEntry) {
   const p = sizeParts(big, small);
   return `${p.big} ${p.link} ${p.small}.`;
-}
-
-export function explain(q: Question) {
-  const big = q.options[q.answer];
-  const small = q.options[1 - q.answer];
-  const S = nameInSentence(small);
-  const lines = [sizeLine(big, small)];
-  const looks = small.m / big.m;
-  if (looks > 1.05) {
-    lines.push(
-      `On a normal web map, ${S} looks ${times(looks)}× bigger than ${nameInSentence(big)}, because land is stretched more the farther it is from the equator (${Math.abs(Math.round(small.lat))}° vs ${Math.abs(Math.round(big.lat))}°).`,
-    );
-  } else {
-    // same 15% line as the "Map: 1.2× too big" chip on the cards, so the sentence never contradicts them
-    const more = stretch(big) > stretch(small) ? big : small;
-    const other = more === big ? small : big;
-    if (stretch(other) >= 1.15)
-      lines.push(`Web maps draw both too big (${nameInSentence(more)} ${times(stretch(more))}×, ${nameInSentence(other)} ${times(stretch(other))}×).`);
-    else if (stretch(more) >= 1.15)
-      lines.push(`Web maps draw ${nameInSentence(more)} ${times(stretch(more))}× too big, so the gap looks ${more === big ? "bigger" : "smaller"} than it really is.`);
-    else lines.push("Both sit close to the equator, so web maps get these two roughly right.");
-  }
-  return lines;
 }
 
 // ---------- saved progress (this browser only) ----------
@@ -235,7 +228,8 @@ export function mergeDays(days: Record<string, DayRecord>) {
   return merged;
 }
 
-export type Stats = { played: number; average: number; streak: number; best: number };
+/** `perfect`: days with every answer right. */
+export type Stats = { played: number; average: number; streak: number; best: number; perfect: number };
 
 export function stats(save: DailySave, today: string): Stats {
   const finished = Object.keys(save.days)
@@ -253,7 +247,11 @@ export function stats(save: DailySave, today: string): Stats {
     prev = d;
   }
   const total = finished.reduce((sum, d) => sum + (save.days[d].s ?? 0), 0);
-  return { played: finished.length, average: finished.length ? total / finished.length : 0, streak, best };
+  const perfect = finished.filter((d) => save.days[d].s === QUESTIONS_PER_DAY).length;
+  return { played: finished.length, average: finished.length ? total / finished.length : 0, streak, best, perfect };
 }
+
+/** Streak lengths that earn a moment on the results screen (and confetti the day they're reached). */
+export const STREAK_MILESTONES = [3, 7, 14, 30, 50, 100, 365];
 
 export const QUESTIONS_PER_DAY = SLOTS.length;

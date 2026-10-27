@@ -13,14 +13,14 @@ function size(other: string, r: number, times: (x: number) => string) {
 export const sizes = {
   index: {
     eyebrow: "Real sizes",
-    title: "How big is every country, really?",
+    title: "How big is each country, really?",
     lead: "Normal web maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Pick a country to see its real area, how much a normal map inflates it, and the countries it really matches.",
-    description: "The real area of every country, how much a normal web map stretches it, and the countries it really matches in size.",
+    description: "The real area of each country, how much a normal web map stretches it, and the countries it really matches in size.",
     mostTitle: "Most stretched by a normal map",
-    allTitle: "Every country, A to Z",
+    allTitle: "Countries A to Z",
   },
   title: (name: string) => `How big is ${name} really?`,
-  metaTitle: (name: string) => `How big is ${name} really? Real size vs the map`,
+  metaTitle: (name: string) => `How big is ${name} really?`,
   metaDescription: (Name: string, area: string, like: string, stretchLine: string) => `${Name} covers ${area}, ${like}. ${stretchLine}`,
   metaStretch: (x: string) => `A normal web map draws it ${x}× too big.`,
   metaRight: "A normal web map shows it about the right size.",
@@ -42,7 +42,7 @@ export const sizes = {
     mild: (Name: string, area: string, like: string, x: string) =>
       `${Name} covers ${area}, ${like}. A normal web map draws it about ${x} times too big: not much, but enough to make it look bigger than countries nearer the equator.`,
     right: (Name: string, area: string, like: string) =>
-      `${Name} covers ${area}, ${like}. It sits close to the equator, where normal web maps barely stretch land, so they show it at about its real size, and make countries farther from the equator look bigger than it.`,
+      `${Name} covers ${area}, ${like}. It sits near the equator, where normal web maps barely stretch land, so they draw it close to its real size, while countries farther north or south look bigger than they are.`,
   },
   picture: { map: "On a normal web map", real: "At real size", alt: (a: string, b: string) => `${a} and ${b}, first as a normal web map draws them, then at real size.` },
   mapCta: (a: string, b: string) => `Compare ${a} with ${b} on the real-size map`,
@@ -62,7 +62,7 @@ export const sizes = {
     howBigA: (Name: string, area: string, rank: string, total: number) => `${Name} covers about ${area}. It is the ${rank} of the ${total} countries and territories on these pages (those over 5,000 km²).`,
     whyBig: (name: string) => `Why does ${name} look so big on maps?`,
     whyBigA: (name: string, x: string) =>
-      `Most web maps use the Mercator projection, which keeps shapes right but stretches area more and more toward the poles. Averaged over the whole country, it draws ${name} about ${x} times too big.`,
+      `Most web maps use the Mercator projection, which keeps the shapes of small areas right but stretches area more and more toward the poles. Averaged over the whole country, it draws ${name} about ${x} times too big.`,
     rightSize: (name: string) => `Do maps show ${name} at the right size?`,
     rightSizeA: (Name: string, x: string, barely: boolean) =>
       barely
@@ -77,5 +77,5 @@ export const sizes = {
           : `They are about the same size: within 5% of each other.`,
   },
   others: "More countries",
-  allLink: "All countries, A to Z →",
+  allLink: "Countries A to Z →",
 };

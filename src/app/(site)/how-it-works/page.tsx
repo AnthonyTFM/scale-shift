@@ -16,7 +16,7 @@ const steps = [
   { title: "Drag", body: "Grab the shape and move it. It shrinks toward the equator and grows toward the poles, so you see how big it would look at each latitude." },
   { title: "Rotate", body: "Select a shape, then turn the compass rose in the bottom-left corner (or press [ and ])." },
   { title: "Travel in time", body: "Use the timeline at the bottom, or press play. Shapes you haven't moved switch to each era's borders." },
-  { title: "Ask “who ruled here?”", body: "Click any land to see who controlled that spot in every era, plus the events that changed it. On today's map, any border dispute is shown first." },
+  { title: "Ask “who ruled here?”", body: "Tap or click any land to see who controlled that spot in every era, plus the events that changed it. On today's map, any border dispute is shown first." },
   { title: "Try a comparison", body: "Open the Comparisons tab to load the most surprising sizes and the most controversial borders in one click." },
   { title: "Share", body: "The Share button copies a link to exactly what you see, or downloads a PNG." },
 ];
@@ -50,8 +50,8 @@ export default function HowItWorksPage() {
           <div className="prose-atlas">
             <h2 id="mercator">Why maps lie about size</h2>
             <p>
-              Almost every web map uses the Mercator projection. It keeps shapes and directions right locally, which is great for navigation.
-              The cost is size: the farther from the equator, the more it inflates area. At 60° north (Oslo, Anchorage), land looks four times
+              Almost every web map uses the Mercator projection. It keeps compass directions and the shapes of small areas right, which made it
+              great for sailors. The price is size: the farther from the equator, the more it inflates area. At 60° north (Oslo, Anchorage), land looks four times
               bigger than it is. Greenland&apos;s middle sits near 72° north, where the stretch is about 10 times, and its northern half is closer
               still to the pole, so the whole island is drawn about 16 times too big.
             </p>

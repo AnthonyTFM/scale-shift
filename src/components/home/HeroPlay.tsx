@@ -2,13 +2,11 @@
 
 import { useEffect, useState, ViewTransition } from "react";
 import Link from "next/link";
-import { dayNumber, loadSave, localDateKey, stats } from "@/lib/daily";
-import { challengeMessage } from "@/lib/challenge-friend";
-import { useShareBox } from "@/components/site/ShareBox";
+import { dayNumber, loadSave, localDateKey, QUESTIONS_PER_DAY, stats } from "@/lib/daily";
 import { home } from "@/content/home";
 import { ClockIcon, FlameIcon } from "@/components/site/Icons";
 
-type State = { day: number; done: boolean; score?: number; streak: number };
+type State = { day: number; done: boolean; score?: number; streak: number; played: number; perfect: number };
 
 /** Time until the player's next local midnight, as whole hours and minutes. */
 function untilMidnight() {
@@ -17,11 +15,14 @@ function untilMidnight() {
   return { h: Math.floor(ms / 3_600_000), m: Math.floor((ms % 3_600_000) / 60_000), ms };
 }
 
-/** The hero's first card: today's game, your status and streak. Morphs into the game on /daily. */
+/**
+ * The daily game's tile at the top of the homepage, beside endless mode's: a title, one line about you (streak and
+ * today's score once played, streak and perfect days before, the game's length on a first visit) and one button. Kept
+ * short so the Best streaks board and the map are on the first screen too. Morphs into the game on /daily.
+ */
 export function HeroPlay() {
   const [s, setS] = useState<State | null>(null);
   const [left, setLeft] = useState<ReturnType<typeof untilMidnight> | null>(null);
-  const { share: open, box } = useShareBox();
   const t = home.hub;
 
   useEffect(() => {
@@ -29,7 +30,8 @@ export function HeroPlay() {
       const today = localDateKey();
       const save = loadSave();
       const rec = save.days[today];
-      setS({ day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: stats(save, today).streak });
+      const st = stats(save, today);
+      setS({ day: dayNumber(today), done: typeof rec?.s === "number", score: rec?.s, streak: st.streak, played: st.played, perfect: st.perfect });
       setLeft(untilMidnight());
     };
     read();
@@ -41,57 +43,70 @@ export function HeroPlay() {
     };
   }, []);
 
-  const share = () => open(challengeMessage(s?.score ?? 0), "home");
+  const streak = s?.streak ? (
+    <span className="inline-flex items-center gap-1">
+      <FlameIcon className="size-5" />
+      <span aria-hidden="true">{s.streak}</span>
+      <span className="sr-only">{t.playStreakSr(s.streak)}</span>
+    </span>
+  ) : null;
 
   return (
     <ViewTransition name="daily-card" share="morph" default="none">
-      <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:px-6 md:py-5">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="text-xs font-bold uppercase tracking-wide text-primary">{t.playEyebrow}</p>
-          {s ? (
-            <p className="text-xs font-bold uppercase tracking-wide text-muted">
-              <span className="hidden sm:inline">{t.playDay} </span>#{s.day}
-            </p>
-          ) : null}
-          {s?.streak ? (
-            <p className="ml-auto inline-flex items-center gap-1 rounded-full bg-card px-2.5 py-1 text-xs font-bold ring-1 ring-line">
-              <FlameIcon className="size-4" /> {s.streak}-day streak
-            </p>
-          ) : null}
-        </div>
-        <h2 className="mt-2 font-display text-3xl leading-tight md:text-4xl">
+      <div className="flex flex-col rounded-card bg-card p-4 text-ink shadow-float ring-1 ring-line sm:p-5">
+        <p className="min-h-4 text-xs font-bold uppercase tracking-wide text-primary">{s ? t.playEyebrow(s.day) : null}</p>
+        <h2 className="mt-1 font-display text-xl leading-tight sm:text-2xl md:text-3xl">
           <Link href="/daily" transitionTypes={["to-daily"]} className="hover:underline">
             {t.playTitle}
           </Link>
         </h2>
-        <p className="mt-1 max-w-md text-muted">{s?.done ? t.playDone(s.score ?? 0) : t.playLead}</p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        {/* one line about you; the same height in every state, so nothing below moves */}
+        <p className="mt-2 flex min-h-7 flex-wrap items-center gap-x-2.5 font-display text-lg tabular-nums leading-tight sm:text-xl">
+          {!s ? null : s.done ? (
+            <>
+              {streak}
+              <span>
+                <span aria-hidden="true">
+                  {s.score}/{QUESTIONS_PER_DAY} <span className="font-sans text-sm font-semibold text-muted">{t.playToday}</span>
+                </span>
+                <span className="sr-only">{t.playTodaySr(s.score ?? 0, QUESTIONS_PER_DAY)}</span>
+              </span>
+            </>
+          ) : s.played ? (
+            <>
+              {streak ?? <span className="text-base text-muted">{t.playNoStreak}</span>}
+              {s.perfect ? <span className="text-base text-muted">{t.playPerfect(s.perfect)}</span> : null}
+            </>
+          ) : (
+            <span className="text-base text-muted">{t.playNew}</span>
+          )}
+        </p>
+        <div className="mt-auto pt-3">
           <Link
             href="/daily"
             transitionTypes={["to-daily"]}
-            className="btn btn-primary btn-lg group"
+            aria-label={s?.done ? t.playDoneCtaLong : t.playCtaLong}
+            className="btn btn-primary group h-12 w-full px-3 sm:w-auto sm:px-6"
           >
-            {s?.done ? t.playDoneCta : t.playCta}
+            <span className="sm:hidden">{s?.done ? t.playDoneCta : t.playCta}</span>
+            <span className="hidden sm:inline">{s?.done ? t.playDoneCtaLong : t.playCtaLong}</span>
             <span aria-hidden="true" className="transition group-hover:translate-x-1">
               →
             </span>
           </Link>
-          {s?.done ? (
-            <button
-              type="button"
-              onClick={share}
-              className="btn btn-red"
-            >
-              {t.challengeCta}
-            </button>
-          ) : null}
-          {s?.done && left ? (
-            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted" aria-live="polite">
-              <ClockIcon className="size-4" /> {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}
-            </p>
-          ) : null}
+          {/* after playing: when the next five arrive */}
+          <p className="mt-1.5 flex min-h-4 items-center gap-1 text-xs font-semibold text-muted">
+            {s?.done && left ? (
+              <>
+                <ClockIcon className="size-3.5" /> {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}
+              </>
+            ) : null}
+          </p>
+          {/* always in the page, so screen readers hear it the moment the new five are ready (not every minute) */}
+          <p className="sr-only" aria-live="polite">
+            {s?.done && left && left.ms < 60_000 ? t.nextReady : ""}
+          </p>
         </div>
-        {box}
       </div>
     </ViewTransition>
   );

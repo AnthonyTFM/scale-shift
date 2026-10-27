@@ -1,4 +1,5 @@
 {
-  "_note": "Nicknames hidden from every leaderboard (test entries, duplicates, requests to be removed). Matching ignores case, spaces and punctuation. Their scores stay stored but never show.",
-  "names": []
+  "_note": "Players hidden from every leaderboard (test entries, duplicates, cheats, requests to be removed): by nickname (matching ignores case, spaces and punctuation) or by player ID (the id in Redis, e.g. a member of lb2:endless:all). Their scores stay stored but never show.",
+  "names": [],
+  "ids": []
 }

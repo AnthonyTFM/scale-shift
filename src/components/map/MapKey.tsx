@@ -82,7 +82,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
         <rect width="36" height="20" fill="url(#key-dis)" opacity="0.7" />
       </Swatch>,
       "Disputed territory",
-      "Click it to see who controls it and who claims it.",
+      "Tap it to see who controls it and who claims it.",
     ]);
   }
 
@@ -119,8 +119,12 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
       </ul>
 
       <p className="mt-4 rounded-lg bg-white/5 p-2.5 text-xs leading-relaxed text-panel-muted">
-        <span className="font-semibold text-panel-text">Tip:</span> rest your mouse near any edge of the map and it scrolls that way. Drag a
-        shape to the edge and it travels with the map.
+        <span className="font-semibold text-panel-text">Tip:</span>{" "}
+        {/* mouse tip only where there's a mouse: touch screens can't hover, so they get the drag tip alone */}
+        <span className="pointer-coarse:hidden">
+          rest your mouse near any edge of the map and it scrolls that way. Drag a shape to the edge and it travels with the map.
+        </span>
+        <span className="hidden pointer-coarse:inline">drag a shape to any edge of the map and the map scrolls that way, taking the shape along.</span>
       </p>
 
       <h3 className="mt-5 text-sm font-bold">Antarctic claims</h3>
@@ -143,7 +147,7 @@ export function MapKey({ era, onClose }: { era: string; onClose: () => void }) {
             ) : null}
           </ul>
           <p className="mt-2 text-xs leading-relaxed text-panel-muted">
-            Striped wedges show each claim; where stripes cross, claims overlap. Click Antarctica for details.
+            Striped wedges show each claim; where stripes cross, claims overlap. Tap Antarctica for details.
             {treatyInForce(era) ? " All claims have been frozen since the Antarctic Treaty of 1959." : ""}
           </p>
         </>

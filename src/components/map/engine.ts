@@ -14,6 +14,8 @@ import {
   panBy,
   placeGeometry,
   projectionFor,
+  splitPolarMoved,
+  wrapsAPole,
   zoomAt,
   mercatorInflation,
   EARTH_RADIUS_KM,
@@ -35,6 +37,8 @@ export type Overlay = {
   hiddenParts: number;
   /** built from a shape cut into slices around a pole: fill only, an outline would show the cuts */
   sliced?: boolean;
+  /** for a sliced shape, the whole shape: moved away from the pole it is placed from this, so no cap goes missing */
+  whole?: MultiPolygon;
   /** area of the drawn geometry (far-off parts excluded) */ km2: number;
   props: PolityProps;
 };
@@ -95,9 +99,10 @@ type BaseCache = {
 /** A name on the map: where it goes and how it is drawn, plus the shape it names and how big that is on screen. */
 type LabelItem = { text: string; p: [number, number]; size: number; weight: number; tw: number; f?: PolityFeature; sizePx?: number };
 
-/** An era change in progress (see sweep.ts), worked out for one view: moving the map shows the new era straight away. */
+/** An era change in progress (see sweep.ts), worked out for one view and moved with the map if it moves meanwhile. */
 type Sweep = {
   start: number;
+  /** the view it was worked out for: its grid, old picture and names are in that view's pixels */ view: View;
   plan: SweepPlan;
   /** grid cell size, CSS pixels */ cs: number;
   /** the old era's land, borders and lakes as they were on screen (no names) */ old: HTMLCanvasElement;
@@ -106,6 +111,7 @@ type Sweep = {
   ownersB: (PolityFeature | null)[];
   /** the old era's highlighted country, shown until halfway */ fromHighlight: PolityFeature | null;
   /** names moving with their countries, worked out on the first frame */ labels: SweepLabels | null;
+  /** at a steady pace (the timeline playing on into the next era), not easing in and out */ steady: boolean;
 };
 
 /** A name that follows its country through a sweep, in one copy of the world. */
@@ -215,8 +221,16 @@ export class MapEngine {
   // Converting ~250 shapes to screen points every frame made phones stutter while panning. They are converted once per
   // zoom level instead (see BaseCache); panning only moves them, so every frame is a complete, exact drawing.
   private cache: BaseCache | null = null;
+  /** the tiles of the zoom level just left, shown under the new level's tiles until those are all drawn */
+  private standIn: BaseCache | null = null;
+  /** the map has been drawn complete once (before that there is nothing to keep on screen while tiles fill in) */
+  private painted = false;
+  /** draw every tile now, with no time limit (for a saved picture) */
+  private fullDraw = false;
   /** the border sweep into the era just shown, while it runs */
   private sweep: Sweep | null = null;
+  /** while the timeline plays on through the eras: the next sweep runs at a steady pace, straight on from the last */
+  private steady = false;
   /** reused for the old era's picture in each sweep */
   private sweepCanvas: HTMLCanvasElement | null = null;
   private tilePool: HTMLCanvasElement[] = [];
@@ -298,12 +312,14 @@ export class MapEngine {
   setLayer(layer: Layer | null) {
     const prev = this.layer;
     const prevCache = this.cache;
-    // a new era while a sweep still runs (clicking quickly through the timeline) shows straight away
-    const busy = !!this.sweep;
+    // a new era while a sweep still runs (clicking quickly through the timeline) shows straight away; one that comes as a
+    // sweep ends (the timeline playing on) sweeps in as usual, even while the reader pans the map or drags a shape
+    const busy = this.sweepLeft() > 0;
     this.sweep = null;
     this.layer = layer;
     this.cache = null;
-    if (prev && layer && prev !== layer && !busy && !this.gesture) this.sweep = this.startSweep(prev, prevCache, layer);
+    this.dropStandIn();
+    if (prev && layer && prev !== layer && !busy) this.sweep = this.startSweep(prev, prevCache, layer);
     if (prevCache) this.recycle(...prevCache.tiles.values());
     this.markBase();
   }
@@ -312,20 +328,28 @@ export class MapEngine {
   sweepLeft() {
     return this.sweep ? Math.max(0, SWEEP_MS - (performance.now() - this.sweep.start)) : 0;
   }
+  /** Whether the next sweep runs at a steady pace instead of easing in and out: while the timeline plays on, so the
+   * borders never slow to a stop between eras. A sweep already running keeps its pace. */
+  setSteady(on: boolean) {
+    this.steady = on;
+  }
   setStates(states: Layer | null) {
     this.states = states;
     this.cache = null;
+    this.dropStandIn();
     this.markBase();
   }
   setClaims(list: ClaimShape[]) {
     this.claims = list;
     this.cache = null;
+    this.dropStandIn();
     this.markBase();
   }
   /** Big lakes, drawn as water over every era so they never appear or vanish between snapshots. */
   setLakes(list: Lake[]) {
     this.lakes = list;
     this.cache = null;
+    this.dropStandIn();
     this.markBase();
   }
   setLabels(on: boolean) {
@@ -404,7 +428,14 @@ export class MapEngine {
 
   /** Re-render to a PNG for downloading. */
   async toBlob(caption: string): Promise<Blob | null> {
-    this.drawNow();
+    // a saved picture must have every tile, so no drawing a few at a time
+    this.fullDraw = true;
+    this.baseDirty = true;
+    try {
+      this.drawNow();
+    } finally {
+      this.fullDraw = false;
+    }
     const out = document.createElement("canvas");
     out.width = this.base.width;
     out.height = this.base.height;
@@ -433,8 +464,7 @@ export class MapEngine {
     this.schedule();
   }
   private viewChanged() {
-    // a sweep is worked out for one view: moving the map shows the new era straight away
-    this.sweep = null;
+    // a sweep in progress carries on, moved with the map (see sweepShift)
     this.lastViewChange = performance.now();
     this.baseDirty = true;
     this.topDirty = true;
@@ -461,6 +491,8 @@ export class MapEngine {
       c.height = Math.round(this.h * this.dpr);
     }
     this.view = clampView(this.view, this.w, this.h);
+    // a sweep's picture of the old era no longer fits a new canvas size
+    this.sweep = null;
     this.viewChanged();
   }
 
@@ -478,8 +510,8 @@ export class MapEngine {
   }
 
   /** Sideways pixel offsets of every copy of the world on screen, the main copy first. Only one copy unless zoomed far out. */
-  private copyShifts() {
-    const size = 2 * Math.PI * this.view.k;
+  private copyShifts(v = this.view) {
+    const size = 2 * Math.PI * v.k;
     const n = Math.max(0, Math.ceil((this.w + size) / 2 / size) - 1);
     const shifts = [0];
     for (let i = 1; i <= n; i++) shifts.push(-i * size, i * size);
@@ -487,11 +519,11 @@ export class MapEngine {
   }
 
   /** Visible lon/lat window, used to skip off-screen shapes. */
-  private visibleBox() {
-    const halfLon = (this.w / 2 / this.view.k) * (180 / Math.PI);
-    const top = latFromMercY(this.view.y + this.h / 2 / this.view.k);
-    const bottom = latFromMercY(this.view.y - this.h / 2 / this.view.k);
-    return { lon: this.view.lon, halfLon, top, bottom };
+  private visibleBox(v = this.view) {
+    const halfLon = (this.w / 2 / v.k) * (180 / Math.PI);
+    const top = latFromMercY(v.y + this.h / 2 / v.k);
+    const bottom = latFromMercY(v.y - this.h / 2 / v.k);
+    return { lon: v.lon, halfLon, top, bottom };
   }
 
   private isVisible(bbox: [number, number, number, number], vb: ReturnType<MapEngine["visibleBox"]>) {
@@ -538,9 +570,9 @@ export class MapEngine {
   }
 
   /** The shapes big enough on screen to be named. */
-  private labelFeats(cache: BaseCache) {
-    const vb = this.visibleBox();
-    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+  private labelFeats(cache: BaseCache, v = this.view) {
+    const vb = this.visibleBox(v);
+    const minDeg = (1.2 / v.k) * (180 / Math.PI);
     return cache.shapes
       .filter((s) => s.f.bbox[2] - s.f.bbox[0] + (s.f.bbox[3] - s.f.bbox[1]) > minDeg && this.isVisible(s.f.bbox, vb))
       .map((s) => s.f);
@@ -556,7 +588,11 @@ export class MapEngine {
     const settled = performance.now() - this.lastViewChange > 150;
     if (!c || c.dpr !== this.dpr || s < 0.67 || s > 1.5 || (settled && Math.abs(s - 1) > 1e-3)) {
       clearTimeout(this.settleTimer);
-      if (c) this.recycle(...c.tiles.values());
+      // the old level stays on screen, scaled, until the new one is drawn (same era and screen only). Zooming on before
+      // that, the level that was last complete stays the stand-in.
+      if (this.standIn || !c || c.dpr !== this.dpr || c.layer !== this.layer) {
+        if (c) this.recycle(...c.tiles.values());
+      } else this.standIn = c;
       return (this.cache = this.buildCache());
     }
     if (Math.abs(s - 1) > 1e-3) {
@@ -641,29 +677,112 @@ export class MapEngine {
 
   /**
    * Land, borders, claims and state lines come from bitmap tiles drawn once per zoom level, so a frame is just a few
-   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. A tile that is not ready yet is
-   * drawn on the spot, so the map is never shown blank or half drawn; the tiles around the screen are drawn ahead of time.
+   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. The tiles around the screen are
+   * drawn ahead of time. On screen, a tile that is not ready yet is drawn on the spot. When the map first opens, and
+   * after zooming in (with the old level's tiles shown underneath, scaled), that is limited to ~10 ms a frame, middle
+   * of the screen first, and the rest follow over the next frames: drawing every tile in one go froze a mid-range phone
+   * for about 0.9 s on opening the map. Everywhere else every tile is drawn at once, so no empty sea ever shows: era
+   * sweeps, zooming out (the old tiles don't cover the edges), era changes, and pictures (`ctx` given, saved images).
    */
   private drawTiles(c: BaseCache, ctx = this.bctx) {
     const s = this.view.k / c.k;
     const pad = TILE_PAD;
+    const live = ctx === this.bctx && !this.fullDraw;
+    const standIn = this.standIn && this.standIn.layer === c.layer && this.standIn.dpr === c.dpr && c.k >= this.standIn.k * 0.999 ? this.standIn : null;
     let missing = false;
+    let pending = false;
+    let drawn = 0;
     let shown = 0;
+    const onScreen: { ox: number; oy: number; half: number; i: number; j: number; d: number }[] = [];
     for (const [ox, oy] of this.cacheOrigins(c)) {
       const { half, i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 0);
       for (let j = j0; j <= j1; j++)
         for (let i = i0; i <= i1; i++) {
-          const tile = this.tile(c, i, j);
-          const src = (c.size + 2 * pad) * c.dpr;
-          ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
-          shown++;
+          const cx = ox + s * ((i + 0.5) * c.size - half) - this.w / 2;
+          const cy = oy + s * ((j + 0.5) * c.size - half) - this.h / 2;
+          onScreen.push({ ox, oy, half, i, j, d: cx * cx + cy * cy });
         }
       const ring = this.tileRange(c, ox, oy, 1);
       for (let j = ring.j0; j <= ring.j1 && !missing; j++)
         for (let i = ring.i0; i <= ring.i1 && !missing; i++) missing = !c.tiles.has(`${i},${j}`);
     }
+    onScreen.sort((a, b) => a.d - b.d);
+    // where the tiles not drawn yet go, on screen
+    const gaps = onScreen
+      .filter(({ i, j }) => !c.tiles.has(`${i},${j}`))
+      .map(({ ox, oy, half, i, j }) => {
+        const x0 = Math.max(0, ox + s * (i * c.size - half));
+        const y0 = Math.max(0, oy + s * (j * c.size - half));
+        return [x0, y0, Math.min(this.w, ox + s * ((i + 1) * c.size - half)) - x0, Math.min(this.h, oy + s * ((j + 1) * c.size - half)) - y0];
+      })
+      .filter(([, , w, h]) => w > 0 && h > 0);
+    // a few tiles a frame only where something shows in the meantime: nothing yet (first opening) or the old level,
+    // if its kept tiles cover every gap (flying to the other side of the world, they don't)
+    const covered = !!standIn && gaps.every(([x, y, w, h]) => this.standInCovers(standIn, x, y, w, h));
+    const deadline = live && !this.sweep && gaps.length && (covered || (!standIn && !this.painted)) ? performance.now() + 10 : Infinity;
+    if (covered && deadline !== Infinity) {
+      // only under the gaps: elsewhere the new tiles' crisp lines would show the old, scaled ones through them
+      ctx.save();
+      ctx.beginPath();
+      for (const [x, y, w, h] of gaps) ctx.rect(x, y, w, h);
+      ctx.clip();
+      this.drawStandIn(standIn, ctx);
+      ctx.restore();
+    }
+    for (const { ox, oy, half, i, j } of onScreen) {
+      shown++;
+      // ready tiles are always drawn; a missing one only while there's time left this frame (and always the first)
+      if (!c.tiles.has(`${i},${j}`) && drawn > 0 && performance.now() > deadline) {
+        pending = true;
+        continue;
+      }
+      if (!c.tiles.has(`${i},${j}`)) drawn++;
+      const tile = this.tile(c, i, j);
+      const src = (c.size + 2 * pad) * c.dpr;
+      ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
+    }
     c.keep = Math.max(24, shown * 3);
+    if (pending) {
+      // the rest next frame (the old level, or nothing yet on first opening, shows where they will go)
+      this.baseDirty = true;
+      this.schedule();
+      return;
+    }
+    if (ctx === this.bctx) {
+      this.painted = true;
+      this.dropStandIn();
+    }
     if (missing && !this.prefetchTimer) this.prefetchTimer = window.setTimeout(this.prefetch, 0);
+  }
+
+  private dropStandIn() {
+    if (this.standIn) this.recycle(...this.standIn.tiles.values());
+    this.standIn = null;
+  }
+
+  /** Whether the old zoom level's kept tiles cover a screen rectangle (checked at its corners and middle). */
+  private standInCovers(c: BaseCache, x: number, y: number, w: number, h: number) {
+    const s = this.view.k / c.k;
+    const half = Math.ceil(Math.PI * c.k / 2) * 2;
+    const at = (px: number, py: number) =>
+      this.cacheOrigins(c).some(([ox, oy]) => c.tiles.has(`${Math.floor(((px - ox) / s + half) / c.size)},${Math.floor(((py - oy) / s + half) / c.size)}`));
+    const [x1, y1] = [x + w - 0.5, y + h - 0.5];
+    return at(x + 0.5, y + 0.5) && at(x1, y + 0.5) && at(x + 0.5, y1) && at(x1, y1) && at(x + w / 2, y + h / 2);
+  }
+
+  /** The old zoom level's tiles that are still kept, scaled to the current view (none are drawn new). */
+  private drawStandIn(c: BaseCache, ctx: CanvasRenderingContext2D) {
+    const s = this.view.k / c.k;
+    const pad = TILE_PAD;
+    const src = (c.size + 2 * pad) * c.dpr;
+    for (const [ox, oy] of this.cacheOrigins(c)) {
+      const { half, i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 0);
+      for (let j = j0; j <= j1; j++)
+        for (let i = i0; i <= i1; i++) {
+          const tile = c.tiles.get(`${i},${j}`);
+          if (tile) ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
+        }
+    }
   }
 
   /** Draw the tiles just off screen between frames (a few ms at a time), so panning finds them ready. */
@@ -826,7 +945,28 @@ export class MapEngine {
     const B = this.ownerGrid(next, cs, gw, gh);
     const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
     const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
-    return { start: performance.now(), plan, cs, old, from: prev, ownersA: A.owners, ownersB: B.owners, fromHighlight, labels: null };
+    return {
+      start: performance.now(),
+      view: { ...this.view },
+      plan,
+      cs,
+      old,
+      from: prev,
+      ownersA: A.owners,
+      ownersB: B.owners,
+      fromHighlight,
+      labels: null,
+      steady: this.steady,
+    };
+  }
+
+  /** Where the map has moved since a sweep was worked out: [scale, dx, dy] taking its pixels to today's view's. */
+  private sweepShift(s: Sweep): [number, number, number] {
+    const v = this.view;
+    const k = v.k / s.view.k;
+    const dx = (this.w / 2) * (1 - k) + v.k * normLon(s.view.lon - v.lon) * (Math.PI / 180);
+    const dy = (this.h / 2) * (1 - k) + v.k * (v.y - s.view.y);
+    return [k, dx, dy];
   }
 
   /** The land, borders and lakes one cache draws, screen-sized, without names. */
@@ -880,11 +1020,15 @@ export class MapEngine {
   private drawSweep(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]) {
     const ctx = this.bctx;
     const t = Math.min(1, (performance.now() - s.start) / SWEEP_MS);
-    const e = t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+    const e = s.steady ? t : t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
     this.drawTiles(cache);
     const area = new Path2D();
     const front = sweepFrame(s.plan, e, s.cs, area);
+    // the old era, the moving border and the names are in the pixels of the view the sweep was worked out for, moved
+    // to where that land is now if the reader has panned or zoomed since (land that came into view shows the new era)
+    const [k, dx, dy] = this.sweepShift(s);
     ctx.save();
+    ctx.transform(k, 0, 0, k, dx, dy);
     ctx.clip(area);
     ctx.drawImage(s.old, 0, 0, this.w, this.h);
     ctx.restore();
@@ -896,8 +1040,8 @@ export class MapEngine {
       if (!lines.length) continue;
       ctx.beginPath();
       for (const { pts } of lines) {
-        ctx.moveTo(pts[0], pts[1]);
-        for (let i = 2; i < pts.length; i += 2) ctx.lineTo(pts[i], pts[i + 1]);
+        ctx.moveTo(k * pts[0] + dx, k * pts[1] + dy);
+        for (let i = 2; i < pts.length; i += 2) ctx.lineTo(k * pts[i] + dx, k * pts[i + 1] + dy);
       }
       ctx.setLineDash(style === 3 ? [] : style === 2 ? [3, 3] : [2, 4]);
       ctx.strokeStyle = style === 1 ? COLORS.borderSoft : COLORS.border;
@@ -908,7 +1052,7 @@ export class MapEngine {
     else this.drawHighlight(cache);
     this.drawLines();
     if (this.labels) {
-      this.drawSweepLabels(s, cache, projs, e);
+      this.drawSweepLabels(s, cache, e, [k, dx, dy]);
       for (const proj of projs) this.drawClaimLabels(ctx, proj);
     }
     // on to the next frame; after the last one the map draws normally again, and looks the same
@@ -928,8 +1072,8 @@ export class MapEngine {
   }
 
   /** Names during a sweep: each follows the middle of its country, and a renamed country switches name halfway. */
-  private drawSweepLabels(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[], e: number) {
-    const L = (s.labels ??= this.sweepLabels(s, cache, projs));
+  private drawSweepLabels(s: Sweep, cache: BaseCache, e: number, [k, dx, dy]: [number, number, number]) {
+    const L = (s.labels ??= this.sweepLabels(s, cache));
     const sums = shownSums(s.plan, e, L.wanted, L.copyOf, COPIES);
     const NB = s.plan.carries.length;
     const items: LabelItem[] = e < 0.5 ? [...L.staticOld] : [...L.staticNew];
@@ -961,24 +1105,29 @@ export class MapEngine {
       const p = p0 && p1 ? [p0[0] + (p1[0] - p0[0]) * e, p0[1] + (p1[1] - p0[1]) * e] : (p0 ?? p1);
       if (p) items.push({ ...it, p: [p[0], p[1]] });
     }
-    this.paintLabels(this.bctx, items);
+    // placed in the pixels of the sweep's view, so moved with the map
+    const moved = k === 1 && !dx && !dy ? items : items.map((it): LabelItem => ({ ...it, p: [k * it.p[0] + dx, k * it.p[1] + dy] }));
+    this.paintLabels(this.bctx, moved);
   }
 
   /** Pairs the names on the old and new maps with what they follow, and finds where that is at the start and the end. */
-  private sweepLabels(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]): SweepLabels {
+  private sweepLabels(s: Sweep, cache: BaseCache): SweepLabels {
     const { plan } = s;
+    // in the view the sweep was worked out for, like its grid
+    const v = s.view;
     const NB = plan.carries.length;
-    const vb = this.visibleBox();
-    const minDeg = (1.2 / this.view.k) * (180 / Math.PI);
+    const vb = this.visibleBox(v);
+    const minDeg = (1.2 / v.k) * (180 / Math.PI);
     const oldFeats = s.from.features.filter(
       (f) => !f.props.x && f.bbox[2] - f.bbox[0] + (f.bbox[3] - f.bbox[1]) > minDeg && this.isVisible(f.bbox, vb),
     );
-    const newFeats = this.labelFeats(cache);
+    const newFeats = this.labelFeats(cache, v);
     const states = this.showStates() ? this.states : null;
     const idA = new Map(s.ownersA.map((f, i) => [f, i]));
     const idB = new Map(s.ownersB.map((f, i) => [f, i]));
-    const size = 2 * Math.PI * this.view.k;
-    const shifts = this.copyShifts();
+    const size = 2 * Math.PI * v.k;
+    const shifts = this.copyShifts(v);
+    const projs = shifts.map((shift) => projectionFor(v, this.w, this.h, shift));
     const byKey = new Map<number, SweepLabel>();
     const track = (code: number, copy: number) => {
       let tr = byKey.get(code * COPIES + copy);
@@ -1228,7 +1377,13 @@ export class MapEngine {
     const key = `${o.id}|${o.era}|${o.name}|${o.lon.toFixed(3)}|${o.lat.toFixed(3)}|${o.rot}`;
     let g = this.placedCache.get(key);
     if (!g) {
-      g = o.moved || o.rot ? placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot) : o.geom;
+      if (!o.moved && !o.rot) g = o.geom;
+      else if (o.whole) {
+        // a polar shape (Antarctica) moved: place the whole shape, then slice it again only if it still wraps a pole.
+        // Placing the slices would leave the cap they cut off at 85° as a hole (about 970,000 km² for Antarctica)
+        const placedWhole = placeGeometry(o.whole, o.origin, [o.lon, o.lat], o.rot);
+        g = wrapsAPole(placedWhole) ? splitPolarMoved(placedWhole) : placedWhole;
+      } else g = placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot);
       if (this.placedCache.size > 200) this.placedCache.clear();
       this.placedCache.set(key, g);
     }

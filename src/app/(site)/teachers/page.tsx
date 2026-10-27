@@ -13,7 +13,7 @@ import { sizeCountries } from "@/lib/sizes";
 import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
-  title: "For teachers: map projections, real country sizes and historical borders",
+  title: "For teachers: map projections and real sizes",
   description:
     "A classroom reference: why the Mercator map distorts size, the real area of today's countries, 4,000 years of world borders, recent border changes and today's disputed territories.",
   alternates: { canonical: "/teachers" },
@@ -254,7 +254,7 @@ export default function TeachersPage() {
                 Open the map
               </Link>
               <Link href="/daily" className="btn btn-white">
-                Today&apos;s challenge
+                Play today&apos;s five
               </Link>
             </p>
           </Section>

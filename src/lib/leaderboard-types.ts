@@ -9,5 +9,10 @@ export type AllTimeBoard = { total: number; rows: AllTimeRow[]; me?: AllTimeRow 
 export type WeekBoard = AllTimeBoard & { start: string; end: string };
 
 export type SubmitResult =
-  | { ok: true; score: number; rank: number; total: number; duplicate: boolean; player?: { id: string; name: string } }
+  | { ok: true; score: number; rank: number; total: number; duplicate: boolean; player?: { id: string; name: string | null } }
   | { ok: false; error: string; field?: "name" | "email" };
+
+/** Endless mode's best streaks, for one day (`date`) or of all time (`date` null). `score` is the streak. */
+export type EndlessBoard = { date: string | null; total: number; rows: DayRow[]; me?: DayRow | null };
+/** Posting an endless run answers with the player's best streak of all time (`score`) and its rank of all time. */
+export type EndlessSubmitResult = SubmitResult;

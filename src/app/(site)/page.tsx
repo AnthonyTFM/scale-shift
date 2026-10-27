@@ -6,6 +6,7 @@ import { events } from "@/content/events";
 import { site } from "@/content/site";
 import { eras } from "@/lib/eras";
 import { HeroPlay } from "@/components/home/HeroPlay";
+import { HeroEndless } from "@/components/home/HeroEndless";
 import { HeroLeaderboard } from "@/components/home/HeroLeaderboard";
 import { LegacyMapRedirect } from "@/components/home/LegacyMapRedirect";
 import { JsonLd } from "@/components/site/PageHero";
@@ -15,7 +16,7 @@ import { BookIcon, ColumnsIcon, DisputeIcon, MapIcon, TimelineIcon, TrophyIcon }
 import { home } from "@/content/home";
 
 export const metadata: Metadata = {
-  title: { absolute: `${site.name}: the real size of countries and empires, 2000 BCE to today` },
+  title: { absolute: `${site.name}: real country sizes, 2000 BCE to today` },
   description: site.description,
   alternates: { canonical: "/" },
 };
@@ -61,8 +62,8 @@ export default function HomePage() {
         }}
       />
 
-      {/* Hero: today's game and yesterday's matchup side by side (the trick before you play), the map under the game,
-          all over a slowly turning globe */}
+      {/* Hero: the claim, the two games side by side (today's five and endless mode), the Best streaks board, yesterday's
+          matchup and the map, all over a slowly turning globe */}
       <section data-hero className="relative isolate overflow-hidden bg-paper text-ink">
         <div className="pointer-events-none absolute inset-0 -z-10">
           {/* positioned with left/top, not translate: Chrome counted the translate-centred float as a layout shift */}
@@ -78,36 +79,49 @@ export default function HomePage() {
           <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#fff8ec_0%,rgba(255,248,236,0.88)_38%,rgba(255,248,236,0)_62%)] lg:block" />
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 md:pb-12 md:pt-9">
-          <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
-            {home.title.split(home.titleAccent).flatMap((part, i) =>
-              i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
-            )}
-          </h1>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">{home.hub.mission}</p>
-          {/* phones: game, yesterday's matchup, map. Wide screens: game and map on the left, the matchup on the right */}
-          <div className="mt-6 grid gap-4 lg:grid-cols-2 lg:items-start">
-            <div className="grid gap-4">
-              <HeroPlay />
-              <div className="hidden lg:block">
-                <MapCard />
-              </div>
+          {/* games first. A first visit gets the big claim; anyone who has played gets one line (see .returning) */}
+          <div className="hero-new">
+            <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
+              {home.title.split(home.titleAccent).flatMap((part, i) =>
+                i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
+              )}
+            </h1>
+            {/* phones get one line, so the games start on the first screen */}
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">
+              <span className="sm:hidden">{home.hub.missionShort}</span>
+              <span className="hidden sm:inline">{home.hub.mission}</span>
+            </p>
+          </div>
+          <p aria-hidden="true" className="hero-back font-display text-2xl leading-tight text-ink md:text-3xl">
+            {home.hub.welcomeBack}
+          </p>
+          {/* phones: the two games side by side, then the Best streaks board (competition first), yesterday's matchup
+              and the map. Wide screens: two columns, each game with its own extra under it: the daily with yesterday's
+              matchup, endless with its Best streaks board; the map across the bottom. Each part is rendered once and
+              placed by the grid; the page order (and screen readers) follow the phone order */}
+          <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
+            <HeroPlay />
+            <HeroEndless />
+            <div className="col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start">
+              <HeroLeaderboard />
             </div>
-            <YesterdayMatchup />
-            <div className="lg:hidden">
-              <MapCard />
+            <div className="col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2 lg:self-start">
+              <YesterdayMatchup />
             </div>
+          </div>
+          <div className="mt-4">
+            <MapCard />
           </div>
         </div>
       </section>
 
-      {/* Today's leaderboard, and the rest of the site */}
-      <div className="mx-auto grid max-w-6xl gap-x-6 gap-y-10 px-4 pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-start">
-        <HeroLeaderboard />
+      {/* the rest of the site */}
+      <div className="mx-auto max-w-6xl px-4 pb-12 pt-2">
         <section aria-labelledby="explore">
           <h2 id="explore" className="font-display text-2xl text-ink md:text-3xl">
             {x.title}
           </h2>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {places.map(({ href, Icon, title, line }) => (
               <li key={href}>
                 <Link href={href} className="press-card flex min-h-16 items-center gap-3 rounded-card px-4 py-3 hover:border-primary">

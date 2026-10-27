@@ -33,6 +33,8 @@ export type PolityFeature = {
   bbox: [number, number, number, number];
   /** was wrapped around a pole and has been cut into slices (see splitPolar): don't outline the cuts */
   sliced?: boolean;
+  /** the shape before slicing: moved off its pole (dragged on the map), it is drawn whole, without the cut-off cap */
+  whole?: MultiPolygon;
 };
 
 export type Layer = {
@@ -103,7 +105,7 @@ async function toLayer(key: string, topo: Topology): Promise<Layer> {
     const geom = toMulti(f.geometry);
     const bbox = bboxOf(geom);
     // shapes around a pole (Antarctica, polar "not mapped" land) are sliced so the map never floods when zoomed in
-    if (wrapsPole(geom, bbox)) features.push({ props: f.properties, geom: splitPolar(geom), bbox, sliced: true });
+    if (wrapsPole(geom, bbox)) features.push({ props: f.properties, geom: splitPolar(geom), bbox, sliced: true, whole: geom });
     else features.push({ props: f.properties, geom, bbox });
   }
   const byName = new Map<string, PolityFeature>();

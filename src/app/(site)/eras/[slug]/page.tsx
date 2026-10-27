@@ -8,7 +8,7 @@ import { equalAreaHeight } from "@/lib/og-map";
 import { eraIntros } from "@/content/era-intros";
 import { appCopy, site } from "@/content/site";
 import { eraByKey, eraIndex, eraPhrase, eras, eraSlug, eraTitle, eventsForEra, keyFromSlug } from "@/lib/eras";
-import { formatBoth, formatBothShort } from "@/lib/format";
+import { formatArea, formatBoth, formatBothShort } from "@/lib/format";
 import { mapLink } from "@/lib/share";
 import { EventCard } from "@/components/EventCard";
 import { breadcrumbJsonLd, JsonLd, PageHero } from "@/components/site/PageHero";
@@ -36,13 +36,25 @@ function summary(key: string) {
   );
 }
 
+/**
+ * A meta description of at most `max` characters: whole sentences if they fill most of it, else cut at a word with an
+ * ellipsis.
+ */
+function clip(text: string, max: number) {
+  if (text.length <= max) return text;
+  const end = text.lastIndexOf(". ", max - 1);
+  if (end >= max * 0.5) return text.slice(0, end + 1);
+  const space = text.lastIndexOf(" ", max - 1);
+  return `${text.slice(0, space > 0 ? space : max - 1).replace(/[,;:.]$/, "")}…`;
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const e = eraByKey(keyFromSlug(slug));
   if (!e) return {};
   return {
     title: e.key === "present" ? "World map today: borders, disputes and real sizes" : `World map in ${e.label}: borders, empires and real sizes`,
-    description: summary(e.key).slice(0, 155),
+    description: clip(summary(e.key), 155),
     alternates: { canonical: `/eras/${eraSlug(e.key)}` },
   };
 }
@@ -85,7 +97,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
     { href: "/eras", label: "Eras" },
     { href: `/eras/${slug}`, label: e.label },
   ];
-  const km = (n: number) => `${Math.round(n / 1000).toLocaleString("en-US")}k km²`;
+  // "4.51M km²", as everywhere else (this page renders on the server, so it can't follow the visitor's unit)
+  const km = (n: number) => formatArea(n, "km2");
 
   return (
     <>
@@ -115,7 +128,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
           // next/image loads lazily by default, which would cancel the high priority
           loading="eager"
           unoptimized
-          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, on an equal-area projection`}
+          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, drawn so each country shows at its real size`}
           width={1200}
           height={equalAreaHeight(1200)}
           className="card w-full bg-white p-3 sm:p-5"
@@ -194,7 +207,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
             </div>
           ) : (
             <p className="mt-2 text-ink-soft">
-              No curated events for this period yet.{" "}
+              No events written up for this period yet.{" "}
               <Link href="/contact?topic=other" className="font-semibold text-link underline">
                 Suggest one
               </Link>

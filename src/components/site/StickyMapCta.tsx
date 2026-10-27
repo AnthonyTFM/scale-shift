@@ -6,16 +6,16 @@ import { usePathname } from "next/navigation";
 import { home } from "@/content/home";
 import { loadSave, localDateKey } from "@/lib/daily";
 
-// pages where the bar would only get in the way: the game, forms and the small print
-const HIDDEN = /^\/(daily|contact|privacy|terms|unsubscribed)(\/|$)/;
+// the bar is for long reading pages (home, eras, timeline, disputes, country sizes, teachers). Hidden on the games,
+// the leaderboard (it has its own "play" banner, and the bar would cover the board), short pages, forms and the small print
+const HIDDEN = /^\/(daily|endless|leaderboard|about|how-it-works|contact|privacy|terms|unsubscribed)(\/|$)/;
 // pages where today's game is the better next step, until it's played
-const PLAY_FIRST = /^\/(leaderboard|eras)(\/|$)/;
+const PLAY_FIRST = /^\/eras(\/|$)/;
 
 /**
  * Phone-only "open the map" bar. It slides away while you scroll down to read and comes back when you scroll up, so it
- * never sits on top of what you're reading. Hidden on the daily challenge so it never covers the game, on forms and
- * the small print, and on the homepage until the hero (with its own map button and the globe) has scrolled fully out
- * of view. On the leaderboard and era pages it offers today's game instead, until that's played.
+ * never sits on top of what you're reading. Only on long reading pages (see HIDDEN), and on the homepage until the hero (with its own map button and the globe) has
+ * scrolled fully out of view. On era pages it offers today's game instead, until that's played.
  */
 export function StickyMapCta() {
   const path = usePathname();
