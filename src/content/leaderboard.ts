@@ -1,21 +1,24 @@
 // Words for the leaderboard page (/leaderboard). Change copy here, not in the page or LeaderboardView.
 
 export const leaderboardCopy = {
-  metaTitle: "Leaderboard: daily scores and best streaks",
-  metaDescription:
-    "Today's top scores in the daily size challenge, the players with the most points of all time, and the longest runs in endless mode.",
-  eyebrow: "Daily and endless",
-  title: "Leaderboard",
-  // the lead, with links on "daily challenge" and "endless mode": before, link, middle, link, after
+  metaTitle: "Leaderboard: the longest endless streaks",
+  metaDescription: "The longest runs of right answers in endless mode, the size game that keeps going until your first miss.",
+  eyebrow: "Endless mode",
+  title: "Best streaks",
+  // the lead, with links on "endless mode" and "daily challenge": before, link, middle, link, after
   lead: {
-    before: "Think you know the world? Prove it. Finish the ",
-    daily: "daily challenge",
-    middle: ", sign in and pick a nickname, and your score lands here. Every correct answer adds a point to the all-time ranking, and your longest run in ",
+    before: "The longest runs in ",
     endless: "endless mode",
-    after: " goes on the Best streaks board.",
+    middle: ": one matchup after another, each a closer call, until your first miss. Sign in and pick a nickname after a run to get on the board. Scores from the ",
+    daily: "daily challenge",
+    after: " stay private: they only keep your own streak going.",
   },
-  // phones show this instead, so the boards start on the first screen
-  leadShort: "Today's best, this week's and all-time points, and the longest endless runs.",
+  // phones show this instead, so the board starts on the first screen
+  leadShort: "The longest runs in endless mode, until the first miss.",
   failed: "The leaderboard couldn't load.",
   retry: "Try again",
+  // under the board
+  rules:
+    "Runs are checked on our server, and your longest one counts. Each email gets one player, and each nickname belongs to the first player who uses it. Emails stay private. Nicknames are public; slurs and offensive names are blocked, and we remove any that slip through. Daily challenge scores are never shown to anyone else. Signed in? “Delete my data” above removes everything. Otherwise, ",
+  contact: "contact us",
 };

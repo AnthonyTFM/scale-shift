@@ -8,10 +8,6 @@ import { useAccount } from "./SignInProvider";
 
 export type Me = { id: string; name: string | null; reminders: boolean } | null;
 
-/** Fired on window once today's score is on the board, so the results card can show the real rank. */
-export const POSTED_EVENT = "lb-posted";
-export type Posted = { date: string; rank: number; total: number };
-export const announcePosted = (detail: Posted) => window.dispatchEvent(new CustomEvent<Posted>(POSTED_EVENT, { detail }));
 export type Join = ReturnType<typeof useJoinTo>;
 
 /** Where a result is posted, what goes with it, and the board to show afterwards. */
@@ -23,20 +19,10 @@ export type JoinTarget<R extends SubmitResult = SubmitResult> = {
   onPosted?: (result: Extract<R, { ok: true }>) => void;
 };
 
-/** Today's daily score. */
-export function useJoin(date: string, choices: number[]) {
-  return useJoinTo({
-    endpoint: "/api/leaderboard",
-    payload: { date, choices },
-    board: (id) => `/api/leaderboard?scope=day&date=${date}&limit=5&player=${id}`,
-    onPosted: (data) => announcePosted({ date, rank: data.rank, total: data.total }),
-  });
-}
-
 /**
  * Getting a result on a leaderboard with sign-in on: who the signed-in player is, posting the result (a returning
- * player's posts straight away), the reminder emails and the board's top five. Shared by the results card and the join
- * pop-up, for the daily and for endless mode.
+ * player's posts straight away), the reminder emails and the board's top five. Shared by endless mode's results card and
+ * its join pop-up. (Daily scores are private: see SaveStreak.)
  */
 export function useJoinTo<R extends SubmitResult = SubmitResult>(target: JoinTarget<R>) {
   const { isLoaded, isSignedIn } = useAccount();

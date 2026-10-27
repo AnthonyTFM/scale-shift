@@ -29,10 +29,10 @@ export function savePlayer(name: string, email?: string, reminders?: boolean): P
 }
 
 /** After signing in: this browser becomes the account's player (the email stays on the server). */
-export function rememberPlayer(p: { id: string; name: string }) {
+export function rememberPlayer(p: { id: string; name: string | null }) {
   try {
     const old = loadPlayer();
-    localStorage.setItem(KEY, JSON.stringify({ id: p.id, name: p.name, reminders: old?.id === p.id ? old.reminders : undefined }));
+    localStorage.setItem(KEY, JSON.stringify({ id: p.id, name: p.name ?? "", reminders: old?.id === p.id ? old.reminders : undefined }));
   } catch {
     /* storage blocked */
   }

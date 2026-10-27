@@ -23,15 +23,17 @@ import { limited } from "@/lib/rate-limit";
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
 
 /**
- * GET /api/leaderboard?scope=day&date=2026-10-20&limit=50&player=<id>
- * GET /api/leaderboard?scope=all&limit=50&player=<id>
- * GET /api/leaderboard?scope=week&date=2026-10-20&limit=50&player=<id>   (the Monday–Sunday week containing date)
+ * GET /api/leaderboard?scope=day&date=2026-10-20&player=<id>
+ * GET /api/leaderboard?scope=all&player=<id>
+ * GET /api/leaderboard?scope=week&date=2026-10-20&player=<id>   (the Monday–Sunday week containing date)
+ *
+ * Daily scores are private (since Oct 2026, the way Wordle keeps them): these answer with how many players there are and
+ * the asking player's own row, never anyone else's. The public board is endless mode's Best streaks (/api/endless).
  */
 export async function GET(request: Request) {
   await connection();
   if (rateLimited(`lb-get:${ipOf(request)}`, 240, 60_000)) return Response.json({ error: "Too many requests. Please wait a minute and try again." }, { status: 429 });
   const q = new URL(request.url).searchParams;
-  const limit = Math.max(1, Math.min(100, Number(q.get("limit")) || 50));
   const player = q.get("player");
   const me = isPlayerId(player) ? player : null;
   // boards read without a player are the same for everyone: Vercel's CDN may serve them for up to 20 seconds
@@ -41,11 +43,11 @@ export async function GET(request: Request) {
     ...(me ? {} : { "Vercel-CDN-Cache-Control": "max-age=10, stale-while-revalidate=10" }),
   };
   try {
-    if (q.get("scope") === "all") return Response.json(await allTimeBoard(limit, me), { headers });
+    if (q.get("scope") === "all") return Response.json({ ...(await allTimeBoard(1, me)), rows: [] }, { headers });
     const date = q.get("date");
     if (!isDateKey(date)) return Response.json({ error: "Use date=YYYY-MM-DD." }, { status: 400 });
-    if (q.get("scope") === "week") return Response.json(await weekBoard(date, limit, me), { headers });
-    return Response.json(await dayBoard(date, limit, me), { headers });
+    if (q.get("scope") === "week") return Response.json({ ...(await weekBoard(date, 0, me)), rows: [] }, { headers });
+    return Response.json({ ...(await dayBoard(date, 0, me)), rows: [] }, { headers });
   } catch (e) {
     console.error("[leaderboard] read failed", e);
     return Response.json({ error: "The leaderboard is unavailable right now." }, { status: 503 });
@@ -53,9 +55,10 @@ export async function GET(request: Request) {
 }
 
 /**
- * POST { player, name, email, date, choices: [0|1 ×5], website } → your score and rank for the day.
+ * POST { player, name?, email, date, choices: [0|1 ×5], website } → your score (and its private rank) for the day.
  * With sign-in on, the player is whoever is signed in (their verified email), and `player` is only a hint for a brand-new
- * one. Without it, the email is needed once per player.
+ * one. Without it, the email is needed once per player. Saving a daily score needs no nickname (nobody else sees it): a
+ * name, if sent, is checked and kept for the Best streaks board.
  */
 export async function POST(request: Request) {
   const fail = (error: string, status: number, field?: "name" | "email") => Response.json({ ok: false, error, ...(field ? { field } : {}) } satisfies SubmitResult, { status });
@@ -70,7 +73,8 @@ export async function POST(request: Request) {
   if (body.website) return fail("Something went wrong. Reload the page and try again.", 400); // honeypot
   const accounts = signInEnabled();
   if (!accounts && !isPlayerId(body.player)) return fail("Something went wrong. Reload the page and try again.", 400);
-  const { name, error } = checkName(body.name);
+  const named = typeof body.name === "string" && body.name.trim() !== "";
+  const { name, error } = named ? checkName(body.name) : { name: "", error: "" };
   if (error) return fail(error, 422, "name");
   if (!isDateKey(body.date) || !isPlayableDate(body.date)) return fail("Only today's challenge can go on the leaderboard.", 422);
   const score = scoreAnswers(body.date, body.choices);
@@ -82,7 +86,7 @@ export async function POST(request: Request) {
     if (accounts) {
       // only a verified email can post, and it always posts as the same player on every device
       const user = await verifiedUser();
-      if (!user) return fail("Sign in to put your score on the leaderboard.", 401);
+      if (!user) return fail("Sign in to save your score.", 401);
       player = await playerFor(user, body.player);
     } else {
       player = body.player as string;
@@ -96,13 +100,13 @@ export async function POST(request: Request) {
       }
     }
     // a nickname belongs to the first player who used it, so a second browser can't post under the same name
-    if (!(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
+    if (named && !(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
     // a brand-new score for today: cap how many different players one network can add per day
     if (!(await store.has(body.date, player))) {
       const n = await store.bumpNetwork(body.date, networkKey(ipOf(request), body.date));
       if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
     }
-    await store.setName(player, name);
+    if (named) await store.setName(player, name);
     const choices = body.choices as number[];
     const fresh = await store.submit(body.date, player, score, Date.now(), choices);
     // posted before picks were kept: add them, if they give the score already on the board (the first try still counts)
@@ -119,7 +123,7 @@ export async function POST(request: Request) {
       rank: mine?.rank ?? board.total,
       total: board.total,
       duplicate: !fresh,
-      player: { id: player, name },
+      player: { id: player, name: named ? name : await store.nameOf(player) },
     } satisfies SubmitResult);
   } catch (e) {
     console.error("[leaderboard] write failed", e);

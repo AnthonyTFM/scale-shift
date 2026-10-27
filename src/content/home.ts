@@ -12,7 +12,7 @@ export const home = {
   // "More to explore": the rest of the site, one line each (the two games and the map have their own cards above)
   explore: {
     title: "More to explore",
-    leaderboard: "Today's best and all-time points",
+    leaderboard: "The longest endless streaks",
     eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
     timeline: (n: number) => `${n} times land changed hands`,
     disputes: (n: number) => `${n} places, from Crimea to Antarctica`,
@@ -69,20 +69,9 @@ export const home = {
     mapTitle: "Drag any country anywhere",
     mapLead: "Drag Russia to the equator and watch it shrink. Any country, any era.",
     mapCta: "Open the map",
-    boardTitle: "Today's leaderboard",
-    boardEmpty: "No scores yet today. Be the first on the board!",
-    // when today's board is empty, the card shows these instead of an empty box
-    boardEmptyShort: "No scores yet today. Be the first!",
-    boardYesterday: "Yesterday's top players",
-    boardAllTime: "All-time top players",
-    boardPoints: (n: number) => `${n} pts`,
-    boardPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"} today`,
     boardCta: "Full leaderboard",
-    // the card's two boards: the daily challenge and endless mode's best streaks
-    boardTabs: { daily: "Daily", endless: "Endless" },
-    boardTabsLabel: "Which leaderboard",
+    // the leaderboard card: endless mode's Best streaks (daily scores are private)
     streakEmpty: "No streaks yet. Start the first run!",
-    // the card's title on the Endless tab: its board is all-time only
     streakTitle: "Best streaks ever",
     streakPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"}`,
     streakSr: (n: number) => `${n} in a row`,
@@ -96,6 +85,5 @@ export const home = {
     challengeCta: "Challenge a friend",
     spotWaiting: "Your spot is waiting",
     spotPlay: "Play now",
-    beatMe: "Challenge a friend to beat you",
   },
 };

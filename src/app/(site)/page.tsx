@@ -103,7 +103,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Today's leaderboard, and the rest of the site */}
+      {/* The Best streaks board, and the rest of the site */}
       <div className="mx-auto grid max-w-6xl gap-x-6 gap-y-10 px-4 pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-start">
         <HeroLeaderboard />
         <section aria-labelledby="explore">

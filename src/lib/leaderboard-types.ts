@@ -9,7 +9,7 @@ export type AllTimeBoard = { total: number; rows: AllTimeRow[]; me?: AllTimeRow 
 export type WeekBoard = AllTimeBoard & { start: string; end: string };
 
 export type SubmitResult =
-  | { ok: true; score: number; rank: number; total: number; duplicate: boolean; player?: { id: string; name: string } }
+  | { ok: true; score: number; rank: number; total: number; duplicate: boolean; player?: { id: string; name: string | null } }
   | { ok: false; error: string; field?: "name" | "email" };
 
 /** Endless mode's best streaks, for one day (`date`) or of all time (`date` null). `score` is the streak. */

@@ -6,7 +6,7 @@ export const endlessCopy = {
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
-  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser, and runs by players on the leaderboard go on the all-time Best streaks board.",
+  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser, and signed-in players' runs go on the all-time Best streaks board.",
   loading: "Loading endless mode",
   failed: "We couldn't load endless mode.",
   retry: "Try again",
@@ -77,8 +77,7 @@ export const endlessCopy = {
       back: "Back to my run",
       post: "Post my streak",
     },
-    // the leaderboard page's Endless tab
-    tab: "Endless",
+    // the leaderboard page (the Best streaks board)
     allCaption: "Best streaks ever",
     streak: "Streak",
     note: "Your longest run of right answers in endless mode. Ties share a rank; whoever got there first is listed first.",
