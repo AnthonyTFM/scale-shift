@@ -14,6 +14,8 @@ import {
   panBy,
   placeGeometry,
   projectionFor,
+  splitPolar,
+  wrapsAPole,
   zoomAt,
   mercatorInflation,
   EARTH_RADIUS_KM,
@@ -35,6 +37,8 @@ export type Overlay = {
   hiddenParts: number;
   /** built from a shape cut into slices around a pole: fill only, an outline would show the cuts */
   sliced?: boolean;
+  /** for a sliced shape, the whole shape: moved away from the pole it is placed from this, so no cap goes missing */
+  whole?: MultiPolygon;
   /** area of the drawn geometry (far-off parts excluded) */ km2: number;
   props: PolityProps;
 };
@@ -1269,7 +1273,13 @@ export class MapEngine {
     const key = `${o.id}|${o.era}|${o.name}|${o.lon.toFixed(3)}|${o.lat.toFixed(3)}|${o.rot}`;
     let g = this.placedCache.get(key);
     if (!g) {
-      g = o.moved || o.rot ? placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot) : o.geom;
+      if (!o.moved && !o.rot) g = o.geom;
+      else if (o.whole) {
+        // a polar shape (Antarctica) moved: place the whole shape, then slice it again only if it still wraps a pole.
+        // Placing the slices would leave the cap they cut off at 85° as a hole (about 970,000 km² for Antarctica)
+        const placedWhole = placeGeometry(o.whole, o.origin, [o.lon, o.lat], o.rot);
+        g = wrapsAPole(placedWhole) ? splitPolar(placedWhole) : placedWhole;
+      } else g = placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot);
       if (this.placedCache.size > 200) this.placedCache.clear();
       this.placedCache.set(key, g);
     }

@@ -125,6 +125,9 @@ export function projectionFor(v: View, w: number, h: number, shift = 0): GeoProj
 }
 
 /** True if a shape surrounds the North or South Pole. */
+/** Does a shape wrap around either pole (no bounding box needed)? */
+export const wrapsAPole = (g: GeoPermissibleObjects) => geoContains(g, [0, -89.9]) || geoContains(g, [0, 89.9]);
+
 export function wrapsPole(g: GeoPermissibleObjects, bbox: [number, number, number, number]) {
   return (bbox[1] < -75 && geoContains(g, [0, -89.9])) || (bbox[3] > 75 && geoContains(g, [0, 89.9]));
 }
