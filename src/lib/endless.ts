@@ -76,6 +76,18 @@ const TRAPS: Pairing[] = [
   { kind: "trap", first: "history", second: "history", weight: 10 },
 ];
 
+/** Every possible opening matchup (level 1), as pairs of ids: the server keeps enough of them free in every run. */
+export function openerPairs(pool: PoolEntry[]): [string, string][] {
+  const out: [string, string][] = [];
+  for (const t of TRAPS)
+    for (const x of pool)
+      if (x.kind === t.first)
+        for (const y of pool)
+          // a pairing of one kind with itself lists each pair once
+          if (y.kind === t.second && (t.first !== t.second || x.id < y.id) && same(x) !== same(y) && fits(LEVELS[0], x, y)) out.push([x.id, y.id]);
+  return out;
+}
+
 /**
  * One matchup at a level, or null if the pool has none left that fit (with these shapes already used in the run, and
  * none of the ones this player saw in their last runs).

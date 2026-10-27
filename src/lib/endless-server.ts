@@ -1,12 +1,13 @@
 // Endless mode on the server: handing out runs and marking them for the Best streaks board.
 //
 // The server picks each run's seed and signs it with the time it was handed out, so a streak can only be posted for a
-// run the server started, not one chosen (or replayed) to suit. Posting re-builds the run's rounds from the seed and
-// marks the answers itself. A run can be posted again as it grows, but once it has ended on a miss its streak is fixed.
+// run the server started, not one chosen (or replayed) to suit. The player's browser only gets a say in which shapes the
+// run avoids (the ones it saw in its last runs), within limits (see cleanSeen). Posting re-builds the run's rounds from
+// the seed and that list, and marks the answers itself. A run can be posted again as it grows, but once it has ended on a miss its streak is fixed.
 import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import pool from "@/data/daily-pool.json";
 import type { PoolEntry } from "./daily";
-import { avoidOf, endlessQuestion, SEEN_MAX } from "./endless";
+import { avoidOf, endlessQuestion, openerPairs, SEEN_MAX } from "./endless";
 import { isDateKey, isPlayableDate, unsubscribeSecret } from "./leaderboard";
 
 /** How long after it starts a run can still be posted. */
@@ -30,13 +31,31 @@ const sign = (seed: string, at: number, avoid = "") =>
     .slice(0, 32);
 
 const IDS = new Set((pool as PoolEntry[]).map((e) => e.id));
+const OPENERS = openerPairs(pool as PoolEntry[]);
+/**
+ * However the "seen" list is chosen, at least this many opening matchups stay possible, so nobody can narrow rounds 1-3
+ * down to a few they've learned (an honest list after many runs leaves far more).
+ */
+const MIN_OPENERS = 120;
 
-/** The recently seen shapes a run may avoid: known shapes only, each once, at most SEEN_MAX, in the order sent. */
+/**
+ * The recently seen shapes a run may avoid: known shape ids only, each once, at most SEEN_MAX, newest first until
+ * avoiding one more would leave fewer than MIN_OPENERS opening matchups. Kept in the order sent.
+ */
 export function cleanSeen(seen: unknown): string[] {
   if (!Array.isArray(seen)) return [];
-  const out: string[] = [];
-  for (const id of seen) if (typeof id === "string" && IDS.has(id) && !out.includes(id) && out.length < SEEN_MAX) out.push(id);
-  return out;
+  const kept = new Set<string>();
+  const openers = () => OPENERS.reduce((n, [a, b]) => n + (kept.has(a) || kept.has(b) ? 0 : 1), 0);
+  for (const id of seen.slice(-SEEN_MAX * 2).reverse()) {
+    if (kept.size >= SEEN_MAX) break;
+    if (typeof id !== "string" || !/^[a-z0-9-]+$/.test(id) || !IDS.has(id) || kept.has(id)) continue;
+    kept.add(id);
+    if (openers() < MIN_OPENERS) {
+      kept.delete(id);
+      break;
+    }
+  }
+  return seen.filter((id, i): id is string => kept.has(id as string) && seen.indexOf(id) === i);
 }
 
 /**
@@ -55,7 +74,9 @@ export type Marked = { ok: true; streak: number; over: boolean; date: string } |
 export function markRun(seed: unknown, token: unknown, choices: unknown, now = Date.now()): Marked {
   const fail = (error: string) => ({ ok: false, error }) as const;
   if (typeof seed !== "string" || !SEED.test(seed) || typeof token !== "string") return fail("That run can't be posted. Start a new one.");
-  const [signed, avoidList = ""] = token.split("~");
+  const parts = token.split("~");
+  if (parts.length > 2) return fail("That run can't be posted. Start a new one.");
+  const [signed, avoidList = ""] = parts;
   const [atRaw, sig] = signed.split(".");
   const at = Number(atRaw);
   const want = Buffer.from(Number.isFinite(at) ? sign(seed, at, avoidList) : "");
