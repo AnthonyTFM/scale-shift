@@ -2,14 +2,13 @@
 
 // The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
 import { useEffect, useRef, useState } from "react";
-import dataVersion from "@/data/data-version.json";
-import dailyVersion from "@/data/daily-version.json";
-import { gapText, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
+import { gapText, isRegion, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
 import { regionContext } from "@/content/region-context";
 import { formatArea, type AreaUnit } from "@/lib/format";
 import { preferredUnit } from "@/lib/units";
 import { mapUrl } from "@/lib/share";
+import { POOL_V as V } from "@/lib/pool-version";
 import { setSound, soundOn } from "@/lib/sound";
 import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
 import { dailyCopy } from "@/content/daily";
@@ -30,8 +29,6 @@ const TILE =
 const COLORS = ["#FF5B4A", "#2F6BFF"];
 /** a web map stretches land by less than this: "about right" (and never "1.1× too big") */
 const ABOUT_RIGHT = 1.15;
-// both stamps: a new pool (daily-version) or new map data (data-version) means fresh files, not cached ones
-const V = `?v=${dataVersion.v}.${dailyVersion.v}`;
 
 let poolPromise: Promise<PoolEntry[]> | null = null;
 export const loadPool = () =>
@@ -359,10 +356,11 @@ function StretchStrip({ options, title }: { options: Question["options"]; title:
   );
 }
 
-/** Short "what was it / where is it today" notes for the historical states in a question. */
+/** Short notes for the historical states in a question (what it was, where its land is today) and for the regions (where they are). */
 function WhoIsWho({ options }: { options: Question["options"] }) {
-  // historical states say what they were and where their land is today; regions say where they are
-  const notes = options.filter((o) => (o.kind === "history" && dailyContext[o.src]) || regionContext[o.n]);
+  // regions only by their own era, so a country or empire that shares a region's name (Punjab) never picks up its note
+  const region = (o: PoolEntry) => (isRegion(o) ? regionContext[o.n] : undefined);
+  const notes = options.filter((o) => (o.kind === "history" && dailyContext[o.src]) || region(o));
   if (!notes.length) return null;
   return (
     <div className="mt-4 space-y-2 rounded-2xl bg-paper p-3 text-sm ring-1 ring-line">
@@ -370,7 +368,7 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
         const c = o.kind === "history" ? dailyContext[o.src] : undefined;
         return (
           <p key={o.id} className="leading-relaxed text-ink-soft">
-            <strong className="text-ink">{o.n}</strong> <span className="text-muted">({o.sub})</span>: {c ? c.what : regionContext[o.n]}
+            <strong className="text-ink">{o.n}</strong> <span className="text-muted">({o.sub})</span>: {c ? c.what : region(o)}
             {c ? (
               <>
                 {" "}
@@ -488,9 +486,8 @@ function TrueArea({ from, to, unit }: { from: number; to: number; unit: AreaUnit
   return <span className="mt-1.5 block font-display text-base tabular-nums text-ink">{formatArea(v, unit, false)}</span>;
 }
 
-/** The two shapes side by side on the real-size map. */
 /** The two shapes side by side on the map, or null when the map can't draw one of them yet (the "adm1-" regions). */
 export function mapHref(q: Question) {
-  if (q.options.some((o) => o.era.startsWith("adm1-"))) return null;
+  if (q.options.some(isRegion)) return null;
   return mapUrl({ era: "present", shapes: q.options.map((o, i) => ({ era: o.era, name: o.src, color: i })) });
 }

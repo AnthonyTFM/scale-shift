@@ -2,9 +2,11 @@
 // Australian, Mexican, Brazilian and Indian states, and Chinese provinces. From Natural Earth's admin-1 map
 // (public domain), downloaded once into .cache/regions.
 //
-// Left out: regions under 5,000 km² (the same floor as countries and US states: they'd be specks on the tiles), and
-// regions whose borders are in active dispute (Jammu and Kashmir, Ladakh, Arunachal Pradesh, the Paracel Islands).
-// Borders are as each country controls them on the ground, like the present-day map.
+// Borders are drawn as each country runs them on the ground, like the present-day map, with one rule for every side of a
+// dispute: Jammu and Kashmir, Ladakh, Arunachal Pradesh, Xinjiang and Tibet are all in, and their notes
+// (src/content/region-context.ts) say who else claims them. Left out: regions under 5,000 km² (the same floor as countries
+// and US states: they'd be specks on the tiles), and two whose outlines are well off their official areas (Ningxia by
+// about a fifth, the Andaman and Nicobar Islands by about an eighth, as most of their small islands are missing).
 
 import fs from "node:fs";
 import path from "node:path";
@@ -17,15 +19,18 @@ const COUNTRIES = {
   CAN: { Province: "Canadian province", Territory: "Canadian territory" },
   AUS: { State: "Australian state", Territory: "Australian territory" },
   MEX: { State: "Mexican state" },
-  BRA: { State: "Brazilian state", "Federal District": "Brazil's federal district" },
+  BRA: { State: "Brazilian state", "Federal District": "Brazil's capital district" },
   IND: { State: "Indian state", "Union Territory": "Indian union territory" },
   CHN: { Province: "Chinese province", "Autonomous Region": "Chinese autonomous region", Municipality: "Chinese city-province" },
 };
-const DISPUTED = new Set(["Jammu and Kashmir", "Ladakh", "Arunachal Pradesh", "Paracel Islands"]);
-// rows Natural Earth labels wrongly (or not at all)
+// left out, by ISO 3166-2 code: outlines well off the official area, Mexico City (a federal entity, not a state), and
+// specks that aren't regions of their own (Jervis Bay, Macquarie Island, the Paracel Islands)
+const SKIP = new Set(["CN-NX", "IN-AN", "MX-DIF", "AU-X02~", "AU-X03~", "CN-X01~"]);
+// rows Natural Earth labels wrongly (or not at all); Lord Howe Island is part of New South Wales, not a territory
 const TYPE_FIX = { Gujarat: "State", "Himachal Pradesh": "State" };
-// names that would read wrong in the game
-const RENAME = { "Federal District": "Federal District (Brasília)", Federal: "Federal District (Brasília)", Mexico: "State of Mexico" };
+const SKIP_NAMES = new Set(["Lord Howe Island"]);
+// names that would read wrong in the game, by ISO code (Natural Earth calls Brazil's capital district "Federal")
+const RENAME = { "BR-DF": "Federal District" };
 const R = 6371;
 
 /** d3 wants each ring clockwise on the sphere; GeoJSON files often have them the other way, which d3 reads as "the rest of the world". */
@@ -50,13 +55,13 @@ export async function loadRegions(root) {
     const p = f.properties;
     const labels = COUNTRIES[p.adm0_a3];
     const name = p.name_en || p.name;
-    if (!labels || !name || !f.geometry || DISPUTED.has(name)) continue;
-    // Mexico City is a federal entity (and under the floor anyway); unnamed rows are slivers
-    const sub = labels[TYPE_FIX[name] ?? p.type_en] ?? (p.adm0_a3 === "MEX" && name !== "Mexico City" ? labels.State : null);
+    if (!labels || !name || !f.geometry || SKIP.has(p.iso_3166_2) || SKIP_NAMES.has(name)) continue;
+    // a Mexican row without a type is a state; unnamed rows are slivers
+    const sub = labels[TYPE_FIX[name] ?? p.type_en] ?? (p.adm0_a3 === "MEX" ? labels.State : null);
     if (!sub) continue;
     const geometry = rewind(f.geometry);
     if (geoArea(geometry) * R * R < 5000) continue;
-    out.push({ n: RENAME[name] ?? name, sub, cc: p.adm0_a3, geometry });
+    out.push({ n: RENAME[p.iso_3166_2] ?? name, sub, cc: p.adm0_a3, geometry });
   }
   return out;
 }
