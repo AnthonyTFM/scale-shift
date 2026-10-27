@@ -1271,10 +1271,51 @@ const EZO = (from) => ({
   w: "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.",
 });
 // the steppe, Burma, the Niger and the Baltic around 1500 (the 1492 and 1500 maps draw them alike)
+// Manchuria and the Amur east of the Greater Khingan: Jurchen and Tungusic land, which the source draws inside the Mongol
+// state or the Ming (`from`). With `ming`, the land Cliopatria gives the Ming (Liaodong) goes back to it.
+const JURCHENS = (from, ming) => [
+  {
+    to: "Jurchens and Amur peoples",
+    poly: [[121, 38], [150, 38], [150, 62], [121, 62], [121, 38]],
+    from: [from],
+    w: "Jurchen tribes, which the Ming counted as its frontier guards, and the Tungusic peoples of the Amur. The Ming ruled only Liaodong.",
+  },
+  ...(ming ? [{ to: ming, clio: ["Ming Dynasty"], from: ["Jurchens and Amur peoples"] }] : []),
+];
+// Bukhara's Transoxiana, the Kazakh steppe and Safavid Khorasan, which the source draws inside the Khiva khanate
+const KHIVA = SPLIT("Khiva Khanate", [["Khanate of Bukhara", "Khanate of Bukhara"], ["Kazakh Khanate", "Kazakh Khanate"], ["Safavid Empire", "Safavid Dynasty"]]);
+// Baffin Island and the Hudson Bay coasts, Inuit land: the source labels them T'atsaot'ine, a Dene people of Great Slave Lake
+const INUIT = { to: "Inuit", poly: [[-90, 55], [-55, 55], [-55, 76], [-90, 76], [-90, 55]], from: ["T'atsaot'ine"] };
+// the peoples of the source's 1715 map on the land its 1783 map gives to Rupert's Land beyond the Hudson Bay basin
+const RL_PEOPLES = [
+  "Athabascan",
+  "Sahtu",
+  "Subarctic forest hunter-gatherers",
+  "Montagnais Innu",
+  "Naskapi Innu",
+  "Eyaq",
+  "Shoshoni",
+  "Northern Paiute",
+  "Nez Perce",
+  "Blackfoot",
+  "Yakima",
+  "Kalapuya",
+  "Tenimo",
+  "Cayuse",
+  "Kalispel",
+  "Umatilla",
+  "Assiniboin",
+  "Gros Ventre",
+];
 const AROUND_1500 = (year) => [
   // Mongolia (the Northern Yuan) and the Kazakh steppe, which the source draws inside the Chagatai Khanate and the White Horde
   ...SPLIT("Chagatai Khanate", [["Northern Yuan", "Mongol Khanate"]]),
   ...SPLIT(["Chagatai Khanate", "Turkic nomads"], [["Kazakh Khanate", "Kazakh Khanate"]]),
+  // the rest of the source's Chagatai Khanate, of which only Moghulistan was left: the Ming's, Tibet's and the Timurids'
+  // borderlands, Mongol land north of the Gobi and, east of the Greater Khingan, the Jurchens
+  ...SPLIT("Chagatai Khanate", [[year === 1492 ? "Ming Empire" : "Ming Chinese Empire", "Ming Dynasty"], ["Tibet", "Tibet"], ["Timurid Emirates", "Timurid Empire"]]),
+  ...JURCHENS("Chagatai Khanate"),
+  { to: "Northern Yuan", poly: [[98, 38], [121, 38], [121, 62], [98, 62], [98, 38]], from: ["Chagatai Khanate"] },
   ...SPLIT("Turkic nomads", [["Khanate of Sibir", "Khanate of Sibir"], ["Nogai Horde", "Nogai Horde"]]),
   ...SPLIT("Poland-Lithuania", [["Principality of Moldavia", "Principality of Moldavia"]]),
   ...SPLIT("Manipur and hill peoples", [
@@ -1298,6 +1339,9 @@ const BEFORE_1800 = {
     ...SPLIT("Amorites", [["Babylonia", "Babylonia"], ["Sealand", "First Sealand Dynasty"]]),
     // Sinai, Egyptian
     ...SPLIT("Elamite and Zagros states", [["Egypt", "New Kingdom of Egypt"]]),
+    // Susa and the Zagros foothills, which the source draws inside Babylonia: the Kassites ruled only Mesopotamia
+    { to: "Elam", ne0: ["Iran"], from: ["Babylonia"] },
+    { to: "Elamite and Zagros states", poly: [[45, 32.9], [50, 32.9], [50, 36], [45, 36], [45, 32.9]], from: ["Elam"] },
   ],
   [-700]: [
     // Assyria's provinces: the source draws them as Aramaean, Neo-Hittite and Israelite lands
@@ -1335,6 +1379,15 @@ const BEFORE_1800 = {
       ["Sophene", "Kingdom of Sophene"],
     ]),
     ...TAMIL("Iron Age chieftainships"),
+    // south of the Hindu Kush the source extends Bactria over Arachosia, the Kabul valley and Gandhara, which the
+    // Greco-Bactrians conquered only from about 190 BCE
+    ...SPLIT("Greco-Bactrian Kingdom", [["Seleucid Kingdom", "Seleucid Empire"]]),
+    {
+      to: "Mauryan successor states",
+      poly: [[60.5, 24], [60.5, 33.2], [62.5, 33.8], [64.5, 34.3], [66.5, 34.6], [68, 34.9], [69.5, 35.4], [71, 35.9], [72.5, 36.4], [74, 36.6], [78, 36.6], [78, 24], [60.5, 24]],
+      from: ["Greco-Bactrian Kingdom"],
+      w: "The Mauryan Empire's north-west broke away after Ashoka died (about 232 BCE). In 206 BCE Antiochus III met an Indian king of the Kabul valley here, Sophagasenus. Shown approximately.",
+    },
   ],
   [-100]: [
     // Parthia had taken Media (148 BCE) and Mesopotamia (141 BCE): the source still draws them as Seleucid
@@ -1576,6 +1629,11 @@ const BEFORE_1800 = {
       ["East Francia", "East Franks"],
     ]),
     ...SPLIT("Palas", [["Kamarupa", "Kamarupa Kingdom"]]),
+    // Gandhara, the Hindu Shahis' (their capital was Udabhandapura on the Indus), Kashmir and the far south-west, which
+    // the source draws inside the Samanid Empire
+    { to: "Hindu Shahis", poly: [[70.5, 29.8], [75.2, 29.8], [75.2, 35.6], [70.5, 35.6], [70.5, 29.8]], from: ["Samanid Empire"] },
+    ...SPLIT(["Samanid Empire", "Hindu Shahis"], [["Kingdom of Kashmir", "Kashmir"]]),
+    ...SPLIT("Samanid Empire", [["Abbasid Caliphate", "Abbasid Caliphate"]]),
   ],
   1000: [
     // Khorasan, Ghaznavid from 999
@@ -1616,6 +1674,25 @@ const BEFORE_1800 = {
       ["Norman Italy", "Norman Italy"],
     ]),
     ...SPLIT("Hill kingdoms (Manipur, Tripura)", [["Kamarupa", "Kamarupa Kingdom"]]),
+    // Kashmir, western Tibet, Qocho, Ghazni's lands and Khwarazm, which the source draws inside the Karakhanid khanate
+    ...SPLIT("Karkhanids", [
+      ["Kingdom of Kashmir", "Lohara Dynasty"],
+      ["Tibet", "Tibetans"],
+      ["Kingdom of Qocho", "Qocho Kingdom"],
+      ["Ghaznavid Emirate", "Ghaznavid Empire"],
+      ["Khwarazm", "Khwarezmid Dynasty"],
+    ]),
+    // North Africa west of Egypt, which the source still gives the Fatimids: the Zirids (independent from 1048) and the
+    // Hammadids held the coast, and the Arab tribes who overran the land from the 1050s the rest
+    {
+      to: "Banu Hilal and Banu Sulaym",
+      ne0: ["Libya", "Tunisia", "Algeria"],
+      from: ["Fatimid Caliphate"],
+      w: "Arab tribes who moved west from Egypt in the 1050s and overran Tripolitania and the countryside of Ifriqiya.",
+    },
+    ...SPLIT("Banu Hilal and Banu Sulaym", [["Zirid dynasty", "Zirid dynasty"], ["Hammadid dynasty", "Hammadid Dynasty"]]),
+    // Sri Lanka: Vijayabahu I drove the Cholas out in 1070
+    { to: "Kingdom of Polonnaruwa", ne0: ["Sri Lanka"], from: ["Cholas"] },
     ...FILL([
       ["Goryeo", "Goryeo"],
       ["Ghana", "Ghana Empire"],
@@ -1650,6 +1727,17 @@ const BEFORE_1800 = {
       ["Chandela dynasty", "Chandela Kingdom"],
     ]),
     ...FILL([["Principality of Jersika", "Principality of Jersika"]]),
+    // North Africa west of Egypt, which the source draws with the Fatimids' old outline: Ifriqiya was Almohad, and the
+    // Banu Ghaniya fought them for Tripolitania and the south with the Arab tribes and the Ayyubid mamluk Qaraqush
+    {
+      to: "Banu Ghaniya and Arab tribes",
+      ne0: ["Libya", "Tunisia", "Algeria"],
+      from: ["Ayyubid Sultanate"],
+      w: "Yahya ibn Ghaniya, heir of the Almoravids, fought the Almohads for Tripolitania and southern Ifriqiya with the Arab tribes and Qaraqush, an Ayyubid mamluk acting on his own. Shown approximately.",
+    },
+    ...SPLIT("Banu Ghaniya and Arab tribes", [["Almohad Caliphate", "Almohad Caliphate"]]),
+    // Sri Lanka, the Polonnaruwa kingdom's: Chola rule there ended in 1070
+    { to: "Kingdom of Polonnaruwa", ne0: ["Sri Lanka"], from: ["Chola Empire"] },
   ],
   1279: [...DECCAN("minor Hindu kingdoms"), ...SPLIT("minor Hindu kingdoms", [["Pandya state", "Pandya Empire"]]), ...FILL([["Kanem Empire", "Empire of Kanem"]])],
   1300: [
@@ -1688,8 +1776,12 @@ const BEFORE_1800 = {
     ...SPLIT(["Sukhothai", "Đại Việt"], [["Lan Xang", "Lan Xang"]]),
     SICILY_ISLAND,
     ...SPLIT("Sinhalese kingdom", [["Jaffna Kingdom", "Jaffna kingdom"]]),
-    // Joseon (1392): the source still draws Korea inside the Mongol state
-    ...SPLIT("Great Khanate", [["Joseon", "Joseon"]]),
+    // Joseon (1392): the source still draws Korea inside the Mongol state (split into the Ming and the Northern Yuan by
+    // splitMing1400 before these rules)
+    ...SPLIT("Northern Yuan", [["Joseon", "Joseon"]]),
+    // the Ming's Liaodong and its garrisons north of the Wall, Moghulistan's east and the Jurchens beyond Liaodong
+    ...SPLIT("Northern Yuan", [["Ming Empire", "Ming Dynasty"], ["Chagatai Khanate", "Chagatai Khanate"]]),
+    ...JURCHENS("Northern Yuan"),
   ],
   1492: [
     ...AROUND_1500(1492),
@@ -1703,6 +1795,11 @@ const BEFORE_1800 = {
     ...SPLIT("Khanate of Bukhara", [["Moghulistan", ["Eastern Moghulistan", "Western Moghulistan"]]]),
     ...SPLIT("Burmese kingdoms", [["Toungoo dynasty", "First Toungoo Empire"], ["Kingdom of Mrauk U", "Kingdom of Mrauk U"], ["Shan states", "Shan States"]]),
     ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
+    ...KHIVA,
+    // Inner Mongolia, the Mongols', and the lands beyond Liaodong, which the source draws inside the Ming
+    ...SPLIT("Ming Chinese Empire", [["Northern Yuan", "Mongol Khanate"]]),
+    ...JURCHENS("Ming Chinese Empire", "Ming Chinese Empire"),
+    INUIT,
     ...FILL([
       ["Moghulistan", "Eastern Moghulistan"],
       ["Northern Yuan", "Mongol Khanate"],
@@ -1729,6 +1826,24 @@ const BEFORE_1800 = {
     ...SPLIT("Champa", [["Laos", "Lan Xang"]]),
     ...SPLIT("Burmese kingdoms", [["Kingdom of Mrauk U", "Kingdom of Mrauk U"]]),
     ...SPLIT("Kingdom of Kandy", [["Portuguese Ceylon", "Portuguese Ceylon", { s: "Portugal" }]]),
+    // the source's "central Asian khanates" (renamed "Siberian peoples"): Khalkha, the Chahar (the Northern Yuan khans)
+    // and Tümed Mongols, the Oirats, Yarkent and the Kazakhs. Cliopatria's "Golden Horde" here is Mongolia, Khalkha in
+    // the east and Oirat west of the Altai. The Ming's Inner Mongolia was the Chahar's.
+    ...SPLIT("Ming Chinese Empire", [["Northern Yuan", ["Mongol Khanate", "Golden Horde"]], ["Tümed Mongols", "Tümed"]]),
+    ...SPLIT("Siberian peoples", [
+      ["Khalkha Mongols", "Golden Horde"],
+      ["Northern Yuan", "Mongol Khanate"],
+      ["Tümed Mongols", "Tümed"],
+      ["Yarkent Khanate", ["Eastern Moghulistan", "Western Moghulistan"]],
+      ["Oirats", "Khoshut Khanate"],
+      ["Kazakh Khanate", "Kazakh Khanate"],
+    ]),
+    { to: "Oirats", poly: [[70, 36], [90, 36], [90, 56], [70, 56], [70, 36]], from: ["Khalkha Mongols"] },
+    // Ferghana and the Pamirs, Bukhara's
+    { to: "Khanate of Bukhara", poly: [[69.5, 36.5], [74.5, 36.5], [74.5, 41.5], [69.5, 41.5], [69.5, 36.5]], from: ["Siberian peoples"] },
+    ...KHIVA,
+    ...JURCHENS("Ming Chinese Empire", "Ming Chinese Empire"),
+    INUIT,
     ...FILL([
       ["Saadi Sultanate", "Saadi Sultanate"],
       ["Funj Sultanate", "Funj Sultanate"],
@@ -1762,6 +1877,11 @@ const BEFORE_1800 = {
     ...TRINH_NGUYEN(1650),
     ...SPLIT("Champa", [["Laotian states", "Lan Xang"]]),
     EZO("Tokugawa shogunate"),
+    ...KHIVA,
+    INUIT,
+    // Puerto Rico and Jamaica (English from 1655), which the source draws inside its shapes for Hispaniola and Cuba
+    { to: "Puerto Rico (Spain)", ne0: ["Puerto Rico"], from: ["Hispaniola (Spain)"], s: "Spanish Habsburg" },
+    { to: "Jamaica (Spain)", ne0: ["Jamaica"], from: ["Cuba (Spain)"], s: "Spanish Habsburg" },
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
       ["Zaydi Imamate", "Qasimids"],
@@ -1790,6 +1910,13 @@ const BEFORE_1800 = {
     ...TRINH_NGUYEN(1700),
     ...SPLIT("Champa", [["Laotian states", "Lan Xang"]]),
     EZO("Tokugawa shogunate"),
+    ...KHIVA,
+    INUIT,
+    // the Caribbean, where the source still draws the Spanish islands of 1650: Jamaica was English from 1655, western
+    // Hispaniola French (Saint-Domingue, ceded in 1697)
+    { to: "Jamaica", ne0: ["Jamaica"], from: ["Cuba (Spain)"], s: "England" },
+    { to: "Saint-Domingue", ne0: ["Haiti"], from: ["Hispaniola (Spain)"], s: "France" },
+    { to: "Puerto Rico (Spain)", ne0: ["Puerto Rico"], from: ["Hispaniola (Spain)"], s: "Spanish Habsburg" },
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
       ["Haudenosaunee Confederacy", "Haudenosaunee"],
@@ -1818,6 +1945,7 @@ const BEFORE_1800 = {
       ["Kingdom of Champasak", "Kingdom of Champasak"],
     ]),
     EZO("Tokugawa shogunate"),
+    ...KHIVA,
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
       ["Wadai Sultanate", "Wadai Empire"],
@@ -1853,6 +1981,39 @@ const BEFORE_1800 = {
     EZO("Japan"),
     // the source draws Assam inside Burma, which only invaded it in 1817
     { ...AHOM, blank: undefined, from: ["Burma"] },
+    // Rupert's Land, the Hudson's Bay Company's charter lands (the Hudson Bay basin), from OpenHistoricalMap. The source
+    // stretches it to the Pacific and California: beyond the basin, the peoples the source's 1715 map draws there come back
+    // and the rest gets broad labels (Quebec's share up to the Hudson Bay watershed, as the Quebec Act of 1774 set it)
+    ...RL_PEOPLES.map((n) => ({ to: n, source: [1715, n], from: ["Rupert's Land"] })),
+    { to: "Dene and Inuit", poly: [[-131, 56.5], [-83.5, 56.5], [-83.5, 72.5], [-131, 72.5], [-131, 56.5]], from: ["Rupert's Land"] },
+    { to: "Pacific Northwest peoples", poly: [[-129, 39.5], [-112.5, 39.5], [-112.5, 54.5], [-129, 54.5], [-129, 39.5]], from: ["Rupert's Land"] },
+    { to: "Athabascan", poly: [[-136, 57], [-128.5, 57], [-128.5, 62], [-136, 62], [-136, 57]], from: ["Rupert's Land"] },
+    { to: "Province of Quebec", poly: [[-77, 47], [-63.5, 47], [-63.5, 56], [-77, 56], [-77, 47]], from: ["Rupert's Land"] },
+    {
+      to: "Rupert's Land",
+      ohm: 2861322,
+      from: ["Rupert's Land", "Dene and Inuit", "Pacific Northwest peoples", "Province of Quebec", "Louisiana (Spain)", ...RL_PEOPLES],
+      s: "Kingdom of Great Britain",
+      w: "Granted to the Hudson's Bay Company in 1670: the lands draining into Hudson Bay. First Nations held the land around its trading posts.",
+    },
+    // South America from OpenHistoricalMap's outlines for 1783: the source draws New Granada with Venezuela, the
+    // Guianas and part of Brazil, Upper Peru inside Peru, and Dutch Suriname as British. Peoples who ruled themselves keep
+    // their land.
+    { to: "Viceroyalty of Brazil", ohm: 2848719, from: ["Viceroyalty of New Granada", "Viceroyalty of Peru"] },
+    // (with Trinidad, attached to Venezuela in 1777)
+    { to: "Captaincy General of Venezuela", ohm: 2842586, from: ["Viceroyalty of New Granada"], s: "Spain" },
+    ...[
+      ["Suriname", 2806842],
+      ["Colony of Berbice", 2848056],
+      ["Colony of Demerara", 2848064],
+      ["Colony of Essequibo", 2848071],
+    ].map(([to, ohm]) => ({ to, ohm, from: ["Suriname", "Viceroyalty of New Granada", "Viceroyalty of Brazil"], s: "Netherlands" })),
+    { to: "Colony of French Guiana", ohm: 2861194, from: ["Suriname", "Viceroyalty of New Granada", "Viceroyalty of Brazil"], s: "France" },
+    { to: "Viceroyalty of the Río de la Plata", ohm: 2860720, from: ["Viceroyalty of Peru", "Paraguay", "Viceroyalty of Brazil"] },
+    { to: "Viceroyalty of Peru", ohm: 2850566, from: ["Viceroyalty of New Granada", "Viceroyalty of the Río de la Plata"] },
+    { to: "Viceroyalty of New Granada", ohm: 2964943, exact: true, from: ["Viceroyalty of New Granada"] },
+    // Saint-Domingue, France's richest colony, which the source leaves unnamed
+    { to: "Saint-Domingue", ne0: ["Haiti"], fill: true, s: "France" },
     ...FILL([
       ["Funj", "Funj Sultanate"],
       ["Wadai Sultanate", "Wadai Empire"],
@@ -2631,6 +2792,7 @@ async function main() {
     const grouped = groupByName(features);
     const slivers = []; // thin pieces new borders cut off our shapes, left blank for the coast fill
     if (HISTOGIS[entry.year] || OHM[entry.year]) await overlayBorders(grouped, entry.year, slivers);
+    if (entry.year === 1400) splitMing1400(grouped);
     if (TERRITORY[entry.year]) {
       const ids = TERRITORY[entry.year].filter((rule) => rule.ohm).map((rule) => rule.ohm);
       if (ids.length) for (const rel of await ohmRelations(path.join(CACHE, "ohm"), ids)) ohmForRules.set(rel.id, onLandOnly(rel.polys));
@@ -2641,7 +2803,6 @@ async function main() {
     }
     if (entry.year >= 1800) matchRulers(grouped);
     splitSvalbard(grouped, entry.year);
-    if (entry.year === 1400) splitMing1400(grouped);
     for (const f of grouped) {
       f.properties.a = Math.round(km2(f.geometry));
       if (f.properties.n) f.properties.l = labelPoint(f.geometry);

@@ -14,7 +14,10 @@ era-stats.json, and the historical shapes in daily/ (daily/index.json and daily/
   Where the source leaves a state out, draws it inside a neighbour or keeps it
   after it fell, the state is redrawn from Cliopatria's outline (below), which
   also fills some land the source leaves blank (listed in scripts/build-data.mjs,
-  BEFORE_1800). Every rename is listed at /about and in
+  BEFORE_1800). On the 1783 map, Rupert's Land, the Spanish viceroyalties of
+  South America and the Guianas follow OpenHistoricalMap's outlines for that year,
+  and a few corrections follow Natural Earth's country outlines (both below).
+  Every rename is listed at /about and in
   src/content/data-corrections.json. These derived files are distributed under
   the same GPL-3.0 license.
 
@@ -49,7 +52,8 @@ Europe in eras/1815.json, 1878.json, 1880.json, 1900.json and 1914.json
   Changes made for this site: clipped to Natural Earth's coastline, simplified
   and quantized, merged with the rest of each map.
 
-Most states in the eleven maps from 1800 to 1960
+Most states in the eleven maps from 1800 to 1960, and Rupert's Land, the Spanish
+viceroyalties of South America and the Guianas in eras/1783.json
   OpenHistoricalMap contributors, https://www.openhistoricalmap.org/
   License: public domain dedication (CC0 1.0),
   https://creativecommons.org/publicdomain/zero/1.0/
@@ -69,7 +73,8 @@ Most states in the eleven maps from 1800 to 1960
 
 eras/1994.json, eras/2000.json, eras/2010.json, eras/present.json, us-states.json,
 lakes.json, globe.json and the present-day shapes in daily/, plus the outlines used
-to give land back to the right country on the maps from 1800 to 1960
+to give land back to the right country on the maps from 1800 to 1960 and in some
+corrections before 1800
   Natural Earth (public domain), https://www.naturalearthdata.com/
   US states: US Census Bureau via us-atlas (public domain)
   The site's /world.svg and /globe-still.svg images are drawn from the same

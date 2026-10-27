@@ -2866,6 +2866,175 @@
       "n": "Gondwana kingdoms",
       "note": "The Gond kingdoms of Garha-Mandla, Deogarh and Chanda, with Bastar and Ratanpur; most paid tribute to the Mughals.",
       "why": "The Mughal and Golconda lands inside the source's broad label are drawn from Cliopatria; what is left is Gondwana."
+    },
+    {
+      "name": "central Asian khanates",
+      "years": [
+        1600
+      ],
+      "n": "Siberian peoples",
+      "why": "The source's broad label. The Khalkha, Chahar and Tümed Mongols, the Oirats, Yarkent and the Kazakhs are drawn from Cliopatria, leaving the peoples of Siberia."
+    },
+    {
+      "name": "Virgin Islands (Danemark)",
+      "years": [
+        1715
+      ],
+      "n": "Puerto Rico (Spain)",
+      "s": "Spain",
+      "why": "The shape is Puerto Rico, Spanish since 1508. Denmark held only St Thomas (from 1672) and St John (from 1718) in the Virgin Islands."
+    },
+    {
+      "name": "Trinidad",
+      "years": [
+        1715
+      ],
+      "s": "Spain",
+      "why": "Spanish from 1592 to 1797."
+    },
+    {
+      "name": "Martinique",
+      "years": [
+        1715
+      ],
+      "s": "France",
+      "why": "French since 1635."
+    },
+    {
+      "name": "Guadeloupe",
+      "years": [
+        1715
+      ],
+      "s": "France",
+      "why": "French since 1635."
+    },
+    {
+      "name": "Grenada",
+      "years": [
+        1715
+      ],
+      "s": "France",
+      "why": "French from 1650 to 1763."
+    },
+    {
+      "name": "Antigua and Barbuda",
+      "years": [
+        1715
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "English since 1632."
+    },
+    {
+      "name": "Netherlands Antilles",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "Netherlands",
+      "why": "Dutch islands: Curaçao, Aruba, Bonaire, St Eustatius, Saba and St Maarten."
+    },
+    {
+      "name": "Bahamas",
+      "years": [
+        1783
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "British; the Treaty of Paris ended Spain's occupation of 1782–83."
+    },
+    {
+      "name": "Turks and Caicos Islands",
+      "years": [
+        1783
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "Part of the British Bahamas."
+    },
+    {
+      "name": "British Guiana",
+      "years": [
+        1783
+      ],
+      "n": "Suriname",
+      "s": "Netherlands",
+      "why": "The shape is Dutch Suriname; Britain held no Guiana colony until 1796. The Dutch colonies of Essequibo, Demerara and Berbice and French Guiana are drawn from OpenHistoricalMap."
+    },
+    {
+      "name": "Malabar",
+      "years": [
+        1783
+      ],
+      "n": "Mysore",
+      "s": null,
+      "why": "Hyder Ali of Mysore conquered Malabar in 1766; the Dutch held only a few forts."
+    },
+    {
+      "name": "Cochin",
+      "years": [
+        1783
+      ],
+      "s": "Mysore",
+      "why": "Cochin's rajas paid tribute to Mysore from 1776; the Dutch held only Fort Cochin."
+    },
+    {
+      "name": "Travancore",
+      "years": [
+        1783
+      ],
+      "s": null,
+      "why": "Travancore was independent; it defeated the Dutch at Colachel in 1741."
+    },
+    {
+      "name": "T'atsaot'ine",
+      "years": [
+        1715,
+        1783
+      ],
+      "n": "Inuit",
+      "s": null,
+      "why": "The T'atsaot'ine (Yellowknives) lived by Great Slave Lake; Baffin Island and the Hudson Bay coasts were Inuit land."
+    },
+    {
+      "name": "Middag Kingdom",
+      "years": [
+        1650
+      ],
+      "s": "Netherlands",
+      "why": "A Dutch vassal from 1645; the Qing took Taiwan only in 1683."
+    },
+    {
+      "name": "Suomi",
+      "years": [
+        1000
+      ],
+      "s": null,
+      "why": "The source's ruler (\"Suom\") is a fragment of the name; the Finnish tribes had no overlord."
+    },
+    {
+      "name": "Aaniiih",
+      "years": [
+        1530,
+        1600
+      ],
+      "s": null,
+      "why": "Gros Ventre, the source's ruler, is another name for the Aaniiih themselves."
+    },
+    {
+      "name": "Czechs",
+      "years": [
+        700,
+        800
+      ],
+      "s": null,
+      "why": "The source's ruler (\"Slavic tribes\") is not a state; the Czech tribes ruled themselves."
+    },
+    {
+      "name": "Southern Xiongnu",
+      "years": [
+        100,
+        200
+      ],
+      "s": "Han",
+      "why": "The Southern Xiongnu submitted to the Han in 50 CE and lived inside its frontier as its subjects."
     }
   ],
   "geometry": [
