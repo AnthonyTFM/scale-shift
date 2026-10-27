@@ -1,6 +1,8 @@
 // Homepage copy. Facts here must stay true. (Greenland vs Africa is thetruesize.com's signature example, so we never lead
 // with it: the homepage's picture is yesterday's real daily matchup.)
 
+import { site } from "./site";
+
 export const home = {
   title: "Your map has been lying to you.",
   /** the word in the title shown in red */
@@ -25,22 +27,22 @@ export const home = {
     unavailableLine: "Yesterday's shapes couldn't load just now.",
     mapLabel: "On a normal map",
     realLabel: "Real size",
-    play: "Try today's five",
-    played: "See today's answers",
+    play: "Play today's five",
+    played: "See today's results",
   },
 
   stickyCta: "Explore the real-size map",
   // the phone bar on era pages, before today's game is played
-  stickyPlay: "Play today's game",
+  stickyPlay: "Play today's five",
 
   // the game-first hero: today's game, yesterday's matchup and the map card over a floating globe, then the leaderboard
   hub: {
     mission:
-      "Most web maps stretch land toward the poles, so the countries you know best are drawn the wrong size. Border Drift shows nearly every country and empire at its real size, across 4,000 years of history.",
+      `Most web maps puff up land near the poles, so the places you know best are drawn the wrong size. ${site.name} shows nearly every country and empire at its real size, across 4,000 years of borders.`,
     playEyebrow: "Today's game",
     playTitle: "Which is bigger?",
     playLead: "Five matchups, about two minutes. The map will try to fool you.",
-    playCta: "Play today's game",
+    playCta: "Play today's five",
     playDone: (score: number) => `You scored ${score}/5 today.`,
     playDay: "Daily challenge",
     // the daily card's two numbers, from this browser
@@ -48,7 +50,7 @@ export const home = {
     playStreakDays: (n: number) => `${n} ${n === 1 ? "day" : "days"} in a row`,
     playNoStreak: "Start today",
     playPlayed: "Games played",
-    playDoneCta: "See today's answers",
+    playDoneCta: "See today's results",
     // the endless card beside today's game (src/components/home/HeroEndless.tsx)
     endlessEyebrow: "Endless mode",
     endlessTitle: "How long can you last?",
@@ -61,11 +63,11 @@ export const home = {
     // the Best streaks board couldn't be reached
     endlessTopFailed: "Unavailable",
     endlessCta: "Play endless",
-    endlessCtaBeat: (n: number) => `Beat your ${n}`,
+    endlessCtaBeat: (n: number) => `Beat your ${n} in a row`,
     endlessSr: (n: number) => `${n} in a row`,
     mapEyebrow: "The real-size map",
     mapTitle: "Drag any country anywhere",
-    mapLead: "Watch shapes shrink and grow as they move, across 4,000 years of borders.",
+    mapLead: "Drag Russia to the equator and watch it shrink. Any country, any era.",
     mapCta: "Open the map",
     boardTitle: "Today's leaderboard",
     boardEmpty: "No scores yet today. Be the first on the board!",
@@ -89,8 +91,8 @@ export const home = {
     you: "(you)",
     // the leaderboard couldn't be reached
     boardFailed: "Couldn't load the leaderboard. Try again in a minute.",
-    nextIn: (h: number, m: number) => `Next game in ${h}h ${m}m`,
-    nextReady: "A new game is ready",
+    nextIn: (h: number, m: number) => `Next five in ${h ? `${h}h ${m}m` : `${m}m`}`,
+    nextReady: "Five new matchups are ready",
     challengeCta: "Challenge a friend",
     spotWaiting: "Your spot is waiting",
     spotPlay: "Play now",

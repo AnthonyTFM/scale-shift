@@ -368,7 +368,7 @@ export const dailyContext: Record<string, DailyContext> = {
   },
   "Belgian Congo": {
     what: "Belgium's colony in Central Africa (1908–1960), taken over from King Leopold II's private Congo Free State. There, forced rubber collection, hostage-taking, mutilation, famine and disease killed between about 1 million and 10 million people (the higher figure is Adam Hochschild's).",
-    today: "Democratic Republic of the Congo",
+    today: "DR Congo",
   },
   "Almoravid dynasty": {
     what: "A Berber Muslim empire from the Sahara that founded Marrakesh and ruled Morocco and southern Spain.",

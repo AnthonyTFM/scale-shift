@@ -165,7 +165,7 @@ export function DailyChallenge() {
       </div>
     );
   }
-  if (!game) return <Skeleton label="Loading today's challenge" />;
+  if (!game) return <Skeleton label="Loading today's five" />;
   const { round, today, save, choices, step } = game;
 
   const answer = (choice: number) => {
@@ -203,8 +203,8 @@ export function DailyChallenge() {
         <p className="mb-3 flex items-start gap-2 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
           <TargetIcon className="size-5" />
           {challenge.day === todayNo
-            ? `${challenge.name} scored ${challenge.score}/5 on today's challenge. Can you beat it?`
-            : `${challenge.name} sent you Daily #${challenge.day}, but this is today's. Play it and send your score back.`}
+            ? dailyCopy.challengeToday(challenge.name, challenge.score)
+            : dailyCopy.challengeOld(challenge.name, challenge.day)}
         </p>
       ) : null}
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
@@ -463,9 +463,7 @@ function Results({
             }`}
           >
             <TickIcon right={right} className="size-6" />
-            <span className="sr-only">
-              Question {i + 1}: {right ? "correct" : "wrong"}
-            </span>
+            <span className="sr-only">{R.markSr(i + 1, right)}</span>
           </li>
         ))}
       </ol>
@@ -588,17 +586,16 @@ function Countdown() {
   if (left === 0) {
     return (
       <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
-        A new challenge is ready. Load it →
+        {dailyCopy.nextReady} <span aria-hidden="true">→</span>
       </button>
     );
   }
   const t = Math.floor(left / 1000);
-  const p = (n: number) => String(n).padStart(2, "0");
   return (
     <p className="text-sm text-muted">
-      Next challenge in{" "}
+      {dailyCopy.nextIn}{" "}
       <span className="font-display tabular-nums font-semibold text-ink" suppressHydrationWarning>
-        {p(Math.floor(t / 3600))}:{p(Math.floor((t % 3600) / 60))}:{p(t % 60)}
+        {dailyCopy.nextTime(Math.floor(t / 3600), Math.floor((t % 3600) / 60))}
       </span>
     </p>
   );

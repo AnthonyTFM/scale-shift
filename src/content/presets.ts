@@ -16,7 +16,7 @@ export type Preset = {
 };
 
 export const presetCategories = {
-  surprising: { title: "Most surprising sizes", blurb: "Comparisons the usual world map gets badly wrong." },
+  surprising: { title: "Most surprising sizes", blurb: "Comparisons a normal map gets badly wrong." },
   controversial: { title: "Most controversial", blurb: "Land that changed hands, or still hasn't been settled." },
 } as const;
 
@@ -97,7 +97,7 @@ export const presets: Preset[] = [
     id: "contiguous-us-vs-australia",
     category: "surprising",
     title: "Lower 48 vs Australia",
-    hook: "The contiguous United States and Australia are close in size.",
+    hook: "The lower 48 US states and Australia are close in size.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "Australia" },

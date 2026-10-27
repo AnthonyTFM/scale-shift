@@ -18,7 +18,7 @@ export function UnsubscribeResult({ failed }: { failed: boolean }) {
       />
       <div className="mx-auto flex max-w-3xl flex-wrap gap-3 px-4 py-10">
         <Link href="/daily" className="btn btn-primary">
-          Play today&apos;s challenge
+          Play today&apos;s five
         </Link>
         <Link href="/contact?topic=other" className="btn btn-white">
           Contact us

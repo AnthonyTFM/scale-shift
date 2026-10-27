@@ -158,7 +158,7 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
       <div className="mb-2 flex items-start gap-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wide text-panel-muted">{eraLabel}</p>
-          <h2 className="font-display text-xl leading-tight">{f ? f.props.n : "No state in the source here"}</h2>
+          <h2 className="font-display text-xl leading-tight">{f ? f.props.n : "No state mapped here"}</h2>
           {f ? (
             <p className="text-xs text-panel-muted">
               {f.props.s ? `Ruled by ${f.props.s} · ` : ""}
@@ -166,7 +166,7 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
               {appCopy.precision[f.props.b]}
             </p>
           ) : (
-            <p className="text-xs text-panel-muted">Unclaimed land, peoples without fixed borders, or land the source map does not draw in this era.</p>
+            <p className="text-xs text-panel-muted">Unclaimed land, peoples without fixed borders, or land our maps leave blank in this era.</p>
           )}
         </div>
         <Close onClose={onClose} />
@@ -175,13 +175,13 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
       {f ? (
         <div className="mb-3 flex flex-wrap items-center gap-2 text-sm">
           <span className="font-semibold">≈ {formatArea(f.props.a, unit)}</span>
-          {f.props.e ? <span className="text-panel-muted">({formatArea(f.props.e, unit)} incl. subject lands)</span> : null}
+          {f.props.e ? <span className="text-panel-muted">({formatArea(f.props.e, unit)} with lands it controlled)</span> : null}
           <button
             type="button"
             onClick={() => onAdd(f.props.n, info.era)}
             className="ml-auto rounded-lg bg-accent px-3 py-1.5 text-sm font-bold text-panel hover:bg-accent-strong"
           >
-            Drag its real size
+            Add it to the map
           </button>
         </div>
       ) : null}
@@ -193,7 +193,7 @@ export function InfoSheet({ info, grid, unit, currentEra, onClose, onAdd, onEra 
       ) : null}
 
       <h3 className="mt-1 text-sm font-bold">{appCopy.whoRuledTitle}</h3>
-      <p className="mb-2 text-xs text-panel-muted">Rulers of this spot in each map snapshot (1° grid, ~100 km).</p>
+      <p className="mb-2 text-xs text-panel-muted">Who ruled this spot on each of our maps (accurate to about 100 km).</p>
       {!grid ? <p className="text-sm text-panel-muted">Loading 4,000 years of history…</p> : null}
       {grid && ranges.length === 0 ? <p className="text-sm text-panel-muted">Open ocean: no rulers recorded.</p> : null}
       <ol className="max-h-56 space-y-1 overflow-auto pr-1 text-sm">

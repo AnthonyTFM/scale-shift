@@ -8,7 +8,7 @@ import { equalAreaHeight } from "@/lib/og-map";
 import { eraIntros } from "@/content/era-intros";
 import { appCopy, site } from "@/content/site";
 import { eraByKey, eraIndex, eraPhrase, eras, eraSlug, eraTitle, eventsForEra, keyFromSlug } from "@/lib/eras";
-import { formatBoth, formatBothShort } from "@/lib/format";
+import { formatArea, formatBoth, formatBothShort } from "@/lib/format";
 import { mapLink } from "@/lib/share";
 import { EventCard } from "@/components/EventCard";
 import { breadcrumbJsonLd, JsonLd, PageHero } from "@/components/site/PageHero";
@@ -97,7 +97,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
     { href: "/eras", label: "Eras" },
     { href: `/eras/${slug}`, label: e.label },
   ];
-  const km = (n: number) => `${Math.round(n / 1000).toLocaleString("en-US")}k km²`;
+  // "4.51M km²", as everywhere else (this page renders on the server, so it can't follow the visitor's unit)
+  const km = (n: number) => formatArea(n, "km2");
 
   return (
     <>
@@ -127,7 +128,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
           // next/image loads lazily by default, which would cancel the high priority
           loading="eager"
           unoptimized
-          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, on an equal-area projection`}
+          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, drawn so each country shows at its real size`}
           width={1200}
           height={equalAreaHeight(1200)}
           className="card w-full bg-white p-3 sm:p-5"

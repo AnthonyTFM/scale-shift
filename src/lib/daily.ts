@@ -169,7 +169,7 @@ const NO_ARTICLE =
 const NEEDS_ARTICLE =
   /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon|Northern Territory|Northwest Territories|Federal District|State of Mexico)/;
 
-/** Name as it reads mid-sentence: "the Roman Empire", "the United States", "the contiguous United States", "Brazil". */
+/** Name as it reads mid-sentence: "the Roman Empire", "the United States", "Brazil". */
 export function nameInSentence(e: Pick<PoolEntry, "n" | "kind">) {
   if (e.n.startsWith("Contiguous ")) return `the contiguous ${e.n.slice(11)}`;
   const the = e.kind === "history" ? !NO_ARTICLE.test(e.n) : NEEDS_ARTICLE.test(e.n);
