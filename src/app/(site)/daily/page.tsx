@@ -8,7 +8,7 @@ import { dailyCopy as t } from "@/content/daily";
 export const metadata: Metadata = {
   title: "Daily challenge: which is bigger?",
   description:
-    "Five new size puzzles every day. Web maps make some countries and empires look far bigger than they are. Can you tell which is really bigger?",
+    "Five new matchups every day. Web maps make some countries and empires look far bigger than they are. Can you tell which is really bigger?",
   alternates: { canonical: "/daily" },
 };
 

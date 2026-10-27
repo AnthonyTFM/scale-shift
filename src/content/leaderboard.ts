@@ -12,7 +12,7 @@ export const leaderboardCopy = {
     daily: "daily challenge",
     middle: ", sign in and pick a nickname, and your score lands here. Every correct answer adds a point to the all-time ranking, and your longest run in ",
     endless: "endless mode",
-    after: " goes on the Endless board.",
+    after: " goes on the Best streaks board.",
   },
   // phones show this instead, so the boards start on the first screen
   leadShort: "Today's best, this week's and all-time points, and the longest endless runs.",

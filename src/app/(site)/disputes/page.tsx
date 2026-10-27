@@ -22,7 +22,7 @@ export default function DisputesPage() {
         title="Disputed borders: control vs. recognition"
         lead={
           <p>
-            Maps have to choose a line. Ours draws who actually controls the land (from Natural Earth). Click any country on today&apos;s map and
+            Maps have to choose a line. Ours draws who actually controls the land (from Natural Earth). Tap any country on today&apos;s map and
             its disputes appear first: who controls the land, since when, who claims it and whether that control was ever made official.
           </p>
         }
@@ -71,7 +71,10 @@ export default function DisputesPage() {
                 </div>
               </dl>
               <p className="mt-3 text-sm leading-relaxed text-ink-soft">{d.summary}</p>
-              <Link href={mapLink("present", [d.lon, d.lat])} className="-mb-2 mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-link hover:underline">
+              <Link
+                href={mapLink("present", [d.lon, d.lat])}
+                aria-label={`See ${d.name} on the map`}
+                className="-mb-2 mt-1 inline-flex min-h-11 items-center text-sm font-semibold text-link hover:underline">
                 See it on the map →
               </Link>
             </li>

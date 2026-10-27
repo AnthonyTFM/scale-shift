@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { appCopy } from "@/content/site";
 import { eventsForPolity, eraByKey, formatYear } from "@/lib/eras";
 import { compactNumber, formatArea, type AreaUnit } from "@/lib/format";
-import { mercatorInflation } from "@/lib/geo";
+import { placeGeometry, webMapArea } from "@/lib/geo";
 import { TakenFormalized } from "@/components/EventCard";
 import { DataNote } from "./InfoSheet";
 import { PALETTE, type Overlay } from "./engine";
+import { PALETTE_NAMES } from "@/lib/palette";
 import { lineageFor, type OverlayStep } from "./overlays";
 
 type Props = {
@@ -29,7 +30,13 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
   const prev = steps && idx > 0 ? steps[idx - 1] : null;
   const next = steps && idx >= 0 && idx < steps.length - 1 ? steps[idx + 1] : null;
   const history = eventsForPolity(lineageFor(o.name));
-  const looks = mercatorInflation(o.lat) / mercatorInflation(o.origin[1]);
+  // how much bigger or smaller the shape is drawn here than at home: the ratio of the two web-map areas, over the whole
+  // shape (moving it along the map changes nothing, so it only counts once moved)
+  const looks = useMemo(() => {
+    if (!o.moved) return 1;
+    const home = webMapArea(o.geom);
+    return home ? webMapArea(placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot)) / home : 1;
+  }, [o.moved, o.geom, o.origin, o.lon, o.lat, o.rot]);
 
   return (
     <section aria-label={`${o.name} details`} className="rounded-xl bg-panel-2 p-4 text-panel-text">
@@ -76,7 +83,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
                 <button
                   key={c}
                   type="button"
-                  aria-label={`Color ${i + 1}`}
+                  aria-label={PALETTE_NAMES[i] ?? `Color ${i + 1}`}
                   aria-pressed={i === o.color % PALETTE.length}
                   onClick={() => {
                     onColor(i);
@@ -93,7 +100,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
 
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-b border-white/10 pb-3 text-sm">
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-panel-muted">True area</dt>
+          <dt className="text-[11px] uppercase tracking-wide text-panel-muted">Real area</dt>
           <dd className="text-lg font-bold">≈ {formatArea(o.km2, unit)}</dd>
         </div>
         {o.props.pop ? (
@@ -179,7 +186,7 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
 
       <div className="mt-3 flex flex-wrap gap-2 text-sm">
         <button type="button" onClick={onZoom} className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/15">
-          Zoom to
+          Zoom to it
         </button>
         {o.moved ? (
           <button type="button" onClick={onReset} className="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/15">

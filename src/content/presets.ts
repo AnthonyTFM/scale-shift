@@ -26,7 +26,7 @@ export const presets: Preset[] = [
     id: "greenland-vs-congo",
     category: "surprising",
     title: "Greenland vs DR Congo",
-    hook: "On most maps, Greenland looks several times bigger. In reality, DR Congo is slightly larger.",
+    hook: "On a normal web map, Greenland looks about 15 times bigger. In reality, DR Congo is about 8% larger.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "DR Congo" },
@@ -129,7 +129,7 @@ export const presets: Preset[] = [
     id: "crimea-vs-belgium",
     category: "controversial",
     title: "Crimea",
-    hook: "Seized by Russia in 2014, but recognized as part of Ukraine by most of the world. It's about the size of Belgium.",
+    hook: "Seized by Russia in 2014, but recognized as part of Ukraine by most of the world. It's a little smaller than Belgium.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "Crimea" },
@@ -141,7 +141,7 @@ export const presets: Preset[] = [
     id: "russia-1914-vs-today",
     category: "controversial",
     title: "Russian Empire 1914 vs Russia today",
-    hook: "Finland, Poland, the Baltics, Ukraine, the Caucasus and Central Asia: all ruled by the tsars, all since lost.",
+    hook: "Finland, central Poland, the Baltics, Belarus, most of Ukraine, Moldova, the South Caucasus and Central Asia: all ruled by the tsars in 1914, all lost by 1991.",
     baseEra: "present",
     shapes: [
       { era: "1914", name: "Russian Empire" },
@@ -152,7 +152,7 @@ export const presets: Preset[] = [
     id: "taiwan-vs-netherlands",
     category: "controversial",
     title: "Taiwan",
-    hook: "Self-governing, claimed by Beijing and recognized by about a dozen countries. It's a little smaller than the Netherlands.",
+    hook: "Self-governing, claimed by Beijing and formally recognized by just 12 states (as of 2026). It's a little smaller than the Netherlands.",
     baseEra: "present",
     shapes: [
       { era: "present", name: "Taiwan" },
@@ -164,7 +164,7 @@ export const presets: Preset[] = [
     id: "mexico-before-1848",
     category: "controversial",
     title: "New Spain 1815 vs Mexico today",
-    hook: "Counting Texas, Mexico lost about half its territory to the United States between 1836 and 1848.",
+    hook: "Mexico lost about half its land: Texas broke away in 1836 and joined the US in 1845, and the US took California and the Southwest after the 1846–48 war.",
     baseEra: "present",
     shapes: [
       { era: "1815", name: "Viceroyalty of New Spain" },
@@ -175,7 +175,7 @@ export const presets: Preset[] = [
     id: "germany-1914-vs-today",
     category: "controversial",
     title: "German Empire 1914 vs Germany today",
-    hook: "Alsace-Lorraine, West Prussia, Silesia and East Prussia, all lost after two world wars.",
+    hook: "Alsace-Lorraine, Posen and West Prussia were lost after 1918; Silesia, Pomerania, East Brandenburg and East Prussia after 1945.",
     baseEra: "present",
     shapes: [
       { era: "1914", name: "German Empire" },
@@ -186,7 +186,7 @@ export const presets: Preset[] = [
     id: "poland-moves-west",
     category: "controversial",
     title: "Poland moves west",
-    hook: "In 1945 Poland lost its eastern lands to the USSR and gained German land in the west.",
+    hook: "The USSR kept the eastern lands it had seized in 1939, nearly half of prewar Poland, and in 1945 Poland was moved west onto German land. Millions of Germans and Poles were expelled.",
     baseEra: "present",
     shapes: [
       { era: "1938", name: "Poland" },
@@ -208,7 +208,7 @@ export const presets: Preset[] = [
     id: "western-sahara-vs-uk",
     category: "controversial",
     title: "Western Sahara",
-    hook: "Africa's last big unresolved territory, mostly held by Morocco since 1975. Bigger than the UK.",
+    hook: "The only African territory still on the UN's decolonization list, mostly held by Morocco since 1975–79. Bigger than the UK.",
     baseEra: "present",
     shapes: [
       { era: "2010", name: "Western Sahara" },
@@ -229,7 +229,7 @@ export const presets: Preset[] = [
     id: "watch-us-grow",
     category: "controversial",
     title: "How the United States grew",
-    hook: "Press play to watch 13 colonies spread from coast to coast, on land taken from Native nations, Britain, Spain and Mexico.",
+    hook: "Press play to watch the US spread from its 1783 borders to the Pacific and beyond, on land taken from Native nations and Mexico, ceded by Britain and Spain, bought from France and Russia, and annexed from Hawaii's overthrown kingdom.",
     baseEra: "1783",
     shapes: [{ era: "1783", name: "United States of America" }],
     play: true,

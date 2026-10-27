@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { appCopy } from "@/content/site";
 import { presetCategories, presets, type Preset } from "@/content/presets";
 
@@ -11,8 +12,11 @@ const picks = {
 };
 
 export function IntroCard({ onClose, onPreset }: Props) {
+  // the card sits over the map: keyboard and screen-reader users start in it, not 27 stops later behind it
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => ref.current?.focus({ preventScroll: true }), []);
   return (
-    <section aria-labelledby="intro-title" className="max-h-[85dvh] overflow-y-auto rounded-2xl bg-card p-5 text-ink shadow-float">
+    <section ref={ref} tabIndex={-1} aria-labelledby="intro-title" className="max-h-[85dvh] overflow-y-auto rounded-2xl bg-card p-5 text-ink shadow-float outline-none">
       <h2 id="intro-title" className="font-display text-2xl leading-tight">
         {appCopy.introTitle}
       </h2>

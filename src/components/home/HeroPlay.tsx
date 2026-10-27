@@ -105,7 +105,8 @@ export function HeroPlay() {
             </button>
           ) : null}
           {s?.done && left ? (
-            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted" aria-live="polite">
+            // announced only once the new game is ready, not every minute of the countdown
+            <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted" aria-live={left.ms < 60_000 ? "polite" : "off"}>
               <ClockIcon className="size-4" /> {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}
             </p>
           ) : null}

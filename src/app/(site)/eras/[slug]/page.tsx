@@ -206,7 +206,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
             </div>
           ) : (
             <p className="mt-2 text-ink-soft">
-              No curated events for this period yet.{" "}
+              No events written up for this period yet.{" "}
               <Link href="/contact?topic=other" className="font-semibold text-link underline">
                 Suggest one
               </Link>

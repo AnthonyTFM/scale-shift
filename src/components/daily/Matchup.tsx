@@ -260,7 +260,8 @@ export function QuestionCard({
               ? "reveal-win border-green [--press-shadow:var(--color-green-shadow)]"
               : picked === i
                 ? "reveal-shake border-red [--press-shadow:var(--color-red-shadow)]"
-                : "opacity-70";
+                : // the other tile fades its drawing, not its words, so the label keeps full contrast
+                  "[&_svg]:opacity-60";
           return (
             <button
               key={o.id}

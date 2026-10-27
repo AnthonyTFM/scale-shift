@@ -80,7 +80,8 @@ export const events: TerritoryEvent[] = [
     lon: 35.2,
     lat: 32.3,
     polities: ["Assyria"],
-    summary: "Samaria falls to the Neo-Assyrian Empire and the northern kingdom is divided into Assyrian provinces.",
+    summary:
+      "Samaria falls to the Neo-Assyrian Empire and the northern kingdom is divided into Assyrian provinces. Sargon II's inscriptions claim 27,290 people were deported, and people from other conquered lands were settled in their place.",
   },
   {
     id: "cyrus-takes-babylon",
@@ -135,7 +136,7 @@ export const events: TerritoryEvent[] = [
     lat: 32.5,
     polities: ["Empire of Alexander", "Seleucid Kingdom", "Ptolemaic Kingdom"],
     summary:
-      "The Partition of Babylon (323 BCE) and Triparadisus (321 BCE) assign satrapies to the generals. Decades of war follow before the Ptolemaic, Seleucid and Antigonid kingdoms settle.",
+      "The Partition of Babylon (323 BCE) and Triparadisus (321 or 320 BCE; historians disagree) assign satrapies to the generals. Decades of war follow before the Ptolemaic, Seleucid and Antigonid kingdoms settle.",
   },
   {
     id: "seleucus-maurya-treaty",
@@ -151,7 +152,7 @@ export const events: TerritoryEvent[] = [
     lat: 31.6,
     polities: ["Mauryan Empire", "Seleucid Kingdom"],
     summary:
-      "After a war over the Indus valley, Seleucus trades much of today's Afghanistan, Baluchistan and Pakistan to Chandragupta in exchange for war elephants.",
+      "After a war over the Indus valley, Seleucus cedes the lands along the Indus, including Arachosia, Paropamisadae and probably Gedrosia (roughly southern Afghanistan, Baluchistan and Pakistan), to Chandragupta for 500 war elephants, according to Strabo. Exactly how much land changed hands is debated.",
   },
   {
     id: "rome-takes-sicily",
@@ -165,7 +166,7 @@ export const events: TerritoryEvent[] = [
     lon: 14.0,
     lat: 37.5,
     polities: ["Roman Republic", "Carthage"],
-    summary: "The First Punic War (264–241 BCE) is fought over Sicily. When it ends, Carthage hands the island to Rome, and Sicily becomes Rome's first overseas province.",
+    summary: "The First Punic War (264–241 BCE) is fought over Sicily. When it ends, Carthage gives up its part of the island, which becomes Rome's first overseas province (with its own governor from about 227 BCE). Syracuse stays an independent ally of Rome until Rome takes it in 212 BCE.",
   },
   {
     id: "qin-unifies-china",
@@ -192,7 +193,8 @@ export const events: TerritoryEvent[] = [
     lon: 10.3,
     lat: 36.85,
     polities: ["Roman Republic", "Carthage"],
-    summary: "The Third Punic War ends with Carthage razed and its land turned into the Roman province of Africa.",
+    summary:
+      "The Third Punic War ends with Carthage razed after six days of street fighting. The Romans kill much of the population and sell the 50,000 survivors into slavery, and its land becomes the Roman province of Africa.",
   },
   {
     id: "caesar-conquers-gaul",
@@ -205,7 +207,8 @@ export const events: TerritoryEvent[] = [
     lon: 2.5,
     lat: 47.0,
     polities: ["Roman Republic"],
-    summary: "Eight years of campaigns (58–50 BCE) bring all of Gaul, up to the Rhine, under Roman control.",
+    summary:
+      "Eight years of campaigns (58–50 BCE) bring all of Gaul, up to the Rhine, under Roman control. Plutarch claims a million Gauls were killed and another million enslaved. Historians doubt the exact figures but not the scale of the killing, and some call it genocide.",
   },
   {
     id: "rome-annexes-egypt",
@@ -231,7 +234,7 @@ export const events: TerritoryEvent[] = [
     lon: -0.1,
     lat: 51.5,
     polities: ["Roman Empire"],
-    summary: "Claudius launches the conquest. Rome never fully holds Scotland, and Hadrian's Wall (begun c. 122) marks the northern frontier.",
+    summary: "Claudius launches the conquest. Rome never fully holds Scotland, and Hadrian's Wall (begun c. 122 CE) marks the northern frontier.",
   },
   {
     id: "trajan-peak",
@@ -245,7 +248,7 @@ export const events: TerritoryEvent[] = [
     lat: 45.8,
     polities: ["Roman Empire"],
     summary:
-      "Trajan annexes Dacia (101–106) and Arabia Petraea (106), and by 117 Rome briefly holds Mesopotamia. His successor, Hadrian, gives it up almost immediately.",
+      "Trajan annexes Dacia (101–106 CE) and Arabia Petraea (106 CE), and by 117 CE Rome briefly holds Mesopotamia. His successor, Hadrian, gives it up almost immediately.",
   },
   {
     id: "rome-divided",
@@ -285,7 +288,7 @@ export const events: TerritoryEvent[] = [
     lon: 36.0,
     lat: 32.8,
     polities: ["Rashidun Caliphate", "Persia", "Eastern Roman Empire"],
-    summary: "After Yarmouk (636), the Caliphate takes Syria. It holds Egypt by 642 and ends the Sasanian Empire by 651.",
+    summary: "After Yarmouk (636 CE), the Caliphate takes Syria. It holds Egypt by 642 CE and ends the Sasanian Empire by 651 CE.",
   },
   {
     id: "umayyad-iberia",
@@ -298,7 +301,7 @@ export const events: TerritoryEvent[] = [
     lon: -5.6,
     lat: 36.0,
     polities: ["Umayyad Caliphate"],
-    summary: "Tariq ibn Ziyad crosses at Gibraltar in 711. Within about seven years most of the peninsula is under Muslim rule.",
+    summary: "Tariq ibn Ziyad crosses at Gibraltar in 711 CE. Within about seven years most of the peninsula is under Muslim rule.",
   },
   {
     id: "treaty-of-verdun",
@@ -313,7 +316,7 @@ export const events: TerritoryEvent[] = [
     lat: 49.2,
     polities: ["Carolingian Empire", "West Francia"],
     summary:
-      "Charlemagne's grandsons fight a civil war after Louis the Pious dies in 840, then split the empire three ways. West and East Francia are the seeds of France and Germany.",
+      "Charlemagne's grandsons fight a civil war after Louis the Pious dies in 840 CE, then split the empire three ways. West and East Francia are the seeds of France and Germany.",
   },
   {
     id: "norman-conquest",
@@ -326,7 +329,7 @@ export const events: TerritoryEvent[] = [
     lon: 0.49,
     lat: 50.91,
     polities: ["England"],
-    summary: "William of Normandy wins at Hastings and is crowned on Christmas Day 1066. The north is subdued by force over the next few years.",
+    summary: "William of Normandy wins at Hastings and is crowned on Christmas Day 1066. He crushes northern revolts in the Harrying of the North (1069–70), burning crops and herds. The chronicler Orderic Vitalis claimed over 100,000 died, mostly of hunger; historians think the figure is exaggerated, but the north is devastated.",
   },
   {
     id: "crusaders-jerusalem",
@@ -339,7 +342,8 @@ export const events: TerritoryEvent[] = [
     lon: 35.23,
     lat: 31.78,
     polities: ["Kingdom of Jerusalem"],
-    summary: "The Crusader states are founded. Saladin retakes Jerusalem in 1187, and the last mainland stronghold, Acre, falls in 1291.",
+    summary:
+      "The crusaders massacre much of the city's Muslim and Jewish population. Estimates run from about 3,000 (the Muslim scholar Ibn al-Arabi) to over 70,000 (the later chronicler Ibn al-Athir, likely exaggerated). The Crusader states are founded. Saladin retakes Jerusalem in 1187. Acre, the crusaders' last major city, falls in 1291, and their last mainland forts are abandoned that summer.",
   },
   {
     id: "genghis-khan",
@@ -353,7 +357,7 @@ export const events: TerritoryEvent[] = [
     lat: 47.2,
     polities: ["Mongol Empire", "Mongols"],
     summary:
-      "The Mongol conquests that follow create the largest contiguous land empire in history. By 1260 it has split into four khanates.",
+      "The Mongol conquests that follow create the largest contiguous land empire in history and kill millions of people (totals are debated). Whole cities are destroyed: at Baghdad in 1258, Hülegü himself claimed over 200,000 dead. By 1260 the empire has split into four khanates.",
   },
   {
     id: "yuan-conquers-song",
@@ -379,7 +383,8 @@ export const events: TerritoryEvent[] = [
     lon: 28.97,
     lat: 41.01,
     polities: ["Ottoman Empire", "Byzantine Empire"],
-    summary: "Mehmed II ends the Byzantine Empire after a 53-day siege and makes the city his capital.",
+    summary:
+      "Mehmed II ends the Byzantine Empire after a 53-day siege and makes the city his capital. His soldiers sack the city: historians estimate about 4,000 people are killed and some 30,000 are marched off to slave markets.",
   },
   {
     id: "fall-of-granada",
@@ -393,7 +398,8 @@ export const events: TerritoryEvent[] = [
     lon: -3.6,
     lat: 37.18,
     polities: ["Castille", "Spain"],
-    summary: "The surrender terms were signed weeks before Castile and Aragon took the city on January 2, 1492.",
+    summary:
+      "The surrender terms were signed weeks before Castile and Aragon took the city on January 2, 1492. That March, the Alhambra Decree orders Spain's Jews to convert or leave, and by 1502 the treaty's promises of religious freedom for Muslims are broken by forced conversions.",
   },
   {
     id: "treaty-of-tordesillas",
@@ -421,7 +427,8 @@ export const events: TerritoryEvent[] = [
     lon: -99.13,
     lat: 19.43,
     polities: ["Aztec Empire", "Viceroyalty of New Spain"],
-    summary: "Tenochtitlan falls on August 13, 1521, to Cortés and his Indigenous allies. New Spain is organized as a viceroyalty in 1535.",
+    summary:
+      "After a siege of about three months, in a city already struck by smallpox in 1520, Tenochtitlan falls on August 13, 1521, to Cortés and his Indigenous allies and is destroyed. Estimates of the dead in the campaign run from about 100,000 to 240,000. New Spain is organized as a viceroyalty in 1535.",
   },
   {
     id: "inca-conquest",
@@ -434,7 +441,8 @@ export const events: TerritoryEvent[] = [
     lon: -71.97,
     lat: -13.53,
     polities: ["Inca Empire"],
-    summary: "Pizarro takes Cusco in 1533. Inca resistance holds out in Vilcabamba until 1572.",
+    summary:
+      "At Cajamarca in November 1532, Pizarro's men kill thousands of the emperor Atahualpa's mostly unarmed attendants and take him hostage. After collecting a huge ransom in gold and silver, they execute him in 1533 and take Cusco. Inca resistance holds out in Vilcabamba until 1572.",
   },
   {
     id: "mughal-founded",
@@ -473,7 +481,7 @@ export const events: TerritoryEvent[] = [
     lon: 68.3,
     lat: 58.2,
     polities: ["Tsardom of Muscovy"],
-    summary: "Yermak's Cossacks defeat the Khanate of Sibir. Russians reach the Pacific coast at Okhotsk by 1639, an advance of about 5,000 km in under 60 years.",
+    summary: "Yermak's Cossacks defeat the Khanate of Sibir. Russians reach the Pacific at the Sea of Okhotsk in 1639, an advance of about 5,000 km in under 60 years.",
   },
   {
     id: "dutch-independence",
@@ -500,7 +508,8 @@ export const events: TerritoryEvent[] = [
     lon: 116.4,
     lat: 39.9,
     polities: ["Qing Empire", "Ming Chinese Empire", "Post-Ming Warlords"],
-    summary: "The Manchu Qing enter Beijing after the Ming collapse. Ming loyalists hold Taiwan until 1683, and Qing expansion into Xinjiang is completed in 1759.",
+    summary:
+      "The Manchu Qing enter Beijing after the Ming collapse. Ming loyalists hold Taiwan until 1683. The Qing conquest of Dzungaria (1755–59) destroys the Dzungar people: the Qing scholar Wei Yuan put their pre-war number at about 600,000, and historians estimate 70–80% died from Qing killings, smallpox and famine.",
   },
   {
     id: "treaty-of-nerchinsk",
@@ -571,7 +580,7 @@ export const events: TerritoryEvent[] = [
     lat: 23.8,
     polities: ["British East India Company", "Mughal Empire", "British Raj"],
     summary:
-      "Victory at Plassey makes the Company the real power in Bengal. Eight years later the Mughal emperor formally grants it the right to collect the province's revenue.",
+      "Victory at Plassey makes the Company the real power in Bengal. Eight years later the Mughal emperor formally grants it the right to collect the province's revenue. In the Bengal famine of 1769–70, while the Company collects that revenue, estimates of the dead run from about 1 million to 10 million, up to a third of the population.",
   },
   {
     id: "louisiana-to-spain",
@@ -615,7 +624,7 @@ export const events: TerritoryEvent[] = [
     lat: 52.23,
     polities: ["Russian Empire", "Prussia", "Austrian Empire"],
     summary:
-      "Russia, Prussia and Austria split the Polish–Lithuanian Commonwealth in three steps (1772, 1793, 1795). The first two were forced through the Polish parliament; the third erased the state. Poland does not reappear until 1918.",
+      "Russia, Prussia and Austria split the Polish–Lithuanian Commonwealth in three steps (1772, 1793, 1795). The first two were forced through the Polish parliament; the third erased the state. Full independence returns only in 1918; in between, Napoleon's Duchy of Warsaw (1807–15) and the tsar's Kingdom of Poland (from 1815) are partial revivals.",
   },
   {
     id: "us-independence",
@@ -643,7 +652,7 @@ export const events: TerritoryEvent[] = [
     lat: -33.86,
     polities: ["Australia"],
     summary:
-      "The First Fleet lands at Sydney Cove. Britain claimed the land without any treaty with Aboriginal nations. The 1992 Mabo decision rejected the doctrine that it had been terra nullius.",
+      "The First Fleet lands at Sydney Cove. Britain claimed the land without any treaty with Aboriginal nations. Frontier wars follow: the University of Newcastle's massacre map records over 400 massacres from 1788 to 1930, killing more than 10,000 people, almost all of them Aboriginal and Torres Strait Islander people. The 1992 Mabo decision rejected the doctrine that the land had been terra nullius.",
   },
   {
     id: "louisiana-purchase",
@@ -685,7 +694,8 @@ export const events: TerritoryEvent[] = [
     lon: -82.5,
     lat: 28.5,
     polities: ["United States", "Spain"],
-    summary: "Andrew Jackson's 1818 incursion shows Spain cannot hold Florida. The treaty also fixes the US–Spanish border all the way to the Pacific.",
+    summary:
+      "In the First Seminole War (1818), Andrew Jackson invades Spanish Florida, seizes St. Marks and Pensacola, and executes two Native leaders and two British subjects. It shows Spain cannot hold Florida. The treaty also fixes the US–Spanish border all the way to the Pacific.",
   },
   {
     id: "mexico-independence",
@@ -740,7 +750,8 @@ export const events: TerritoryEvent[] = [
     lon: 3.06,
     lat: 36.75,
     polities: ["France"],
-    summary: "Algiers falls in 1830, and the interior is subdued over decades. Algeria is declared part of France in 1848.",
+    summary:
+      "Algiers falls in 1830, and Algeria is declared part of France in 1848, but conquering the interior takes four decades of war, including smoking civilians to death in caves (Dahra, 1845). Between 500,000 and 1,000,000 Algerians die from violence, famine and disease by 1875, and some historians call it genocide.",
   },
   {
     id: "texas",
@@ -770,7 +781,7 @@ export const events: TerritoryEvent[] = [
     lat: -35.27,
     polities: ["New Zealand"],
     summary:
-      "British officials and Māori chiefs sign it, but the English and Māori texts differ on sovereignty. What was agreed is still debated and underpins settlements today.",
+      "British officials and Māori chiefs sign it, but the English and Māori texts differ on sovereignty. The New Zealand Wars follow, and the 1863 New Zealand Settlements Act lets the government confiscate land from tribes it calls 'in rebellion', mostly in Waikato and Taranaki. What was agreed is still debated and underpins settlements today.",
   },
   {
     id: "hong-kong-ceded",
@@ -869,7 +880,8 @@ export const events: TerritoryEvent[] = [
     lon: -152.0,
     lat: 64.0,
     polities: ["United States", "Russian Empire"],
-    summary: "The US buys about 1.5 million km² from Russia for $7.2 million. The flag changes at Sitka on October 18, 1867.",
+    summary:
+      "The US buys about 1.5 million km² from Russia for $7.2 million. The flag changes at Sitka on October 18, 1867. Alaska Natives are not consulted, and in 1869 Tlingit leaders protest that their land was sold without their consent. Native land claims are largely settled only in 1971.",
   },
   {
     id: "canadian-confederation",
@@ -883,7 +895,8 @@ export const events: TerritoryEvent[] = [
     lon: -75.7,
     lat: 45.42,
     polities: ["Canada"],
-    summary: "Four provinces confederate. Rupert's Land (1870), British Columbia (1871) and Newfoundland (1949) later make it the world's second-largest country.",
+    summary:
+      "Four provinces confederate. Rupert's Land is bought from the Hudson's Bay Company (1870) without consulting the First Nations and Métis who live there, which sparks the Red River Resistance. With British Columbia (1871) and Newfoundland (1949), Canada becomes the world's second-largest country.",
   },
   {
     id: "german-unification",
@@ -941,7 +954,7 @@ export const events: TerritoryEvent[] = [
     lat: 21.31,
     polities: ["United States"],
     summary:
-      "American businessmen overthrow Queen Liliʻuokalani in 1893. An annexation treaty fails in the Senate, so Congress annexes Hawaii by joint resolution in 1898. Congress formally apologized for the overthrow in 1993.",
+      "A group of mostly American businessmen overthrows Queen Liliʻuokalani in 1893, backed by US Minister John L. Stevens, who brings Marines ashore from USS Boston. An annexation treaty fails in the Senate, so Congress annexes Hawaii by joint resolution in 1898. In its 1993 apology, Congress said the US Minister had conspired in the overthrow.",
   },
   {
     id: "spanish-american-war",
@@ -955,7 +968,8 @@ export const events: TerritoryEvent[] = [
     lon: 120.98,
     lat: 14.6,
     polities: ["United States", "Spain"],
-    summary: "After a four-month war, Spain gives up its last major colonies. The Philippine–American War follows (1899–1902).",
+    summary:
+      "After a four-month war, Spain gives up its last major colonies. The US then fights Filipino independence forces in the Philippine–American War (1899–1902), in which as many as 200,000 Filipino civilians die from violence, famine and disease (US State Department historians; some estimates are higher).",
   },
   {
     id: "korea-annexed",
@@ -970,7 +984,7 @@ export const events: TerritoryEvent[] = [
     lat: 37.57,
     polities: ["Empire of Japan", "Korea"],
     summary:
-      "Korea becomes a protectorate in 1905 and is annexed in 1910 by treaties signed under duress. A 1965 Japan–South Korea treaty declared them 'already null and void'.",
+      "Korea becomes a protectorate in 1905 and is annexed in 1910 by treaties signed under duress. A 1965 Japan–South Korea treaty declared them 'already null and void', wording the two sides read differently: Japan says the treaties were valid when signed and lapsed in 1948, while South Korea says they were void from the start.",
   },
   {
     id: "versailles",
@@ -1026,11 +1040,12 @@ export const events: TerritoryEvent[] = [
     lon: 37.62,
     lat: 55.75,
     polities: ["USSR", "Russian Empire"],
-    summary: "The Bolsheviks seize power in 1917 and win the Civil War. Four Soviet republics sign the Union Treaty in December 1922.",
+    summary:
+      "The Bolsheviks seize power in 1917 and win the Civil War, and the Red Army conquers the independent republics of Azerbaijan and Armenia (1920) and Georgia (1921). Four Soviet republics sign the Union Treaty in December 1922.",
   },
   {
     id: "lausanne",
-    title: "Turkey's borders are recognized",
+    title: "Türkiye's borders are recognized",
     taken: 1922,
     formalized: 1923,
     formalizedBy: "Treaty of Lausanne",
@@ -1040,7 +1055,8 @@ export const events: TerritoryEvent[] = [
     lon: 32.85,
     lat: 39.93,
     polities: ["Turkey", "Ottoman Sultanate", "Ottoman Empire", "Türkiye"],
-    summary: "Turkish nationalists fight from 1919 and win by September 1922, overturning the punitive Treaty of Sèvres (1920). Lausanne recognizes the new republic's borders.",
+    summary:
+      "Turkish nationalists fight from 1919 and win by September 1922, overturning the punitive Treaty of Sèvres (1920). Lausanne recognizes the new republic's borders. A compulsory population exchange signed there in January 1923 sends about 1.2 million Orthodox Christians to Greece, most of whom had already been driven out in 1922, and 355,000–400,000 Muslims from Greece to Türkiye.",
   },
   {
     id: "saudi-arabia",
@@ -1067,7 +1083,8 @@ export const events: TerritoryEvent[] = [
     lon: 38.74,
     lat: 9.03,
     polities: ["Ethiopia", "Italy"],
-    summary: "Italian forces invade in 1935 and take Addis Ababa in May 1936. Ethiopia is liberated in 1941.",
+    summary:
+      "Italian forces invade in 1935, drop mustard gas on soldiers and civilians in breach of the 1925 Geneva Protocol, and take Addis Ababa in May 1936. After an attempt on the viceroy's life in February 1937, Italian forces massacre people in Addis Ababa: estimates run from 1,400 to 30,000, and a 2017 study puts the toll at about 19,200. Ethiopia is liberated in 1941.",
   },
   {
     id: "anschluss",
@@ -1108,7 +1125,7 @@ export const events: TerritoryEvent[] = [
     lat: 56.95,
     polities: ["USSR"],
     summary:
-      "The Baltic states are occupied in June 1940 and annexed in August. Many Western countries never recognized the annexation. Independence is restored in 1991.",
+      "The Baltic states are occupied in June 1940 and annexed in August. In June 1941 Soviet authorities deport about 40,000 people from the three countries to prison camps and settlements in Siberia. Many Western countries never recognized the annexation. Independence is restored in 1991.",
   },
   {
     id: "poland-moves-west",
@@ -1123,7 +1140,7 @@ export const events: TerritoryEvent[] = [
     lat: 51.1,
     polities: ["Poland", "Germany", "USSR"],
     summary:
-      "At Potsdam the Allies place Poland's western border on the Oder–Neisse line, provisionally. A reunified Germany confirms it by treaty only 45 years later.",
+      "At Potsdam the Allies place Poland's western border on the Oder–Neisse line, provisionally, and allow the German population there to be removed: about 12 million Germans flee or are expelled from eastern Europe (1944–50). The Soviet Union keeps eastern Poland, and Poles from there are moved west. East Germany recognizes the line in 1950 and West Germany in 1970; a reunified Germany makes it final by treaty in 1990.",
   },
   {
     id: "kuril-islands",
@@ -1136,7 +1153,8 @@ export const events: TerritoryEvent[] = [
     lon: 147.9,
     lat: 45.0,
     polities: ["USSR", "Russia", "Japan"],
-    summary: "The Soviet Union occupies the islands in August–September 1945. Japan still claims the four southernmost islands, and the two countries have never signed a peace treaty.",
+    summary:
+      "The Soviet Union occupies the islands in August–September 1945, and their roughly 17,000 Japanese residents are deported to Japan by 1949. Japan still claims the four southernmost islands, and the two countries have never signed a peace treaty.",
   },
   {
     id: "partition-of-india",
@@ -1150,7 +1168,8 @@ export const events: TerritoryEvent[] = [
     lon: 77.2,
     lat: 28.6,
     polities: ["India", "Pakistan", "British Raj"],
-    summary: "India and Pakistan become independent in August 1947. Partition displaces an estimated 10–20 million people.",
+    summary:
+      "India and Pakistan become independent in August 1947. Partition displaces 12–20 million people, and communal violence kills somewhere between 200,000 and 2 million; estimates vary widely.",
   },
   {
     id: "kashmir-divided",
@@ -1164,7 +1183,7 @@ export const events: TerritoryEvent[] = [
     lat: 34.1,
     polities: ["India", "Pakistan", "China"],
     summary:
-      "The 1947–48 war leaves a UN ceasefire line (1949), renamed the Line of Control in 1972. India, Pakistan and China each administer part of the region, and none of the claims is resolved.",
+      "The 1947–48 war leaves a UN ceasefire line (1949), renamed the Line of Control in 1972. India, Pakistan and China each administer part of the region, and none of the claims is resolved. India bases its claim on the Maharaja's accession to India in October 1947. Pakistan disputes it and points to UN Security Council Resolution 47 (1948), which called for a plebiscite that was never held. India says the 1972 Simla Agreement made it a matter for the two countries alone.",
   },
   {
     id: "israel-founded",
@@ -1179,7 +1198,7 @@ export const events: TerritoryEvent[] = [
     lat: 32.08,
     polities: ["Israel"],
     summary:
-      "The 1949 armistice lines (the 'Green Line') were ceasefire lines, not agreed borders. Several of Israel's borders remain unsettled.",
+      "During the 1947–49 war more than 700,000 Palestinian Arabs, about half the Arab population, flee or are expelled, and Israel bars their return; Palestinians call it the Nakba ('catastrophe'). The causes are debated: Israel's traditional account stresses flight, while Palestinian accounts and many historians stress expulsion. The 1949 armistice lines (the 'Green Line') were ceasefire lines, not agreed borders, and several of Israel's borders remain unsettled.",
   },
   {
     id: "prc-founded",
@@ -1207,7 +1226,7 @@ export const events: TerritoryEvent[] = [
     lat: 29.65,
     polities: ["China"],
     summary:
-      "PLA forces take Chamdo in October 1950, and Tibetan delegates sign the agreement under pressure in 1951. The Dalai Lama repudiated it after fleeing in 1959, but Tibet is internationally recognized as part of China.",
+      "PLA forces defeat the Tibetan army at Chamdo in October 1950, and Tibetan delegates sign the agreement in 1951. China calls this the 'peaceful liberation' of Tibet and says the agreement was freely made. The Dalai Lama repudiated it after fleeing in 1959, saying it was signed under duress, and the Tibetan government-in-exile calls it an invasion. Tibet is internationally recognized as part of China.",
   },
   {
     id: "year-of-africa",
@@ -1235,7 +1254,8 @@ export const events: TerritoryEvent[] = [
     lon: 3.06,
     lat: 36.75,
     polities: ["Algeria", "France"],
-    summary: "An eight-year war (1954–62) ends 132 years of French rule. The Évian Accords are signed in March and independence comes on July 5, 1962.",
+    summary:
+      "An eight-year war (1954–62) ends 132 years of French rule. Estimates of Algerian deaths run from 300,000 (the FLN in 1962) and 350,000 (French officials) to about 1.5 million (later Algerian figures). The Évian Accords are signed in March and independence comes on July 5, 1962.",
   },
   {
     id: "six-day-war",
@@ -1249,7 +1269,7 @@ export const events: TerritoryEvent[] = [
     lat: 31.9,
     polities: ["Israel", "Palestine", "Egypt", "Syria"],
     summary:
-      "Sinai was returned to Egypt under the 1979 peace treaty, with withdrawal completed in 1982. The West Bank, East Jerusalem and Golan remain disputed. UN Security Council Resolution 497 (1981) declared Israel's extension of its law to the Golan null and void.",
+      "About 280,000–325,000 Palestinians are displaced by the war. Sinai was returned to Egypt under the 1979 peace treaty, with withdrawal completed in 1982. The UN treats the West Bank, East Jerusalem and Gaza as occupied Palestinian territory, and an ICJ advisory opinion (July 2024) found Israel's continued presence there unlawful. Israel rejects this, calls the West Bank disputed rather than occupied, and applies its own law to East Jerusalem and the Golan; UN Security Council Resolution 497 (1981) declared the Golan move null and void. Israel withdrew its settlers and troops from Gaza in 2005; its forces went back in during the war that began in October 2023.",
   },
   {
     id: "bangladesh",
@@ -1263,11 +1283,12 @@ export const events: TerritoryEvent[] = [
     lon: 90.41,
     lat: 23.81,
     polities: ["Bangladesh", "Pakistan"],
-    summary: "Independence is declared in March 1971, and the war ends in December. Pakistan recognizes Bangladesh in 1974.",
+    summary:
+      "Independence is declared in March 1971 as the Pakistani army launches a crackdown that many scholars call genocide. Between 300,000 and 3 million people are killed (Bangladesh's official figure is 3 million; Pakistan's Hamoodur Rahman Commission said 26,000), 200,000–400,000 women are raped, and about 10 million refugees flee to India. The war ends in December, and Pakistan recognizes Bangladesh in 1974.",
   },
   {
     id: "cyprus-1974",
-    title: "Turkey's invasion divides Cyprus",
+    title: "Türkiye's invasion divides Cyprus",
     taken: 1974,
     formalized: null,
     status: "disputed",
@@ -1276,7 +1297,8 @@ export const events: TerritoryEvent[] = [
     lon: 33.36,
     lat: 35.19,
     polities: ["Northern Cyprus", "Cyprus", "Turkish Cypriot-administered area"],
-    summary: "The north declares itself the Turkish Republic of Northern Cyprus in 1983. Only Türkiye recognizes it.",
+    summary:
+      "After a coup backed by Greece's military government on July 15, 1974, Türkiye invades on July 20, citing its rights under the 1960 Treaty of Guarantee, and ends up holding about 36% of the island. Some 140,000–200,000 Greek Cypriots flee or are driven south, and tens of thousands of Turkish Cypriots move north. The north declares itself the Turkish Republic of Northern Cyprus in 1983; UN Security Council Resolution 541 calls this legally invalid, and only Türkiye recognizes it.",
   },
   {
     id: "western-sahara",
@@ -1290,7 +1312,7 @@ export const events: TerritoryEvent[] = [
     lat: 24.5,
     polities: ["Western Sahara", "Morocco"],
     summary:
-      "After the Green March and the 1975 Madrid Accords, Morocco takes control of most of the territory, and the Polisario Front holds the east. The UN still lists Western Sahara as a non-self-governing territory.",
+      "After the Green March, the 1975 Madrid Accords split the territory between Morocco (north) and Mauritania (south). Mauritania pulls out in 1979 and Morocco takes its share too. The Polisario Front, which proclaimed the Sahrawi Republic in 1976, holds the east and wants a referendum on independence. The UN still lists Western Sahara as a non-self-governing territory; Security Council Resolution 2797 (2025) calls for talks on the basis of Morocco's autonomy plan.",
   },
   {
     id: "east-timor",
@@ -1304,7 +1326,8 @@ export const events: TerritoryEvent[] = [
     lon: 125.57,
     lat: -8.56,
     polities: ["Timor-Leste", "Indonesia"],
-    summary: "The UN never recognized Indonesia's 1976 annexation. After a 1999 vote for independence, Timor-Leste becomes independent in May 2002.",
+    summary:
+      "The UN never recognized Indonesia's 1976 annexation. East Timor's truth commission (CAVR) counted at least 102,800 conflict deaths in 1974–99: about 18,600 killings, mostly by Indonesian forces, and 84,200 deaths from hunger and illness. After a 1999 vote for independence, Timor-Leste becomes independent in May 2002.",
   },
   {
     id: "german-reunification",
@@ -1346,7 +1369,8 @@ export const events: TerritoryEvent[] = [
     lon: 18.4,
     lat: 43.86,
     polities: ["Yugoslavia", "Slovenia", "Croatia", "Bosnia and Herzegovina"],
-    summary: "Slovenia and Croatia declare independence in June 1991, and wars follow through 1995. Montenegro (2006) and Kosovo (2008) are the last to split off.",
+    summary:
+      "Slovenia and Croatia declare independence in June 1991, and wars follow through 1995. In Bosnia alone about 100,000 people are killed. Ethnic cleansing culminates at Srebrenica in July 1995, where Bosnian Serb forces kill about 8,000 Bosniak men and boys, a genocide according to both the ICTY and the ICJ. Montenegro (2006) and Kosovo (2008) are the last to split off.",
   },
   {
     id: "eritrea",
@@ -1402,7 +1426,7 @@ export const events: TerritoryEvent[] = [
     lat: 42.67,
     polities: ["Kosovo", "Serbia"],
     summary:
-      "Kosovo is under UN administration from 1999 and declares independence in 2008. About half of UN members recognize it, but Serbia does not. The International Court of Justice found in 2010 that the declaration did not violate international law.",
+      "After Serbian forces expel or drive out about 850,000 Kosovo Albanians (UNHCR count) and NATO bombs Yugoslavia (March–June 1999), Kosovo is put under UN administration. It declares independence in 2008. Kosovo says about 120 countries recognize it; Serbia, which does not, says withdrawals bring that number below 90. The International Court of Justice found in 2010 that the declaration did not violate international law.",
   },
   {
     id: "russo-georgian-war",
@@ -1416,7 +1440,7 @@ export const events: TerritoryEvent[] = [
     lat: 42.23,
     polities: ["Georgia", "Russia"],
     summary:
-      "Both regions break from Georgian control in wars in the early 1990s. After the August 2008 war, Russia recognizes them, but almost no other country does.",
+      "Both regions break from Georgian control in wars in the early 1990s. After Sukhumi falls in September 1993, about 200,000–250,000 ethnic Georgians are driven out of Abkhazia. After the August 2008 war, Russia recognizes them, but almost no other country does.",
   },
   {
     id: "south-sudan",
@@ -1444,7 +1468,7 @@ export const events: TerritoryEvent[] = [
     lat: 45.3,
     polities: ["Crimea", "Russia", "Ukraine"],
     summary:
-      "Russian forces take control in February–March 2014, and Russia declares annexation on March 18. UN General Assembly Resolution 68/262 affirmed Ukraine's territorial integrity, and most countries do not recognize the annexation.",
+      "Russian forces take control in February–March 2014, and Russia declares annexation on March 18, citing a March 16 referendum held under Russian military control. UN General Assembly Resolution 68/262 (100 votes in favor) said the referendum had 'no validity' and affirmed Ukraine's territorial integrity, and most countries do not recognize the annexation.",
   },
   {
     id: "india-bangladesh-enclaves",
@@ -1487,7 +1511,7 @@ export const events: TerritoryEvent[] = [
     lat: 39.82,
     polities: ["Azerbaijan", "Armenia"],
     summary:
-      "Armenian forces control the region from 1994. Azerbaijan retakes much of it in 2020 and the rest in September 2023, and the breakaway republic dissolves on January 1, 2024.",
+      "Armenian forces control the region from 1994. In that first war (1988–94) about 600,000 Azerbaijanis are driven from Karabakh and the districts around it, and hundreds of thousands of Armenians flee Azerbaijan. Azerbaijan retakes much of the region in 2020 and the rest in September 2023, when over 100,000 Karabakh Armenians, nearly the entire population, flee to Armenia (UNHCR). The breakaway republic dissolves on January 1, 2024.",
   },
   // added Oct 19: major 20th-century border changes that were missing
   {
@@ -1533,7 +1557,7 @@ export const events: TerritoryEvent[] = [
     lat: 41.5,
     polities: ["Ottoman Empire",  "Bulgaria",  "Serbia",  "Greece",  "Montenegro",  "Albania"],
     summary:
-      "Bulgaria, Serbia, Greece and Montenegro seize nearly all Ottoman land in Europe in 1912, and Albania becomes independent. A second war in 1913, over the spoils, leaves Bulgaria with less.",
+      "Bulgaria, Serbia, Greece and Montenegro seize nearly all Ottoman land in Europe in 1912, and Albania becomes independent. A second war in 1913, over the spoils, leaves Bulgaria with less. A Carnegie Endowment inquiry (1914) documented massacres of civilians and expulsions by all sides.",
   },
   {
     id: "austria-hungary-ends",
@@ -1548,7 +1572,7 @@ export const events: TerritoryEvent[] = [
     lat: 48.21,
     polities: ["Austria Hungary",  "Austria",  "Czechoslovakia",  "Yugoslavia",  "Poland",  "Hungary"],
     summary:
-      "As World War I ends in autumn 1918, Czechoslovakia, Poland and the Kingdom of Serbs, Croats and Slovenes (later Yugoslavia) declare independence and Hungary leaves the union. Saint-Germain (1919) and Trianon (1920) fix the new borders.",
+      "As World War I ends in autumn 1918, Czechoslovakia, Poland and the State of Slovenes, Croats and Serbs declare independence and Hungary leaves the union. On December 1 the South Slav state joins Serbia to form the Kingdom of Serbs, Croats and Slovenes (later Yugoslavia). Saint-Germain (1919) and Trianon (1920) fix the new borders.",
   },
   {
     id: "manchuria-1931",
@@ -1576,7 +1600,7 @@ export const events: TerritoryEvent[] = [
     lat: 52.23,
     polities: ["Poland",  "USSR",  "Germany"],
     summary:
-      "Following a secret protocol of the Molotov–Ribbentrop Pact, Germany invades on September 1, 1939, and the Soviet Union on September 17. The Allies never recognize the division; Poland is restored in 1945 with new borders.",
+      "Following a secret protocol of the Molotov–Ribbentrop Pact, Germany invades on September 1, 1939, and the Soviet Union on September 17. About 5.6–5.8 million Polish citizens die under the two occupations, roughly half of them Jews murdered in the Holocaust (Institute of National Remembrance, 2009). The Allies never recognize the division; Poland is restored in 1945 with new borders.",
   },
   {
     id: "korea-divided",
@@ -1680,7 +1704,7 @@ export const events: TerritoryEvent[] = [
     lat: 22.2,
     polities: ["Portugal",  "China"],
     summary:
-      "Portuguese since the 1550s, Macau is handed over on December 20, 1999, under the 1987 Joint Declaration, two years after Hong Kong, and keeps its own system as a Special Administrative Region.",
+      "Settled by the Portuguese around 1557 with Chinese permission (and an annual rent), and ruled as a colony under an 1887 treaty that China later called unequal, Macau is handed over on December 20, 1999, under the 1987 Joint Declaration, two years after Hong Kong, and keeps its own system as a Special Administrative Region.",
   },
   {
     id: "montenegro-2006",

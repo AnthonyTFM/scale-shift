@@ -77,14 +77,14 @@ export function ChangesPanel({ era, unit, onClose, onFocus }: Props) {
           ))}
         </ol>
       ) : (
-        <p className="mt-2 text-sm text-panel-muted">No curated events in this period yet.</p>
+        <p className="mt-2 text-sm text-panel-muted">No events written up for this period yet.</p>
       )}
       {stats && era !== "present" ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <List title="Grew most" items={stats.gained.slice(0, 5).map((c) => ({ n: renamed(c), detail: `+${formatArea(c.to - c.from, unit)}` }))} />
-          <List title="Shrank most" items={stats.lost.slice(0, 5).map((c) => ({ n: renamed(c), detail: `−${formatArea(c.from - c.to, unit)}` }))} />
+          <List title="Grew the most" items={stats.gained.slice(0, 5).map((c) => ({ n: renamed(c), detail: `+${formatArea(c.to - c.from, unit)}` }))} />
+          <List title="Shrank the most" items={stats.lost.slice(0, 5).map((c) => ({ n: renamed(c), detail: `−${formatArea(c.from - c.to, unit)}` }))} />
           <List title="Appeared" items={stats.appeared.slice(0, 5).map((c) => ({ n: c.n, detail: formatArea(c.a, unit) }))} />
-          <List title="Gone" items={stats.vanished.slice(0, 5).map((c) => ({ n: c.n, detail: formatArea(c.a, unit) }))} />
+          <List title="Disappeared" items={stats.vanished.slice(0, 5).map((c) => ({ n: c.n, detail: formatArea(c.a, unit) }))} />
         </div>
       ) : null}
       <p className="mt-3 text-xs text-panel-muted">

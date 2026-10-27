@@ -1,4 +1,4 @@
-import { geoArea, geoCentroid, geoContains, geoDistance, geoMercator, geoRotation, type GeoPermissibleObjects, type GeoProjection } from "d3-geo";
+import { geoArea, geoCentroid, geoContains, geoDistance, geoMercator, geoPath, geoRotation, type GeoPermissibleObjects, type GeoProjection } from "d3-geo";
 import type { MultiPolygon, Polygon, Position } from "geojson";
 
 export const EARTH_RADIUS_KM = 6371.0088;
@@ -69,6 +69,21 @@ export function placeGeometry(g: MultiPolygon, origin: LonLat, target: LonLat, r
 
 /** How much a web map inflates areas at a given latitude (sec²φ). */
 export const mercatorInflation = (lat: number) => 1 / Math.cos(lat * RAD) ** 2;
+
+// a web map at scale 1, cut at the same ±85.05° as the map
+const WEB_MAP = geoMercator()
+  .scale(1)
+  .translate([0, 0])
+  .clipExtent([
+    [-4, -MAX_MERC_Y],
+    [4, MAX_MERC_Y],
+  ]);
+/**
+ * How big a shape is drawn on a web map, in arbitrary units (only ratios mean anything). Unlike mercatorInflation at one
+ * point, this follows the whole shape: Greenland's far north is stretched far more than its middle, so the one-point
+ * figure said 11× where the real one is 15×.
+ */
+export const webMapArea = (g: MultiPolygon) => geoPath(WEB_MAP).area(g);
 
 export const mercY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + (Math.max(-85, Math.min(85, lat)) * RAD) / 2));
 export const latFromMercY = (y: number) => (2 * Math.atan(Math.exp(y)) - Math.PI / 2) / RAD;
