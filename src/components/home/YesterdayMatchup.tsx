@@ -128,14 +128,14 @@ function Proof({ shapes, label, mapLabel, realLabel, replay }: { shapes?: [Shape
         type="button"
         onClick={again}
         disabled={!shapes}
-        aria-label={`${label}. ${replay}`}
-        className="block w-full cursor-pointer rounded-xl bg-white p-3 text-left ring-1 ring-line disabled:cursor-default"
+        aria-label={shapes ? `${label}. ${replay}` : label}
+        className="block w-full cursor-pointer rounded-xl bg-white p-2 text-left ring-1 ring-line disabled:cursor-default"
       >
-        <span className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-muted">
+        <span className="flex items-center justify-between gap-1 text-[10px] font-semibold uppercase leading-tight tracking-wide text-muted">
           <span className={landed ? "text-ink" : undefined}>{landed ? realLabel : mapLabel}</span>
           {shapes ? <span className="font-bold normal-case tracking-normal text-link">{replay}</span> : null}
         </span>
-        <svg viewBox={`0 0 ${W} ${H}`} className={`mt-2 block w-full ${rewind ? "[&_*]:!transition-none" : ""}`} aria-hidden="true">
+        <svg viewBox={`0 0 ${W} ${H}`} className={`mt-1 block w-full ${rewind ? "[&_*]:!transition-none" : ""}`} aria-hidden="true">
           <line x1="4" x2={W - 4} y1={H - 1} y2={H - 1} className="stroke-line" />
           {parts?.map((p, i) => {
             const cx = (W / 2) * i + W / 4;
@@ -226,14 +226,13 @@ export function YesterdayMatchup() {
     <section
       aria-labelledby="yesterday-eyebrow yesterday-h"
       aria-busy={pick === undefined || (!!pick && !pick.shapes)}
-      className="rounded-card bg-tile p-4 text-ink ring-1 ring-line sm:p-5"
+      className="rounded-card bg-tile p-4 text-ink ring-1 ring-line"
     >
       <p id="yesterday-eyebrow" className="text-xs font-bold uppercase tracking-wide text-primary">
         {t.eyebrow}
         {pick ? <span className="text-muted"> · #{pick.day}</span> : null}
       </p>
-      {/* two lines kept on phones (long empire names wrap), one on wide screens, so the drawings below don't move */}
-      <h2 id="yesterday-h" className="mt-1 min-h-[2lh] font-display text-2xl leading-tight lg:min-h-[1lh]">
+      <h2 id="yesterday-h" className="mt-0.5 min-h-[1lh] font-display text-lg leading-tight">
         {a && b ? (
           <>
             <span className="text-danger">{a.n}</span> vs <span className="text-primary">{b.n}</span>
@@ -244,24 +243,30 @@ export function YesterdayMatchup() {
           <span className="sr-only">{t.loading}</span>
         )}
       </h2>
-      <div className="mt-3">
-        <Proof
-          shapes={pick?.shapes}
-          label={a && b ? t.proofSr(a.n, b.n) : t.loading}
-          mapLabel={t.mapLabel}
-          realLabel={t.realLabel}
-          replay={t.replay}
-        />
+      {/* compact: the picture beside the trick in words */}
+      <div className="mt-2 flex items-start gap-3">
+        <div className="w-[46%] max-w-56 shrink-0">
+          {/* a new key each day, so a tab left open past midnight plays the new pair from the map's size */}
+          <Proof
+            key={pick?.date ?? "none"}
+            shapes={pick?.shapes}
+            label={a && b ? t.proofSr(a.n, b.n) : pick === null ? t.unavailable : t.loading}
+            mapLabel={t.mapLabel}
+            realLabel={t.realLabel}
+            replay={t.replay}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="min-h-[4lh] text-sm leading-snug">
+            {pick === null ? t.unavailableLine : null}
+            {mapNote ? `${mapNote} ` : null}
+            <span className="font-semibold">{realNote}</span>
+          </p>
+          <Link href="/daily" transitionTypes={["to-daily"]} className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-link hover:underline">
+            {playedToday ? t.played : t.play} <span aria-hidden="true">→</span>
+          </Link>
+        </div>
       </div>
-      {/* the trick in words: what the map shows, then the truth */}
-      <p className="mt-3 min-h-[3lh] text-sm leading-relaxed sm:min-h-[2lh]">
-        {pick === null ? t.unavailableLine : null}
-        {mapNote ? `${mapNote} ` : null}
-        <span className="font-semibold">{realNote}</span>
-      </p>
-      <Link href="/daily" transitionTypes={["to-daily"]} className="inline-flex min-h-11 items-center gap-1 font-bold text-link hover:underline">
-        {playedToday ? t.played : t.play} <span aria-hidden="true">→</span>
-      </Link>
     </section>
   );
 }

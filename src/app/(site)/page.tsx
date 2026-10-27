@@ -62,8 +62,8 @@ export default function HomePage() {
         }}
       />
 
-      {/* Hero: the claim and yesterday's matchup as proof, then the two games side by side (today's five and endless
-          mode) and the map, all over a slowly turning globe */}
+      {/* Hero: the claim, the two games side by side (today's five and endless mode), the Best streaks board, yesterday's
+          matchup and the map, all over a slowly turning globe */}
       <section data-hero className="relative isolate overflow-hidden bg-paper text-ink">
         <div className="pointer-events-none absolute inset-0 -z-10">
           {/* positioned with left/top, not translate: Chrome counted the translate-centred float as a layout shift */}
@@ -79,38 +79,40 @@ export default function HomePage() {
           <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#fff8ec_0%,rgba(255,248,236,0.88)_38%,rgba(255,248,236,0)_62%)] lg:block" />
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 md:pb-12 md:pt-9">
-          {/* proof first: the headline makes the claim and yesterday's real matchup shows it, a normal map's drawing
-              shrinking to real size, before anything asks you to play. Phones: headline, the proof, then the games and
-              the map. Wide screens: the headline beside the proof, then the two games side by side, then the map */}
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
-            <div>
-              <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
-                {home.title.split(home.titleAccent).flatMap((part, i) =>
-                  i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
-                )}
-              </h1>
-              <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">{home.hub.mission}</p>
-            </div>
-            <YesterdayMatchup />
-          </div>
-          <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {/* games first: the headline, then today's five and endless mode side by side, then the Best streaks board (the
+              competition), with yesterday's matchup (the proof, small) and the map beside it. Phones: one column in that
+              order */}
+          <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
+            {home.title.split(home.titleAccent).flatMap((part, i) =>
+              i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
+            )}
+          </h1>
+          {/* phones get one line, so the games start on the first screen */}
+          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">
+            <span className="sm:hidden">{home.hub.missionShort}</span>
+            <span className="hidden sm:inline">{home.hub.mission}</span>
+          </p>
+          <div className="mt-5 grid gap-4 md:mt-6 md:grid-cols-2">
             <HeroPlay />
             <HeroEndless />
           </div>
-          <div className="mt-4">
-            <MapCard />
+          <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start">
+            <HeroLeaderboard />
+            <div className="grid gap-4">
+              <YesterdayMatchup />
+              <MapCard />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* The Best streaks board, and the rest of the site */}
-      <div className="mx-auto grid max-w-6xl gap-x-6 gap-y-10 px-4 pb-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] lg:items-start">
-        <HeroLeaderboard />
+      {/* the rest of the site */}
+      <div className="mx-auto max-w-6xl px-4 pb-12 pt-2">
         <section aria-labelledby="explore">
           <h2 id="explore" className="font-display text-2xl text-ink md:text-3xl">
             {x.title}
           </h2>
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {places.map(({ href, Icon, title, line }) => (
               <li key={href}>
                 <Link href={href} className="press-card flex min-h-16 items-center gap-3 rounded-card px-4 py-3 hover:border-primary">

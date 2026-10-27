@@ -27,7 +27,7 @@ export const home = {
     unavailableLine: "Yesterday's shapes couldn't load just now.",
     mapLabel: "On a normal map",
     realLabel: "Real size",
-    replay: "Watch again",
+    replay: "Replay",
     // the picture, for screen readers (the line under it says the sizes in words)
     proofSr: (a: string, b: string) => `${a} and ${b}, drawn as a normal map shows them, then shrinking or growing to their real sizes`,
     play: "Play today's five",
@@ -42,6 +42,8 @@ export const home = {
   hub: {
     mission:
       `Most web maps puff up land near the poles, so the places you know best are drawn the wrong size. ${site.name} shows nearly every country and empire at its real size, across 4,000 years of borders.`,
+    // phones show this one line instead of `mission`, so the games start on the first screen
+    missionShort: "Normal web maps get sizes wrong. Can you tell what's really bigger?",
     playEyebrow: "Today's game",
     playTitle: "Which is bigger?",
     playLead: "Five matchups, about two minutes. The map will try to fool you.",
