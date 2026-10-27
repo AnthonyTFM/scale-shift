@@ -1,0 +1,8605 @@
+{
+ "1900": [
+  [
+   2851153,
+   "Russian Empire"
+  ],
+  [
+   2694485,
+   "Manchu Empire",
+   {
+    "adopts": [
+     "Qing Dynasty"
+    ]
+   }
+  ],
+  [
+   2874806,
+   "United States of America"
+  ],
+  [
+   2831052,
+   "Canada"
+  ],
+  [
+   2751092,
+   "Brazil",
+   {
+    "adopts": [
+     "Brazilian Republic"
+    ]
+   }
+  ],
+  [
+   2961101,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2866012,
+   "Algeria",
+   {
+    "partsIn": [
+     [
+      -9,
+      18,
+      12,
+      38
+     ]
+    ],
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2866012,
+   "France",
+   {
+    "partsIn": [
+     [
+      -6,
+      41,
+      10,
+      52
+     ]
+    ]
+   }
+  ],
+  [
+   2860948,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Confederation"
+    ]
+   }
+  ],
+  [
+   2831546,
+   "Anglo-Egyptian Sudan",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828316,
+   "Western Australia (UK)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961759,
+   "Congo Free State",
+   {
+    "props": {
+     "w": "The personal possession of King Leopold II of Belgium, 1885–1908."
+    },
+    "adopts": [
+     "Belgian Congo"
+    ]
+   }
+  ],
+  [
+   2828319,
+   "South Australia (UK)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2869935,
+   "Greenland",
+   {
+    "partsIn": [
+     [
+      -75,
+      59,
+      -10,
+      84
+     ]
+    ],
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2869935,
+   "Denmark",
+   {
+    "partsIn": [
+     [
+      -25,
+      54,
+      16,
+      67
+     ]
+    ]
+   }
+  ],
+  [
+   2906151,
+   "French West Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2692584,
+   "Ottoman Empire"
+  ],
+  [
+   2828315,
+   "Queensland (UK)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2859728,
+   "Mexico"
+  ],
+  [
+   2864437,
+   "Netherlands Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2694889,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2690843,
+   "Ethiopia",
+   {
+    "adopts": [
+     "Ethiopian Empire"
+    ]
+   }
+  ],
+  [
+   2839914,
+   "Territory of Chad"
+  ],
+  [
+   2842572,
+   "United States of Venezuela",
+   {
+    "adopts": [
+     "Venezuela"
+    ]
+   }
+  ],
+  [
+   2962064,
+   "Angola",
+   {
+    "props": {
+     "s": "Portugal"
+    },
+    "adopts": [
+     "Kingdom of Portugal"
+    ]
+   }
+  ],
+  [
+   2918492,
+   "French Congo",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2863617,
+   "German East Africa",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2840010,
+   "German South-West Africa",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2846198,
+   "New South Wales (UK)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690864,
+   "Portuguese East Africa",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2860799,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2828439,
+   "Cape Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803155,
+   "Barotziland – North-Western Rhodesia"
+  ],
+  [
+   2828669,
+   "Northern Nigeria",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Proclaimed a British protectorate in January 1900; the Sokoto Caliphate, its largest state, held out until 1903."
+    },
+    "adopts": [
+     "Sokoto Caliphate"
+    ]
+   }
+  ],
+  [
+   2848856,
+   "Ecuador"
+  ],
+  [
+   2848969,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2947202,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2961096,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Emirate of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2865796,
+   "Madagascar",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2874874,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803159,
+   "Barotziland"
+  ],
+  [
+   2690857,
+   "Kamerun",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2831418,
+   "British East Africa",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2863122,
+   "Paraguay"
+  ],
+  [
+   2848688,
+   "Bolivia"
+  ],
+  [
+   2917849,
+   "Zinder Military Territory"
+  ],
+  [
+   2889890,
+   "Empire of Japan"
+  ],
+  [
+   2831468,
+   "Southern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Run by the British South Africa Company."
+    }
+   }
+  ],
+  [
+   2869649,
+   "Sokoto Caliphate"
+  ],
+  [
+   2963549,
+   "Morocco"
+  ],
+  [
+   2831427,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889836,
+   "Philippines",
+   {
+    "props": {
+     "s": "United States of America",
+     "w": "Ceded by Spain to the United States in 1898; the Philippine–American War went on until 1902."
+    }
+   }
+  ],
+  [
+   2828465,
+   "Transvaal",
+   {
+    "props": {
+     "w": "The South African Republic. Britain took Pretoria in June 1900 and annexed it in September; Boer forces fought on until 1902."
+    }
+   }
+  ],
+  [
+   2803153,
+   "North Eastern Rhodesia"
+  ],
+  [
+   2921268,
+   "New Zealand",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2920530,
+   "French Indochina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2921507,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2961779,
+   "German New Guinea",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2796705,
+   "Victoria (UK)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2917203,
+   "French Upper Volta",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2694487,
+   "Korea",
+   {
+    "adopts": [
+     "Korean Empire"
+    ]
+   }
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Suriname",
+   {
+    "partsIn": [
+     [
+      -58.5,
+      1.5,
+      -53.5,
+      6.5
+     ]
+    ],
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Curaçao",
+   {
+    "partsIn": [
+     [
+      -70.5,
+      11.8,
+      -67.8,
+      12.8
+     ]
+    ],
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Dutch Windward Islands",
+   {
+    "partsIn": [
+     [
+      -63.5,
+      17.3,
+      -62.7,
+      18.3
+     ]
+    ],
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Netherlands",
+   {
+    "partsIn": [
+     [
+      3,
+      50,
+      8,
+      54
+     ]
+    ]
+   }
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2926848,
+   "British Somaliland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828508,
+   "Crown Colony of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690947,
+   "Tunisia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2923111,
+   "Sultanate of Hobyo",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2691740,
+   "Orange Free State",
+   {
+    "props": {
+     "w": "A Boer republic at war with Britain, which annexed it in May 1900; its forces fought on until 1902."
+    }
+   }
+  ],
+  [
+   2961075,
+   "Sarawak",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Ruled by the Brooke family under British protection; a British colony from 1946 until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2690839,
+   "Eritrea",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2828668,
+   "Southern Nigeria",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A British protectorate from 1900 (shown approximately)."
+    }
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2808172,
+   "Honduras"
+  ],
+  [
+   2859573,
+   "Guatemala"
+  ],
+  [
+   2905974,
+   "Oman",
+   {
+    "adopts": [
+     "Sultanate of Muscat and Oman"
+    ]
+   }
+  ],
+  [
+   2861553,
+   "Cuba",
+   {
+    "props": {
+     "s": "United States of America",
+     "w": "Under United States military government from 1898 until independence in May 1902."
+    }
+   }
+  ],
+  [
+   2918031,
+   "Sultanate of Dar al Kuti"
+  ],
+  [
+   2803133,
+   "British Central Africa",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2923109,
+   "Majeerteen Sultanate",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2828441,
+   "Natal",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    },
+    "adopts": [
+     "Natalia Republic"
+    ]
+   }
+  ],
+  [
+   2691472,
+   "Togoland",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2861194,
+   "French Guiana"
+  ],
+  [
+   2828665,
+   "Lagos",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "The British Colony and Protectorate of Lagos (shown approximately)."
+    }
+   }
+  ],
+  [
+   2848287,
+   "North Borneo",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Run by the British North Borneo Company until 1946, then a British colony until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848459,
+   "Malaya"
+  ],
+  [
+   2846199,
+   "Tasmania (UK)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848313,
+   "Ceylon"
+  ],
+  [
+   2828425,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2841713,
+   "Dominican Republic"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2841719,
+   "Haiti",
+   {
+    "adopts": [
+     "Empire of Haiti"
+    ]
+   }
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803437,
+   "French Somaliland",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2808164,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848476,
+   "Johore Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2876367,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2841938,
+   "Chan Santa Cruz"
+  ],
+  [
+   2864415,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    },
+    "adopts": [
+     "Portuguese Colonies"
+    ]
+   }
+  ],
+  [
+   2834851,
+   "Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834850,
+   "Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961067,
+   "British Protectorate of Brunei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2839750,
+   "Protectorate of the Portuguese Congo",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2831408,
+   "British East Africa",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2923096,
+   "Italian Somaliland",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2834829,
+   "Trinidad and Tobago",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848279,
+   "Straits Settlements",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961788,
+   "Samoa"
+  ],
+  [
+   2860768,
+   "Sultanate of Sulu",
+   {
+    "props": {
+     "s": "United States of America"
+    }
+   }
+  ],
+  [
+   2876347,
+   "Establishments in Oceania"
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A sultanate under British protection from 1890."
+    }
+   }
+  ],
+  [
+   2865901,
+   "Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831875,
+   "Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2860735,
+   "Confederate States of Lanao"
+  ],
+  [
+   2865790,
+   "Comoros",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Guadeloupe"
+  ],
+  [
+   2834750,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694575,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2962074,
+   "São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2889933,
+   "Kwangchowan",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848211,
+   "British Weihaiwei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2889899,
+   "Kiautschou Bay Leased Territory",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2865806,
+   "Sultanate of Ndzuwani"
+  ],
+  [
+   2846200,
+   "Protectorate of Tonga",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2832944,
+   "Colony of Barbados",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831184,
+   "Gilbert and Ellice Islands Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2696415,
+   "Danish West Indies",
+   {
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2889770,
+   "German Protectorate of the Marshall Islands",
+   {
+    "props": {
+     "s": "Germany"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846168,
+   "Niue"
+  ],
+  [
+   2865808,
+   "Sultanate of Mwali"
+  ],
+  [
+   2848195,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846265,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2801211,
+   "British New Guinea",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A British colony, run with Queensland's backing; Australia took it over in 1906 as the Territory of Papua."
+    }
+   }
+  ],
+  [
+   2851348,
+   "Khanate of Khiva",
+   {
+    "props": {
+     "s": "Russian Empire",
+     "w": "A Russian protectorate from 1873 until the khan was overthrown in 1920."
+    }
+   }
+  ],
+  [
+   2961275,
+   "Emirate of Bukhara",
+   {
+    "props": {
+     "s": "Russian Empire",
+     "w": "A Russian protectorate from 1868 until the Red Army took Bukhara in 1920."
+    }
+   }
+  ],
+  [
+   2961764,
+   "Lado Enclave",
+   {
+    "props": {
+     "s": "Congo Free State",
+     "w": "Leased to King Leopold II for the Congo Free State in 1894; it went back to the Anglo-Egyptian Sudan in 1910, after his death."
+    }
+   }
+  ]
+ ],
+ "1914": [
+  [
+   2851294,
+   "Russian Empire"
+  ],
+  [
+   2873299,
+   "United States"
+  ],
+  [
+   2831069,
+   "Canada"
+  ],
+  [
+   2694664,
+   "Republic of China"
+  ],
+  [
+   2905001,
+   "Brazil",
+   {
+    "adopts": [
+     "Brazilian Republic"
+    ]
+   }
+  ],
+  [
+   2961101,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2917206,
+   "French West Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2866012,
+   "Algeria",
+   {
+    "partsIn": [
+     [
+      -9,
+      18,
+      12,
+      38
+     ]
+    ],
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2866012,
+   "France",
+   {
+    "partsIn": [
+     [
+      -6,
+      41,
+      10,
+      52
+     ]
+    ]
+   }
+  ],
+  [
+   2860947,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Confederation"
+    ]
+   }
+  ],
+  [
+   2961762,
+   "Anglo-Egyptian Sudan",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961758,
+   "Belgian Congo",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2869935,
+   "Greenland",
+   {
+    "partsIn": [
+     [
+      -75,
+      59,
+      -10,
+      84
+     ]
+    ],
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2869935,
+   "Denmark",
+   {
+    "partsIn": [
+     [
+      -25,
+      54,
+      16,
+      67
+     ]
+    ]
+   }
+  ],
+  [
+   2840000,
+   "French Equatorial Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2841937,
+   "Mexico"
+  ],
+  [
+   2864434,
+   "Netherlands Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2828810,
+   "Tibet"
+  ],
+  [
+   2849728,
+   "Ottoman Empire"
+  ],
+  [
+   2694889,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2918030,
+   "French Equatorial Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2691747,
+   "South Africa",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690843,
+   "Abyssinia",
+   {
+    "adopts": [
+     "Ethiopian Empire"
+    ]
+   }
+  ],
+  [
+   2962064,
+   "Angola",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691743,
+   "Northern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2863617,
+   "German E. Africa (Tanganyika)",
+   {
+    "props": {
+     "s": "German Empire"
+    }
+   }
+  ],
+  [
+   2842571,
+   "Venezuela"
+  ],
+  [
+   2690856,
+   "Nigeria",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690837,
+   "Italian Tripolitania",
+   {
+    "props": {
+     "s": "Kingdom of Italy"
+    }
+   }
+  ],
+  [
+   2828752,
+   "Kamerun",
+   {
+    "props": {
+     "s": "German Empire"
+    }
+   }
+  ],
+  [
+   2840010,
+   "German South-West Africa",
+   {
+    "props": {
+     "s": "German Empire"
+    }
+   }
+  ],
+  [
+   2690864,
+   "Mozambique",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848843,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2745674,
+   "French Indochina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2694484,
+   "Empire of Japan"
+  ],
+  [
+   2803190,
+   "Italian Cyrenaica",
+   {
+    "props": {
+     "s": "Kingdom of Italy"
+    }
+   }
+  ],
+  [
+   2961096,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Emirate of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2831417,
+   "British East Africa",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848860,
+   "Ecuador"
+  ],
+  [
+   2848976,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2905000,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2865795,
+   "Madagascar (France)",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874871,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2863122,
+   "Paraguay"
+  ],
+  [
+   2848686,
+   "Bolivia"
+  ],
+  [
+   2831468,
+   "Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828507,
+   "Dominion of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889835,
+   "Philippines"
+  ],
+  [
+   2801019,
+   "New Zealand"
+  ],
+  [
+   2961761,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2921507,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2889769,
+   "German New Guinea",
+   {
+    "props": {
+     "s": "German Empire"
+    }
+   }
+  ],
+  [
+   2866016,
+   "Morocco"
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Suriname",
+   {
+    "partsIn": [
+     [
+      -58.5,
+      1.5,
+      -53.5,
+      6.5
+     ]
+    ],
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Curaçao",
+   {
+    "partsIn": [
+     [
+      -70.5,
+      11.8,
+      -67.8,
+      12.8
+     ]
+    ],
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Dutch Windward Islands",
+   {
+    "partsIn": [
+     [
+      -63.5,
+      17.3,
+      -62.7,
+      18.3
+     ]
+    ],
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2883430,
+   "Netherlands",
+   {
+    "partsIn": [
+     [
+      3,
+      50,
+      8,
+      54
+     ]
+    ]
+   }
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2926848,
+   "British Somaliland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690947,
+   "Tunisia"
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2923111,
+   "Sultanate of Hobyo",
+   {
+    "props": {
+     "s": "Kingdom of Italy"
+    }
+   }
+  ],
+  [
+   2961074,
+   "Sarawak",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Ruled by the Brooke family under British protection; a British colony from 1946 until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2690839,
+   "Eritrea",
+   {
+    "props": {
+     "s": "Kingdom of Italy"
+    }
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2808172,
+   "Honduras"
+  ],
+  [
+   2859573,
+   "Guatemala"
+  ],
+  [
+   2905974,
+   "Muscat and Oman",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    },
+    "adopts": [
+     "Imamate of Oman"
+    ]
+   }
+  ],
+  [
+   2861550,
+   "Cuba",
+   {
+    "adopts": [
+     "Republic of Cuba"
+    ]
+   }
+  ],
+  [
+   2803134,
+   "Nyasaland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2923109,
+   "Majeerteen Sultanate",
+   {
+    "props": {
+     "s": "Kingdom of Italy"
+    }
+   }
+  ],
+  [
+   2691472,
+   "Togoland",
+   {
+    "props": {
+     "s": "German Empire"
+    }
+   }
+  ],
+  [
+   2861194,
+   "French Guiana"
+  ],
+  [
+   2828423,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848286,
+   "North Borneo",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Run by the British North Borneo Company until 1946, then a British colony until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone"
+  ],
+  [
+   2873307,
+   "Panama",
+   {
+    "adopts": [
+     "Republic of Panama"
+    ]
+   }
+  ],
+  [
+   2848459,
+   "Federated Malay States",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848313,
+   "Ceylon"
+  ],
+  [
+   2923088,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2841713,
+   "Dominican Republic"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2841719,
+   "Haiti",
+   {
+    "adopts": [
+     "Empire of Haiti"
+    ]
+   }
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803437,
+   "French Somaliland",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2808164,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848476,
+   "Johore Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2876367,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2691746,
+   "Swaziland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848477,
+   "Kelantan Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2864414,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848478,
+   "Trengganu Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834851,
+   "Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846175,
+   "New Hebrides",
+   {
+    "props": {
+     "w": "An Anglo-French condominium from 1906, until independence as Vanuatu in 1980."
+    }
+   }
+  ],
+  [
+   2834850,
+   "Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2923095,
+   "Italian Somaliland",
+   {
+    "props": {
+     "s": "Kingdom of Italy"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848479,
+   "Kedah Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2839750,
+   "Protectorate of the Portuguese Congo",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2831408,
+   "British East Africa",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961066,
+   "Brunei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834829,
+   "Trinidad and Tobago",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848278,
+   "Straits Settlements",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961788,
+   "Samoa"
+  ],
+  [
+   2860768,
+   "Sultanate of Sulu",
+   {
+    "props": {
+     "s": "United States"
+    }
+   }
+  ],
+  [
+   2876346,
+   "French Establishments in Oceania",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A sultanate under British protection from 1890 until 1963."
+    }
+   }
+  ],
+  [
+   2865901,
+   "Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831873,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Guadeloupe"
+  ],
+  [
+   2834750,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694575,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848480,
+   "Perlis Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889933,
+   "Kwangchowan",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848211,
+   "British Weihaiwei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2889899,
+   "Kiautschou Bay Leased Territory",
+   {
+    "props": {
+     "s": "German Empire"
+    }
+   }
+  ],
+  [
+   2846200,
+   "Tonga"
+  ],
+  [
+   2832944,
+   "Barbados"
+  ],
+  [
+   2831184,
+   "Gilbert and Ellice Islands Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2696415,
+   "Danish West Indies",
+   {
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831866,
+   "Colony of Seychelles",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848195,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846264,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2801211,
+   "Territory of Papua",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "British New Guinea until 1906, then run by Australia."
+    }
+   }
+  ],
+  [
+   2851348,
+   "Khanate of Khiva",
+   {
+    "props": {
+     "s": "Russian Empire",
+     "w": "A Russian protectorate from 1873 until the khan was overthrown in 1920."
+    }
+   }
+  ],
+  [
+   2961275,
+   "Emirate of Bukhara",
+   {
+    "props": {
+     "s": "Russian Empire",
+     "w": "A Russian protectorate from 1868 until the Red Army took Bukhara in 1920."
+    }
+   }
+  ]
+ ],
+ "1920": [
+  [
+   2959040,
+   "Soviet Russia (RSFSR)",
+   {
+    "adopts": [
+     "Republics of the Soviet Union"
+    ]
+   }
+  ],
+  [
+   2874809,
+   "United States"
+  ],
+  [
+   2831069,
+   "Canada"
+  ],
+  [
+   2694664,
+   "Republic of China"
+  ],
+  [
+   2905001,
+   "Brazil",
+   {
+    "adopts": [
+     "Brazilian Republic"
+    ]
+   }
+  ],
+  [
+   2828360,
+   "Australia"
+  ],
+  [
+   2906139,
+   "French West Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848483,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860947,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Confederation"
+    ]
+   }
+  ],
+  [
+   2961762,
+   "Sudan"
+  ],
+  [
+   2961758,
+   "Belgian Congo",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2831848,
+   "Union of South Africa"
+  ],
+  [
+   2692906,
+   "Mexico"
+  ],
+  [
+   2864434,
+   "Dutch East Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2828810,
+   "Tibet"
+  ],
+  [
+   2694889,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2690861,
+   "Angola"
+  ],
+  [
+   2690843,
+   "Ethiopia",
+   {
+    "adopts": [
+     "Ethiopian Empire"
+    ]
+   }
+  ],
+  [
+   2803205,
+   "Egypt",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2842571,
+   "Venezuela"
+  ],
+  [
+   2855612,
+   "Tanganyika Territory",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690856,
+   "Nigeria"
+  ],
+  [
+   2690837,
+   "Italian Tripolitania",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2863628,
+   "Mozambique"
+  ],
+  [
+   2848843,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2962062,
+   "Northern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2745674,
+   "French Indochina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2851273,
+   "Empire of Japan"
+  ],
+  [
+   2803190,
+   "Italian Cyrenaica",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2961096,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Emirate of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2831416,
+   "Kenya",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2839999,
+   "French Equatorial Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865795,
+   "Madagascar (France)",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2863740,
+   "Ottoman Sultanate",
+   {
+    "adopts": [
+     "Ottoman Empire"
+    ]
+   }
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874871,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2848859,
+   "Ecuador"
+  ],
+  [
+   2848975,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2905000,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2863122,
+   "Paraguay"
+  ],
+  [
+   2848686,
+   "Bolivia"
+  ],
+  [
+   2848214,
+   "Ukrainian SSR",
+   {
+    "props": {
+     "s": "Soviet Russia (RSFSR)",
+     "w": "Soviet from 1919; the Ukrainian People's Republic, its rival, was driven out in November 1920. It joined the Soviet Union at its founding in 1922."
+    }
+   }
+  ],
+  [
+   2839465,
+   "Mesopotamia (GB)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828747,
+   "French Cameroons",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831468,
+   "Southern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828507,
+   "Dominion of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889835,
+   "Philippines"
+  ],
+  [
+   2855497,
+   "French Upper Volta",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846161,
+   "New Zealand"
+  ],
+  [
+   2961761,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848485,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2923094,
+   "Italian Somaliland",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2926848,
+   "British Somaliland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2863750,
+   "Greece",
+   {
+    "adopts": [
+     "First Hellenic Republic"
+    ]
+   }
+  ],
+  [
+   2690947,
+   "Tunisia"
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2863796,
+   "Armenian SSR",
+   {
+    "props": {
+     "s": "Soviet Russia (RSFSR)",
+     "w": "The Republic of Armenia lost Kars to Turkey and became a Soviet republic in December 1920."
+    }
+   }
+  ],
+  [
+   2923111,
+   "Sultanate of Hobyo",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2961074,
+   "Sarawak",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Ruled by the Brooke family under British protection; a British colony from 1946 until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2690839,
+   "Eritrea",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2808172,
+   "Honduras"
+  ],
+  [
+   2864000,
+   "State of Aleppo",
+   {
+    "props": {
+     "s": "France"
+    },
+    "adopts": [
+     "French Mandate for Syria and Lebanon"
+    ]
+   }
+  ],
+  [
+   2859573,
+   "Guatemala"
+  ],
+  [
+   2905974,
+   "Muscat and Oman",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    },
+    "adopts": [
+     "Sultanate of Muscat and Oman"
+    ]
+   }
+  ],
+  [
+   2861550,
+   "Cuba",
+   {
+    "adopts": [
+     "Republic of Cuba"
+    ]
+   }
+  ],
+  [
+   2803134,
+   "Nyasaland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2923109,
+   "Majeerteen Sultanate",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2863995,
+   "State of Damascus",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2861194,
+   "French Guiana"
+  ],
+  [
+   2828750,
+   "British Cameroons",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828423,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848286,
+   "North Borneo",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Run by the British North Borneo Company until 1946, then a British colony until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone"
+  ],
+  [
+   2873307,
+   "Panama",
+   {
+    "adopts": [
+     "Republic of Panama"
+    ]
+   }
+  ],
+  [
+   2848459,
+   "Federated Malay States",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848313,
+   "Ceylon"
+  ],
+  [
+   2923088,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2863621,
+   "Ruanda-Urundi",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2841712,
+   "Dominican Republic"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694159,
+   "British Togoland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "The west of German Togoland, a British mandate from 1922 run with the Gold Coast; it joined Ghana in 1957."
+    }
+   }
+  ],
+  [
+   2841718,
+   "Haiti"
+  ],
+  [
+   2848316,
+   "Mandatory Palestine (GB)"
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803437,
+   "French Somaliland",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2808164,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848476,
+   "Johore Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2876367,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2691746,
+   "Swaziland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848477,
+   "Kelantan Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2864414,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848478,
+   "Trengganu Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834851,
+   "Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831411,
+   "Protectorate of Kenya",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848319,
+   "Qatar",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846175,
+   "New Hebrides",
+   {
+    "props": {
+     "w": "An Anglo-French condominium from 1906, until independence as Vanuatu in 1980."
+    }
+   }
+  ],
+  [
+   2834850,
+   "Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831357,
+   "State of Greater Lebanon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848479,
+   "Kedah Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848135,
+   "Cyprus",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Ottoman land under British rule from 1878, annexed by Britain in 1914 and a crown colony from 1925 until independence in 1960."
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2839750,
+   "Protectorate of the Portuguese Congo",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2961066,
+   "Brunei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834829,
+   "Trinidad"
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848278,
+   "Straits Settlements",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846171,
+   "Samoa"
+  ],
+  [
+   2876346,
+   "French Establishments in Oceania",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A sultanate under British protection from 1890 until 1963."
+    }
+   }
+  ],
+  [
+   2865901,
+   "Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2830316,
+   "Dodecanese Islands",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831873,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Guadeloupe"
+  ],
+  [
+   2834750,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694575,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2846231,
+   "Gilbert and Ellice Islands Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848480,
+   "Perlis Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889933,
+   "Kwangchowan",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848211,
+   "British Weihaiwei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A British Crown dependency, not part of the United Kingdom."
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2889899,
+   "Kiautschou Bay Leased Territory"
+  ],
+  [
+   2739874,
+   "Andorra",
+   {
+    "adopts": [
+     "Principality of Andorra"
+    ]
+   }
+  ],
+  [
+   2846200,
+   "Tonga"
+  ],
+  [
+   2832944,
+   "Barbados"
+  ],
+  [
+   2801185,
+   "Crown Colony of Malta",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831866,
+   "Colony of Seychelles",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2746467,
+   "Liechtenstein"
+  ],
+  [
+   2876371,
+   "Wallis and Futuna Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2828299,
+   "Jersey",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848195,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2853735,
+   "San Marino"
+  ],
+  [
+   2846264,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2958014,
+   "Far Eastern Republic",
+   {
+    "props": {
+     "w": "A buffer state Soviet Russia set up in April 1920 between itself and the Japanese in the Far East; it merged into Soviet Russia in November 1922."
+    }
+   }
+  ],
+  [
+   2848186,
+   "Byelorussian SSR",
+   {
+    "props": {
+     "s": "Soviet Russia (RSFSR)",
+     "w": "Re-founded in July 1920 around Minsk; it joined the Soviet Union in 1922, and gained the land to its east from Soviet Russia in 1924 and 1926."
+    }
+   }
+  ],
+  [
+   2697987,
+   "Azerbaijan SSR",
+   {
+    "props": {
+     "s": "Soviet Russia (RSFSR)",
+     "w": "Soviet from April 1920, when the Red Army ended the Azerbaijan Democratic Republic."
+    }
+   }
+  ],
+  [
+   2851346,
+   "Khorezm People's Soviet Republic",
+   {
+    "props": {
+     "s": "Soviet Russia (RSFSR)",
+     "w": "Set up in place of the Khanate of Khiva in 1920; divided between the Soviet Uzbek and Turkmen republics in 1924."
+    }
+   }
+  ],
+  [
+   2851359,
+   "Bukharan People's Soviet Republic",
+   {
+    "props": {
+     "s": "Soviet Russia (RSFSR)",
+     "w": "Set up after the Red Army took Bukhara in September 1920; divided among the Soviet republics of Central Asia in 1924."
+    }
+   }
+  ],
+  [
+   2801211,
+   "Territory of Papua",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "British New Guinea until 1906, then run by Australia."
+    }
+   }
+  ],
+  [
+   2801212,
+   "Territory of New Guinea",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "German New Guinea until 1914; an Australian mandate of the League of Nations from December 1920 (Japanese-occupied in 1942–45)."
+    }
+   }
+  ],
+  [
+   2920537,
+   "Tonkin",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French protectorate, part of French Indochina."
+    }
+   }
+  ],
+  [
+   2920531,
+   "Annam",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French protectorate under the Nguyễn emperors at Huế, part of French Indochina."
+    }
+   }
+  ],
+  [
+   2920527,
+   "Cochinchina",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French colony, part of French Indochina."
+    }
+   }
+  ]
+ ],
+ "1930": [
+  [
+   2851157,
+   "USSR"
+  ],
+  [
+   2874804,
+   "United States"
+  ],
+  [
+   2831058,
+   "Canada"
+  ],
+  [
+   2905001,
+   "Brazil",
+   {
+    "adopts": [
+     "Brazilian Republic"
+    ]
+   }
+  ],
+  [
+   2828360,
+   "Australia"
+  ],
+  [
+   2889460,
+   "Republic of China"
+  ],
+  [
+   2906139,
+   "French West Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848483,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860947,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Republic"
+    ]
+   }
+  ],
+  [
+   2961762,
+   "Sudan"
+  ],
+  [
+   2961758,
+   "Belgian Congo",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2831731,
+   "Union of South Africa"
+  ],
+  [
+   2692906,
+   "Mexico"
+  ],
+  [
+   2864434,
+   "Dutch East Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2828810,
+   "Tibet"
+  ],
+  [
+   2694889,
+   "Persia",
+   {
+    "adopts": [
+     "Pahlavi Dynasty"
+    ]
+   }
+  ],
+  [
+   2942671,
+   "Mongolia",
+   {
+    "adopts": [
+     "Mongolian People's Republic"
+    ]
+   }
+  ],
+  [
+   2690861,
+   "Angola"
+  ],
+  [
+   2923091,
+   "Ethiopia",
+   {
+    "adopts": [
+     "Ethiopian Empire"
+    ]
+   }
+  ],
+  [
+   2803204,
+   "Egypt",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    },
+    "adopts": [
+     "Kingdom of Egypt"
+    ]
+   }
+  ],
+  [
+   2842571,
+   "Venezuela"
+  ],
+  [
+   2855612,
+   "Tanganyika Territory",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690856,
+   "Nigeria"
+  ],
+  [
+   2690837,
+   "Italian Tripolitania",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2698263,
+   "Mozambique"
+  ],
+  [
+   2962062,
+   "Northern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2801347,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2745674,
+   "French Indochina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2889779,
+   "Empire of Japan"
+  ],
+  [
+   2803190,
+   "Italian Cyrenaica",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2822863,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Kingdom of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2839999,
+   "French Equatorial Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865840,
+   "Madagascar (France)",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831414,
+   "Kenya",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874871,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2863122,
+   "Paraguay"
+  ],
+  [
+   2848686,
+   "Bolivia"
+  ],
+  [
+   2923092,
+   "Italian Somaliland",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2839465,
+   "Iraq",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848857,
+   "Ecuador"
+  ],
+  [
+   2848975,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2848865,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2828747,
+   "French Cameroons",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2830879,
+   "Dominion of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831077,
+   "Dominion of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831467,
+   "Southern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889835,
+   "Philippines"
+  ],
+  [
+   2855497,
+   "French Upper Volta",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846160,
+   "New Zealand"
+  ],
+  [
+   2848485,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831426,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2863990,
+   "Syria (France)",
+   {
+    "props": {
+     "s": "France"
+    },
+    "adopts": [
+     "French Mandate for Syria and Lebanon"
+    ]
+   }
+  ],
+  [
+   2926848,
+   "British Somaliland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2849759,
+   "Tuvan People's Republic",
+   {
+    "props": {
+     "w": "Independent in name from 1921, recognised only by the Soviet Union and Mongolia; the Soviet Union annexed it in 1944."
+    }
+   }
+  ],
+  [
+   2690947,
+   "Tunisia"
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2961074,
+   "Sarawak",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Ruled by the Brooke family under British protection; a British colony from 1946 until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2690839,
+   "Eritrea",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2808161,
+   "Honduras"
+  ],
+  [
+   2861549,
+   "Cuba",
+   {
+    "adopts": [
+     "Republic of Cuba"
+    ]
+   }
+  ],
+  [
+   2807664,
+   "Guatemala"
+  ],
+  [
+   2905974,
+   "Muscat and Oman",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803134,
+   "Nyasaland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2848317,
+   "Transjordan",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861194,
+   "French Guiana"
+  ],
+  [
+   2828750,
+   "British Cameroons",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828423,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848286,
+   "North Borneo",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Run by the British North Borneo Company until 1946, then a British colony until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone"
+  ],
+  [
+   2873307,
+   "Panama",
+   {
+    "adopts": [
+     "Republic of Panama"
+    ]
+   }
+  ],
+  [
+   2848459,
+   "Federated Malay States",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848313,
+   "Ceylon"
+  ],
+  [
+   2923088,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2863620,
+   "Ruanda-Urundi",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2841711,
+   "Dominican Republic"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694159,
+   "British Togoland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "The west of German Togoland, a British mandate from 1922 run with the Gold Coast; it joined Ghana in 1957."
+    }
+   }
+  ],
+  [
+   2841718,
+   "Haiti"
+  ],
+  [
+   2848316,
+   "Mandatory Palestine (GB)",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803437,
+   "French Somaliland",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2808152,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848476,
+   "Johore Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2876367,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2691746,
+   "Swaziland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848477,
+   "Kelantan Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2864414,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848478,
+   "Trengganu Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834851,
+   "Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831411,
+   "Protectorate of Kenya",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848319,
+   "Qatar",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846175,
+   "New Hebrides",
+   {
+    "props": {
+     "w": "An Anglo-French condominium from 1906, until independence as Vanuatu in 1980."
+    }
+   }
+  ],
+  [
+   2834850,
+   "Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831358,
+   "Lebanese Republic",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848479,
+   "Kedah Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2864005,
+   "Jabal al-Druze",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2801349,
+   "Cyprus",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Ottoman land under British rule from 1878, annexed by Britain in 1914 and a crown colony from 1925 until independence in 1960."
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2839750,
+   "Protectorate of the Portuguese Congo",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2863987,
+   "Alawite State",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2961066,
+   "Brunei",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834829,
+   "Trinidad"
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848278,
+   "Straits Settlements",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846170,
+   "Samoa"
+  ],
+  [
+   2876346,
+   "French Establishments in Oceania",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A sultanate under British protection from 1890 until 1963."
+    }
+   }
+  ],
+  [
+   2865901,
+   "Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2920371,
+   "Dodecanese Islands",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831873,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Guadeloupe"
+  ],
+  [
+   2834750,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694575,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2831167,
+   "Gilbert and Ellice Islands Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848480,
+   "Perlis Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2889933,
+   "Kwangchowan",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "A British Crown dependency, not part of the United Kingdom."
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2739874,
+   "Andorra",
+   {
+    "adopts": [
+     "Principality of Andorra"
+    ]
+   }
+  ],
+  [
+   2846200,
+   "Tonga"
+  ],
+  [
+   2832944,
+   "Barbados"
+  ],
+  [
+   2801185,
+   "Crown Colony of Malta",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848194,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831866,
+   "Colony of Seychelles",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2746467,
+   "Liechtenstein"
+  ],
+  [
+   2876371,
+   "Wallis and Futuna Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2828299,
+   "Jersey",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2853735,
+   "San Marino"
+  ],
+  [
+   2846264,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2801211,
+   "Territory of Papua",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "British New Guinea until 1906, then run by Australia."
+    }
+   }
+  ],
+  [
+   2801212,
+   "Territory of New Guinea",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "German New Guinea until 1914; an Australian mandate of the League of Nations from December 1920 (Japanese-occupied in 1942–45)."
+    }
+   }
+  ],
+  [
+   2920537,
+   "Tonkin",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French protectorate, part of French Indochina."
+    }
+   }
+  ],
+  [
+   2920531,
+   "Annam",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French protectorate under the Nguyễn emperors at Huế, part of French Indochina."
+    }
+   }
+  ],
+  [
+   2920527,
+   "Cochinchina",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French colony, part of French Indochina."
+    }
+   }
+  ]
+ ],
+ "1938": [
+  [
+   2851157,
+   "USSR"
+  ],
+  [
+   2874803,
+   "United States"
+  ],
+  [
+   2831062,
+   "Canada"
+  ],
+  [
+   2905001,
+   "Brazil",
+   {
+    "adopts": [
+     "Unitary State of Brazil"
+    ]
+   }
+  ],
+  [
+   2848197,
+   "Australia"
+  ],
+  [
+   2948950,
+   "Republic of China"
+  ],
+  [
+   2917850,
+   "French West Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848216,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2860947,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Republic"
+    ]
+   }
+  ],
+  [
+   2803203,
+   "Sudan"
+  ],
+  [
+   2839997,
+   "French Equatorial Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2961758,
+   "Belgian Congo",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2831731,
+   "Union of South Africa"
+  ],
+  [
+   2692906,
+   "Mexico"
+  ],
+  [
+   2905965,
+   "Saudi Arabia",
+   {
+    "adopts": [
+     "Kingdom of Saudi Arabia"
+    ]
+   }
+  ],
+  [
+   2864434,
+   "Dutch East Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2828810,
+   "Tibet"
+  ],
+  [
+   2801208,
+   "Italian East Africa",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2803189,
+   "Libya"
+  ],
+  [
+   2694890,
+   "Iran",
+   {
+    "adopts": [
+     "Pahlavi Dynasty"
+    ]
+   }
+  ],
+  [
+   2942671,
+   "Mongolia",
+   {
+    "adopts": [
+     "Mongolian People's Republic"
+    ]
+   }
+  ],
+  [
+   2690861,
+   "Angola (Portugal)",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2803204,
+   "Egypt",
+   {
+    "adopts": [
+     "Kingdom of Egypt"
+    ]
+   }
+  ],
+  [
+   2842571,
+   "Venezuela"
+  ],
+  [
+   2855612,
+   "Tanganyika Territory",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2690856,
+   "Nigeria",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2698263,
+   "Mozambique (Portugal)",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962062,
+   "Northern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801347,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2948947,
+   "French Indochina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2889894,
+   "Empire of Japan"
+  ],
+  [
+   2848255,
+   "British Burma",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2822863,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Kingdom of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2865840,
+   "Madagascar (France)",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831414,
+   "Kenya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2874871,
+   "Siam",
+   {
+    "adopts": [
+     "Kingdom of Thailand"
+    ]
+   }
+  ],
+  [
+   2839466,
+   "Iraq",
+   {
+    "adopts": [
+     "Kingdom of Iraq"
+    ]
+   }
+  ],
+  [
+   2848857,
+   "Ecuador"
+  ],
+  [
+   2848975,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2848865,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2828747,
+   "French Cameroons",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2802056,
+   "Paraguay"
+  ],
+  [
+   2802057,
+   "Bolivia"
+  ],
+  [
+   2830878,
+   "Dominion of Newfoundland"
+  ],
+  [
+   2831077,
+   "Dominion of Newfoundland"
+  ],
+  [
+   2831467,
+   "Southern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2889834,
+   "Philippines",
+   {
+    "props": {
+     "s": "United States"
+    }
+   }
+  ],
+  [
+   2846160,
+   "New Zealand"
+  ],
+  [
+   2848485,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831426,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2863988,
+   "Syria (France)",
+   {
+    "props": {
+     "s": "France"
+    },
+    "adopts": [
+     "French Mandate for Syria and Lebanon"
+    ]
+   }
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2926848,
+   "British Somaliland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2849759,
+   "Tuvan People's Republic",
+   {
+    "props": {
+     "w": "Independent in name from 1921, recognised only by the Soviet Union and Mongolia; the Soviet Union annexed it in 1944."
+    }
+   }
+  ],
+  [
+   2690947,
+   "Tunisia"
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2960814,
+   "Yemen",
+   {
+    "adopts": [
+     "North Yemen"
+    ]
+   }
+  ],
+  [
+   2961074,
+   "Sarawak",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Ruled by the Brooke family under British protection; a British colony from 1946 until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2808161,
+   "Honduras"
+  ],
+  [
+   2861549,
+   "Cuba",
+   {
+    "adopts": [
+     "Republic of Cuba"
+    ]
+   }
+  ],
+  [
+   2807664,
+   "Guatemala"
+  ],
+  [
+   2905974,
+   "Muscat and Oman",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2803134,
+   "Nyasaland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2848317,
+   "Transjordan",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2861194,
+   "French Guiana"
+  ],
+  [
+   2828750,
+   "British Cameroons",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2828423,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848286,
+   "North Borneo",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Run by the British North Borneo Company until 1946, then a British colony until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848458,
+   "Federated Malay States",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2873306,
+   "Panama",
+   {
+    "adopts": [
+     "Republic of Panama"
+    ]
+   }
+  ],
+  [
+   2848313,
+   "Ceylon"
+  ],
+  [
+   2923088,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2863620,
+   "Ruanda-Urundi",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2841711,
+   "Dominican Republic"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2694159,
+   "British Togoland",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "The west of German Togoland, a British mandate from 1922 run with the Gold Coast; it joined Ghana in 1957."
+    }
+   }
+  ],
+  [
+   2841717,
+   "Haiti",
+   {
+    "adopts": [
+     "Republic of Haiti"
+    ]
+   }
+  ],
+  [
+   2848316,
+   "Mandatory Palestine (GB)",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2803437,
+   "French Somaliland"
+  ],
+  [
+   2808152,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848476,
+   "Johore Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2876367,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2691746,
+   "Swaziland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848477,
+   "Kelantan Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2864414,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848478,
+   "Trengganu Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2834851,
+   "Bahamas"
+  ],
+  [
+   2831411,
+   "Protectorate of Kenya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848319,
+   "Qatar",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846175,
+   "New Hebrides",
+   {
+    "props": {
+     "s": "France",
+     "w": "An Anglo-French condominium from 1906, until independence as Vanuatu in 1980."
+    }
+   }
+  ],
+  [
+   2834850,
+   "Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831358,
+   "Lebanese Republic",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848479,
+   "Kedah Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801349,
+   "Cyprus",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Ottoman land under British rule from 1878, annexed by Britain in 1914 and a crown colony from 1925 until independence in 1960."
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2839750,
+   "Protectorate of the Portuguese Congo",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2961066,
+   "Brunei",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2834829,
+   "Trinidad"
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848277,
+   "Straits Settlements",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846170,
+   "Samoa"
+  ],
+  [
+   2876346,
+   "French Establishments in Oceania",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "A sultanate under British protection from 1890 until 1963."
+    }
+   }
+  ],
+  [
+   2865901,
+   "Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2920371,
+   "Italian Islands of the Aegean",
+   {
+    "props": {
+     "s": "Italy"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831873,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Guadeloupe"
+  ],
+  [
+   2834750,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2694575,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2831167,
+   "Gilbert and Ellice Islands Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848480,
+   "Perlis Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2889933,
+   "Kwangchowan",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848223,
+   "Aden Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "A British Crown dependency, not part of the United Kingdom."
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2739874,
+   "Andorra",
+   {
+    "adopts": [
+     "Principality of Andorra"
+    ]
+   }
+  ],
+  [
+   2846200,
+   "Tonga"
+  ],
+  [
+   2832944,
+   "Barbados"
+  ],
+  [
+   2801185,
+   "Crown Colony of Malta",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848193,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831866,
+   "Colony of Seychelles",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2746467,
+   "Liechtenstein"
+  ],
+  [
+   2876371,
+   "Wallis and Futuna Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2828299,
+   "Jersey",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2853735,
+   "San Marino"
+  ],
+  [
+   2846264,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801211,
+   "Territory of Papua",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "British New Guinea until 1906, then run by Australia."
+    }
+   }
+  ],
+  [
+   2801212,
+   "Territory of New Guinea",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "German New Guinea until 1914; an Australian mandate of the League of Nations from December 1920 (Japanese-occupied in 1942–45)."
+    }
+   }
+  ],
+  [
+   2920537,
+   "Tonkin",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French protectorate, part of French Indochina."
+    }
+   }
+  ],
+  [
+   2948944,
+   "Annam",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French protectorate under the Nguyễn emperors at Huế, part of French Indochina."
+    }
+   }
+  ],
+  [
+   2920527,
+   "Cochinchina",
+   {
+    "props": {
+     "s": "France",
+     "w": "A French colony, part of French Indochina."
+    }
+   }
+  ]
+ ],
+ "1945": [
+  [
+   2851155,
+   "USSR"
+  ],
+  [
+   2874803,
+   "United States"
+  ],
+  [
+   2831062,
+   "Canada"
+  ],
+  [
+   2905001,
+   "Brazil",
+   {
+    "adopts": [
+     "Unitary State of Brazil"
+    ]
+   }
+  ],
+  [
+   2848197,
+   "Australia"
+  ],
+  [
+   2694469,
+   "China"
+  ],
+  [
+   2917850,
+   "French West Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2961653,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2860947,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Republic"
+    ]
+   }
+  ],
+  [
+   2803203,
+   "Sudan",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2839997,
+   "French Equatorial Africa",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2961758,
+   "Belgian Congo",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2831731,
+   "South Africa"
+  ],
+  [
+   2692906,
+   "Mexico"
+  ],
+  [
+   2905965,
+   "Saudi Arabia",
+   {
+    "adopts": [
+     "Kingdom of Saudi Arabia"
+    ]
+   }
+  ],
+  [
+   2888098,
+   "Indonesia"
+  ],
+  [
+   2828810,
+   "Tibet"
+  ],
+  [
+   2694890,
+   "Iran",
+   {
+    "adopts": [
+     "Pahlavi Dynasty"
+    ]
+   }
+  ],
+  [
+   2942671,
+   "Mongolia",
+   {
+    "adopts": [
+     "Mongolian People's Republic"
+    ]
+   }
+  ],
+  [
+   2690861,
+   "Angola (Portugal)",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2803446,
+   "Ethiopia"
+  ],
+  [
+   2831555,
+   "British Military Administration of Libya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2803204,
+   "Egypt",
+   {
+    "props": {
+     "s": "United Kingdom"
+    },
+    "adopts": [
+     "Kingdom of Egypt"
+    ]
+   }
+  ],
+  [
+   2842571,
+   "Venezuela"
+  ],
+  [
+   2855612,
+   "Tanganyika Territory",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2690856,
+   "Nigeria",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2698263,
+   "Mozambique (Portugal)",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962062,
+   "Northern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801347,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2848473,
+   "Thailand",
+   {
+    "adopts": [
+     "Kingdom of Thailand"
+    ]
+   }
+  ],
+  [
+   2822863,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Kingdom of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2859424,
+   "British Military Administration of Somaliland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2889895,
+   "Empire of Japan"
+  ],
+  [
+   2801016,
+   "Burma"
+  ],
+  [
+   2831553,
+   "Fezzan-Ghadames Military Territory",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865839,
+   "Madagascar (France)",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831414,
+   "Kenya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2839466,
+   "Iraq"
+  ],
+  [
+   2828747,
+   "French Cameroons",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2802056,
+   "Paraguay"
+  ],
+  [
+   2802057,
+   "Bolivia"
+  ],
+  [
+   2830878,
+   "Dominion of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831077,
+   "Dominion of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831467,
+   "Southern Rhodesia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2889831,
+   "Philippines"
+  ],
+  [
+   2846160,
+   "New Zealand"
+  ],
+  [
+   2806974,
+   "Ecuador",
+   {
+    "adopts": [
+     "Republic of Ecuador"
+    ]
+   }
+  ],
+  [
+   2848975,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2806975,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2848485,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831426,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848289,
+   "British Military Administration of Borneo",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2879261,
+   "Syria",
+   {
+    "adopts": [
+     "French Mandate for Syria and Lebanon"
+    ]
+   }
+  ],
+  [
+   2746245,
+   "Laos"
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2690947,
+   "Tunisia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2746209,
+   "Cambodia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2960814,
+   "Yemen",
+   {
+    "adopts": [
+     "North Yemen"
+    ]
+   }
+  ],
+  [
+   2801070,
+   "Korea (USSR)",
+   {
+    "props": {
+     "s": "USSR"
+    }
+   }
+  ],
+  [
+   2839746,
+   "Eritrea",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2808161,
+   "Honduras"
+  ],
+  [
+   2861549,
+   "Cuba",
+   {
+    "adopts": [
+     "Republic of Cuba"
+    ]
+   }
+  ],
+  [
+   2807664,
+   "Guatemala"
+  ],
+  [
+   2905974,
+   "Muscat and Oman"
+  ],
+  [
+   2852492,
+   "Germany (USA)",
+   {
+    "props": {
+     "s": "United States"
+    }
+   }
+  ],
+  [
+   2856524,
+   "Germany (UK)",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2803134,
+   "Nyasaland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2801071,
+   "Korea (USA)",
+   {
+    "props": {
+     "s": "United States"
+    }
+   }
+  ],
+  [
+   2801990,
+   "British Malaya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848317,
+   "Transjordan",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2861194,
+   "French Guiana"
+  ],
+  [
+   2828750,
+   "British Cameroons",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2828423,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2859753,
+   "Panama",
+   {
+    "adopts": [
+     "Republic of Panama"
+    ]
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848313,
+   "British Ceylon",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2923088,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2859751,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2863620,
+   "Ruanda-Urundi",
+   {
+    "props": {
+     "s": "Belgium"
+    }
+   }
+  ],
+  [
+   2841711,
+   "Dominican Republic"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2694159,
+   "British Togoland",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "The west of German Togoland, a British mandate from 1922 run with the Gold Coast; it joined Ghana in 1957."
+    }
+   }
+  ],
+  [
+   2841717,
+   "Haiti",
+   {
+    "adopts": [
+     "Republic of Haiti"
+    ]
+   }
+  ],
+  [
+   2848316,
+   "Mandatory Palestine (GB)",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2803437,
+   "French Somaliland",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2808152,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2691746,
+   "Swaziland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2864412,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2834851,
+   "Bahamas"
+  ],
+  [
+   2831411,
+   "Protectorate of Kenya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848319,
+   "Qatar",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846175,
+   "New Hebrides",
+   {
+    "props": {
+     "w": "An Anglo-French condominium from 1906, until independence as Vanuatu in 1980."
+    }
+   }
+  ],
+  [
+   2834850,
+   "Jamaica (UK)",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2748904,
+   "Lebanon"
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801349,
+   "Cyprus",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Ottoman land under British rule from 1878, annexed by Britain in 1914 and a crown colony from 1925 until independence in 1960."
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2839750,
+   "Protectorate of the Portuguese Congo",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2834829,
+   "Trinidad"
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848273,
+   "Straits Settlements",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846170,
+   "Samoa"
+  ],
+  [
+   2876346,
+   "French Establishments in Oceania",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "A sultanate under British protection from 1890 until 1963."
+    }
+   }
+  ],
+  [
+   2865901,
+   "Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2920369,
+   "Dodecanese Islands",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Italian from 1912, under British military rule from 1945, and Greek from 1947."
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831873,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2834740,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Guadeloupe",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2694460,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2846232,
+   "Gilbert and Ellice Islands Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2832971,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848223,
+   "Aden Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "A British Crown dependency, not part of the United Kingdom."
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2739874,
+   "Andorra",
+   {
+    "adopts": [
+     "Principality of Andorra"
+    ]
+   }
+  ],
+  [
+   2846200,
+   "Tonga"
+  ],
+  [
+   2832944,
+   "Barbados"
+  ],
+  [
+   2801185,
+   "Crown Colony of Malta",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2848193,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831866,
+   "Colony of Seychelles",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2746467,
+   "Liechtenstein"
+  ],
+  [
+   2876371,
+   "Wallis and Futuna Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2828299,
+   "Jersey",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2853735,
+   "San Marino"
+  ],
+  [
+   2846264,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801211,
+   "Territory of Papua",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "British New Guinea until 1906, then run by Australia."
+    }
+   }
+  ],
+  [
+   2801212,
+   "Territory of New Guinea",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "German New Guinea until 1914; an Australian mandate of the League of Nations from December 1920 (Japanese-occupied in 1942–45)."
+    }
+   }
+  ]
+ ],
+ "1960": [
+  [
+   2870172,
+   "USSR"
+  ],
+  [
+   2831061,
+   "Canada"
+  ],
+  [
+   2889427,
+   "China"
+  ],
+  [
+   2889888,
+   "United States"
+  ],
+  [
+   2905001,
+   "Brazil",
+   {
+    "adopts": [
+     "Brazilian Republic"
+    ]
+   }
+  ],
+  [
+   2926850,
+   "Australia"
+  ],
+  [
+   2961650,
+   "India",
+   {
+    "adopts": [
+     "Republic of India"
+    ]
+   }
+  ],
+  [
+   2860947,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Republic"
+    ]
+   }
+  ],
+  [
+   2926753,
+   "Sudan",
+   {
+    "adopts": [
+     "Republic of Sudan"
+    ]
+   }
+  ],
+  [
+   2839755,
+   "Congo-Léopoldville",
+   {
+    "adopts": [
+     "Democratic Republic of the Congo"
+    ]
+   }
+  ],
+  [
+   2870649,
+   "Greenland",
+   {
+    "props": {
+     "s": "Denmark"
+    },
+    "adopts": [
+     "Denmark"
+    ]
+   }
+  ],
+  [
+   2865917,
+   "South Africa"
+  ],
+  [
+   2692906,
+   "Mexico"
+  ],
+  [
+   2905960,
+   "Saudi Arabia",
+   {
+    "adopts": [
+     "Kingdom of Saudi Arabia"
+    ]
+   }
+  ],
+  [
+   2888602,
+   "Libya",
+   {
+    "adopts": [
+     "Kingdom of Libya"
+    ]
+   }
+  ],
+  [
+   2920913,
+   "Iran",
+   {
+    "adopts": [
+     "Pahlavi Dynasty"
+    ]
+   }
+  ],
+  [
+   2942671,
+   "Mongolia",
+   {
+    "adopts": [
+     "Mongolian People's Republic"
+    ]
+   }
+  ],
+  [
+   2888175,
+   "Indonesia",
+   {
+    "adopts": [
+     "Republic of Indonesia"
+    ]
+   }
+  ],
+  [
+   2801984,
+   "Chad"
+  ],
+  [
+   2831356,
+   "Mali",
+   {
+    "adopts": [
+     "Mali Federation"
+    ]
+   }
+  ],
+  [
+   2839747,
+   "Ethiopia"
+  ],
+  [
+   2803135,
+   "Federation of Rhodesia and Nyasaland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801985,
+   "Niger"
+  ],
+  [
+   2839468,
+   "United Arab Republic"
+  ],
+  [
+   2831371,
+   "Mauritania"
+  ],
+  [
+   2920520,
+   "Pakistan",
+   {
+    "adopts": [
+     "Islamic Republic of Pakistan"
+    ]
+   }
+  ],
+  [
+   2901072,
+   "Venezuela"
+  ],
+  [
+   2828743,
+   "Nigeria"
+  ],
+  [
+   2855612,
+   "Tanganyika",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2945320,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2860420,
+   "Morocco"
+  ],
+  [
+   2848252,
+   "Burma"
+  ],
+  [
+   2822863,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Kingdom of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2859423,
+   "Somalia",
+   {
+    "adopts": [
+     "Federal Republic of Somalia"
+    ]
+   }
+  ],
+  [
+   2839926,
+   "Central African Republic"
+  ],
+  [
+   2865805,
+   "Madagascar"
+  ],
+  [
+   2691745,
+   "Bechuanaland Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831414,
+   "Kenya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2961510,
+   "Thailand",
+   {
+    "adopts": [
+     "Kingdom of Thailand"
+    ]
+   }
+  ],
+  [
+   2920914,
+   "Iraq",
+   {
+    "adopts": [
+     "Iraqi Republic"
+    ]
+   }
+  ],
+  [
+   2828746,
+   "Cameroon",
+   {
+    "adopts": [
+     "Republic of Cameroon"
+    ]
+   }
+  ],
+  [
+   2802056,
+   "Paraguay"
+  ],
+  [
+   2802057,
+   "Bolivia"
+  ],
+  [
+   2694479,
+   "Japan"
+  ],
+  [
+   2831666,
+   "Congo"
+  ],
+  [
+   2831360,
+   "Ivory Coast"
+  ],
+  [
+   2694793,
+   "Philippines",
+   {
+    "adopts": [
+     "Republic of the Philippines"
+    ]
+   }
+  ],
+  [
+   2831374,
+   "Upper Volta"
+  ],
+  [
+   2800982,
+   "New Zealand"
+  ],
+  [
+   2831665,
+   "Gabon"
+  ],
+  [
+   2806974,
+   "Ecuador",
+   {
+    "adopts": [
+     "Republic of Ecuador"
+    ]
+   }
+  ],
+  [
+   2848975,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2806975,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2848485,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Aden and its protectorates were British until South Yemen's independence in 1967."
+    }
+   }
+  ],
+  [
+   2831372,
+   "Guinea"
+  ],
+  [
+   2828394,
+   "Ghana"
+  ],
+  [
+   2747289,
+   "Laos",
+   {
+    "adopts": [
+     "Kingdom of Laos"
+    ]
+   }
+  ],
+  [
+   2806844,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831426,
+   "Uganda",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2803501,
+   "Senegal"
+  ],
+  [
+   2746263,
+   "Cambodia",
+   {
+    "adopts": [
+     "Kingdom of Cambodia"
+    ]
+   }
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2745237,
+   "South Vietnam",
+   {
+    "props": {
+     "w": "The Republic of Vietnam, divided from the North at the 17th parallel (shown approximately) from 1954 until 1975."
+    },
+    "adopts": [
+     "Republic of Vietnam"
+    ]
+   }
+  ],
+  [
+   2801170,
+   "Tunisia",
+   {
+    "adopts": [
+     "Republic of Tunisia"
+    ]
+   }
+  ],
+  [
+   2745244,
+   "North Vietnam",
+   {
+    "adopts": [
+     "Democratic Republic of Vietnam"
+    ]
+   }
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2960814,
+   "Yemen",
+   {
+    "adopts": [
+     "North Yemen"
+    ]
+   }
+  ],
+  [
+   2801992,
+   "Federation of Malaya"
+  ],
+  [
+   2848298,
+   "Sarawak",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Ruled by the Brooke family under British protection; a British colony from 1946 until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2889791,
+   "North Korea",
+   {
+    "adopts": [
+     "Democratic People's Republic of Korea"
+    ]
+   }
+  ],
+  [
+   2871201,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2828683,
+   "Republic of Dahomey"
+  ],
+  [
+   2808161,
+   "Honduras"
+  ],
+  [
+   2861549,
+   "Cuba",
+   {
+    "adopts": [
+     "Communist Cuba"
+    ]
+   }
+  ],
+  [
+   2807664,
+   "Guatemala"
+  ],
+  [
+   2920523,
+   "Muscat and Oman"
+  ],
+  [
+   2744317,
+   "Jordan",
+   {
+    "adopts": [
+     "Kingdom of Jordan"
+    ]
+   }
+  ],
+  [
+   2694472,
+   "South Korea",
+   {
+    "adopts": [
+     "Republic of Korea"
+    ]
+   }
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2828750,
+   "British Cameroons",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848290,
+   "North Borneo",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Run by the British North Borneo Company until 1946, then a British colony until it joined Malaysia in 1963."
+    }
+   }
+  ],
+  [
+   2859753,
+   "Panama",
+   {
+    "adopts": [
+     "Republic of Panama"
+    ]
+   }
+  ],
+  [
+   2828774,
+   "Sierra Leone"
+  ],
+  [
+   2848312,
+   "Dominion of Ceylon",
+   {
+    "adopts": [
+     "Sri Lanka"
+    ]
+   }
+  ],
+  [
+   2694160,
+   "Togo"
+  ],
+  [
+   2848488,
+   "Federation of Arab Emirates of the South"
+  ],
+  [
+   2859751,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2863619,
+   "Ruanda-Urundi",
+   {
+    "props": {
+     "s": "Belgium"
+    },
+    "adopts": [
+     "Belgian Congo"
+    ]
+   }
+  ],
+  [
+   2841711,
+   "Dominican Republic"
+  ],
+  [
+   2906076,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2846234,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2889543,
+   "Taiwan"
+  ],
+  [
+   2691741,
+   "Basutoland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2841717,
+   "Haiti",
+   {
+    "adopts": [
+     "Republic of Haiti"
+    ]
+   }
+  ],
+  [
+   2831242,
+   "British Solomon Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2807603,
+   "British Honduras",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2864015,
+   "Israel",
+   {
+    "adopts": [
+     "State of Israel"
+    ]
+   }
+  ],
+  [
+   2874779,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2848364,
+   "Kuwait",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2832970,
+   "West Indies Federation",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Fiji"
+  ],
+  [
+   2691746,
+   "Swaziland",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2834851,
+   "Bahamas"
+  ],
+  [
+   2831411,
+   "Protectorate of Kenya",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848319,
+   "Qatar",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846175,
+   "New Hebrides",
+   {
+    "props": {
+     "w": "An Anglo-French condominium from 1906, until independence as Vanuatu in 1980."
+    }
+   }
+  ],
+  [
+   2748904,
+   "Lebanon"
+  ],
+  [
+   2803502,
+   "Gambia",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2800989,
+   "Cyprus"
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2921302,
+   "Brunei",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2962690,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2846170,
+   "Samoa"
+  ],
+  [
+   2690950,
+   "Zanzibar",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "A sultanate under British protection from 1890 until 1963."
+    }
+   }
+  ],
+  [
+   2831873,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2694460,
+   "Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2846232,
+   "Gilbert and Ellice Islands Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848223,
+   "Aden Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2834741,
+   "West Indies Federation",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "A British Crown dependency, not part of the United Kingdom."
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848268,
+   "Singapore",
+   {
+    "props": {
+     "s": "United Kingdom",
+     "w": "Self-governing from 1959; part of Malaysia from 1963 and independent from 1965."
+    }
+   }
+  ],
+  [
+   2739874,
+   "Andorra",
+   {
+    "adopts": [
+     "Principality of Andorra"
+    ]
+   }
+  ],
+  [
+   2846200,
+   "Tonga"
+  ],
+  [
+   2855298,
+   "Egyptian administration of Gaza"
+  ],
+  [
+   2961708,
+   "Colony of the Turks and Caicos Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801185,
+   "Crown Colony of Malta",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848134,
+   "Akrotiri and Dhekelia"
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2848193,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831869,
+   "Colony of Seychelles",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2692582,
+   "Liechtenstein"
+  ],
+  [
+   2876371,
+   "Wallis and Futuna Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2828299,
+   "Jersey",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2697346,
+   "U.S. Naval Base Subic Bay"
+  ],
+  [
+   2832936,
+   "British Virgin Islands",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2853735,
+   "San Marino"
+  ],
+  [
+   2846264,
+   "Cook Islands"
+  ],
+  [
+   2848182,
+   "Maldives Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom"
+    }
+   }
+  ],
+  [
+   2801148,
+   "Territory of Papua and New Guinea",
+   {
+    "props": {
+     "s": "Australia",
+     "w": "Papua and the UN trust territory of New Guinea, run by Australia as one from 1949; independent as Papua New Guinea in 1975."
+    }
+   }
+  ],
+  [
+   2922012,
+   "Free Dadra and Nagar Haveli",
+   {
+    "props": {
+     "w": "Taken from Portuguese India by pro-Indian volunteers in 1954; it ran itself until India annexed it in 1961."
+    }
+   }
+  ]
+ ],
+ "_readme": "OpenHistoricalMap countries laid over the Cliopatria base on the maps from 1900 to 1960, besides the hand-checked European lists in build-data.mjs (OHM) and HistoGIS: by map, [relation id, our name, options], largest first (where two overlap, the later one wins). Options: props (ruler s, note w) for the shape, adopts (Cliopatria polities that are the same country: they take this name). Names follow the reviewed maps where a relation is the same land as one of their shapes. Territories OHM files below the country level (Papua, the Far Eastern Republic, the protectorates of French Indochina and others) come last in each list. Generated from OHM and checked against CShapes; relations left out are listed in `left out` and `left out by map`.",
+ "left out": {
+  "2846233": "British Western Pacific Territories: a high commission over the Solomons, the Gilbert and Ellice Islands and others, which are drawn themselves",
+  "2846235": "British Western Pacific Territories: as above",
+  "2846236": "British Western Pacific Territories: as above",
+  "2846238": "British Western Pacific Territories: as above"
+ },
+ "left out by map": {
+  "1900": {
+   "2808118": "Mosquito Reserve: taken back by Nicaragua in 1894"
+  },
+  "1914": {
+   "2917202": "Upper Senegal and Niger: its outline runs over Senegal, a colony of its own; French West Africa is shown whole, as on the reviewed map",
+   "2917211": "Protectorate of Mauritania: as above"
+  },
+  "1920": {
+   "2848317": "Emirate of Transjordan: founded in April 1921; in 1920 the land was part of the Palestine mandate"
+  },
+  "1945": {
+   "2746077": "North Vietnam: drawn over all of Vietnam, which the Democratic Republic claimed in September 1945 while France retook the south; France still ruled Indochina in law",
+   "2865791": "British occupation of the Comoros Islands: Britain handed the Comoros, with Madagascar, to the Free French in 1943"
+  }
+ }
+}

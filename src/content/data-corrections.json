@@ -1,5 +1,5 @@
 {
-  "_readme": "Fixes applied to the historical-basemaps source when `npm run data` builds the map. years = snapshot years (negative = BCE). n = new name, s = new 'ruled by' (null clears it), note = shown on the map as a data note. Every rule is listed on /about.",
+  "_readme": "Fixes applied to the base source when `npm run data` builds the map (historical-basemaps to 1783; Cliopatria from 1800 to 1960). years = snapshot years (negative = BCE). n = new name, s = new 'ruled by' (null clears it), note = shown on the map as a data note. Every rule is listed on /about.",
   "rules": [
     {
       "name": "Thai",
@@ -10,30 +10,529 @@
       "why": "An ethnic label stretched over regions it does not describe."
     },
     {
-      "name": "Kingdom of Brazil",
+      "name": "Holy Roman Empire Minor States",
+      "years": [
+        1800
+      ],
+      "n": "Holy Roman Empire",
+      "note": "The Empire's many smaller states, shown together. The Empire was dissolved in 1806.",
+      "why": "The Empire's smaller states, which Cliopatria draws as one."
+    },
+    {
+      "name": "Cispadane Republic",
+      "years": [
+        1800
+      ],
+      "n": "Cisalpine Republic",
+      "why": "The Cispadane Republic merged into the Cisalpine Republic in 1797."
+    },
+    {
+      "name": "Grand Duchy of Berg",
+      "years": [
+        1815
+      ],
+      "n": "Kingdom of Prussia",
+      "why": "The Grand Duchy ended in 1813; the Congress of Vienna gave its land to Prussia."
+    },
+    {
+      "name": "Nawab of Awadh",
+      "years": [
+        1800
+      ],
+      "n": "Awadh",
+      "why": "Cliopatria names the state after its ruler's title."
+    },
+    {
+      "name": "Maratha Empire",
+      "years": [
+        1815
+      ],
+      "n": "Maratha Confederacy",
+      "note": "Maratha states under the Peshwa at Pune. Defeated by the British in 1803–05, when Scindia lost Delhi, Agra and the Doab; the British ended the confederacy in 1818.",
+      "why": "Named as on the 1800 map."
+    },
+    {
+      "name": "British Ceylon",
+      "years": [
+        1800
+      ],
+      "n": "Kingdom of Kandy",
+      "s": null,
+      "note": "The Sinhalese kingdom of the island's hill country, ruled from Kandy. The British, who held the coast from 1796, took it in 1815.",
+      "why": "Cliopatria labels the inland kingdom, independent until 1815, as British Ceylon; the British held only the coast."
+    },
+    {
+      "name": "British trading posts",
+      "years": [
+        1800,
+        1815
+      ],
+      "note": "Fur-trading posts of the Hudson's Bay and North West companies, as Cliopatria draws them. First Nations held the land around them.",
+      "why": "Cliopatria draws these posts as part of the British Empire, with India."
+    },
+    {
+      "name": "Khmer Empire",
+      "years": [
+        1800
+      ],
+      "n": "Cambodia",
+      "note": "The Khmer kingdom, under Siamese and Vietnamese overlordship.",
+      "why": "The Khmer Empire ended in the 15th century; by 1800 Cambodia was a smaller kingdom."
+    },
+    {
+      "name": "Cambodia",
       "years": [
         1878,
         1880
       ],
-      "n": "Empire of Brazil",
-      "why": "Brazil was an empire from 1822 until the republic was proclaimed in November 1889."
+      "note": "A kingdom under French protection from 1863.",
+      "why": "Cliopatria draws it as part of French Indochina, which was formed only in 1887."
     },
     {
-      "name": "Kingdom of Brazil",
+      "name": "Qasimids",
       "years": [
-        1900
+        1800
       ],
-      "n": "Brazil",
+      "n": "Imamate of Yemen",
+      "why": "Cliopatria names the Zaydi imamate after its ruling family."
+    },
+    {
+      "name": "Karamanli Dynasty",
+      "years": [
+        1800,
+        1815
+      ],
+      "n": "Tripolitania",
+      "s": "Ottoman Empire",
+      "note": "Ruled by the Karamanli pashas, in name for the Ottoman sultan, until 1835.",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Muhammad Ali dynasty",
+      "years": [
+        1815
+      ],
+      "n": "Egypt",
+      "s": "Ottoman Empire",
+      "note": "Ruled from 1805 by Muhammad Ali, the Ottoman sultan's governor in name and Egypt's master in fact.",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Omani Slave Coast",
+      "years": [
+        1815
+      ],
+      "n": "Zanzibar",
+      "s": "Omani Empire",
+      "note": "Zanzibar and the Swahili coast under the sultan of Oman, who moved his court to Zanzibar in 1840.",
+      "why": "Cliopatria's name for Oman's East African coast."
+    },
+    {
+      "name": "House of Khalifa",
+      "years": [
+        1815
+      ],
+      "n": "Bahrain",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Merina Kingdom",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "n": "Kingdom of Imerina",
+      "why": "Named as OpenHistoricalMap names it."
+    },
+    {
+      "name": "People's Republic of Zanzibar",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Sultanate of Zanzibar",
+      "why": "The People's Republic dates from 1964; in 1878 the sultan of Zanzibar held this coast."
+    },
+    {
+      "name": "First Hellenic Republic",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Greece",
+      "why": "The First Hellenic Republic ended in 1832; by 1878 Greece was a kingdom."
+    },
+    {
+      "name": "German Africa",
+      "years": [
+        1878,
+        1880
+      ],
+      "n": "Duala",
       "s": null,
-      "why": "Brazil had been a republic since 1889, independent of Portugal since 1822."
+      "note": "The Duala kings of the Cameroon estuary. Germany made it a protectorate in 1884.",
+      "why": "German rule here began in 1884."
     },
     {
-      "name": "White Russia",
+      "name": "Qatar Dynasty",
       "years": [
-        1930
+        1878,
+        1880
       ],
-      "n": "USSR",
-      "why": "The whole Soviet Union (about 19.5 million km²) was labeled 'White Russia', the old English name for Belarus."
+      "n": "Qatar",
+      "why": "Cliopatria names the state after its ruling family."
+    },
+    {
+      "name": "Comoro sultanates",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "s": null,
+      "note": "The sultanates of Anjouan, Mohéli and Grande Comore (and Mayotte, until France took it in 1841).",
+      "why": "Cliopatria draws these islands as part of French India or French Africa; France took Mayotte in 1841 and the rest in 1886."
+    },
+    {
+      "name": "Portuguese Mozambique",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "note": "Portugal held the coast and, through its estates (prazos), the Zambezi valley; African kingdoms ruled the interior.",
+      "why": "Cliopatria draws it as part of the Portuguese Empire."
+    },
+    {
+      "name": "South Georgia",
+      "years": [
+        1800,
+        1815,
+        1878,
+        1880
+      ],
+      "note": "Claimed for Britain by James Cook in 1775; no one lived there, but sealers came.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Saint Pierre and Miquelon",
+      "years": [
+        1800
+      ],
+      "note": "French islands, held by Britain from 1793 to 1802.",
+      "why": "Cliopatria draws them as part of French Louisiana."
+    },
+    {
+      "name": "Colony of Sierra Leone",
+      "years": [
+        1800
+      ],
+      "note": "Freetown and its peninsula, settled by freed slaves from 1787 and run by the Sierra Leone Company until it became a crown colony in 1808.",
+      "why": "Cliopatria draws it as part of the British Cape Colony."
+    },
+    {
+      "name": "Colony of Sierra Leone",
+      "years": [
+        1815
+      ],
+      "note": "Freetown and its peninsula, a crown colony since 1808.",
+      "why": "Cliopatria draws it as part of the British Cape Colony."
+    },
+    {
+      "name": "Lagos Colony",
+      "years": [
+        1878,
+        1880
+      ],
+      "note": "Lagos and its coast, a British colony from 1861, run with the Gold Coast from 1874 to 1886.",
+      "why": "Cliopatria draws it as part of the British Gold Coast."
+    },
+    {
+      "name": "Fernando Po",
+      "years": [
+        1800
+      ],
+      "note": "Spain's by treaty since 1778; its settlers left in 1781, and the Bubi people held the island.",
+      "why": "Cliopatria draws it as part of the Spanish Empire."
+    },
+    {
+      "name": "Prince of Wales Island",
+      "years": [
+        1800,
+        1815
+      ],
+      "note": "Penang, which the East India Company took from the sultan of Kedah in 1786; the strip of mainland opposite (Province Wellesley) was added in 1800.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Malacca",
+      "years": [
+        1800
+      ],
+      "note": "A Dutch colony, held by Britain from 1795 to 1818; the Dutch traded it to Britain for good in 1824.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Malacca",
+      "years": [
+        1815
+      ],
+      "note": "A Dutch colony, held by Britain from 1795 to 1818; the Dutch traded it to Britain for good in 1824.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Padang",
+      "years": [
+        1800
+      ],
+      "note": "The Dutch posts on Sumatra's west coast around Padang, held by Britain from 1795 to 1819.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Padang",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch posts on Sumatra's west coast around Padang, held by Britain from 1795 to 1819.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Amboyna and Banda",
+      "years": [
+        1800
+      ],
+      "note": "The Dutch spice islands of Ambon and Banda, with Buru, Seram and the islands to the south-east, taken by Britain in 1796 and handed back in 1803 after the Peace of Amiens.",
+      "why": "Cliopatria draws them as part of the Dutch East Indies."
+    },
+    {
+      "name": "Bangka and Belitung",
+      "years": [
+        1815
+      ],
+      "note": "Ceded to Britain in 1812 by the sultan it had put on Palembang's throne. Under the treaty of 1814 Britain traded them to the Netherlands for Cochin, in India, and handed them over in 1816.",
+      "why": "Cliopatria draws Bangka as part of the Dutch East Indies and Belitung as part of the British Colonial Empire."
+    },
+    {
+      "name": "Makassar",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch government of Makassar in southern Celebes, which passed to Britain with Java in 1811; handed back to the Netherlands in 1816.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Kupang",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch post at Kupang on Timor, which surrendered to Britain in January 1812; handed back to the Netherlands in 1816.",
+      "why": "Cliopatria draws it as part of the Dutch East Indies."
+    },
+    {
+      "name": "Moluccas",
+      "years": [
+        1815
+      ],
+      "note": "The Dutch spice islands (Ambon, Banda, Ternate and their dependencies, with Manado in Celebes), taken by Britain in 1810 and handed back to the Netherlands in 1817.",
+      "why": "Cliopatria draws them as part of the Dutch East Indies."
+    },
+    {
+      "name": "North Borneo",
+      "years": [
+        1880
+      ],
+      "note": "Leased from the sultans of Brunei and Sulu in 1877–78 by Alfred Dent’s company, which Britain chartered as the British North Borneo Company in 1881.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Martinique",
+      "years": [
+        1800
+      ],
+      "note": "A French colony, held by Britain from 1794 to 1802.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "Martinique",
+      "years": [
+        1815
+      ],
+      "note": "Returned to France in 1814. During Napoleon’s Hundred Days in 1815 British troops occupied it, staying until 1816.",
+      "why": "Cliopatria draws it as part of the Bourbon Kingdom of France."
+    },
+    {
+      "name": "Colony of Guadeloupe",
+      "years": [
+        1815
+      ],
+      "note": "Returned to France in 1814. During Napoleon’s Hundred Days in 1815 British troops occupied it, staying until 1816.",
+      "why": "Cliopatria draws it as part of the Bourbon Kingdom of France."
+    },
+    {
+      "name": "Commonwealth of Australia",
+      "years": [
+        1914,
+        1920,
+        1930,
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Australia",
+      "why": "Named as on the later maps."
+    },
+    {
+      "name": "La Réunion",
+      "years": [
+        1900,
+        1914,
+        1920,
+        1930,
+        1938,
+        1945
+      ],
+      "n": "Réunion",
+      "why": "Named as on the other maps of these years."
+    },
+    {
+      "name": "Portuguese Republic",
+      "years": [
+        1914,
+        1920
+      ],
+      "n": "Portugal",
+      "why": "Cliopatria's name for Portugal; its pieces here are the Azores and Madeira, part of Portugal."
+    },
+    {
+      "name": "Estado Novo",
+      "years": [
+        1930,
+        1938,
+        1945,
+        1960
+      ],
+      "n": "Portugal",
+      "why": "Cliopatria's name for Portugal under Salazar (from 1933); its pieces here are Portugal's islands. Its colonies are named on their own."
+    },
+    {
+      "name": "Denmark-Norway",
+      "years": [
+        1930,
+        1938
+      ],
+      "n": "Denmark",
+      "why": "Cliopatria's name for Denmark, which had not been joined to Norway since 1814."
+    },
+    {
+      "name": "Second Spanish Republic",
+      "years": [
+        1938
+      ],
+      "n": "Spain",
+      "why": "Cliopatria draws the Canary Islands as the Republic's; the Nationalists held them from July 1936. Spain is shown whole on this map."
+    },
+    {
+      "name": "Francoist Spain",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "Spain",
+      "why": "Cliopatria's name for Spain under Franco; its pieces here are the Canary Islands, part of Spain."
+    },
+    {
+      "name": "French Fourth Republic",
+      "years": [
+        1945
+      ],
+      "n": "France",
+      "why": "Cliopatria's name for France, ahead of the Fourth Republic's founding in October 1946."
+    },
+    {
+      "name": "French Fifth Republic",
+      "years": [
+        1960
+      ],
+      "n": "France",
+      "why": "Cliopatria's name for France; its overseas departments and territories are named on their own."
+    },
+    {
+      "name": "United States of America",
+      "years": [
+        1945,
+        1960
+      ],
+      "n": "United States",
+      "why": "Named as on the other maps of these years."
+    },
+    {
+      "name": "North Yemen",
+      "years": [
+        1920
+      ],
+      "n": "Yemen",
+      "why": "The Mutawakkilite Kingdom of Yemen; 'North Yemen' dates from 1962."
+    },
+    {
+      "name": "Comoros",
+      "years": [
+        1945
+      ],
+      "note": "Part of the colony of Madagascar until 1946, when the islands became a French overseas territory of their own.",
+      "why": "Cliopatria draws them as part of French Africa."
+    },
+    {
+      "name": "Curaçao",
+      "years": [
+        1800
+      ],
+      "note": "A Dutch colony, held by Britain from 1800 to 1803 and from 1807 to 1816.",
+      "why": "Cliopatria draws it as part of the British Colonial Empire."
+    },
+    {
+      "name": "French Egypt",
+      "years": [
+        1800
+      ],
+      "note": "An Ottoman province, occupied by Napoleon’s army from 1798 until it surrendered in 1801.",
+      "why": "Cliopatria draws it as part of the French Consulate."
+    },
+    {
+      "name": "Konbaung Dynasty",
+      "years": [
+        1800,
+        1815
+      ],
+      "n": "Burma",
+      "why": "Cliopatria names the kingdom after its ruling dynasty."
+    },
+    {
+      "name": "Duchy of Bavaria",
+      "years": [
+        1800
+      ],
+      "n": "Electorate of Bavaria",
+      "why": "Bavaria’s rulers had been electors of the Holy Roman Empire since 1623."
+    },
+    {
+      "name": "Dutch Gold Coast",
+      "years": [
+        1800
+      ],
+      "s": "Batavian Republic",
+      "why": "Cliopatria gives the Dutch forts no ruler."
+    },
+    {
+      "name": "Dutch Gold Coast",
+      "years": [
+        1815
+      ],
+      "s": "United Kingdom of the Netherlands",
+      "why": "Cliopatria gives the Dutch forts no ruler."
     },
     {
       "name": "Luisiana",
@@ -55,8 +554,7 @@
     {
       "name": "Zhoa",
       "years": [
-        -1000,
-        -700
+        -1000
       ],
       "n": "Zhou",
       "why": "Misspelling of Zhou (dynasty from 1046 BCE)."
@@ -64,20 +562,10 @@
     {
       "name": "Hittites",
       "years": [
-        -1000,
-        -700
+        -1000
       ],
       "n": "Neo-Hittite states",
       "why": "The Hittite Empire collapsed around 1180 BCE; small Neo-Hittite kingdoms survived in Syria and Anatolia."
-    },
-    {
-      "name": "Urartu",
-      "years": [
-        -1500,
-        -1000
-      ],
-      "note": "Urartu only emerged around 860 BCE. Earlier, this highland was home to Hurrian peoples (the Mitanni kingdom in 1500 BCE).",
-      "why": "Urartu appears centuries before it existed."
     },
     {
       "name": "Xiongnu",
@@ -105,14 +593,6 @@
       "why": "Mauryan Empire shown about 85 years after it fell."
     },
     {
-      "name": "Seleucid Kingdom",
-      "years": [
-        -100
-      ],
-      "note": "By 100 BCE the Seleucids held little beyond Syria; Parthia had taken Mesopotamia and Iran. The source outline is too large.",
-      "why": "Outline far larger than Seleucid territory in 100 BCE."
-    },
-    {
       "name": "Parthian Empire",
       "years": [
         300
@@ -128,25 +608,6 @@
       "n": "Sasanian Empire",
       "s": null,
       "why": "Persia in 400 CE was the Sasanian Empire."
-    },
-    {
-      "name": "Suren Kingdom",
-      "years": [
-        200,
-        300,
-        400
-      ],
-      "note": "The Indo-Parthian (Suren) kingdom had ended by the late 1st century CE; the source keeps it too long.",
-      "why": "Kingdom shown long after it ended."
-    },
-    {
-      "name": "Satavahanihara",
-      "years": [
-        300,
-        400
-      ],
-      "note": "The Satavahana dynasty ended around 220 CE; by 300 the Deccan was split among successor states.",
-      "why": "Dynasty shown after it ended."
     },
     {
       "name": "Jin Empire",
@@ -172,14 +633,6 @@
       ],
       "n": "Umayyad Caliphate",
       "why": "The Sasanian Empire fell to the Arab conquests by 651."
-    },
-    {
-      "name": "Sasanian dependencies",
-      "years": [
-        700
-      ],
-      "note": "The Sasanian Empire had fallen by 651; these lands were ruled by local dynasties or the Caliphate.",
-      "why": "Shown as Sasanian after the empire fell."
     },
     {
       "name": "Western Gokturk Khaganate",
@@ -230,14 +683,6 @@
       "why": "Temüjin was proclaimed Genghis Khan, founding the Mongol Empire, in 1206."
     },
     {
-      "name": "Liao",
-      "years": [
-        1200
-      ],
-      "note": "The Liao dynasty fell in 1125. In 1200 northern China was ruled by the Jurchen Jin dynasty, which this source does not draw.",
-      "why": "Liao shown 75 years after it fell; Jin missing."
-    },
-    {
       "name": "Fatimid Caliphate",
       "years": [
         1200
@@ -260,14 +705,6 @@
       ],
       "n": "Ghurid Sultanate",
       "why": "The Delhi Sultanate was founded in 1206; in 1200 northern India was ruled by the Ghurids."
-    },
-    {
-      "name": "Buwayhid Emirates",
-      "years": [
-        1200
-      ],
-      "note": "The Buyid emirates ended in 1062. In 1200 this region was held by Seljuk successor states and the Khwarazmians.",
-      "why": "Buyids shown long after they ended."
     },
     {
       "name": "Tibet",
@@ -301,8 +738,7 @@
         1650,
         1700,
         1715,
-        1783,
-        1800
+        1783
       ],
       "note": "The Songhai Empire fell to Morocco in 1591. This area was then split between the Moroccan Pashalik of Timbuktu and smaller successor states; the source keeps the old outline.",
       "why": "Empire shown after its conquest."
@@ -330,8 +766,7 @@
         1650,
         1700,
         1715,
-        1783,
-        1800
+        1783
       ],
       "n": "Habsburg Monarchy",
       "why": "The Austrian Empire was only proclaimed in 1804."
@@ -350,52 +785,8 @@
         1783
       ],
       "n": "Province of Quebec",
-      "s": "Great Britain",
+      "s": "Kingdom of Great Britain",
       "why": "France ceded Canada to Britain in 1763."
-    },
-    {
-      "name": "Quebec",
-      "years": [
-        1800
-      ],
-      "n": "Upper and Lower Canada",
-      "s": "Great Britain",
-      "why": "British since 1763; split into Upper and Lower Canada in 1791."
-    },
-    {
-      "name": "Luisiana",
-      "years": [
-        1800
-      ],
-      "n": "Louisiana",
-      "s": "Spain",
-      "note": "Spain secretly agreed to return Louisiana to France in October 1800 (Treaty of San Ildefonso) but governed it until 1803.",
-      "why": "Spain still governed Louisiana in 1800."
-    },
-    {
-      "name": "Canada",
-      "years": [
-        1815
-      ],
-      "n": "British North America",
-      "s": "United Kingdom",
-      "why": "Canada was only formed in 1867."
-    },
-    {
-      "name": "United Provinces of the Río de la Plata",
-      "years": [
-        1815
-      ],
-      "s": null,
-      "why": "Self-governing since 1810; independence declared in 1816."
-    },
-    {
-      "name": "Manchu Empire",
-      "years": [
-        1914
-      ],
-      "n": "Republic of China",
-      "why": "The Qing (Manchu) dynasty abdicated in February 1912."
     },
     {
       "name": "Papua New Guinea",
@@ -403,332 +794,2285 @@
         1492,
         1500,
         1715,
-        1783,
-        1800,
-        1878,
-        1880
+        1783
       ],
       "n": "Papuan peoples",
       "why": "Papua New Guinea became a country in 1975."
     },
     {
-      "name": "Papua New Guinea",
+      "name": "Ur",
       "years": [
-        1900,
-        1914
+        -2000
       ],
-      "n": "New Guinea (British and German colonies)",
-      "why": "Papua New Guinea became a country in 1975."
+      "note": "The Third Dynasty of Ur fell to Elam around 2004 BCE. By 2000 BCE its lands were split between Isin, Larsa and other cities ruled by Amorite dynasties.",
+      "why": "Ur shown as one kingdom just after it fell."
     },
     {
-      "name": "Papua New Guinea",
+      "name": "Kingdom of David and Solomon",
       "years": [
-        1920,
-        1930,
-        1945
+        -1500
       ],
-      "n": "Papua and New Guinea (Australian territories)",
-      "s": "Australia",
-      "why": "Papua New Guinea became a country in 1975."
+      "n": "Canaanite city-states",
+      "why": "The kingdom of David and Solomon is dated to the 10th century BCE. In 1500 BCE Canaan was a land of city-states, soon under Egyptian rule."
     },
     {
-      "name": "Papua New Guinea",
+      "name": "Arameans",
       "years": [
-        1960
+        -1500
       ],
-      "n": "Territory of Papua and New Guinea",
-      "s": "Australia",
-      "why": "Independence came in 1975."
+      "n": "Amorites",
+      "why": "The Aramaeans appear around 1100 BCE; in 1500 BCE Amorite kingdoms held these lands (Mitanni and Babylonia drawn from Cliopatria)."
     },
     {
-      "name": "USSR",
+      "name": "state societies and Aramaean kingdoms",
       "years": [
-        1920
+        -1500
       ],
-      "n": "Soviet Russia (RSFSR)",
-      "why": "The USSR was founded in December 1922."
+      "n": "Elamite and Zagros states",
+      "why": "The Aramaeans appear around 1100 BCE; Elam and the peoples of the Zagros held these lands."
     },
     {
-      "name": "Far Eastern SSR",
+      "name": "Urartu",
       "years": [
-        1920
+        -1500
       ],
-      "n": "Far Eastern Republic",
-      "why": "The buffer state's actual name (1920–1922)."
+      "n": "Hurrians",
+      "note": "Urartu only emerged around 860 BCE. In 1500 BCE these highlands were home to Hurrian peoples; the Hurrian kingdom of Mitanni lay to the south-west.",
+      "why": "Urartu shown centuries before it existed."
     },
     {
-      "name": "Far Eastern SSR",
+      "name": "Urartu",
       "years": [
-        1930
+        -1000
       ],
-      "n": "USSR",
-      "why": "The Far Eastern Republic joined Soviet Russia in 1922."
+      "n": "Nairi",
+      "note": "Urartu only emerged around 860 BCE. In 1000 BCE the Assyrians called this highland of small kingdoms Nairi.",
+      "why": "Urartu shown before it existed."
     },
     {
-      "name": "Iran",
+      "name": "Greek city-states",
       "years": [
-        1920,
-        1930
+        -1500
       ],
-      "n": "Persia",
-      "why": "The country asked to be called Iran internationally in 1935."
+      "n": "Mycenaean Greece",
+      "why": "Mycenaean palace kingdoms, not city-states, ruled Greece in 1500 BCE."
     },
     {
-      "name": "Zaire (Belgium)",
+      "name": "Greek city-states",
       "years": [
-        1920,
-        1930
+        -1000
       ],
-      "n": "Belgian Congo",
-      "s": "Belgium",
-      "why": "The name Zaire was used only from 1971 to 1997."
+      "n": "Greeks",
+      "note": "Greece was in its Dark Age after the Mycenaean palaces fell around 1200 BCE; the city-states grew up from about 800 BCE.",
+      "why": "City-states shown two centuries early."
     },
     {
-      "name": "Zaire",
+      "name": "Egypt",
       "years": [
-        1945
+        -700
       ],
-      "n": "Belgian Congo",
-      "s": "Belgium",
-      "why": "The name Zaire was used only from 1971 to 1997."
+      "s": "Kush",
+      "why": "Kushite kings ruled Egypt as its 25th Dynasty (about 744–656 BCE)."
     },
     {
-      "name": "Zaire",
+      "name": "Babylonia",
       "years": [
-        1960
+        -700
       ],
-      "n": "Congo-Léopoldville",
-      "why": "Independent as the Republic of the Congo in June 1960; Zaire only from 1971."
+      "s": "Assyria",
+      "why": "Sennacherib of Assyria ruled Babylon and made his son its king in 700 BCE."
     },
     {
-      "name": "Zaire",
+      "name": "Hittites",
       "years": [
-        2000,
-        2010
+        -700
       ],
-      "n": "DR Congo",
-      "why": "Renamed the Democratic Republic of the Congo in 1997."
+      "n": "Neo-Hittite states",
+      "note": "By 700 BCE Assyria had annexed most of the Neo-Hittite kingdoms (Carchemish in 717 BCE; their lands are drawn from Cliopatria). Tabal and its neighbours still paid it tribute.",
+      "why": "The Hittite Empire collapsed around 1180 BCE; Assyria took most of its successor states."
     },
     {
-      "name": "Tanzania, United Republic of",
+      "name": "Kingdom of David and Solomon",
       "years": [
-        1920,
-        1930,
-        1938,
-        1945
+        -700
       ],
-      "n": "Tanganyika Territory",
-      "s": "United Kingdom",
-      "why": "Tanzania was formed in 1964; this was the British mandate of Tanganyika."
+      "n": "Judah",
+      "s": "Assyria",
+      "note": "Judah, with Ammon, Moab and Edom east of the Jordan, all paying tribute to Assyria. Israel, to the north, was annexed by Assyria in 722 BCE.",
+      "why": "The united kingdom split around 930 BCE; Assyria annexed Israel in 722 BCE (drawn from Cliopatria)."
     },
     {
-      "name": "Tanzania, United Republic of",
+      "name": "Zhoa",
       "years": [
-        1960
+        -700
       ],
-      "n": "Tanganyika",
-      "s": "United Kingdom",
-      "why": "Tanganyika became independent in December 1961."
+      "n": "Zhou royal domain and minor states",
+      "why": "Misspelling of Zhou. In 700 BCE the Zhou king held only a small domain around Luoyang; the great states, drawn from Cliopatria, ruled themselves."
     },
     {
-      "name": "Tanzania, United Republic of",
+      "name": "Zhou states",
       "years": [
-        1994,
-        2000,
-        2010
+        -500,
+        -400,
+        -323,
+        -300
       ],
-      "n": "Tanzania",
-      "why": "Shorter common name."
+      "n": "Zhou royal domain and minor states",
+      "why": "The Zhou king held only a small domain; Chu, Qi, Qin and the other great states, drawn from Cliopatria, ruled themselves."
     },
     {
-      "name": "Zambia",
+      "name": "Boii",
       "years": [
-        1920,
-        1930,
-        1960
+        -500
       ],
-      "n": "Northern Rhodesia",
-      "s": "United Kingdom",
-      "why": "Zambia became independent in 1964."
+      "n": "Etruscans",
+      "why": "The Boii crossed the Alps around 400 BCE; in 500 BCE the Po valley around Felsina (Bologna) was Etruscan."
     },
     {
-      "name": "Zimbabwe",
+      "name": "Etrurians",
       "years": [
-        1920,
-        1930,
-        1960
+        -500,
+        -400
       ],
-      "n": "Southern Rhodesia",
-      "s": "United Kingdom",
-      "why": "Zimbabwe became independent in 1980."
+      "n": "Etruscans",
+      "why": "The usual English name (joined with the Etruscan Po valley in 500 BCE)."
     },
     {
-      "name": "Rhodesia",
+      "name": "Gandhāra",
       "years": [
-        1945
+        -500
       ],
-      "n": "Southern Rhodesia",
-      "why": "Official name of the colony."
+      "s": "Achaemenid Empire",
+      "why": "Darius I made Gandhara a Persian satrapy around 518 BCE."
     },
     {
-      "name": "Botswana",
+      "name": "Magadha",
       "years": [
-        1914,
-        1920,
-        1930,
-        1938,
-        1945,
-        1960
+        -323
       ],
-      "n": "Bechuanaland Protectorate",
-      "s": "United Kingdom",
-      "why": "Botswana became independent in 1966."
+      "n": "Nanda Empire",
+      "why": "The Nanda dynasty ruled from Magadha until Chandragupta Maurya overthrew it around 322 BCE."
     },
     {
-      "name": "Malaysia",
+      "name": "Kingdom of Syphax",
       "years": [
-        1920,
-        1930,
-        1938,
-        1945
+        -200
       ],
-      "n": "British Malaya",
-      "s": "United Kingdom",
-      "why": "Malaysia was formed in 1963."
+      "n": "Numidia",
+      "why": "Syphax was captured in 203 BCE; Masinissa then ruled a united Numidia as Rome's ally."
     },
     {
-      "name": "Malaysia",
+      "name": "Kingdom of Gala",
       "years": [
-        1960
+        -200
       ],
-      "n": "Federation of Malaya",
-      "why": "Malaysia was formed in 1963."
+      "n": "Numidia",
+      "why": "Gala died around 207 BCE; his son Masinissa united Numidia in 202 BCE."
+    },
+    {
+      "name": "Bactria",
+      "years": [
+        -200
+      ],
+      "n": "Greco-Bactrian Kingdom",
+      "s": null,
+      "why": "Greek kings (Euthydemus I in 200 BCE) ruled Bactria; the Saka conquest came around 130 BCE."
+    },
+    {
+      "name": "Parthia",
+      "years": [
+        -200
+      ],
+      "s": "Seleucid Kingdom",
+      "why": "Arsaces II submitted to Antiochus III around 209 BCE and ruled as a Seleucid vassal."
+    },
+    {
+      "name": "Mauryan Empire",
+      "years": [
+        -200
+      ],
+      "note": "By 200 BCE the empire was breaking up after Ashoka's death (232 BCE); Kalinga and the Deccan were probably lost. The outline is its earlier extent.",
+      "why": "Outline larger than the empire in 200 BCE."
+    },
+    {
+      "name": "Nan-Yue",
+      "years": [
+        -100
+      ],
+      "n": "Han Empire",
+      "why": "The Han conquered Nanyue in 111 BCE."
+    },
+    {
+      "name": "Min-Yue",
+      "years": [
+        -100
+      ],
+      "n": "Han Empire",
+      "why": "The Han conquered Minyue in 110 BCE."
+    },
+    {
+      "name": "Silla",
+      "years": [
+        -1,
+        100,
+        200,
+        300
+      ],
+      "n": "Jinhan",
+      "why": "Saro, which became Silla, was then one of the twelve statelets of the Jinhan confederacy (Mahan and Byeonhan drawn from Cliopatria)."
+    },
+    {
+      "name": "Satavahanihara",
+      "years": [
+        -1,
+        100,
+        200
+      ],
+      "n": "Satavahana Empire",
+      "why": "'Satavahanihara' is a district named in a Satavahana inscription, not the kingdom's name."
+    },
+    {
+      "name": "Paekche",
+      "years": [
+        100,
+        200,
+        300
+      ],
+      "n": "Mahan",
+      "why": "Baekje was then one of the 54 statelets of the Mahan confederacy; it absorbed the rest in the 4th century."
+    },
+    {
+      "name": "Saka Kingdom",
+      "years": [
+        100,
+        200,
+        300
+      ],
+      "n": "Western Satraps",
+      "why": "The Saka rulers of western India, known as the Western Satraps; the Kushans held the north (drawn from Cliopatria)."
+    },
+    {
+      "name": "Pomeranian culture",
+      "years": [
+        100
+      ],
+      "n": "Goths",
+      "why": "The Pomeranian culture ended around 150 BCE; in 100 CE this was the Wielbark culture of the Goths."
+    },
+    {
+      "name": "Dumonii",
+      "years": [
+        100,
+        200,
+        300
+      ],
+      "n": "Dumnonii",
+      "s": "Roman Empire",
+      "why": "Misspelling; the Dumnonii of Devon and Cornwall were a self-governing district of Roman Britain."
+    },
+    {
+      "name": "Suren Kingdom",
+      "years": [
+        200
+      ],
+      "n": "Parthian Empire",
+      "why": "The Indo-Parthian (Suren) kingdom had broken up by the late 1st century; the Kushans held the east (drawn from Cliopatria) and Parthia the west."
+    },
+    {
+      "name": "Chola",
+      "years": [
+        200
+      ],
+      "n": "Hindu kingdoms",
+      "why": "The source labels all of the far south 'Chola'; the Chola, Pandya and Chera kingdoms are drawn from Cliopatria."
+    },
+    {
+      "name": "Rome (Constantinus)",
+      "years": [
+        300
+      ],
+      "n": "Rome (Constantius)",
+      "why": "The western Caesar in 300 was Constantius I; his son Constantine came to power in 306."
+    },
+    {
+      "name": "Han Zhao",
+      "years": [
+        300
+      ],
+      "n": "Southern Xiongnu",
+      "note": "Liu Yuan, a Xiongnu chief, founded the Han Zhao state here in 304.",
+      "why": "Han Zhao shown four years before it was founded."
+    },
+    {
+      "name": "Suren Kingdom",
+      "years": [
+        300,
+        400
+      ],
+      "n": "Sasanian Empire",
+      "why": "The Sasanians took these lands in the 230s; the Kushano-Sasanians, the Kushans and later the Kidarites held the east (drawn from Cliopatria)."
+    },
+    {
+      "name": "Satavahanihara",
+      "years": [
+        300
+      ],
+      "n": "Satavahana successor states",
+      "note": "The Satavahana dynasty ended around 220 CE. The Vakatakas, Pallavas (both drawn from Cliopatria), Ikshvakus and Abhiras divided the Deccan.",
+      "why": "Dynasty shown after it ended."
+    },
+    {
+      "name": "Satavahanihara",
+      "years": [
+        400
+      ],
+      "n": "Deccan kingdoms",
+      "note": "The Satavahana dynasty ended around 220 CE. In 400 the Deccan was divided between the Vakatakas, Kadambas and Pallavas (drawn from Cliopatria) and smaller kingdoms.",
+      "why": "Dynasty shown long after it ended."
+    },
+    {
+      "name": "Gupta Empire",
+      "years": [
+        300
+      ],
+      "n": "Gangetic kingdoms",
+      "note": "The Gupta Empire began with Chandragupta I around 320. In 300 the Ganges plain was shared between the Naga kings, the Licchavis, the Maghas and the early Gupta kings.",
+      "why": "Gupta Empire shown about 20 years before it began."
+    },
+    {
+      "name": "Meroe",
+      "years": [
+        400
+      ],
+      "n": "Nubian kingdoms",
+      "note": "The kingdom of Kush (Meroë) fell around 350 CE; Nobatia, Makuria and Alodia (drawn from Cliopatria) grew up in its place.",
+      "why": "Kush shown after it fell."
+    },
+    {
+      "name": "Hindu kingdoms",
+      "years": [
+        400
+      ],
+      "n": "Kalabhra dynasty",
+      "why": "The Kalabhras ruled the Tamil country from about the 3rd to the 6th century."
+    },
+    {
+      "name": "Hadramaut",
+      "years": [
+        400
+      ],
+      "n": "Himyarite Kingdom",
+      "why": "Himyar conquered Hadramaut around 300 CE."
+    },
+    {
+      "name": "Kushan Principalities",
+      "years": [
+        500
+      ],
+      "n": "Hephthalite Empire",
+      "why": "The last Kushan (Kidarite) rulers fell to the Hephthalites and the Alchon Huns by about 470."
+    },
+    {
+      "name": "Ruanruan",
+      "years": [
+        500
+      ],
+      "n": "Rouran Khaganate",
+      "why": "Ruanruan ('wriggling worms') is a Chinese insult for the Rouran."
+    },
+    {
+      "name": "Makkura",
+      "years": [
+        500,
+        600,
+        700,
+        800,
+        900,
+        1000,
+        1100,
+        1200,
+        1279,
+        1300,
+        1400
+      ],
+      "n": "Makuria",
+      "why": "The usual English spelling."
+    },
+    {
+      "name": "Western Roman Empire",
+      "years": [
+        500
+      ],
+      "n": "Brittonic kingdoms",
+      "why": "Rome left Britain around 410 and the Western Empire ended in 476; western Britain was ruled by Brittonic kings."
+    },
+    {
+      "name": "Turingians",
+      "years": [
+        500
+      ],
+      "n": "Thuringians",
+      "why": "Misspelling."
+    },
+    {
+      "name": "Shaskanka",
+      "years": [
+        600
+      ],
+      "n": "Gauda (Shashanka)",
+      "why": "Misspelling of Shashanka, king of Gauda (Bengal) from about 590 to 625."
+    },
+    {
+      "name": "Cantia",
+      "years": [
+        600,
+        700
+      ],
+      "n": "Kent",
+      "why": "The source's 'Cantia' (Kent) covers most of England; Mercia, Wessex and the other kingdoms are drawn from Cliopatria."
+    },
+    {
+      "name": "Ostrogoths",
+      "years": [
+        600
+      ],
+      "n": "Avars",
+      "why": "The Ostrogothic kingdom ended in 553; by 600 these lands were Avar and Bavarian (Bavaria drawn from Cliopatria)."
+    },
+    {
+      "name": "Slavs",
+      "years": [
+        600
+      ],
+      "s": "Avars",
+      "why": "The Alpine Slavs lived under Avar rule around 600, not Byzantine."
+    },
+    {
+      "name": "Mataram",
+      "years": [
+        600,
+        700
+      ],
+      "n": "Javanese kingdoms",
+      "note": "The Mataram kingdom was founded around 732. Before that Java held Tarumanagara, then Sunda and Galuh, in the west (drawn from Cliopatria) and Kalingga in the centre.",
+      "why": "Mataram shown before it was founded."
+    },
+    {
+      "name": "Lombard principalities",
+      "years": [
+        600,
+        700
+      ],
+      "n": "Lombard Kingdom",
+      "why": "The Lombards ruled a kingdom, with its capital at Pavia, from 568 to 774."
     },
     {
       "name": "Hejaz",
       "years": [
-        1930
+        700
       ],
-      "n": "Kingdom of Hejaz and Nejd",
-      "why": "Ibn Saud conquered the Hejaz in 1925."
+      "n": "Umayyad Caliphate",
+      "why": "The Umayyads took the Hejaz back from Ibn al-Zubayr in 692."
     },
     {
-      "name": "Hejaz",
+      "name": "Mazun",
       "years": [
-        1938
+        700
       ],
-      "n": "Saudi Arabia",
-      "why": "Part of Saudi Arabia since 1932."
+      "n": "Oman",
+      "s": "Umayyad Caliphate",
+      "why": "Mazun was the Sasanian name for Oman, which the Umayyads ruled from the 690s."
     },
     {
-      "name": "Chinese Warlords",
+      "name": "Armenia",
       "years": [
-        1930
+        700
       ],
-      "n": "Republic of China",
-      "why": "The Nationalist government reunified most of China in 1928."
+      "s": "Umayyad Caliphate",
+      "why": "Armenia was under Umayyad rule around 700 (the province of Arminiya from 701)."
     },
     {
-      "name": "Chinese warlords",
+      "name": "Caucasian Albania",
       "years": [
-        1938
+        700
       ],
-      "n": "Republic of China",
-      "note": "Japan occupied much of eastern China from 1937, which this snapshot does not show.",
-      "why": "The Nationalist government ruled China in 1938."
+      "s": "Umayyad Caliphate",
+      "why": "Caucasian Albania was under Umayyad rule around 700."
     },
     {
-      "name": "India",
+      "name": "Sasanian dependencies",
       "years": [
-        1945
+        700
       ],
-      "n": "British Raj",
-      "s": "United Kingdom",
-      "why": "India and Pakistan became independent in August 1947."
+      "n": "Yemen",
+      "s": "Umayyad Caliphate",
+      "why": "The Sasanian Empire fell by 651; Yemen became part of the Umayyad Caliphate."
     },
     {
-      "name": "Pakistan",
+      "name": "Paekche",
       "years": [
-        1945
+        700
       ],
-      "n": "British Raj",
-      "s": "United Kingdom",
-      "why": "Pakistan was created in August 1947."
+      "n": "Silla",
+      "why": "Silla and Tang conquered Baekje in 660."
     },
     {
-      "name": "Namibia",
+      "name": "Uyghurs",
       "years": [
-        1945,
-        1960
+        700
       ],
-      "n": "South West Africa",
-      "s": "South Africa",
-      "why": "Namibia became independent in 1990."
+      "n": "Tarim Basin kingdoms",
+      "s": "Tang Empire",
+      "why": "The Uyghurs reached the Tarim Basin after 840; in 700 its oasis kingdoms (Kucha, Khotan, Kashgar, Karashahr) were under Tang protection."
     },
     {
-      "name": "Central African Republic",
+      "name": "Palas",
       "years": [
-        1945
+        700
       ],
-      "n": "Ubangi-Shari",
+      "n": "Bengali kingdoms",
+      "note": "The Pala dynasty came to power around 750. Before that Bengal was divided among local rulers, such as the Khadgas in the east.",
+      "why": "Palas shown about 50 years early."
+    },
+    {
+      "name": "Georgian Kingdom",
+      "years": [
+        700
+      ],
+      "n": "Principality of Iberia",
+      "why": "Georgia was united as a kingdom in 1008; in 700 Kartli (Iberia) was a principality, with Lazica (drawn from Cliopatria) to the west."
+    },
+    {
+      "name": "Slavs",
+      "years": [
+        700
+      ],
+      "n": "Carantania",
+      "s": null,
+      "why": "Carantania, a Slavic principality, ruled itself until it came under Bavaria around 745."
+    },
+    {
+      "name": "Barghawata",
+      "years": [
+        700
+      ],
+      "n": "Masmuda Berbers",
+      "why": "The Barghawata state was founded around 744; in 700 these were Masmuda Berber lands."
+    },
+    {
+      "name": "Göktürks",
+      "years": [
+        700
+      ],
+      "n": "Second Turkic Khaganate",
+      "why": "The Turks rebuilt their khaganate in Mongolia in 682."
+    },
+    {
+      "name": "Tufan Empire",
+      "years": [
+        700
+      ],
+      "n": "Tibetan Empire",
+      "why": "Tufan is the Chinese name for the Tibetan Empire."
+    },
+    {
+      "name": "Hindu states",
+      "years": [
+        700
+      ],
+      "n": "Kamarupa",
+      "why": "The kingdom of Kamarupa ruled the Brahmaputra valley."
+    },
+    {
+      "name": "Bulgars",
+      "years": [
+        700
+      ],
+      "s": "Khazars",
+      "why": "The Khazars broke up Old Great Bulgaria around 668 and ruled the Bulgars who stayed."
+    },
+    {
+      "name": "Goths",
+      "years": [
+        700
+      ],
+      "s": "Khazars",
+      "why": "The Crimean Goths came under Khazar rule; Old Great Bulgaria had fallen by 668."
+    },
+    {
+      "name": "Sabirs",
+      "years": [
+        700
+      ],
+      "s": "Khazars",
+      "why": "The Sabirs were absorbed by the Khazars in the 7th century."
+    },
+    {
+      "name": "Magyars",
+      "years": [
+        700
+      ],
+      "s": "Khazars",
+      "why": "The early Magyars lived under Khazar rule."
+    },
+    {
+      "name": "West Getaes",
+      "years": [
+        700
+      ],
+      "n": "West Geats",
+      "why": "The Geats of Västergötland; the Getae were a Thracian people."
+    },
+    {
+      "name": "East Getaes",
+      "years": [
+        700
+      ],
+      "n": "East Geats",
+      "why": "The Geats of Östergötland; the Getae were a Thracian people."
+    },
+    {
+      "name": "Nan-Zhao",
+      "years": [
+        700
+      ],
+      "note": "Nanzhao was then one of six kingdoms around Lake Erhai; it united them around 738.",
+      "why": "Nanzhao shown before it united the region."
+    },
+    {
+      "name": "Frisians",
+      "years": [
+        700
+      ],
+      "n": "Frisian Kingdom",
+      "why": "King Radbod's Frisia ruled itself until the Franks took it in 719–734 (outline from Cliopatria)."
+    },
+    {
+      "name": "Hainan",
+      "years": [
+        700,
+        800,
+        900
+      ],
+      "s": "Tang Empire",
+      "why": "Tang prefectures ruled Hainan's coast."
+    },
+    {
+      "name": "Rajput Clans and Small States",
+      "years": [
+        800
+      ],
+      "n": "Mon–Khmer peoples and small states",
+      "note": "Mon and Khmer peoples and small kingdoms; Haripuñjaya, Lavo and Land Chenla are drawn from Cliopatria.",
+      "why": "The source labels this part of Southeast Asia 'Rajput clans', a name for north-western India."
+    },
+    {
+      "name": "Avars",
+      "years": [
+        800
+      ],
+      "s": "Carolingian Empire",
+      "note": "Charlemagne destroyed the Avar khaganate in 791–796; the Avars who stayed east of the Danube paid him tribute.",
+      "why": "Avar khaganate shown at full size after its fall."
+    },
+    {
+      "name": "Idrisid Caliphate",
+      "years": [
+        800,
+        900
+      ],
+      "n": "Idrisid dynasty",
+      "why": "The Idrisids claimed the imamate, never the caliphate (the Barghawata, drawn from Cliopatria, ruled themselves)."
+    },
+    {
+      "name": "Vallabhi",
+      "years": [
+        800,
+        900
+      ],
+      "n": "Gurjara Pratihara",
+      "why": "The Maitraka kingdom of Valabhi fell around 776."
+    },
+    {
+      "name": "Silia",
+      "years": [
+        800
+      ],
+      "n": "Unified Silla",
+      "why": "Misspelling of Silla, which ruled most of Korea from 668."
+    },
+    {
+      "name": "Britany",
+      "years": [
+        800,
+        900,
+        1000,
+        1100,
+        1200,
+        1279,
+        1300,
+        1400
+      ],
+      "n": "Brittany",
+      "why": "Misspelling."
+    },
+    {
+      "name": "Britany",
+      "years": [
+        1492,
+        1500,
+        1530
+      ],
+      "n": "Brittany",
       "s": "France",
-      "why": "Independent as the Central African Republic in 1960."
+      "why": "Misspelling. Anne of Brittany married Charles VIII of France in 1491; the duchy was joined to France in 1532."
     },
     {
-      "name": "Burkina Faso",
+      "name": "Lombard duchies",
       "years": [
-        1945
+        800
       ],
-      "n": "Upper Volta",
-      "note": "France dissolved Upper Volta among neighbouring colonies from 1932 to 1947.",
-      "why": "Renamed Burkina Faso in 1984."
+      "n": "Principality of Benevento",
+      "why": "Charlemagne took the Lombard kingdom in 774; only Benevento stayed Lombard."
     },
     {
-      "name": "Burkina Faso",
+      "name": "Tibetan Empire",
       "years": [
-        1960
+        900
       ],
-      "n": "Upper Volta",
-      "why": "Renamed Burkina Faso in 1984."
+      "n": "Tibetan kingdoms",
+      "note": "The Tibetan Empire broke up after 842. In 900 Tibet was divided among local rulers; Qocho, Khotan and Ganzhou (drawn from Cliopatria) ruled the oases to the north.",
+      "why": "Empire shown after it fell."
     },
     {
-      "name": "Mali",
+      "name": "Oghuz Turks",
       "years": [
-        1945
+        900
       ],
-      "n": "French Sudan",
-      "s": "France",
-      "why": "Mali became independent in 1960."
+      "n": "Turkic and Mongolic tribes",
+      "why": "The source stretches the Oghuz over the whole steppe; the Kimek–Kipchak, Kyrgyz and Oghuz lands are drawn from Cliopatria."
     },
     {
-      "name": "Western Sahara",
+      "name": "Pallava",
       "years": [
-        1945,
-        1960
+        900
       ],
-      "n": "Spanish Sahara",
-      "s": "Spain",
-      "why": "Spain held the territory until 1975–76."
+      "n": "Chola Empire",
+      "why": "Aditya I Chola defeated the last Pallava king around 897 (the Pandya lands drawn from Cliopatria)."
+    },
+    {
+      "name": "Mercia",
+      "years": [
+        900
+      ],
+      "s": "Wessex",
+      "note": "English Mercia, ruled by Æthelred and Æthelflæd under the kings of Wessex. Wessex and the Danelaw are drawn from Cliopatria.",
+      "why": "The source's Mercia covers Wessex and the Danelaw."
+    },
+    {
+      "name": "Picts",
+      "years": [
+        900
+      ],
+      "n": "Kingdom of Alba",
+      "why": "The Picts and the Scots of Dál Riata had united by the 840s; Donald II (889–900) was the first 'king of Alba'."
+    },
+    {
+      "name": "Scots",
+      "years": [
+        900
+      ],
+      "n": "Kingdom of Alba",
+      "why": "The Picts and the Scots of Dál Riata had united by the 840s."
+    },
+    {
+      "name": "Magyars",
+      "years": [
+        900
+      ],
+      "n": "Pechenegs",
+      "why": "The Magyars left these steppes for the Carpathian Basin around 895; the Pechenegs took them."
+    },
+    {
+      "name": "Avars",
+      "years": [
+        900
+      ],
+      "n": "Principality of Hungary",
+      "why": "The Avars were gone by the 820s; the Magyars conquered the Carpathian Basin in 895–900."
+    },
+    {
+      "name": "Carolingian Empire",
+      "years": [
+        900
+      ],
+      "n": "Lotharingia",
+      "s": "East Francia",
+      "why": "The Carolingian Empire broke up in 888. Lotharingia passed to East Francia in 900; Provence and Upper Burgundy (drawn from Cliopatria) were kingdoms."
+    },
+    {
+      "name": "Polyanians",
+      "years": [
+        900
+      ],
+      "n": "Kyivan Rus",
+      "why": "Kyiv, the Polianians' town, was the centre of Kyivan Rus."
+    },
+    {
+      "name": "Croatian kingdom",
+      "years": [
+        900
+      ],
+      "n": "Duchy of Croatia",
+      "why": "Croatia became a kingdom under Tomislav around 925."
+    },
+    {
+      "name": "Buyid Emirate",
+      "years": [
+        1000
+      ],
+      "n": "Habbarid Emirate",
+      "note": "Sindh was ruled from al-Mansura by the Habbarids, and Multan by an Ismaili emirate; the Buyids never ruled here.",
+      "why": "The Buyids ruled Iran and Iraq, not Sindh."
+    },
+    {
+      "name": "Nan Chao",
+      "years": [
+        1000,
+        1100,
+        1200
+      ],
+      "n": "Kingdom of Dali",
+      "why": "Nanzhao fell in 902; the Kingdom of Dali was founded in 937."
+    },
+    {
+      "name": "Magyars",
+      "years": [
+        1000
+      ],
+      "n": "Kingdom of Hungary",
+      "why": "Stephen I was crowned king of Hungary at Christmas 1000."
+    },
+    {
+      "name": "Senas",
+      "years": [
+        1000,
+        1100
+      ],
+      "n": "Hill kingdoms (Manipur, Tripura)",
+      "note": "Hill kingdoms and peoples east of Bengal, among them Manipur and Tripura. Kamarupa (and in 1000 the Chandra kingdom) are drawn from Cliopatria.",
+      "why": "The Sena dynasty ruled Bengal, further west, from the late 11th century."
+    },
+    {
+      "name": "Annam",
+      "years": [
+        1000
+      ],
+      "n": "Đại Cồ Việt",
+      "why": "Annam was the Chinese name for the province; Vietnam ruled itself from 939 and was named Đại Cồ Việt in 968."
+    },
+    {
+      "name": "Burgandy",
+      "years": [
+        1000
+      ],
+      "n": "Kingdom of Burgundy",
+      "why": "Misspelling."
+    },
+    {
+      "name": "Burgandy",
+      "years": [
+        1100,
+        1200
+      ],
+      "n": "Kingdom of Burgundy",
+      "s": "Holy Roman Empire",
+      "why": "Misspelling; the kingdom (Arles) was part of the Holy Roman Empire from 1032."
+    },
+    {
+      "name": "Cyprus",
+      "years": [
+        1000,
+        1100
+      ],
+      "s": "Byzantine Empire",
+      "why": "Byzantium took Cyprus back in 965 and held it until 1184."
+    },
+    {
+      "name": "Hainan",
+      "years": [
+        1000,
+        1100
+      ],
+      "s": "Song Empire",
+      "why": "Song prefectures ruled Hainan's coast."
+    },
+    {
+      "name": "Korea",
+      "years": [
+        1000,
+        1100
+      ],
+      "n": "Goryeo",
+      "why": "Korea was the kingdom of Goryeo from 918 to 1392 (in 1100 its south, left blank by the source, drawn from Cliopatria)."
+    },
+    {
+      "name": "Pratiharas",
+      "years": [
+        1100
+      ],
+      "n": "Gahadavala dynasty",
+      "why": "The Pratiharas lost Kannauj by about 1036; the Gahadavalas ruled it from about 1090."
+    },
+    {
+      "name": "Bulgar Khanate",
+      "years": [
+        1100
+      ],
+      "n": "Byzantine Empire",
+      "why": "Byzantium conquered the First Bulgarian Empire in 1018 and held it until 1185."
+    },
+    {
+      "name": "Armenia",
+      "years": [
+        1100
+      ],
+      "s": "Seljuk Empire",
+      "why": "The Seljuks took Armenia from Byzantium in 1064–1071."
+    },
+    {
+      "name": "León",
+      "years": [
+        1100
+      ],
+      "n": "León and Castile",
+      "why": "León and Castile were united under Alfonso VI (1072–1109)."
+    },
+    {
+      "name": "Castilla",
+      "years": [
+        1100
+      ],
+      "n": "León and Castile",
+      "why": "León and Castile were united under Alfonso VI (1072–1109)."
+    },
+    {
+      "name": "Pyu state",
+      "years": [
+        1100,
+        1200
+      ],
+      "n": "Pagan Kingdom",
+      "why": "The Pyu city-states had faded by the 10th century; Pagan ruled central Burma."
+    },
+    {
+      "name": "Mon state",
+      "years": [
+        1100,
+        1200
+      ],
+      "n": "Pagan Kingdom",
+      "why": "Anawrahta of Pagan conquered the Mon kingdom of Thaton in 1057."
+    },
+    {
+      "name": "Bagan",
+      "years": [
+        1200
+      ],
+      "n": "Pagan Kingdom",
+      "why": "Joined with the Pyu and Mon lands it ruled."
+    },
+    {
+      "name": "Duchy of Benevento",
+      "years": [
+        1100
+      ],
+      "n": "Norman Italy",
+      "why": "The Lombard duchy ended in 1077; southern Italy and Sicily were held by the Normans."
+    },
+    {
+      "name": "Duchy of Benevento",
+      "years": [
+        1200
+      ],
+      "n": "Kingdom of Sicily",
+      "why": "The Normans' Kingdom of Sicily (1130) held all of southern Italy."
+    },
+    {
+      "name": "Hindu kingdoms",
+      "years": [
+        1100
+      ],
+      "n": "Rajput kingdoms",
+      "why": "The Ghaznavids held the Punjab (drawn from Cliopatria); Rajput dynasties ruled the rest."
+    },
+    {
+      "name": "Corsica",
+      "years": [
+        1100,
+        1200
+      ],
+      "s": "Republic of Pisa",
+      "why": "Pisa ruled Corsica from the 1070s."
+    },
+    {
+      "name": "Liao",
+      "years": [
+        1200
+      ],
+      "n": "Jin dynasty",
+      "why": "The Jurchen Jin destroyed the Liao in 1125 and took northern China from the Song in 1127 (its southern lands, which the source gives to the Song, drawn from Cliopatria)."
+    },
+    {
+      "name": "Song Empire",
+      "years": [
+        1200
+      ],
+      "n": "Southern Song",
+      "why": "The Song lost northern China to the Jin in 1127."
+    },
+    {
+      "name": "Buwayhid Emirates",
+      "years": [
+        1200
+      ],
+      "n": "Seljuk successor states",
+      "note": "The Buyid emirates ended in 1062 and the Great Seljuk sultanate in 1194. In 1200 Iran was divided between the Khwarazmians, the Ildegizid atabegs of Azerbaijan, the Salghurids of Fars and the Abbasid caliph in Iraq.",
+      "why": "Buyids shown long after they ended."
+    },
+    {
+      "name": "Khwarazmian dynasty",
+      "years": [
+        1200
+      ],
+      "n": "Soomra Emirate",
+      "s": "Ghurid Sultanate",
+      "why": "The source puts the Khwarazmians in Sindh, whose Soomra rulers paid tribute to the Ghurids; Khwarazm is drawn from Cliopatria."
+    },
+    {
+      "name": "Harapunchai",
+      "years": [
+        1200
+      ],
+      "n": "Haripunchai",
+      "why": "Misspelling (the Khmer lands it covers drawn from Cliopatria)."
+    },
+    {
+      "name": "Imperial Japan (Fujiwara)",
+      "years": [
+        1200
+      ],
+      "n": "Japan (Kamakura shogunate)",
+      "why": "Minamoto no Yoritomo founded the Kamakura shogunate in 1185–1192."
+    },
+    {
+      "name": "Yemen",
+      "years": [
+        1200
+      ],
+      "s": "Ayyubid Sultanate",
+      "why": "The Ayyubids conquered Yemen in 1174."
+    },
+    {
+      "name": "Buyid dynasty",
+      "years": [
+        1200
+      ],
+      "n": "Kingdom of Kashmir",
+      "why": "The Buyids never ruled Kashmir and ended in 1062; Kashmir had its own kings."
+    },
+    {
+      "name": "East Java",
+      "years": [
+        1200
+      ],
+      "n": "Kediri",
+      "why": "East Java was the kingdom of Kediri (Bali drawn from Cliopatria)."
+    },
+    {
+      "name": "Armenia",
+      "years": [
+        1200
+      ],
+      "s": "Georgia",
+      "why": "Zakarid princes ruled Armenia under the Georgian crown from 1199."
+    },
+    {
+      "name": "Kamarupa",
+      "years": [
+        1200
+      ],
+      "n": "Hill peoples",
+      "note": "Hill peoples between the Kingdom of Dali and Pagan; Kamarupa was a kingdom in Assam, to the west.",
+      "why": "The source puts Kamarupa in northern Burma."
+    },
+    {
+      "name": "Croatia",
+      "years": [
+        1200
+      ],
+      "s": "Hungary",
+      "why": "Croatia was in union with Hungary from 1102."
+    },
+    {
+      "name": "Hainan",
+      "years": [
+        1200
+      ],
+      "s": "Southern Song",
+      "why": "Song prefectures ruled Hainan's coast."
+    },
+    {
+      "name": "Kediri",
+      "years": [
+        1279
+      ],
+      "n": "Singhasari",
+      "why": "Singhasari conquered Kediri in 1222 and ruled East Java until 1292."
+    },
+    {
+      "name": "Orissa",
+      "years": [
+        1279,
+        1300
+      ],
+      "n": "Eastern Ganga dynasty",
+      "why": "Orissa was ruled by the Eastern Ganga dynasty."
+    },
+    {
+      "name": "Luva",
+      "years": [
+        1279,
+        1300
+      ],
+      "n": "Lavo",
+      "why": "Misspelling of Lavo (Lopburi)."
+    },
+    {
+      "name": "Great Khanate",
+      "years": [
+        1279,
+        1300
+      ],
+      "n": "Yuan dynasty",
+      "why": "Kublai Khan proclaimed the Yuan dynasty in 1271."
     },
     {
       "name": "Tibet",
       "years": [
-        1960
+        1279,
+        1300
       ],
-      "s": "China",
-      "note": "Under the control of the People's Republic of China since 1950–51.",
-      "why": "Shown as independent in 1960."
+      "s": "Yuan dynasty",
+      "why": "The Yuan ruled Tibet through the Sakya lamas from the 1260s to 1354."
     },
     {
-      "name": "Vietnam",
+      "name": "Georgia",
       "years": [
-        1960
+        1279,
+        1300
       ],
-      "note": "Divided into North and South Vietnam from 1954 to 1976.",
-      "why": "Shown as one country in 1960."
+      "s": "Ilkhanate",
+      "why": "Georgia was a vassal of the Ilkhanate from 1256."
+    },
+    {
+      "name": "Hainan",
+      "years": [
+        1279,
+        1300
+      ],
+      "s": "Yuan dynasty",
+      "why": "The Yuan took Hainan from the Song in 1278."
+    },
+    {
+      "name": "Ryazan",
+      "years": [
+        1279,
+        1300
+      ],
+      "n": "Rus principalities",
+      "s": "Khanate of the Golden Horde",
+      "why": "The source's 'Ryazan' covers most of the Rus lands, all paying tribute to the Golden Horde (in 1300 some drawn from Cliopatria)."
+    },
+    {
+      "name": "Pagan",
+      "years": [
+        1300
+      ],
+      "n": "Myinsaing Kingdom",
+      "why": "The Pagan Empire fell after the Mongol invasion of 1287; the Myinsaing brothers ruled central Burma (the Shan states, Hanthawaddy and Lan Na drawn from Cliopatria)."
+    },
+    {
+      "name": "Srivijaya Empire",
+      "years": [
+        1300
+      ],
+      "n": "Malayu-Dharmasraya",
+      "note": "Srivijaya had faded by the late 13th century; its successor in Sumatra was the kingdom of Malayu at Dharmasraya.",
+      "why": "Srivijaya shown after it faded."
+    },
+    {
+      "name": "Seljuk Caliphate",
+      "years": [
+        1300
+      ],
+      "n": "Sultanate of Rum",
+      "s": "Ilkhanate",
+      "why": "The Seljuks were sultans, never caliphs; the Sultanate of Rum was an Ilkhanate vassal until it ended in 1308 (Armenian Cilicia drawn from Cliopatria)."
+    },
+    {
+      "name": "Kediri",
+      "years": [
+        1300,
+        1400
+      ],
+      "n": "Majapahit",
+      "why": "Majapahit, founded in 1293, ruled East Java."
+    },
+    {
+      "name": "Chola Empire",
+      "years": [
+        1300
+      ],
+      "n": "Pandya state",
+      "why": "The Pandyas ended the Chola dynasty in 1279."
+    },
+    {
+      "name": "Sicily",
+      "years": [
+        1300,
+        1400
+      ],
+      "n": "Kingdom of Naples",
+      "why": "After the Sicilian Vespers (1282) the island of Sicily had its own Aragonese kings (drawn from Cliopatria); the mainland kingdom was Naples."
+    },
+    {
+      "name": "Raška",
+      "years": [
+        1300
+      ],
+      "n": "Kingdom of Serbia",
+      "why": "Serbia was a kingdom from 1217 (Stefan Dragutin's Syrmia and Bosnia drawn from Cliopatria)."
+    },
+    {
+      "name": "Shoa",
+      "years": [
+        1300
+      ],
+      "n": "Ifat Sultanate",
+      "why": "The Sultanate of Ifat conquered Shewa in 1285."
+    },
+    {
+      "name": "Shoa",
+      "years": [
+        1400
+      ],
+      "n": "Ifat Sultanate",
+      "s": "Ethiopia",
+      "why": "Ifat held Shewa, paying tribute to Ethiopia from 1332."
+    },
+    {
+      "name": "Navarre",
+      "years": [
+        1300
+      ],
+      "s": "France",
+      "why": "Navarre and France shared their kings from 1285 to 1328."
+    },
+    {
+      "name": "Corsica",
+      "years": [
+        1300,
+        1400
+      ],
+      "s": "Republic of Genoa",
+      "why": "Genoa took Corsica from Pisa after the battle of Meloria (1284)."
+    },
+    {
+      "name": "Chola Empire",
+      "years": [
+        1400
+      ],
+      "n": "Vijayanagara Empire",
+      "why": "The Cholas ended in 1279; Vijayanagara conquered the Tamil country by 1378."
+    },
+    {
+      "name": "Pandya state",
+      "years": [
+        1400
+      ],
+      "s": "Vijayanagara Empire",
+      "why": "The later Pandyas ruled the far south as Vijayanagara's vassals."
+    },
+    {
+      "name": "Pagan",
+      "years": [
+        1400
+      ],
+      "n": "Ava Kingdom",
+      "why": "The Pagan Empire fell in 1287; Ava ruled central Burma from 1364 (the Shan states, Hanthawaddy and Lan Na drawn from Cliopatria)."
+    },
+    {
+      "name": "Srivijaya Empire",
+      "years": [
+        1400
+      ],
+      "n": "Majapahit",
+      "why": "Srivijaya had faded by the late 13th century; Majapahit claimed Sumatra in 1400."
+    },
+    {
+      "name": "Seljuk Caliphate",
+      "years": [
+        1400
+      ],
+      "n": "Ottoman Empire",
+      "why": "The Sultanate of Rum ended in 1308; Bayezid I had annexed the Anatolian beyliks by 1398 (until Timur restored them in 1402)."
+    },
+    {
+      "name": "Beylik of Aydin",
+      "years": [
+        1400
+      ],
+      "n": "Ottoman Empire",
+      "why": "Bayezid I annexed Aydin in 1390; Timur restored it in 1402."
+    },
+    {
+      "name": "Sukhothai",
+      "years": [
+        1400
+      ],
+      "s": "Ayutthaya",
+      "why": "Sukhothai became a vassal of Ayutthaya in 1378 (Lan Xang drawn from Cliopatria)."
+    },
+    {
+      "name": "Aceh",
+      "years": [
+        1400
+      ],
+      "n": "Samudera Pasai Sultanate",
+      "why": "The Aceh Sultanate was founded around 1496; Samudera Pasai led northern Sumatra in 1400."
+    },
+    {
+      "name": "Moldova",
+      "years": [
+        1400
+      ],
+      "n": "Principality of Moldavia",
+      "why": "Moldova is the modern name."
+    },
+    {
+      "name": "Sardinia",
+      "years": [
+        1400
+      ],
+      "n": "Giudicato of Arborea",
+      "why": "Arborea held most of Sardinia until 1409; Aragon held Cagliari and Alghero."
+    },
+    {
+      "name": "Hainan",
+      "years": [
+        1400
+      ],
+      "s": "Ming Empire",
+      "why": "Ming prefectures ruled Hainan's coast."
+    },
+    {
+      "name": "Shogun Japan (Kamakura)",
+      "years": [
+        1400
+      ],
+      "n": "Japan (Muromachi shogunate)",
+      "why": "The Kamakura shogunate fell in 1333; the Ashikaga shoguns ruled from Kyoto from 1338."
+    },
+    {
+      "name": "Sultanate of Delhi",
+      "years": [
+        1400
+      ],
+      "note": "After Timur sacked Delhi in December 1398 the sultan ruled little beyond Delhi, and the governors of Gujarat, Malwa and Khandesh ruled on their own. Bengal, Jaunpur, Sindh, the Bahmani Sultanate and Vijayanagara (drawn from Cliopatria) were independent.",
+      "why": "The source draws the Tughlaq empire at its 1330s height."
+    },
+    {
+      "name": "Wattasid Caliphate",
+      "years": [
+        1492,
+        1500
+      ],
+      "n": "Wattasid Sultanate",
+      "why": "The Wattasids were sultans, not caliphs."
+    },
+    {
+      "name": "Golkonda",
+      "years": [
+        1492,
+        1500
+      ],
+      "n": "Bahmani Sultanate",
+      "why": "The Golconda Sultanate was founded in 1518; Golconda was a Bahmani province."
+    },
+    {
+      "name": "Bidar",
+      "years": [
+        1492,
+        1500
+      ],
+      "n": "Bahmani Sultanate",
+      "why": "Bidar was the capital of the Bahmani Sultanate, which lasted until 1527."
+    },
+    {
+      "name": "Teutonic Knights",
+      "years": [
+        1492,
+        1500
+      ],
+      "s": "Poland-Lithuania",
+      "why": "The Order's Prussia was a Polish fief from 1466 (Livonia, drawn from Cliopatria, ruled itself)."
+    },
+    {
+      "name": "Cyprus",
+      "years": [
+        1492,
+        1500
+      ],
+      "s": "Venice",
+      "why": "Venice took Cyprus in 1489."
+    },
+    {
+      "name": "White Horde",
+      "years": [
+        1492,
+        1500
+      ],
+      "n": "Turkic nomads",
+      "note": "The White Horde broke up in the 1460s; the Kazakhs, the Nogais and Sibir (drawn from Cliopatria) took most of it. These are the steppe peoples between them, such as the Bashkirs and the Turkmens.",
+      "why": "Horde shown after it broke up."
+    },
+    {
+      "name": "Wari",
+      "years": [
+        1492
+      ],
+      "n": "Inca Empire",
+      "why": "The Wari state ended around 1000 CE; this was the heart of the Inca Empire (its other lands from the source's 1500 map)."
+    },
+    {
+      "name": "Chimú",
+      "years": [
+        1492
+      ],
+      "n": "Inca Empire",
+      "why": "The Inca conquered the Chimú kingdom around 1470."
+    },
+    {
+      "name": "Chankas",
+      "years": [
+        1492
+      ],
+      "n": "Inca Empire",
+      "why": "The Inca defeated the Chanka confederation around 1438."
+    },
+    {
+      "name": "Congo",
+      "years": [
+        1492,
+        1500,
+        1530,
+        1600,
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "n": "Kingdom of Kongo",
+      "why": "Congo is a modern name; this was the Kingdom of Kongo."
+    },
+    {
+      "name": "Tsardom of Muscovy",
+      "years": [
+        1530
+      ],
+      "n": "Grand Duchy of Moscow",
+      "why": "Ivan IV took the title of tsar in 1547."
+    },
+    {
+      "name": "Bukara Khanate",
+      "years": [
+        1530
+      ],
+      "n": "Khanate of Bukhara",
+      "why": "Misspelling (Moghulistan's lands, which it covered, drawn from Cliopatria)."
+    },
+    {
+      "name": "Quazaq Khanate",
+      "years": [
+        1530,
+        1600,
+        1650,
+        1700,
+        1715
+      ],
+      "n": "Kazakh Khanate",
+      "why": "Misspelling."
+    },
+    {
+      "name": "Watassid Morocco",
+      "years": [
+        1530
+      ],
+      "n": "Wattasid Sultanate",
+      "why": "Misspelling."
+    },
+    {
+      "name": "Watassid Morocco",
+      "years": [
+        1600
+      ],
+      "n": "Saadi Sultanate",
+      "why": "The Saadi dynasty replaced the Wattasids in 1549–1554."
+    },
+    {
+      "name": "Senegal",
+      "years": [
+        1530
+      ],
+      "n": "Senegambian kingdoms",
+      "note": "Senegal is a modern name. In 1530 the Jolof Empire held much of this region, with Kaabu (under Mali) to the south and the Denanke kingdom of Futa Toro on the Senegal River.",
+      "why": "A modern name for a region of several kingdoms."
+    },
+    {
+      "name": "Malacca",
+      "years": [
+        1530,
+        1600
+      ],
+      "n": "Sultanate of Johor",
+      "why": "The Portuguese took Malacca in 1511; its sultans moved to Johor."
+    },
+    {
+      "name": "Naples",
+      "years": [
+        1530,
+        1600
+      ],
+      "s": "Spain",
+      "why": "Ruled by the kings of Spain from 1504."
+    },
+    {
+      "name": "Sicily",
+      "years": [
+        1530,
+        1600
+      ],
+      "s": "Spain",
+      "why": "Ruled by the kings of Spain (as Aragon's heirs)."
+    },
+    {
+      "name": "Sardinia",
+      "years": [
+        1530,
+        1600
+      ],
+      "s": "Spain",
+      "why": "Ruled by the kings of Spain (as Aragon's heirs)."
+    },
+    {
+      "name": "Milan",
+      "years": [
+        1600
+      ],
+      "s": "Spain",
+      "why": "Spanish from 1535."
+    },
+    {
+      "name": "Habsburg Netherlands",
+      "years": [
+        1600
+      ],
+      "n": "Spanish Netherlands",
+      "s": "Spain",
+      "why": "The southern Netherlands were ruled by Spain."
+    },
+    {
+      "name": "Saylan",
+      "years": [
+        1530
+      ],
+      "n": "Sinhalese kingdoms",
+      "why": "Misspelling of Ceylon; the island was divided between Kotte, Sitawaka, Kandy and Jaffna (drawn from Cliopatria)."
+    },
+    {
+      "name": "Saylan",
+      "years": [
+        1600
+      ],
+      "n": "Kingdom of Kandy",
+      "why": "Portugal held the coast (drawn from Cliopatria); Kandy held the hill country."
+    },
+    {
+      "name": "Guanches",
+      "years": [
+        1530,
+        1600
+      ],
+      "n": "Canary Islands",
+      "s": "Spain",
+      "why": "Castile completed the conquest of the Canaries in 1496."
+    },
+    {
+      "name": "Guanches",
+      "years": [
+        1650
+      ],
+      "n": "Canary Islands",
+      "s": "Spanish Habsburg",
+      "why": "Castile completed the conquest of the Canaries in 1496."
+    },
+    {
+      "name": "Rajputana",
+      "years": [
+        1600
+      ],
+      "s": "Mughal Empire",
+      "why": "Most Rajput states, though not Mewar, had accepted Mughal rule by 1600."
+    },
+    {
+      "name": "Bengal",
+      "years": [
+        1600
+      ],
+      "s": "Mughal Empire",
+      "why": "Akbar conquered Bengal in 1576."
+    },
+    {
+      "name": "Japan (Warring States)",
+      "years": [
+        1600
+      ],
+      "n": "Japan",
+      "note": "Toyotomi Hideyoshi unified Japan in 1590; Tokugawa Ieyasu won the battle of Sekigahara in October 1600.",
+      "why": "The Warring States period ended with unification in 1590."
+    },
+    {
+      "name": "Lan Na",
+      "years": [
+        1650,
+        1700,
+        1715
+      ],
+      "s": "Ava",
+      "why": "Lan Na was ruled by Burma from 1558 to 1775."
+    },
+    {
+      "name": "Nepal",
+      "years": [
+        1650
+      ],
+      "n": "Nepalese kingdoms",
+      "why": "Gorkha united Nepal in 1768; before that the Malla kings and dozens of hill principalities ruled it."
+    },
+    {
+      "name": "Luxembourg",
+      "years": [
+        1650,
+        1700
+      ],
+      "n": "Spanish Netherlands",
+      "s": "Spanish Habsburg",
+      "why": "The source's 'Luxembourg' covers all of the Spanish Netherlands."
+    },
+    {
+      "name": "Sardinia-Piedmont",
+      "years": [
+        1650,
+        1700,
+        1715
+      ],
+      "n": "Savoy-Piedmont",
+      "why": "The Duke of Savoy gained Sardinia only in 1720."
+    },
+    {
+      "name": "Ceylon",
+      "years": [
+        1650
+      ],
+      "n": "Portuguese Ceylon",
+      "s": "Portugal",
+      "why": "Portugal held Colombo and the west coast until 1656–1658."
+    },
+    {
+      "name": "Bidar",
+      "years": [
+        1650
+      ],
+      "n": "Bijapur",
+      "why": "Bijapur annexed Bidar in 1619."
+    },
+    {
+      "name": "Belize",
+      "years": [
+        1650
+      ],
+      "n": "Maya peoples",
+      "why": "Belize is a later name; British logwood cutters settled the coast from the mid-17th century."
+    },
+    {
+      "name": "Philippines",
+      "years": [
+        1650,
+        1700
+      ],
+      "s": "Spanish Habsburg",
+      "why": "Spain ruled the Philippines from 1565, apart from the Muslim sultanates in the south."
+    },
+    {
+      "name": "Philippines",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "Spain",
+      "why": "Spain ruled the Philippines from 1565, apart from the Muslim sultanates in the south."
+    },
+    {
+      "name": "Post-Ming Warlords",
+      "years": [
+        1700
+      ],
+      "n": "Manchu Empire",
+      "why": "The Qing crushed the Three Feudatories in 1681 and took Taiwan in 1683."
+    },
+    {
+      "name": "Dutch Formosa",
+      "years": [
+        1700
+      ],
+      "n": "Manchu Empire",
+      "why": "Koxinga expelled the Dutch in 1662; the Qing took Taiwan in 1683."
+    },
+    {
+      "name": "Naples",
+      "years": [
+        1700
+      ],
+      "s": "Spanish Habsburg",
+      "why": "Spanish until 1707, when Austria took it."
+    },
+    {
+      "name": "Sardinia",
+      "years": [
+        1700
+      ],
+      "s": "Spanish Habsburg",
+      "why": "Spanish until 1708, when Austria took it."
+    },
+    {
+      "name": "Sicily",
+      "years": [
+        1700
+      ],
+      "s": "Spanish Habsburg",
+      "why": "Spanish until 1713, when it went to Savoy."
+    },
+    {
+      "name": "Arakan (Indian princely state)",
+      "years": [
+        1700,
+        1715
+      ],
+      "n": "Kingdom of Mrauk U",
+      "why": "Arakan was an independent kingdom until Burma conquered it in 1784, never an Indian princely state."
+    },
+    {
+      "name": "New Amsterdam",
+      "years": [
+        1700
+      ],
+      "n": "Province of New York",
+      "s": "England",
+      "why": "The English took New Amsterdam in 1664 and named it New York."
+    },
+    {
+      "name": "Egypt",
+      "years": [
+        1715
+      ],
+      "s": "Ottoman Empire",
+      "why": "Egypt was an Ottoman province from 1517."
+    },
+    {
+      "name": "United Kingdom",
+      "years": [
+        1715
+      ],
+      "n": "Kingdom of Great Britain",
+      "why": "England and Scotland united as Great Britain in 1707; the United Kingdom dates from 1801."
+    },
+    {
+      "name": "Jamaica (UK)",
+      "years": [
+        1715
+      ],
+      "n": "Jamaica",
+      "why": "The United Kingdom dates from 1801."
+    },
+    {
+      "name": "Barbados (UK)",
+      "years": [
+        1715
+      ],
+      "n": "Barbados",
+      "why": "The United Kingdom dates from 1801."
+    },
+    {
+      "name": "Virgin Islands (UK)",
+      "years": [
+        1715
+      ],
+      "n": "British Virgin Islands",
+      "why": "The United Kingdom dates from 1801."
+    },
+    {
+      "name": "Haiti",
+      "years": [
+        1715
+      ],
+      "n": "Saint-Domingue",
+      "s": "France",
+      "why": "Haiti took its name at independence in 1804; this was French Saint-Domingue."
+    },
+    {
+      "name": "United Kingdom",
+      "years": [
+        1783
+      ],
+      "n": "Kingdom of Great Britain",
+      "s": null,
+      "why": "Great Britain from 1707; the United Kingdom dates from 1801."
+    },
+    {
+      "name": "UK",
+      "years": [
+        1783
+      ],
+      "n": "Kingdom of Great Britain",
+      "why": "Great Britain from 1707; the United Kingdom dates from 1801."
+    },
+    {
+      "name": "Acadian Peninsula (UK)",
+      "years": [
+        1783
+      ],
+      "n": "Nova Scotia",
+      "s": "Kingdom of Great Britain",
+      "why": "British Nova Scotia from 1713; the United Kingdom dates from 1801."
+    },
+    {
+      "name": "Mecklenburg-Strelitz",
+      "years": [
+        1783
+      ],
+      "n": "Electorate of Hanover",
+      "s": "Kingdom of Great Britain",
+      "why": "The source labels Hanover's lands 'Mecklenburg-Strelitz'; Hanover's elector was Britain's king."
+    },
+    {
+      "name": "Hanover",
+      "years": [
+        1783
+      ],
+      "n": "Electorate of Hanover",
+      "s": "Kingdom of Great Britain",
+      "why": "Joined with the rest of the electorate."
+    },
+    {
+      "name": "Assam",
+      "years": [
+        1783
+      ],
+      "n": "Bhutan",
+      "why": "This outline is Bhutan's, with the Duars it held until 1865 (the Ahom kingdom of Assam drawn from Natural Earth)."
+    },
+    {
+      "name": "Bhutan",
+      "years": [
+        1783
+      ],
+      "s": null,
+      "why": "A stray value in the source."
+    },
+    {
+      "name": "Lombardy",
+      "years": [
+        1783
+      ],
+      "s": null,
+      "why": "A stray value in the source."
+    },
+    {
+      "name": "Afghanistan",
+      "years": [
+        1783
+      ],
+      "n": "Durrani Empire",
+      "why": "The Durrani Empire (1747–1823), forerunner of Afghanistan (its lands in Kashmir and Khorasan drawn from Cliopatria)."
+    },
+    {
+      "name": "Multan",
+      "years": [
+        1783
+      ],
+      "s": "Durrani Empire",
+      "why": "Multan was Durrani until 1818."
+    },
+    {
+      "name": "Sind",
+      "years": [
+        1783
+      ],
+      "s": "Durrani Empire",
+      "why": "Sindh's rulers paid tribute to the Durrani shahs."
+    },
+    {
+      "name": "Golconda",
+      "years": [
+        1783
+      ],
+      "n": "Hyderabad State",
+      "why": "The Golconda Sultanate ended in 1687; the Nizams of Hyderabad ruled from 1724."
+    },
+    {
+      "name": "Kingdom of the Two Sicilies",
+      "years": [
+        1783
+      ],
+      "n": "Kingdom of Naples and Sicily",
+      "why": "The two crowns were joined as the Two Sicilies only in 1816."
+    },
+    {
+      "name": "Dahomey",
+      "years": [
+        1783
+      ],
+      "s": "Oyo",
+      "why": "Dahomey paid tribute to Oyo from 1730 to 1818."
+    },
+    {
+      "name": "Venetia",
+      "years": [
+        1783
+      ],
+      "n": "Republic of Venice",
+      "why": "Venetia is the region; the Republic of Venice lasted until 1797."
+    },
+    {
+      "name": "Holstein",
+      "years": [
+        1783
+      ],
+      "s": "Denmark-Norway",
+      "why": "The Danish king ruled all of Holstein from 1773."
+    },
+    {
+      "name": "central Asian khanates",
+      "years": [
+        1783
+      ],
+      "n": "Kazakh Khanate",
+      "why": "The source's broad label covers the Kazakh Khanate; Khiva, Bukhara and Kokand are drawn from Cliopatria."
+    },
+    {
+      "name": "minor states",
+      "years": [
+        -200
+      ],
+      "n": "Armenian and Caucasian kingdoms",
+      "why": "The source labels Asia Minor and the Caucasus 'minor states'; Pontus, Cappadocia, Bithynia, Galatia, Paphlagonia, Sophene and Media Atropatene are drawn from Cliopatria."
+    },
+    {
+      "name": "minor states",
+      "years": [
+        -100
+      ],
+      "n": "Caucasian kingdoms",
+      "why": "The source labels Asia Minor and the Caucasus 'minor states'; Pontus, Armenia, Cappadocia, Bithynia and Sophene are drawn from Cliopatria."
+    },
+    {
+      "name": "Đại Việt",
+      "years": [
+        1600,
+        1650
+      ],
+      "n": "Champa",
+      "why": "The source draws all of Vietnam as Đại Việt. The Trịnh and Nguyễn lords' lands are drawn from Cliopatria; the south was still Champa (Panduranga), and Cao Bằng was held by the last Mạc rulers."
+    },
+    {
+      "name": "Đại Việt",
+      "years": [
+        1700,
+        1715
+      ],
+      "n": "Champa",
+      "s": "Đại Việt (Nguyễn lords)",
+      "why": "The source draws all of Vietnam as Đại Việt. The Trịnh and Nguyễn lords' lands are drawn from Cliopatria; the south was Champa (Panduranga), a Nguyễn vassal from 1697."
+    },
+    {
+      "name": "Đại Việt",
+      "years": [
+        1783
+      ],
+      "n": "Đại Việt (Trịnh lords)",
+      "why": "In 1783 the Trịnh lords ruled the north for the Lê emperors; the Tây Sơn (drawn from Cliopatria) held the south."
+    },
+    {
+      "name": "Burmese kingdoms",
+      "years": [
+        1492,
+        1500
+      ],
+      "n": "Manipur and hill peoples",
+      "why": "Ava, Prome, Mrauk U, Lan Na and the Shan states, inside the source's 'Burmese kingdoms', are drawn from Cliopatria; what is left is Manipur and the hill peoples to the north."
+    },
+    {
+      "name": "central Asian khanates",
+      "years": [
+        1650
+      ],
+      "n": "Siberian and Amur peoples",
+      "why": "The source's broad label. The Khalkha Mongols, Dzungars, Khoshut, Yarkent, Bukhara and the Qing's lands are drawn from Cliopatria, leaving the peoples of the Baikal and the Amur."
+    },
+    {
+      "name": "central Asian khanates",
+      "years": [
+        1700,
+        1715
+      ],
+      "n": "Kyrgyz",
+      "why": "The source's broad label. The Dzungars, the Qing, Russia, Bukhara and (in 1715) Kokand are drawn from Cliopatria, leaving the Kyrgyz of the Tian Shan."
+    },
+    {
+      "name": "Lahore",
+      "years": [
+        1783
+      ],
+      "n": "Himalayan hill states",
+      "note": "Ladakh, Jammu, Kangra, Chamba and other hill kingdoms.",
+      "why": "The source's 'Lahore' covers Kashmir and the hills; the Durrani lands and the Sikh misls' Punjab are drawn from Cliopatria."
+    },
+    {
+      "name": "Islamic and Hindu states",
+      "years": [
+        1650
+      ],
+      "n": "Gondwana kingdoms",
+      "note": "The Gond kingdoms of Garha-Mandla, Deogarh and Chanda, with Bastar and Ratanpur; most paid tribute to the Mughals.",
+      "why": "The Mughal and Golconda lands inside the source's broad label are drawn from Cliopatria; what is left is Gondwana."
+    },
+    {
+      "name": "central Asian khanates",
+      "years": [
+        1600
+      ],
+      "n": "Siberian peoples",
+      "why": "The source's broad label. The Khalkha, Chahar and Tümed Mongols, the Oirats, Yarkent and the Kazakhs are drawn from Cliopatria, leaving the peoples of Siberia."
+    },
+    {
+      "name": "Virgin Islands (Danemark)",
+      "years": [
+        1715
+      ],
+      "n": "Puerto Rico (Spain)",
+      "s": "Spain",
+      "why": "The shape is Puerto Rico, Spanish since 1508. Denmark held only St Thomas (from 1672) and St John (from 1718) in the Virgin Islands."
+    },
+    {
+      "name": "Trinidad",
+      "years": [
+        1715
+      ],
+      "s": "Spain",
+      "why": "Spanish from 1592 to 1797."
+    },
+    {
+      "name": "Martinique",
+      "years": [
+        1715
+      ],
+      "s": "France",
+      "why": "French since 1635."
+    },
+    {
+      "name": "Guadeloupe",
+      "years": [
+        1715
+      ],
+      "s": "France",
+      "why": "French since 1635."
+    },
+    {
+      "name": "Grenada",
+      "years": [
+        1715
+      ],
+      "s": "France",
+      "why": "French from 1650 to 1763."
+    },
+    {
+      "name": "Antigua and Barbuda",
+      "years": [
+        1715
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "English since 1632."
+    },
+    {
+      "name": "Netherlands Antilles",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "Netherlands",
+      "why": "Dutch islands: Curaçao, Aruba, Bonaire, St Eustatius, Saba and St Maarten."
+    },
+    {
+      "name": "Bahamas",
+      "years": [
+        1783
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "British; the Treaty of Paris ended Spain's occupation of 1782–83."
+    },
+    {
+      "name": "Turks and Caicos Islands",
+      "years": [
+        1783
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "Part of the British Bahamas."
+    },
+    {
+      "name": "British Guiana",
+      "years": [
+        1783
+      ],
+      "n": "Suriname",
+      "s": "Netherlands",
+      "why": "The shape is Dutch Suriname; Britain held no Guiana colony until 1796. The Dutch colonies of Essequibo, Demerara and Berbice and French Guiana are drawn from OpenHistoricalMap."
+    },
+    {
+      "name": "Malabar",
+      "years": [
+        1783
+      ],
+      "n": "Mysore",
+      "s": null,
+      "why": "Hyder Ali of Mysore conquered Malabar in 1766; the Dutch held only a few forts."
+    },
+    {
+      "name": "Cochin",
+      "years": [
+        1783
+      ],
+      "s": "Mysore",
+      "why": "Cochin's rajas paid tribute to Mysore from 1776; the Dutch held only Fort Cochin."
+    },
+    {
+      "name": "Travancore",
+      "years": [
+        1783
+      ],
+      "s": null,
+      "why": "Travancore was independent; it defeated the Dutch at Colachel in 1741."
+    },
+    {
+      "name": "T'atsaot'ine",
+      "years": [
+        1715,
+        1783
+      ],
+      "n": "Inuit",
+      "s": null,
+      "why": "The T'atsaot'ine (Yellowknives) lived by Great Slave Lake; Baffin Island and the Hudson Bay coasts were Inuit land."
+    },
+    {
+      "name": "Middag Kingdom",
+      "years": [
+        1650
+      ],
+      "s": "Netherlands",
+      "why": "A Dutch vassal from 1645; the Qing took Taiwan only in 1683."
+    },
+    {
+      "name": "Suomi",
+      "years": [
+        1000
+      ],
+      "s": null,
+      "why": "The source's ruler (\"Suom\") is a fragment of the name; the Finnish tribes had no overlord."
+    },
+    {
+      "name": "Aaniiih",
+      "years": [
+        1530,
+        1600
+      ],
+      "s": null,
+      "why": "Gros Ventre, the source's ruler, is another name for the Aaniiih themselves."
+    },
+    {
+      "name": "Czechs",
+      "years": [
+        700,
+        800
+      ],
+      "s": null,
+      "why": "The source's ruler (\"Slavic tribes\") is not a state; the Czech tribes ruled themselves."
+    },
+    {
+      "name": "Southern Xiongnu",
+      "years": [
+        100,
+        200
+      ],
+      "s": "Han",
+      "why": "The Southern Xiongnu submitted to the Han in 50 CE and lived inside its frontier as its subjects."
     }
   ],
   "geometry": [
+    {
+      "era": "1994–2010",
+      "what": "Drew the 1994, 2000 and 2010 maps from Natural Earth’s present-day borders, rolled back to 31 December of each year: South Sudan joined to Sudan (independent 2011), Crimea to Ukraine (annexed by Russia in 2014), Serbia, Montenegro and Kosovo as Yugoslavia in 1994 and 2000, the Netherlands Antilles (dissolved 2010), East Timor under UN administration in 2000 and held by Indonesia in 1994, Zaire (renamed in 1997), British Hong Kong and Portuguese Macau in 1994, and the names countries had then (Turkey, Macedonia, Swaziland, Czech Republic, Cape Verde).",
+      "why": "The historical source’s outlines for these years were coarse and out of date: Bratislava was drawn inside Austria, Kosovo and East Timor were missing after independence, Walvis Bay was still South African, and several island countries were not mapped. Dates checked against CShapes 2.0 (ETH Zurich)."
+    },
+    {
+      "era": "1900, 1914",
+      "what": "Drew Europe’s national borders from HistoGIS (Austrian Academy of Sciences), which takes them from maps of the time: for example Alsace-Lorraine in Germany, Bessarabia in Russia, Finland, Iceland and the Caucasus within the empires that held them, Southern Dobruja Bulgarian in 1900 and Romanian in 1914. Cyprus in 1900 and 1914 is shown as Ottoman land under British administration.",
+      "why": "The historical source’s European borders were approximate; in 1914 it showed Finland, Georgia, Armenia and Azerbaijan as independent and Austria-Hungary about 4% too small. HistoGIS is published under CC BY 4.0."
+    },
+    {
+      "era": "1920–1960",
+      "what": "Drew Europe’s national borders from OpenHistoricalMap, which dates every border change to the day: for example Finland’s border before 1940 (Vyborg and Petsamo Finnish), Estonia’s and Latvia’s pre-war borders, the Free City of Danzig (1920–1938), the Memel Territory under Allied rule (1920), the Saar under the League of Nations (1920, 1930), Alsace-Lorraine French again, Italian Istria and Zadar, Czechoslovakia after the Munich Agreement and Hungary after the First Vienna Award (1938), the Hatay State (1938) and Poland’s borders after 1945. The same source gives the French zone of Morocco, so Spain’s zone shows apart from it (1920–1945), and Manchukuo (1938).",
+      "why": "The historical source’s European borders were approximate: in 1920 it showed Strasbourg as German and Vyborg as Russian, and in 1938 Danzig as Polish. OpenHistoricalMap is public domain (CC0); every border was checked against CShapes 2.0 (ETH Zurich) and agrees to within a few percent, except where CShapes keeps a border that had not yet changed in law."
+    },
+    {
+      "era": "1800–1960",
+      "what": "Drew the maps from 1800 to 1960 from Cliopatria (Seshat Global History Databank), cut to Natural Earth’s coastline, with OpenHistoricalMap’s dated borders laid over it and HistoGIS’s in Europe from 1815 to 1914, instead of the historical-basemaps source. Where one source keeps a single outline for decades while the borders moved, the other’s dated outline is used: in India, Cliopatria’s Awadh in 1800 and Maratha Confederacy in 1815. A few places are set from Natural Earth’s outlines or Cliopatria’s: Bombay and Surat as British in 1800, the Mughal emperor’s Delhi in 1815, Bulgaria and Eastern Rumelia in 1878–80, the Falklands, and, approximately, Cutch and the Ahom kingdom of Assam. From 1900 OpenHistoricalMap also gives territories it files below the country level: Papua and New Guinea under Australia, the Far Eastern Republic and the Soviet republics of 1920, Khiva and Bukhara under Russian protection (1900, 1914), the Lado Enclave (1900), the protectorates of French Indochina (1920–1938), Berlin’s sectors (1945) and West Berlin (1960), and Dadra and Nagar Haveli (1960). Cliopatria’s scattered pieces of an empire are named as the colonies they were (Algeria, Senegal, Martinique, Portuguese Mozambique; in 1960 France’s overseas departments and territories and Portugal’s colonies), and the lands Japan occupied in the war are drawn under their own rulers in 1945.",
+      "why": "These sources date their borders to the year and allow any use with credit."
+    },
+    {
+      "era": "1900",
+      "what": "Redrew Africa as it was divided between colonies, which had mostly drawn today’s borders by 1900 (shown with Natural Earth’s outlines, some by province), with the states still ruling themselves: Ethiopia, Liberia, Morocco, Darfur, Wadai, and the Boer republics at war with Britain. Also corrected Siam with the lands it ceded in 1904–1909, Chile with the Atacama coast and Tacna, Bolivia with Acre, Peru, Ecuador, Colombia and Paraguay with today’s borders where the sources draw overlapping claims, Spain’s Río de Oro south of 26°N, British Guiana’s 1899 border, Bulgaria with Eastern Rumelia, the United States’ new Philippines, Hawaii, Puerto Rico and Cuba, Japanese Taiwan, Portuguese Timor, Sarawak and North Borneo, New Zealand, Newfoundland, and Australia’s six colonies on the eve of federation.",
+      "why": "The source showed much of Africa as peoples and kingdoms that colonial armies had already conquered (Samori Touré’s empire in 1898, the Ndebele kingdom in 1893, Benin in 1897), left large areas unnamed and still showed Harar as Egyptian, 15 years after Egypt left. Elsewhere it kept borders from before the War of the Pacific (1879–1884) and Spain’s colonies after 1898."
+    },
+    {
+      "era": "1914–1960",
+      "what": "Gave land drawn for the wrong country to the country that held it, using Natural Earth’s outlines of today’s borders and provinces: Turkey within its 1923 Lausanne borders in 1920 (no Sèvres zones), Greece with its Aegean islands in 1920, Tacna Chilean in 1914 (until 1929), Hatay to French Syria until 1938 (the State of Aleppo in 1920), Yemen and the British Aden Protectorate as separate states (from 1900), Transjordan apart from Iraq, Iraq independent in 1938, Saudi Arabia’s borders in 1930 and 1938 (no Ha’il emirate after 1921), Egypt and Libya with today’s border in 1914 and 1920, French Equatorial Africa apart from French West Africa in 1914, Angola’s eastern border as arbitrated in 1905 (1914), the Spanish Sahara south of 27°40′N with Spain’s zones in Morocco and Ifni (Spanish from 1934), Laos and Cambodia (1920–1938), the Byelorussian SSR around Minsk (1920), Thailand without the Malay and Shan lands it gave back in 1945, Italian Somaliland and British Jubaland in 1914, Jubaland British until 1925, British (Southern) Cameroons, Korea and Taiwan as Japanese colonies (1914–1938), Sarawak and North Borneo with today’s border with Dutch Borneo, Zanzibar, Hawaii (until statehood in 1959), Newfoundland apart from Canada, Cyprus as a British colony (1920–1945), Portuguese Timor, Trieste Italian in 1945 (run by the Allies from June 1945, Italian in law until 1947), Upper Volta split between its neighbours in 1945, Lebanon and North Yemen’s borders in 1945 and 1960, Peru, Ecuador and Colombia with today’s borders to 1938, and Paraguay’s in the Chaco to 1930 (close to the lines each held; the sources draw each country’s whole claim), and in 1960 the West Bank to Jordan, Gaza to Egypt, South Vietnam, Dutch New Guinea, Singapore and Hawaii (a US state from 1959). Colonies whose borders have not changed since (Gambia, Basutoland, Swaziland, Brunei, Portuguese and Spanish Guinea, Puerto Rico, Togo, Haiti from 1938) now follow today’s lines, Islands and small states the sources left blank or gave to a neighbour were added: the Solomon Islands, New Caledonia, the Bahamas, Jamaica, Trinidad, Cape Verde and Réunion; the Isle of Man, Malta, Liechtenstein, Andorra and San Marino on every map from 1900; the Dodecanese under Italian (1938) and British (1945) rule; and in 1945 and 1960 the Faroes and the Baltic coast and islands (Soviet from 1944), with Germany’s islands by occupation zone in 1945.",
+      "why": "Each map was checked against CShapes 2.0 (ETH Zurich) on its date (31 December, or 28 June for 1914), and these were the places where the source drew land for a country that did not hold it."
+    },
+    {
+      "era": "1800–1960",
+      "what": "Removed the thin strips of a shape’s old outline left along a new border or coastline: at sea they go, on land they go to the neighbours. For example, the source’s British Somaliland showed as a strip along the Italian coast in 1914.",
+      "why": "Where a better outline replaced the source’s, the old shape could show through as thin strips of the wrong colour."
+    },
     {
       "era": "1400",
       "what": "Split the 'Great Khanate' into the Ming Empire (outline from the 1492 snapshot) and the Northern Yuan.",
@@ -738,21 +3082,6 @@
       "era": "1279–1920",
       "what": "Separated Svalbard from Norway / Denmark-Norway / Sweden–Norway.",
       "why": "Svalbard belonged to no country until the 1920 Svalbard Treaty, which took effect in 1925."
-    },
-    {
-      "era": "1994–2010",
-      "what": "Named Switzerland, which the source draws without a name (it showed as 'not mapped'). The outline is the source's own.",
-      "why": "Switzerland has been an independent country throughout; the source's 1994, 2000 and 2010 snapshots leave its name blank."
-    },
-    {
-      "era": "1994–2010",
-      "what": "Joined Gotland to Sweden and Lewis and Harris to the United Kingdom, which the source draws without a name. In 1994 the source draws Taiwan twice; the map uses its unnamed outline (the one 2000 and 2010 use) instead of the older named one.",
-      "why": "They belonged to those countries throughout; without a name they showed as 'not mapped' (around Taiwan, as a blank rim)."
-    },
-    {
-      "era": "1815–1900",
-      "what": "Named Tasmania, which the source draws without a name, as the British colony it was, like the mainland colonies: Van Diemen's Land in 1815, 'Tasmania (UK)' in 1878–1900.",
-      "why": "Tasmania was a British colony from 1803 until federation in 1901 (Van Diemen's Land until 1856); without a name it showed as 'not mapped'."
     },
     {
       "era": "Present",
