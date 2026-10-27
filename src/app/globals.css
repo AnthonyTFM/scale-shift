@@ -470,10 +470,11 @@ html:not(.returning) .hero-back {
   display: none;
 }
 
-/* /daily once today's round is done: the intro goes, so the results come first. Set before paint by the root layout's
+/* /daily once today's round is done (and /endless once a run ends): the intro goes, so the results come first. Set before paint by the root layout's
    script for a player coming back; :has() covers finishing the round on the page */
 .daily-done .daily-intro,
-body:has(#daily-done) .daily-intro {
+body:has(#daily-done) .daily-intro,
+body:has(#endless-done) .endless-intro {
   /* out of sight, but the page keeps its heading for screen readers */
   position: absolute;
   width: 1px;

@@ -34,14 +34,20 @@ export const endlessCopy = {
       n >= 20 ? "Ruler of the world!" : n >= 12 ? "Emperor!" : n >= 7 ? "Empire builder!" : n >= 3 ? "Regional power" : "The map fooled you",
     verdict: (round: number) => `Your run ended on round ${round}.`,
     newBest: "New best!",
-    best: "Best",
-    bestSub: "in a row",
-    runs: "Runs",
-    runsSub: "played",
-    level: "Level",
+    // the next goal, under the streak: always within reach
+    // a countdown while it's close; a far-off best is just named, so it never reads as a mountain
+    goalBest: (more: number, best: number) => (more <= 5 ? `${more} more to beat your best (${best})` : `Your best: ${best} in a row`),
+    goalFirst: "Get one right to start your streak",
+    goalRank: (more: number, place: number) => `${more} more ${more === 1 ? "takes" : "take"} #${place} of all time`,
+    goalTop: "That's #1 of all time!",
     playAgain: "Play again",
+    // under Play again on computers
+    enterHint: "or press Enter",
     share: "Share my run",
-    shareShort: "Share",
+    // where a run lands on the Best streaks board, before it's posted
+    wouldRank: (rank: number) => `This run would be #${rank} of all time`,
+    // the miss that ended the run, when the two were close
+    soClose: (pct: number) => `So close: only ${pct}% apart`,
     // the daily challenge, before and after today's is played
     dailyPlay: "Play today's five",
     dailyDone: "See today's results",
@@ -50,7 +56,6 @@ export const endlessCopy = {
     shareMore: (n: number) => `+${n} more`,
     shareDare: (round: number) => `The map fooled me on round ${round}. How far can you go?`,
     missTitle: "The one that got you",
-    allTitle: (n: number) => `All ${n} matchups`,
     dragOnMap: "Compare sizes on the map",
     dragOnMapSr: (big: string, small: string) => `Compare the sizes of ${big} and ${small} on the map`,
   },
@@ -60,6 +65,10 @@ export const endlessCopy = {
     seeAll: "See all",
     joinCta: "Get on the Best streaks board",
     joinHint: "See where your run ranks.",
+    // with the board loaded: where this run would land, and one tap to post it
+    joinWould: (rank: number) => `This run would be #${rank} of all time`,
+    joinWouldHint: "Sign in to post it.",
+    joinPost: "Post it",
     join: "Join",
     opening: "Opening sign-in…",
     posting: "Posting your streak…",
