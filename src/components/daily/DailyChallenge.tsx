@@ -491,7 +491,9 @@ function Results({
           <ol className="mt-2 space-y-1">
             {counts
               .map((c, n) => {
-                const pct = Math.round((100 * c) / crowdN);
+                const exact = (100 * c) / crowdN;
+                // a handful of plays among hundreds still shows: "<1%", not "0%"
+                const pct = c && exact < 0.5 ? "<1" : String(Math.round(exact));
                 const top = Math.max(...counts);
                 return (
                   <li key={n} className="flex items-center gap-2 text-sm">
@@ -499,7 +501,8 @@ function Results({
                       {n}
                     </span>
                     <span className="sr-only">{R.crowdRow(n, pct, n === score)}</span>
-                    <span aria-hidden="true" className="flex flex-1 items-center gap-2">
+                    {/* every row has the same track and the same label slot, so the bars compare fairly */}
+                    <span aria-hidden="true" className="flex-1">
                       <span
                         className={`flex h-6 items-center rounded-md px-2 text-xs font-bold ${
                           !c ? "text-muted" : `min-w-10 justify-end ${n === score ? "bg-primary text-white" : "bg-line text-ink"}`
@@ -508,7 +511,9 @@ function Results({
                       >
                         {pct}%
                       </span>
-                      {n === score ? <span className="shrink-0 text-xs font-bold text-primary">{R.crowdYou}</span> : null}
+                    </span>
+                    <span aria-hidden="true" className="w-8 shrink-0 text-xs font-bold text-primary">
+                      {n === score ? R.crowdYou : null}
                     </span>
                   </li>
                 );

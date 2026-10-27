@@ -144,7 +144,7 @@ export const dailyCopy = {
     // the chart of how everyone scored today (anonymous counts)
     crowdTitle: "How everyone did today",
     crowdSub: (n: number) => `${n} players so far`,
-    crowdRow: (score: number, pct: number, mine: boolean) => `${score} out of 5: ${pct}% of players${mine ? ", including you" : ""}`,
+    crowdRow: (score: number, pct: string, mine: boolean) => `${score} out of 5: ${pct}% of players${mine ? ", including you" : ""}`,
     crowdYou: "You",
     scoresTitle: "Your scores",
     scoresSub: (avg: string) => `Average ${avg} out of 5`,
