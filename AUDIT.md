@@ -150,4 +150,28 @@ Numbers are in [mapmath-output.md](docs/audit-2026-10-27/mapmath-output.md).
 
 ## Re-run after the fixes
 
-See the section added below once the preview has been re-tested.
+Lighthouse (mobile) was run on production ("before", `main` at #161) and on this branch's preview ("after"), one run each, at the same time of day:
+
+| Page | Perf before → after | A11y before → after | Best practices | LCP before → after | TBT before → after | CLS |
+|---|---|---|---|---|---|---|
+| / | 95 → 95 | 100 → 100 | 100 → 100 | 2.6 → 2.0 s | 110 → 216 ms | 0 |
+| /daily | 92 → 99 | 100 → 100 | 100 → 100 | 3.0 → 1.6 s | 102 → 75 ms | 0 → 0.011 |
+| /map | 62 → 59 | 100 → 100 | 100 → 100 | 3.4 → 3.8 s | 1,794 → 1,737 ms | 0 |
+| /eras | 86 → 100 | 100 → 100 | 100 → 100 | 3.9 → 1.5 s | 160 → 47 ms | 0 |
+| /disputes | 96 → 99 | 100 → 100 | 100 → 100 | 2.5 → 1.8 s | 100 → 79 ms | 0 |
+
+- **What the numbers mean:** this branch makes no speed changes, so most of the differences between runs are noise. Earlier runs on the same pages swung by up to 15 points.
+- **Accessibility and best practices** stay at 100. The fixed issues (contrast, tap target, labels) are now gone in manual checks too:
+  - The faded reveal tile keeps its text at full contrast.
+  - The phone map has ‹ › era buttons, and ‹ steps from Present to 2010.
+  - The map intro card takes focus.
+  - Nothing overflows sideways at 360 px.
+- **/map is still slow on phones** (TBT about 1.7 s). That is P1 #5 and needs the map-engine work that is waiting for approval.
+- **Before/after screenshots:** the reveal tile, the phone era bar and the Somaliland entry. They are attached to the PR conversation.
+- **Checks:** lint, typecheck, build and check:data pass, and CI is green.
+
+## What's left (top 3 next moves)
+
+1. **/map on phones (P1 #5–7, 10–11):** spread the first draw over frames and fix the stacked panels and keyboard gaps. The map engine is ours. AtlasApp.tsx needs Evan's PRs to merge first, or Evan to take it.
+2. **Delight and sharing (benchmark):** a "map size → real size" proof on the first screen, today's score spread as a chart with "you" on it, and link previews that show a comparison and the challenger's score.
+3. **Evan's data (P0 #4):** 18 wrong historical shapes, plus the stale era stats and Natural Earth credit once his PRs merge.
