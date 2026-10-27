@@ -34,9 +34,10 @@ export function ShapeCard({ overlay: o, steps, unit, onRemove, onColor, onStep, 
   // shape (moving it along the map changes nothing, so it only counts once moved)
   const looks = useMemo(() => {
     if (!o.moved) return 1;
-    const home = webMapArea(o.geom);
-    return home ? webMapArea(placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot)) / home : 1;
-  }, [o.moved, o.geom, o.origin, o.lon, o.lat, o.rot]);
+    const g = o.whole ?? o.geom; // Antarctica: the whole shape, as the map draws it once moved
+    const home = webMapArea(g);
+    return home ? webMapArea(placeGeometry(g, o.origin, [o.lon, o.lat], o.rot)) / home : 1;
+  }, [o.moved, o.whole, o.geom, o.origin, o.lon, o.lat, o.rot]);
 
   return (
     <section aria-label={`${o.name} details`} className="rounded-xl bg-panel-2 p-4 text-panel-text">

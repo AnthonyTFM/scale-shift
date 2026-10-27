@@ -16,7 +16,15 @@ export function IntroCard({ onClose, onPreset }: Props) {
   const ref = useRef<HTMLElement>(null);
   useEffect(() => ref.current?.focus({ preventScroll: true }), []);
   return (
-    <section ref={ref} tabIndex={-1} aria-labelledby="intro-title" className="max-h-[85dvh] overflow-y-auto rounded-2xl bg-card p-5 text-ink shadow-float outline-none">
+    <section
+      ref={ref}
+      tabIndex={-1}
+      aria-labelledby="intro-title"
+      // no focus ring on the card itself (the global :focus-visible rule would draw one on open, even for touch users);
+      // the buttons inside keep theirs
+      style={{ outline: "none" }}
+      className="max-h-[85dvh] overflow-y-auto rounded-2xl bg-card p-5 text-ink shadow-float"
+    >
       <h2 id="intro-title" className="font-display text-2xl leading-tight">
         {appCopy.introTitle}
       </h2>

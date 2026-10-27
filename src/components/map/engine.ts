@@ -14,6 +14,8 @@ import {
   panBy,
   placeGeometry,
   projectionFor,
+  splitPolarMoved,
+  wrapsAPole,
   zoomAt,
   mercatorInflation,
   EARTH_RADIUS_KM,
@@ -35,6 +37,8 @@ export type Overlay = {
   hiddenParts: number;
   /** built from a shape cut into slices around a pole: fill only, an outline would show the cuts */
   sliced?: boolean;
+  /** for a sliced shape, the whole shape: moved away from the pole it is placed from this, so no cap goes missing */
+  whole?: MultiPolygon;
   /** area of the drawn geometry (far-off parts excluded) */ km2: number;
   props: PolityProps;
 };
@@ -217,6 +221,12 @@ export class MapEngine {
   // Converting ~250 shapes to screen points every frame made phones stutter while panning. They are converted once per
   // zoom level instead (see BaseCache); panning only moves them, so every frame is a complete, exact drawing.
   private cache: BaseCache | null = null;
+  /** the tiles of the zoom level just left, shown under the new level's tiles until those are all drawn */
+  private standIn: BaseCache | null = null;
+  /** the map has been drawn complete once (before that there is nothing to keep on screen while tiles fill in) */
+  private painted = false;
+  /** draw every tile now, with no time limit (for a saved picture) */
+  private fullDraw = false;
   /** the border sweep into the era just shown, while it runs */
   private sweep: Sweep | null = null;
   /** while the timeline plays on through the eras: the next sweep runs at a steady pace, straight on from the last */
@@ -308,6 +318,7 @@ export class MapEngine {
     this.sweep = null;
     this.layer = layer;
     this.cache = null;
+    this.dropStandIn();
     if (prev && layer && prev !== layer && !busy) this.sweep = this.startSweep(prev, prevCache, layer);
     if (prevCache) this.recycle(...prevCache.tiles.values());
     this.markBase();
@@ -325,17 +336,20 @@ export class MapEngine {
   setStates(states: Layer | null) {
     this.states = states;
     this.cache = null;
+    this.dropStandIn();
     this.markBase();
   }
   setClaims(list: ClaimShape[]) {
     this.claims = list;
     this.cache = null;
+    this.dropStandIn();
     this.markBase();
   }
   /** Big lakes, drawn as water over every era so they never appear or vanish between snapshots. */
   setLakes(list: Lake[]) {
     this.lakes = list;
     this.cache = null;
+    this.dropStandIn();
     this.markBase();
   }
   setLabels(on: boolean) {
@@ -414,7 +428,14 @@ export class MapEngine {
 
   /** Re-render to a PNG for downloading. */
   async toBlob(caption: string): Promise<Blob | null> {
-    this.drawNow();
+    // a saved picture must have every tile, so no drawing a few at a time
+    this.fullDraw = true;
+    this.baseDirty = true;
+    try {
+      this.drawNow();
+    } finally {
+      this.fullDraw = false;
+    }
     const out = document.createElement("canvas");
     out.width = this.base.width;
     out.height = this.base.height;
@@ -567,7 +588,11 @@ export class MapEngine {
     const settled = performance.now() - this.lastViewChange > 150;
     if (!c || c.dpr !== this.dpr || s < 0.67 || s > 1.5 || (settled && Math.abs(s - 1) > 1e-3)) {
       clearTimeout(this.settleTimer);
-      if (c) this.recycle(...c.tiles.values());
+      // the old level stays on screen, scaled, until the new one is drawn (same era and screen only). Zooming on before
+      // that, the level that was last complete stays the stand-in.
+      if (this.standIn || !c || c.dpr !== this.dpr || c.layer !== this.layer) {
+        if (c) this.recycle(...c.tiles.values());
+      } else this.standIn = c;
       return (this.cache = this.buildCache());
     }
     if (Math.abs(s - 1) > 1e-3) {
@@ -652,29 +677,112 @@ export class MapEngine {
 
   /**
    * Land, borders, claims and state lines come from bitmap tiles drawn once per zoom level, so a frame is just a few
-   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. A tile that is not ready yet is
-   * drawn on the spot, so the map is never shown blank or half drawn; the tiles around the screen are drawn ahead of time.
+   * image copies: panning and edge scrolling never wait on redrawing hundreds of shapes. The tiles around the screen are
+   * drawn ahead of time. On screen, a tile that is not ready yet is drawn on the spot. When the map first opens, and
+   * after zooming in (with the old level's tiles shown underneath, scaled), that is limited to ~10 ms a frame, middle
+   * of the screen first, and the rest follow over the next frames: drawing every tile in one go froze a mid-range phone
+   * for about 0.9 s on opening the map. Everywhere else every tile is drawn at once, so no empty sea ever shows: era
+   * sweeps, zooming out (the old tiles don't cover the edges), era changes, and pictures (`ctx` given, saved images).
    */
   private drawTiles(c: BaseCache, ctx = this.bctx) {
     const s = this.view.k / c.k;
     const pad = TILE_PAD;
+    const live = ctx === this.bctx && !this.fullDraw;
+    const standIn = this.standIn && this.standIn.layer === c.layer && this.standIn.dpr === c.dpr && c.k >= this.standIn.k * 0.999 ? this.standIn : null;
     let missing = false;
+    let pending = false;
+    let drawn = 0;
     let shown = 0;
+    const onScreen: { ox: number; oy: number; half: number; i: number; j: number; d: number }[] = [];
     for (const [ox, oy] of this.cacheOrigins(c)) {
       const { half, i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 0);
       for (let j = j0; j <= j1; j++)
         for (let i = i0; i <= i1; i++) {
-          const tile = this.tile(c, i, j);
-          const src = (c.size + 2 * pad) * c.dpr;
-          ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
-          shown++;
+          const cx = ox + s * ((i + 0.5) * c.size - half) - this.w / 2;
+          const cy = oy + s * ((j + 0.5) * c.size - half) - this.h / 2;
+          onScreen.push({ ox, oy, half, i, j, d: cx * cx + cy * cy });
         }
       const ring = this.tileRange(c, ox, oy, 1);
       for (let j = ring.j0; j <= ring.j1 && !missing; j++)
         for (let i = ring.i0; i <= ring.i1 && !missing; i++) missing = !c.tiles.has(`${i},${j}`);
     }
+    onScreen.sort((a, b) => a.d - b.d);
+    // where the tiles not drawn yet go, on screen
+    const gaps = onScreen
+      .filter(({ i, j }) => !c.tiles.has(`${i},${j}`))
+      .map(({ ox, oy, half, i, j }) => {
+        const x0 = Math.max(0, ox + s * (i * c.size - half));
+        const y0 = Math.max(0, oy + s * (j * c.size - half));
+        return [x0, y0, Math.min(this.w, ox + s * ((i + 1) * c.size - half)) - x0, Math.min(this.h, oy + s * ((j + 1) * c.size - half)) - y0];
+      })
+      .filter(([, , w, h]) => w > 0 && h > 0);
+    // a few tiles a frame only where something shows in the meantime: nothing yet (first opening) or the old level,
+    // if its kept tiles cover every gap (flying to the other side of the world, they don't)
+    const covered = !!standIn && gaps.every(([x, y, w, h]) => this.standInCovers(standIn, x, y, w, h));
+    const deadline = live && !this.sweep && gaps.length && (covered || (!standIn && !this.painted)) ? performance.now() + 10 : Infinity;
+    if (covered && deadline !== Infinity) {
+      // only under the gaps: elsewhere the new tiles' crisp lines would show the old, scaled ones through them
+      ctx.save();
+      ctx.beginPath();
+      for (const [x, y, w, h] of gaps) ctx.rect(x, y, w, h);
+      ctx.clip();
+      this.drawStandIn(standIn, ctx);
+      ctx.restore();
+    }
+    for (const { ox, oy, half, i, j } of onScreen) {
+      shown++;
+      // ready tiles are always drawn; a missing one only while there's time left this frame (and always the first)
+      if (!c.tiles.has(`${i},${j}`) && drawn > 0 && performance.now() > deadline) {
+        pending = true;
+        continue;
+      }
+      if (!c.tiles.has(`${i},${j}`)) drawn++;
+      const tile = this.tile(c, i, j);
+      const src = (c.size + 2 * pad) * c.dpr;
+      ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
+    }
     c.keep = Math.max(24, shown * 3);
+    if (pending) {
+      // the rest next frame (the old level, or nothing yet on first opening, shows where they will go)
+      this.baseDirty = true;
+      this.schedule();
+      return;
+    }
+    if (ctx === this.bctx) {
+      this.painted = true;
+      this.dropStandIn();
+    }
     if (missing && !this.prefetchTimer) this.prefetchTimer = window.setTimeout(this.prefetch, 0);
+  }
+
+  private dropStandIn() {
+    if (this.standIn) this.recycle(...this.standIn.tiles.values());
+    this.standIn = null;
+  }
+
+  /** Whether the old zoom level's kept tiles cover a screen rectangle (checked at its corners and middle). */
+  private standInCovers(c: BaseCache, x: number, y: number, w: number, h: number) {
+    const s = this.view.k / c.k;
+    const half = Math.ceil(Math.PI * c.k / 2) * 2;
+    const at = (px: number, py: number) =>
+      this.cacheOrigins(c).some(([ox, oy]) => c.tiles.has(`${Math.floor(((px - ox) / s + half) / c.size)},${Math.floor(((py - oy) / s + half) / c.size)}`));
+    const [x1, y1] = [x + w - 0.5, y + h - 0.5];
+    return at(x + 0.5, y + 0.5) && at(x1, y + 0.5) && at(x + 0.5, y1) && at(x1, y1) && at(x + w / 2, y + h / 2);
+  }
+
+  /** The old zoom level's tiles that are still kept, scaled to the current view (none are drawn new). */
+  private drawStandIn(c: BaseCache, ctx: CanvasRenderingContext2D) {
+    const s = this.view.k / c.k;
+    const pad = TILE_PAD;
+    const src = (c.size + 2 * pad) * c.dpr;
+    for (const [ox, oy] of this.cacheOrigins(c)) {
+      const { half, i0, i1, j0, j1 } = this.tileRange(c, ox, oy, 0);
+      for (let j = j0; j <= j1; j++)
+        for (let i = i0; i <= i1; i++) {
+          const tile = c.tiles.get(`${i},${j}`);
+          if (tile) ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
+        }
+    }
   }
 
   /** Draw the tiles just off screen between frames (a few ms at a time), so panning finds them ready. */
@@ -1269,7 +1377,13 @@ export class MapEngine {
     const key = `${o.id}|${o.era}|${o.name}|${o.lon.toFixed(3)}|${o.lat.toFixed(3)}|${o.rot}`;
     let g = this.placedCache.get(key);
     if (!g) {
-      g = o.moved || o.rot ? placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot) : o.geom;
+      if (!o.moved && !o.rot) g = o.geom;
+      else if (o.whole) {
+        // a polar shape (Antarctica) moved: place the whole shape, then slice it again only if it still wraps a pole.
+        // Placing the slices would leave the cap they cut off at 85° as a hole (about 970,000 km² for Antarctica)
+        const placedWhole = placeGeometry(o.whole, o.origin, [o.lon, o.lat], o.rot);
+        g = wrapsAPole(placedWhole) ? splitPolarMoved(placedWhole) : placedWhole;
+      } else g = placeGeometry(o.geom, o.origin, [o.lon, o.lat], o.rot);
       if (this.placedCache.size > 200) this.placedCache.clear();
       this.placedCache.set(key, g);
     }

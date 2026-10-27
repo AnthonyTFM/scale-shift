@@ -1,4 +1,4 @@
-import { geoArea, geoCentroid, geoContains, geoDistance, geoMercator, geoPath, geoRotation, type GeoPermissibleObjects, type GeoProjection } from "d3-geo";
+import { geoArea, geoCentroid, geoContains, geoDistance, geoEquirectangular, geoMercator, geoPath, geoRotation, type GeoPermissibleObjects, type GeoProjection } from "d3-geo";
 import type { MultiPolygon, Polygon, Position } from "geojson";
 
 export const EARTH_RADIUS_KM = 6371.0088;
@@ -125,6 +125,9 @@ export function projectionFor(v: View, w: number, h: number, shift = 0): GeoProj
 }
 
 /** True if a shape surrounds the North or South Pole. */
+/** Does a shape wrap around either pole (no bounding box needed)? */
+export const wrapsAPole = (g: GeoPermissibleObjects) => geoContains(g, [0, -89.9]) || geoContains(g, [0, 89.9]);
+
 export function wrapsPole(g: GeoPermissibleObjects, bbox: [number, number, number, number]) {
   return (bbox[1] < -75 && geoContains(g, [0, -89.9])) || (bbox[3] > 75 && geoContains(g, [0, 89.9]));
 }
@@ -186,6 +189,36 @@ export function splitPolar(g: MultiPolygon): MultiPolygon {
     }
   }
   return { type: "MultiPolygon", coordinates: parts };
+}
+
+/** A plain lon/lat map (1 unit = 1°), for cutting shapes along the date line the way d3 does on the sphere. */
+const LONLAT = geoEquirectangular().scale(180 / Math.PI).translate([0, 0]).precision(0.1);
+
+/**
+ * splitPolar for a shape that has been moved or turned: its rings may now cross the date line anywhere, which the flat
+ * cut in splitPolar would read as an edge running the long way round. d3 first cuts it on the sphere along the date line
+ * (closing a ring that wraps a pole along the pole itself), then splitPolar slices those flat rings. Holes are not kept:
+ * the only shapes that wrap a pole (Antarctica) have none.
+ */
+export function splitPolarMoved(g: MultiPolygon): MultiPolygon {
+  const rings: Position[][] = [];
+  let ring: Position[] = [];
+  const close = () => {
+    if (ring.length >= 3) rings.push([...ring, ring[0]]);
+    ring = [];
+  };
+  geoPath(LONLAT, {
+    moveTo: (x: number, y: number) => {
+      close();
+      ring.push([x, -y]);
+    },
+    lineTo: (x: number, y: number) => void ring.push([x, -y]),
+    closePath: close,
+    arc: () => {},
+    beginPath: () => {},
+  } as unknown as CanvasRenderingContext2D)(g);
+  close();
+  return splitPolar({ type: "MultiPolygon", coordinates: rings.map((r) => [r]) });
 }
 
 /** Zoom by `factor`, keeping the point under (px, py) fixed. */
