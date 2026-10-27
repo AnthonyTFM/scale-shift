@@ -11,7 +11,7 @@ import type { ShapeFile } from "@/lib/outline";
 import { play } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
 import { useShareBox } from "@/components/site/ShareBox";
-import { FlameIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, flameTier, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "@/components/daily/Matchup";
 import { EndlessJoin } from "./EndlessJoin";
 
@@ -207,6 +207,8 @@ export function EndlessGame() {
     buzz(right ? 12 : [30, 50, 30]);
     track("endless_answer", { n: run.step + 1, correct: right });
     const n = streakOf(run.questions, choices);
+    // passing the old best, or reaching a hotter flame: a longer buzz
+    if (right && ((run.bestBefore > 0 && n === run.bestBefore + 1) || n === 10 || n === 25)) buzz([20, 40, 60]);
     const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, b: run.bestBefore, c: choices, ...(run.token ? { t: run.token } : {}), ...(right ? {} : { over: true, e: Date.now() }) } };
     writeEndless(updated);
     if (!right) track("endless_end", { streak: n });
@@ -235,7 +237,7 @@ export function EndlessGame() {
 
   return (
     <div ref={top} className="flex flex-col">
-      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} />}
+      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} />}
       {run.done ? (
         <Results
           run={run}
@@ -270,7 +272,8 @@ export function EndlessGame() {
  * The run at a glance, pinned under the site header while playing, so anyone who looks (or tunes in to a stream) sees
  * the streak, the best and the level straight away: a big streak, the best, five level bars and the rules in one line.
  */
-function ScoreBar({ ref, streak, best, level }: { ref: React.Ref<HTMLDivElement>; streak: number; best: number; level: number }) {
+function ScoreBar({ ref, streak, best, level, newBest }: { ref: React.Ref<HTMLDivElement>; streak: number; best: number; level: number; newBest: boolean }) {
+  const tier = flameTier(streak);
   return (
     <div
       ref={ref}
@@ -279,9 +282,13 @@ function ScoreBar({ ref, streak, best, level }: { ref: React.Ref<HTMLDivElement>
     >
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-ink">
-          <FlameIcon className="size-7" />
+          {/* a hotter flame at 10 and 25 in a row: it pops in each time it changes */}
+          <span key={tier} className={tier ? "pop-in" : undefined}>
+            <FlameIcon className="size-7" tier={tier} />
+          </span>
           <span className="font-display text-4xl leading-none tabular-nums">{streak}</span>
           <span className="text-sm font-bold text-muted">{t.hudStreak}</span>
+          {newBest ? <span className="pop-in ml-1 rounded-full bg-gold px-2 py-0.5 text-xs font-extrabold uppercase tracking-wide text-ink">{t.hudNewBest}</span> : null}
         </p>
         <p className="flex items-center gap-1.5 text-ink">
           <TrophyIcon className="size-6" />
@@ -295,6 +302,10 @@ function ScoreBar({ ref, streak, best, level }: { ref: React.Ref<HTMLDivElement>
         ))}
       </ol>
       <p className="sr-only">{t.levelSr(level + 1, LEVELS.length, t.levels[level])}</p>
+      {/* said once, the moment the run passes the old best */}
+      <p className="sr-only" aria-live="polite">
+        {newBest ? t.hudNewBestSr : ""}
+      </p>
       {/* on phones held sideways the bar keeps to one row of numbers and the level bars, so the game fits */}
       <p className="mt-1.5 text-center text-xs font-semibold text-ink-soft [@media(max-height:500px)]:hidden">{t.rules}</p>
     </div>

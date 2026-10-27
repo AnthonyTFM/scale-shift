@@ -49,7 +49,13 @@ export const home = {
     playStreak: "Your streak",
     playStreakDays: (n: number) => `${n} ${n === 1 ? "day" : "days"} in a row`,
     playNoStreak: "Start today",
-    playPlayed: "Games played",
+    // played today: today's score in the first box
+    playToday: "Today",
+    playTodaySr: (score: number, total: number) => `${score} out of ${total}`,
+    // not played yet today: days with all five right
+    playPerfect: "Perfect days",
+    // a first visit, instead of the boxes: from yesterday's anonymous counts
+    playTeaser: (pct: number) => `Yesterday, only ${pct}% of players went 5 for 5. Can you?`,
     playDoneCta: "See today's results",
     // the endless card beside today's game (src/components/home/HeroEndless.tsx)
     endlessEyebrow: "Endless mode",

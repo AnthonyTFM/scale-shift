@@ -14,11 +14,22 @@ export function TrophyIcon({ className = "size-6" }: IconProps) {
 }
 
 /** Flame: the streak count. */
-export function FlameIcon({ className = "size-6" }: IconProps) {
+/** Flame colours, hotter as an endless run goes on (see flameTier): orange, then white-gold, then blue. */
+const FLAMES = [
+  { body: "#FF8A3D", edge: "#D93A2B", core: "#FFC233" },
+  { body: "#FFC233", edge: "#E07A00", core: "#FFF4C2" },
+  { body: "#2F6BFF", edge: "#1E3FB0", core: "#BFE3FF" },
+];
+
+/** Which flame an endless streak earns: 10 in a row burns white-gold, 25 burns blue. */
+export const flameTier = (streak: number) => (streak >= 25 ? 2 : streak >= 10 ? 1 : 0);
+
+export function FlameIcon({ className = "size-6", tier = 0 }: IconProps & { tier?: number }) {
+  const f = FLAMES[tier] ?? FLAMES[0];
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
-      <path d="M12 2.5c.6 3.2 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.3 2.6-5.4.2 1.7.9 2.8 2 3.4-.4-3.6.1-6.4.9-9Z" fill="#FF8A3D" stroke="#D93A2B" strokeWidth="1.4" strokeLinejoin="round" />
-      <path d="M12 21c-1.8 0-3-1.3-3-3 0-1.5 1-2.6 2-3.4.2 1.2.8 1.9 1.6 2.2.2-1.3.4-2.1.8-2.8 1 1 1.6 2.3 1.6 3.9 0 1.8-1.2 3.1-3 3.1Z" fill="#FFC233" />
+      <path d="M12 2.5c.6 3.2 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.6 1.4-4.3 2.6-5.4.2 1.7.9 2.8 2 3.4-.4-3.6.1-6.4.9-9Z" fill={f.body} stroke={f.edge} strokeWidth="1.4" strokeLinejoin="round" />
+      <path d="M12 21c-1.8 0-3-1.3-3-3 0-1.5 1-2.6 2-3.4.2 1.2.8 1.9 1.6 2.2.2-1.3.4-2.1.8-2.8 1 1 1.6 2.3 1.6 3.9 0 1.8-1.2 3.1-3 3.1Z" fill={f.core} />
     </svg>
   );
 }

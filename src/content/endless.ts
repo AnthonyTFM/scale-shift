@@ -17,6 +17,9 @@ export const endlessCopy = {
   // the score bar that stays on screen while playing: big streak, best, level, and the rules in one line
   hudStreak: "in a row",
   hudBest: "Best",
+  // pinned beside the streak once a run passes your old best
+  hudNewBest: "New best!",
+  hudNewBestSr: "New best streak!",
   rules: "Pick the one that's bigger in real life. One miss ends the run.",
   right: "You got it!",
   wrong: "Not quite! Run over.",

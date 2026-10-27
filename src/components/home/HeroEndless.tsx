@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { loadEndless } from "@/lib/endless";
 import { home } from "@/content/home";
-import { FlameIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, flameTier, TrophyIcon } from "@/components/site/Icons";
 
 /** The best streak ever: unknown while loading, null when the board is empty, "failed" when it couldn't be reached. */
 type Top = { name: string; score: number } | null | "failed";
@@ -77,7 +77,7 @@ export function HeroEndless() {
           <dd className="mt-0.5 flex min-h-9 items-center gap-1.5 font-display text-3xl tabular-nums leading-none">
             {best === null ? null : best > 0 ? (
               <>
-                <FlameIcon className="flame-flicker size-7" />
+                <FlameIcon className="flame-flicker size-7" tier={flameTier(best)} />
                 <span aria-hidden="true">
                   <CountUp to={best} />
                 </span>
