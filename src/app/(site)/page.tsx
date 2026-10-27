@@ -62,8 +62,8 @@ export default function HomePage() {
         }}
       />
 
-      {/* Hero: the two games side by side (today's five and endless mode), then the map and yesterday's matchup (the
-          trick before you play), all over a slowly turning globe */}
+      {/* Hero: the claim and yesterday's matchup as proof, then the two games side by side (today's five and endless
+          mode) and the map, all over a slowly turning globe */}
       <section data-hero className="relative isolate overflow-hidden bg-paper text-ink">
         <div className="pointer-events-none absolute inset-0 -z-10">
           {/* positioned with left/top, not translate: Chrome counted the translate-centred float as a layout shift */}
@@ -79,26 +79,26 @@ export default function HomePage() {
           <div className="absolute inset-0 hidden bg-[linear-gradient(90deg,#fff8ec_0%,rgba(255,248,236,0.88)_38%,rgba(255,248,236,0)_62%)] lg:block" />
         </div>
         <div className="mx-auto max-w-6xl px-4 pb-10 pt-6 md:pb-12 md:pt-9">
-          <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
-            {home.title.split(home.titleAccent).flatMap((part, i) =>
-              i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
-            )}
-          </h1>
-          <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">{home.hub.mission}</p>
-          {/* phones: today's game, endless, yesterday's matchup, map. Wide screens: the two games side by side, then the map
-              on the left and the matchup on the right */}
+          {/* proof first: the headline makes the claim and yesterday's real matchup shows it, a normal map's drawing
+              shrinking to real size, before anything asks you to play. Phones: headline, the proof, then the games and
+              the map. Wide screens: the headline beside the proof, then the two games side by side, then the map */}
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:items-center">
+            <div>
+              <h1 className="font-display text-4xl leading-[1.05] text-ink md:text-5xl lg:text-6xl">
+                {home.title.split(home.titleAccent).flatMap((part, i) =>
+                  i ? [<span key={i} className="text-red">{home.titleAccent}</span>, part] : [part],
+                )}
+              </h1>
+              <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-muted md:text-lg">{home.hub.mission}</p>
+            </div>
+            <YesterdayMatchup />
+          </div>
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <HeroPlay />
             <HeroEndless />
           </div>
-          <div className="mt-4 grid gap-4 lg:grid-cols-2 lg:items-start">
-            <div className="hidden lg:block">
-              <MapCard />
-            </div>
-            <YesterdayMatchup />
-            <div className="lg:hidden">
-              <MapCard />
-            </div>
+          <div className="mt-4">
+            <MapCard />
           </div>
         </div>
       </section>

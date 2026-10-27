@@ -27,6 +27,9 @@ export const home = {
     unavailableLine: "Yesterday's shapes couldn't load just now.",
     mapLabel: "On a normal map",
     realLabel: "Real size",
+    replay: "Watch again",
+    // the picture, for screen readers (the line under it says the sizes in words)
+    proofSr: (a: string, b: string) => `${a} and ${b}, drawn as a normal map shows them, then shrinking or growing to their real sizes`,
     play: "Play today's five",
     played: "See today's results",
   },
