@@ -45,7 +45,7 @@ export function HeroPlay() {
 
   return (
     <ViewTransition name="daily-card" share="morph" default="none">
-      <div className="rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:px-6 md:py-5">
+      <div className="flex flex-col rounded-card bg-card p-5 text-ink shadow-float ring-1 ring-line md:px-6 md:py-5">
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-xs font-bold uppercase tracking-wide text-primary">{t.playEyebrow}</p>
           {s ? (
@@ -65,7 +65,8 @@ export function HeroPlay() {
           </Link>
         </h2>
         <p className="mt-1 max-w-md text-muted">{s?.done ? t.playDone(s.score ?? 0) : t.playLead}</p>
-        <div className="mt-4 flex flex-wrap items-center gap-3">
+        {/* at the foot of the card, level with the endless card's button beside it */}
+        <div className="mt-auto flex flex-wrap items-center gap-3 pt-4">
           <Link
             href="/daily"
             transitionTypes={["to-daily"]}

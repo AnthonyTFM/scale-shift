@@ -421,8 +421,26 @@ html:has(.atlas-page:not([style*="display: none"])) body {
 .globe-float {
   animation: globe-float 9s ease-in-out infinite;
 }
+/* the homepage's endless card: its flame flickers */
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+  30% {
+    transform: scale(1.06, 0.96) rotate(-3deg);
+  }
+  60% {
+    transform: scale(0.97, 1.05) rotate(2deg);
+  }
+}
+.flame-flicker {
+  transform-origin: 50% 90%;
+  animation: flame-flicker 1.6s ease-in-out infinite;
+}
 @media (prefers-reduced-motion: reduce) {
-  .globe-float {
+  .globe-float,
+  .flame-flicker {
     animation: none;
   }
   ::view-transition-group(*),

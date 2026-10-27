@@ -7,11 +7,9 @@ export const home = {
   titleAccent: "lying",
   globeLabel: "A globe of today's countries.",
 
-  // "More to explore": the rest of the site, one line each (the game and the map have their own cards above)
+  // "More to explore": the rest of the site, one line each (the two games and the map have their own cards above)
   explore: {
     title: "More to explore",
-    endlessTitle: "Endless mode",
-    endless: "Closer and closer matchups, until your first miss",
     leaderboard: "Today's best and all-time points",
     eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
     timeline: (n: number) => `${n} times land changed hands`,
@@ -46,6 +44,18 @@ export const home = {
     playDone: (score: number) => `You scored ${score}/5 today.`,
     playDay: "Daily challenge",
     playDoneCta: "See today's answers",
+    // the endless card beside today's game (src/components/home/HeroEndless.tsx)
+    endlessEyebrow: "Endless mode",
+    endlessTitle: "How long can you last?",
+    endlessLead: "Closer and closer matchups, until your first miss.",
+    endlessYourBest: "Your best",
+    endlessNoBest: "No run yet",
+    endlessTop: "#1 streak ever",
+    endlessTopBy: (name: string) => `by ${name}`,
+    endlessTopNone: "Be the first",
+    endlessCta: "Play endless",
+    endlessCtaBeat: (n: number) => `Beat your ${n}`,
+    endlessSr: (n: number) => `${n} in a row`,
     mapEyebrow: "The real-size map",
     mapTitle: "Drag any country anywhere",
     mapLead: "Watch shapes shrink and grow as they move, across 4,000 years of borders.",
