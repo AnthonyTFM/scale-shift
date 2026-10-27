@@ -8,7 +8,7 @@ import { pick, ratio, rng, type PoolEntry, type Question, type QuestionKind } fr
  * the web map points the wrong way (the trick the whole site is about); by level 5 the two are within about 10%.
  */
 export const LEVELS = [
-  { from: 1, min: 1.5, max: 4, trap: true },
+  { from: 1, min: 1.4, max: 4, trap: true },
   { from: 4, min: 1.3, max: 2 },
   { from: 8, min: 1.15, max: 1.5 },
   { from: 13, min: 1.08, max: 1.25 },
@@ -62,35 +62,48 @@ function fits(level: (typeof LEVELS)[number], x: PoolEntry, y: PoolEntry) {
   const r = ratio(x, y);
   if (r < level.min || r > level.max) return false;
   if (!("trap" in level)) return true;
-  // the trap: the smaller one looks at least 20% bigger on a web map
+  // the trap: the smaller one looks at least 15% bigger on a web map
   const [big, small] = x.a > y.a ? [x, y] : [y, x];
-  return small.m / big.m >= 1.2;
+  return small.m / big.m >= 1.15;
 }
 
-/** One matchup at a level, or null if the pool has none left that fit (with these shapes already used). */
-function tryLevel(pool: PoolEntry[], level: (typeof LEVELS)[number], r: () => number, used: Set<string>): Question | null {
-  const pairings = "trap" in level ? [{ kind: "trap" as const, first: "country" as const, second: "country" as const, weight: 1 }] : PAIRINGS;
+// the opening traps: mostly countries, with US states and historical states as the trick's other side (about 820
+// openers from 286 shapes, where countries alone gave 200 from 105)
+const TRAPS: Pairing[] = [
+  { kind: "trap", first: "country", second: "country", weight: 50 },
+  { kind: "trap", first: "state", second: "country", weight: 15 },
+  { kind: "trap", first: "history", second: "country", weight: 25 },
+  { kind: "trap", first: "history", second: "history", weight: 10 },
+];
+
+/**
+ * One matchup at a level, or null if the pool has none left that fit (with these shapes already used in the run, and
+ * none of the ones this player saw in their last runs).
+ */
+function tryLevel(pool: PoolEntry[], level: (typeof LEVELS)[number], r: () => number, used: Set<string>, avoid?: ReadonlySet<string>): Question | null {
+  const pairings = "trap" in level ? TRAPS : PAIRINGS;
+  const free = (e: PoolEntry) => !used.has(e.id) && !avoid?.has(e.id);
   const total = pairings.reduce((s, p) => s + p.weight, 0);
   for (let attempt = 0; attempt < 40; attempt++) {
     // a weighted pick of what to compare
     let w = r() * total;
     const pairing = pairings.find((p) => (w -= p.weight) < 0) ?? pairings[0];
     const first = pick(
-      pool.filter((e) => e.kind === pairing.first && !used.has(e.id)),
+      pool.filter((e) => e.kind === pairing.first && free(e)),
       r,
     );
     if (!first) continue;
     // two eras of the same empire ("Roman Empire" in 1 CE and 200 CE), or the contiguous United States against the whole
     // country, would be a confusing matchup
     const partners = pool.filter(
-      (e) => e.kind === pairing.second && e.id !== first.id && same(e) !== same(first) && !used.has(e.id) && fits(level, first, e),
+      (e) => e.kind === pairing.second && e.id !== first.id && same(e) !== same(first) && free(e) && fits(level, first, e),
     );
     if (!partners.length) continue;
     const second = pick(partners, r);
     const options: [PoolEntry, PoolEntry] = r() < 0.5 ? [first, second] : [second, first];
     const kind = pairing.kind;
-    // Antarctica isn't a country: "Which country is bigger?" becomes "Which is bigger?"
-    const prompt = options.some((o) => o.sub === "continent") ? PROMPTS[kind].replace(" country", "") : PROMPTS[kind];
+    // Antarctica, a US state or a historical state isn't a country: "Which country is bigger?" becomes "Which is bigger?"
+    const prompt = options.some((o) => o.sub === "continent" || o.kind !== "country") ? PROMPTS[kind].replace(" country", "") : PROMPTS[kind];
     return { kind, prompt, options, answer: options[0].a > options[1].a ? 0 : 1 };
   }
   return null;
@@ -99,14 +112,17 @@ function tryLevel(pool: PoolEntry[], level: (typeof LEVELS)[number], r: () => nu
 /**
  * Round `round` (1-based) of the run with this seed. `used` holds the shapes from the run's earlier rounds and gets this
  * round's two added, so no shape comes back within a run until the pool runs dry (after about 100 rounds); then it starts
- * over, so a shape still never comes back within about 100 rounds.
+ * over, so a shape still never comes back within about 100 rounds. `avoid` is the shapes this player saw in their last
+ * runs: they're skipped too while there are others left, so starting again doesn't bring back the same matchups.
  */
-export function endlessQuestion(all: PoolEntry[], seed: string, round: number, used: Set<string>): Question {
+export function endlessQuestion(all: PoolEntry[], seed: string, round: number, used: Set<string>, avoid?: ReadonlySet<string>): Question {
   const pool = poolFor(all, seed);
   const r = rng(`atlas-endless:${seed}:${round}`);
-  // the round's own level first (with every shape free again once the unused ones have no pair left), then easier ones
+  // the round's own level first (without the recently seen shapes, then with them, then with every shape free again
+  // once the unused ones have no pair left), then easier ones
   for (let l = levelOf(round); l >= 0; l--) {
-    let q = tryLevel(pool, LEVELS[l], r, used);
+    let q = tryLevel(pool, LEVELS[l], r, used, avoid);
+    if (!q && avoid?.size) q = tryLevel(pool, LEVELS[l], r, used);
     if (!q && used.size) {
       // start over, keeping the last round's two (a Set keeps insertion order) so neither comes straight back
       const last = [...used].slice(-2);
@@ -123,9 +139,9 @@ export function endlessQuestion(all: PoolEntry[], seed: string, round: number, u
 }
 
 /** The first `count` rounds of a run. */
-export function endlessRun(all: PoolEntry[], seed: string, count: number): Question[] {
+export function endlessRun(all: PoolEntry[], seed: string, count: number, avoid?: ReadonlySet<string>): Question[] {
   const used = new Set<string>();
-  return Array.from({ length: count }, (_, i) => endlessQuestion(all, seed, i + 1, used));
+  return Array.from({ length: count }, (_, i) => endlessQuestion(all, seed, i + 1, used, avoid));
 }
 
 /** How many answers in a row were right (the run ends at the first wrong one). */
@@ -171,3 +187,39 @@ export function writeEndless(save: EndlessSave) {
     /* ignore */
   }
 }
+
+// ---------- shapes seen in recent runs (this browser only) ----------
+
+const SEEN = "atlas-endless-seen";
+/** How many recent shapes a new run avoids: about the last dozen short runs. */
+export const SEEN_MAX = 80;
+
+/** The shapes this browser saw in its last runs, oldest first. */
+export function loadSeen(): string[] {
+  try {
+    const raw = JSON.parse(localStorage.getItem(SEEN) ?? "[]");
+    return Array.isArray(raw) ? raw.filter((id): id is string => typeof id === "string").slice(-SEEN_MAX) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Adds a round's two shapes to the recently seen list. */
+export function rememberSeen(ids: string[]) {
+  try {
+    const seen = loadSeen().filter((id) => !ids.includes(id));
+    localStorage.setItem(SEEN, JSON.stringify([...seen, ...ids].slice(-SEEN_MAX)));
+  } catch {
+    /* storage blocked: runs just can't avoid what was seen before */
+  }
+}
+
+/**
+ * The recently seen shapes a run avoids, from its token (`<time>.<signature>~<id>,<id>…`): the server signed them with
+ * the seed, so the rounds can be rebuilt (and re-marked) exactly.
+ */
+export function avoidOf(token: string | undefined): Set<string> {
+  const list = token?.split("~")[1];
+  return new Set(list ? list.split(",") : []);
+}
+
