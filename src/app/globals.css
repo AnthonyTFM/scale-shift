@@ -362,6 +362,16 @@ body {
   .sheet[open] { animation-name: sheet-in; }
 }
 /* the page behind the pop-up doesn't scroll */
+/* endless mode: the header and the score bar cover the top of the screen, so focused items scroll in below them */
+html:has([data-score-bar]) {
+  scroll-padding-top: 190px;
+}
+@media (max-height: 500px) {
+  html:has([data-score-bar]) {
+    scroll-padding-top: 90px;
+  }
+}
+
 html:has(dialog.sheet[open]) {
   overflow: hidden;
 }

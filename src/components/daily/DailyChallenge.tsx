@@ -473,7 +473,7 @@ function Results({
       </Link>
       <p className="mt-1.5 text-center text-sm text-muted">{R.endlessLine}</p>
 
-      {/* getting on the leaderboard is the first thing after the score */}
+      {/* getting on the leaderboard comes next, after the endless button */}
       <LeaderboardJoin date={round.date} choices={choices} score={score} />
       <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
         {[

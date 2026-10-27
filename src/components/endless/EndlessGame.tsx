@@ -255,7 +255,8 @@ function ScoreBar({ ref, streak, best, level }: { ref: React.Ref<HTMLDivElement>
   return (
     <div
       ref={ref}
-      className="sticky top-16 z-30 -mx-4 mb-3 border-b border-line bg-paper/95 px-4 pb-2.5 pt-2 backdrop-blur [@media(max-height:500px)]:top-0 sm:mx-0 sm:mb-4 sm:rounded-b-[20px] sm:border-x sm:px-4"
+      data-score-bar
+      className="sticky top-16 z-20 -mx-4 mb-3 border-b border-line bg-paper/95 px-4 pb-2.5 pt-2 backdrop-blur [@media(max-height:500px)]:top-0 sm:mx-0 sm:mb-4 sm:rounded-[22px] sm:border-2 sm:px-4"
     >
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-ink">
@@ -275,7 +276,8 @@ function ScoreBar({ ref, streak, best, level }: { ref: React.Ref<HTMLDivElement>
         ))}
       </ol>
       <p className="sr-only">{t.levelSr(level + 1, LEVELS.length, t.levels[level])}</p>
-      <p className="mt-1.5 text-center text-xs font-semibold text-ink-soft">{t.rules}</p>
+      {/* on phones held sideways the bar keeps to one row of numbers and the level bars, so the game fits */}
+      <p className="mt-1.5 text-center text-xs font-semibold text-ink-soft [@media(max-height:500px)]:hidden">{t.rules}</p>
     </div>
   );
 }

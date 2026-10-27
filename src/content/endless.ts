@@ -14,8 +14,6 @@ export const endlessCopy = {
   levels: ["Warm-up", "Getting closer", "Tricky", "Close calls", "Razor thin"],
   levelSr: (n: number, total: number, name: string) => `Level ${n} of ${total}: ${name}`,
   round: (n: number, level: string) => `Round ${n} · ${level}`,
-  streak: (n: number) => `${n} in a row`,
-  best: (n: number) => `Best ${n}`,
   // the score bar that stays on screen while playing: big streak, best, level, and the rules in one line
   hudStreak: "in a row",
   hudBest: "Best",
