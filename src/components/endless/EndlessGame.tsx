@@ -6,7 +6,7 @@ import { site } from "@/content/site";
 import { endlessCopy as t } from "@/content/endless";
 import { track } from "@/lib/analytics";
 import { loadSave, localDateKey, nameInSentence, sizeParts, type PoolEntry, type Question } from "@/lib/daily";
-import { endlessQuestion, LEVELS, levelOf, loadEndless, newSeed, streakOf, writeEndless, type EndlessSave } from "@/lib/endless";
+import { avoidOf, endlessQuestion, LEVELS, levelOf, loadEndless, loadSeen, newSeed, rememberSeen, streakOf, writeEndless, type EndlessSave } from "@/lib/endless";
 import type { ShapeFile } from "@/lib/outline";
 import { play } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
@@ -26,6 +26,8 @@ type Run = {
   seed: string;
   questions: Question[];
   used: Set<string>;
+  /** shapes this player saw in their last runs, which this run steers clear of (signed into the token) */
+  avoid: Set<string>;
   shapes: Record<string, ShapeFile>;
   choices: number[];
   step: number;
@@ -52,7 +54,8 @@ async function newRun(date: string): Promise<{ seed: string; token?: string }> {
     const res = await fetch("/api/endless/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ date }),
+      // the shapes seen in the last runs, so this one can steer clear of them
+      body: JSON.stringify({ date, seen: loadSeen() }),
       signal: abort.signal,
     });
     const d = res.ok ? ((await res.json()) as { seed?: unknown; token?: unknown }) : null;
@@ -67,7 +70,7 @@ async function newRun(date: string): Promise<{ seed: string; token?: string }> {
 
 /** Builds rounds up to `count` (they only depend on the seed, so this is the same run every time). */
 function upTo(run: Run, count: number) {
-  while (run.questions.length < count) run.questions.push(endlessQuestion(run.pool, run.seed, run.questions.length + 1, run.used));
+  while (run.questions.length < count) run.questions.push(endlessQuestion(run.pool, run.seed, run.questions.length + 1, run.used, run.avoid));
   return run.questions[count - 1];
 }
 
@@ -83,7 +86,7 @@ async function prepare(fresh: boolean): Promise<Run> {
   // the best is saved after every right answer, so a resumed run takes the best from before it started
   const bestBefore = kept ? (kept.b ?? save.best) : save.best;
   const token = kept ? kept.t : started!.token;
-  const run: Run = { pool, seed, questions: [], used: new Set(), shapes: {}, choices: kept?.c ?? [], step: 0, bestBefore, over: false, done: false, saved: false, token };
+  const run: Run = { pool, seed, questions: [], used: new Set(), avoid: avoidOf(token), shapes: {}, choices: kept?.c ?? [], step: 0, bestBefore, over: false, done: false, saved: false, token };
   if (ended) {
     // straight to its results (they need no drawings); answers that don't fit start a new run instead
     upTo(run, ended.c.length);
@@ -133,6 +136,12 @@ export function EndlessGame() {
       .then(setRun)
       .catch(() => setFailed(true));
   }, []);
+
+  // the matchup on screen counts as seen, so the next runs steer clear of its two shapes
+  const shown = run && !run.done ? run.questions[run.step] : undefined;
+  useEffect(() => {
+    if (shown) rememberSeen(shown.options.map((o) => o.id));
+  }, [shown]);
 
   // fetch the next round's drawings while this one is on screen (the next matchup doesn't depend on the answer)
   useEffect(() => {
