@@ -235,6 +235,8 @@ export function DailyChallenge() {
             choices.length === round.questions.length && scoreOf(round, choices) === round.questions.length ? reveal.perfect : correct ? reveal.right : reveal.wrong
           }
           nextLabel={step + 1 < round.questions.length ? reveal.next : reveal.seeResults}
+          // never measure against a shape still to come today: it would give that question away
+          exclude={round.questions.flatMap((x) => x.options.map((o) => o.id))}
           onPick={answer}
           onNext={() => {
             advanced.current = true;

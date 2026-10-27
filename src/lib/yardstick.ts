@@ -51,14 +51,23 @@ export function homeList(): string {
 
 const gap = (a: number, b: number) => Math.abs(Math.log(a / b));
 
-/** The familiar place closest in size to the pair (by their geometric mean), never one of the two themselves. */
-export function yardstickFor(options: readonly PoolEntry[], pool: readonly PoolEntry[], list = homeList()): PoolEntry | null {
+/**
+ * The familiar place closest in size to the pair (by their geometric mean), never one of the two themselves, nor any
+ * shape in `exclude`: the rest of the day's questions, or endless mode's next rounds (a yardstick that turns up later as
+ * an option would give that round away).
+ */
+export function yardstickFor(
+  options: readonly PoolEntry[],
+  pool: readonly PoolEntry[],
+  exclude: ReadonlySet<string> = new Set(),
+  list = homeList(),
+): PoolEntry | null {
   const byId = new Map(pool.map((e) => [e.id, e]));
   const target = Math.sqrt(options[0].a * options[1].a);
   const pick = (ids: string[]) =>
     ids
       .map((id) => byId.get(id))
-      .filter((e): e is PoolEntry => !!e && !options.some((o) => o.id === e.id || o.n === e.n))
+      .filter((e): e is PoolEntry => !!e && !exclude.has(e.id) && !options.some((o) => o.id === e.id || o.n === e.n))
       .sort((x, y) => gap(x.a, target) - gap(y.a, target))[0];
   const local = pick(LISTS[list] ?? LISTS.world);
   if (local && gap(local.a, target) <= Math.log(3)) return local;
@@ -67,11 +76,21 @@ export function yardstickFor(options: readonly PoolEntry[], pool: readonly PoolE
 }
 
 /** One place's size next to the yardstick, in words: "about the same size as", "about 2.4× the size of"... */
-export function sizeAgainst(e: PoolEntry, y: PoolEntry) {
-  const r = e.a / y.a;
-  const name = nameInSentence(y);
+function roughly(r: number, name: string) {
   if (r >= 0.9 && r <= 1.11) return copy.scaleSame(name);
   if (r > 1.11) return copy.scaleTimes(r < 10 ? (Math.round(r * 10) / 10).toString() : Math.round(r).toString(), name);
   const [f, word] = copy.fractions.reduce((best, c) => (gap(r, c[0]) < gap(r, best[0]) ? c : best));
   return gap(r, f) <= 0.1 ? copy.scaleFraction(word, name) : copy.scalePercent(Math.round(r * 100), name);
+}
+
+/** The exact form, for when the rough one would read the same for both shapes: "about 93% the size of", "about 1.07×". */
+function exactly(r: number, name: string) {
+  return r < 1 ? copy.scalePercent(Math.round(r * 100), name) : copy.scaleTimes(r < 10 ? r.toFixed(2) : Math.round(r).toString(), name);
+}
+
+/** Both shapes' sizes next to the yardstick, in words; exact for both when the rough words would be the same. */
+export function sizesAgainst(options: readonly PoolEntry[], y: PoolEntry): string[] {
+  const name = nameInSentence(y);
+  const rough = options.map((o) => roughly(o.a / y.a, name));
+  return rough[0] === rough[1] ? options.map((o) => exactly(o.a / y.a, name)) : rough;
 }

@@ -77,7 +77,7 @@ export const dailyCopy = {
     scaleSame: (name: string) => `about the same size as ${name}`,
     scaleTimes: (x: string, name: string) => `about ${x}× the size of ${name}`,
     scaleFraction: (part: string, name: string) => `about ${part} the size of ${name}`,
-    scalePercent: (pct: number, name: string) => (pct < 1 ? `less than 1% of the size of ${name}` : `about ${pct}% of the size of ${name}`),
+    scalePercent: (pct: number, name: string) => (pct < 1 ? `less than 1% the size of ${name}` : `about ${pct}% the size of ${name}`),
     fractions: [
       [3 / 4, "three-quarters"],
       [2 / 3, "two-thirds"],

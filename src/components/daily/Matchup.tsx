@@ -1,7 +1,7 @@
 "use client";
 
 // The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
-import { useEffect, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import { gapText, isRegion, nameInSentence, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
 import { regionContext } from "@/content/region-context";
@@ -9,7 +9,7 @@ import { formatArea, type AreaUnit } from "@/lib/format";
 import { preferredUnit } from "@/lib/units";
 import { mapUrl } from "@/lib/share";
 import { POOL_V as V } from "@/lib/pool-version";
-import { sizeAgainst, yardstickFor } from "@/lib/yardstick";
+import { sizesAgainst, yardstickFor } from "@/lib/yardstick";
 import { setSound, soundOn } from "@/lib/sound";
 import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
 import { dailyCopy } from "@/content/daily";
@@ -63,12 +63,16 @@ export async function loadShapes(questions: Question[]): Promise<Record<string, 
   return Object.fromEntries(ids.map((id, i) => [id, withMapDrawing(files[i], entry.get(id)!)]));
 }
 
-// one fetch per file, however many cards ask for it
+// one fetch per file, however many cards ask for it; a failed one is forgotten, so the next card tries again
 const cached = <T,>(load: (id: string) => Promise<T>) => {
   const files = new Map<string, Promise<T>>();
   return (id: string) => {
     let p = files.get(id);
-    if (!p) files.set(id, (p = load(id)));
+    if (!p) {
+      p = load(id);
+      files.set(id, p);
+      p.catch(() => files.delete(id));
+    }
     return p;
   };
 };
@@ -76,9 +80,11 @@ const cached = <T,>(load: (id: string) => Promise<T>) => {
 /** A shape's small "where is it" map (scripts/lib/locator.mjs), or null where there is none (Antarctica). */
 type Loc = { land: string; parent?: string; me: string; dot?: [number, number] };
 const loadLoc = cached((id) =>
-  fetch(`/data/daily/loc/${id}.json${V}`)
-    .then((r) => (r.ok ? (r.json() as Promise<Loc>) : null))
-    .catch(() => null),
+  fetch(`/data/daily/loc/${id}.json${V}`).then((r) => {
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(id);
+    return r.json() as Promise<Loc>;
+  }),
 );
 const loadShapeFile = cached((id) =>
   fetch(`/data/daily/shapes/${id}.json${V}`).then((r) => {
@@ -139,6 +145,7 @@ export function QuestionCard({
   onPick,
   onNext,
   stuckTop,
+  exclude,
 }: {
   /** "Round 2 of 5" */
   eyebrow: string;
@@ -154,6 +161,8 @@ export function QuestionCard({
   onNext: () => void;
   /** where the page's sticky top ends (the header, plus endless's score bar), in px from the top of the screen */
   stuckTop?: () => number;
+  /** shapes never to use as the yardstick: the rest of the day's questions, or endless mode's next rounds */
+  exclude?: readonly string[];
 }) {
   const answered = picked !== undefined;
   const correct = picked === q.answer;
@@ -163,23 +172,27 @@ export function QuestionCard({
   // web map never draws land smaller than it is, so the map drawings set the scale and frame the tiles before answering.
   const span = Math.max(...q.options.flatMap((o) => [size(shapes[o.id].merc), size(shapes[o.id].ea)])) * 1.12;
   // a familiar place for scale, shown once answered: a dashed outline in both tiles (when it fits them) and a line each
-  const [yard, setYard] = useState<{ q: Question; e: PoolEntry; ea: Outline } | null>(null);
+  // (the words need only the pool; the outline comes after, and the reveal works without either)
+  const [yard, setYard] = useState<{ q: Question; e: PoolEntry; ea?: Outline } | null>(null);
+  const skip = exclude?.join(",") ?? "";
   useEffect(() => {
     let live = true;
     loadPool()
       .then((pool) => {
-        const e = yardstickFor(q.options, pool);
-        return e && loadShapeFile(e.id).then((f) => live && setYard({ q, e, ea: f.ea }));
+        const e = yardstickFor(q.options, pool, new Set(skip.split(",")));
+        if (!e || !live) return;
+        setYard({ q, e });
+        return loadShapeFile(e.id).then((f) => live && setYard({ q, e, ea: f.ea }));
       })
       .catch(() => {
-        /* no yardstick: the reveal works without it */
+        /* no yardstick, or no outline for it */
       });
     return () => {
       live = false;
     };
-  }, [q]);
+  }, [q, skip]);
   const scale = yard?.q === q ? yard : null;
-  const yardDrawn = scale && size(scale.ea) <= span * 0.98 ? scale.ea : undefined;
+  const yardDrawn = scale?.ea && size(scale.ea) <= span * 0.98 ? scale.ea : undefined;
 
   const big = q.options[q.answer];
   const small = q.options[1 - q.answer];
@@ -282,13 +295,11 @@ export function QuestionCard({
                 rewind={rewind}
                 color={COLORS[i]}
                 yard={yardDrawn}
+                // once answered, a small map of where the place is, over the tile's corner (Antarctica has none)
+                corner={Math.abs(o.lat) <= 75 ? <Locator id={o.id} color={COLORS[i]} shown={answered} /> : null}
               />
-              {/* the name, and once answered, a small map of where the place is (its room is kept before, so nothing moves) */}
               <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
-              <span className="mt-0.5 flex items-start justify-between gap-2">
-                <span className="min-w-0 text-xs leading-snug text-muted">{o.sub}</span>
-                <Locator id={o.id} color={COLORS[i]} shown={answered} />
-              </span>
+              <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
               {answered ? (
                 <>
                   <TrueArea from={o.m} to={o.a} unit={unit} />
@@ -379,11 +390,11 @@ function ScaleRows({ options, yard, drawn }: { options: Question["options"]; yar
         {reveal.forScale(nameInSentence(yard))}
       </p>
       <ul className="mt-2 space-y-1 text-[13px] leading-snug text-ink-soft sm:text-sm">
-        {options.map((o, i) => (
-          <li key={o.id} className="flex items-baseline gap-2">
+        {sizesAgainst(options, yard).map((words, i) => (
+          <li key={options[i].id} className="flex items-baseline gap-2">
             <span aria-hidden="true" className="size-2.5 shrink-0 translate-y-px rounded-full" style={{ background: COLORS[i] }} />
             <span>
-              <strong className="text-ink">{o.n}</strong>: {sizeAgainst(o, yard)}
+              <strong className="text-ink">{options[i].n}</strong>: {words}
             </span>
           </li>
         ))}
@@ -471,21 +482,27 @@ function Locator({ id, color, shown }: { id: string; color: string; shown: boole
   const [loc, setLoc] = useState<Loc | null>(null);
   useEffect(() => {
     let live = true;
-    loadLoc(id).then((l) => live && setLoc(l));
+    loadLoc(id)
+      .then((l) => live && setLoc(l))
+      .catch(() => {
+        /* no map this time: the next round tries again */
+      });
     return () => {
       live = false;
     };
   }, [id]);
+  if (!shown || !loc) return null;
   return (
     <svg
       viewBox="0 0 100 66"
       aria-hidden="true"
-      className={`aspect-[100/66] w-14 shrink-0 rounded-md bg-tile ring-1 ring-line sm:w-20 ${shown ? "pop-in reveal-late" : "invisible"}`}
+      className="pop-in reveal-late pointer-events-none absolute bottom-1.5 right-1.5 aspect-[100/66] w-[38%] max-w-28 rounded-lg bg-tile shadow-[0_1px_4px_rgba(29,33,64,0.25)] ring-2 ring-white"
     >
       {loc ? (
         <>
           <path d={loc.land} fill={LAND} />
-          {loc.parent ? <path d={loc.parent} fill={PARENT} /> : null}
+          {/* a thin edge in its own colour closes the hairline gaps between the regions it's made of */}
+          {loc.parent ? <path d={loc.parent} fill={PARENT} stroke={PARENT} strokeWidth={0.8} strokeLinejoin="round" /> : null}
           <path d={loc.me} fill={color} stroke={color} strokeWidth={0.6} strokeLinejoin="round" />
           {loc.dot ? <circle cx={loc.dot[0]} cy={loc.dot[1]} r={6} fill="none" stroke={color} strokeWidth={1.6} /> : null}
         </>
@@ -542,6 +559,7 @@ function RevealTile({
   rewind,
   color,
   yard,
+  corner,
 }: {
   map: Outline;
   real: Outline;
@@ -552,6 +570,8 @@ function RevealTile({
   color: string;
   /** a familiar place at the same scale, drawn dashed once the real shape has settled */
   yard?: Outline;
+  /** drawn over the tile's bottom-right corner (the small "where is it" map) */
+  corner?: ReactNode;
 }) {
   const area = (o: Outline) => {
     const [x0, y0, x1, y1] = mainBox(o);
@@ -576,11 +596,12 @@ function RevealTile({
           <Shape outline={map} span={span} color={color} ghost="line" />
         </g>
         {yard ? (
-          <g style={{ opacity: shown ? 1 : 0, transition: shown ? "opacity 0.4s ease 1.2s" : "none" }}>
+          <g className="reveal-yard" style={{ opacity: shown ? 1 : 0, transition: shown ? undefined : "none" }}>
             <Shape outline={yard} span={span} color={DASH} ghost="dash" />
           </g>
         ) : null}
       </svg>
+      {corner}
     </span>
   );
 }
