@@ -7,6 +7,7 @@
 //   public/data/daily/shapes/{id}.json  two pre-drawn SVG outlines per shape:
 //                                       "merc" = how it looks on a normal web map (Mercator)
 //                                       "ea"   = its true size (equal-area projection centred on the shape)
+//   public/data/daily/loc/{id}.json     a small "where is it" map for each shape (see scripts/lib/locator.mjs)
 // Both outlines are in km, so two shapes drawn with the same scale compare correctly.
 
 import fs from "node:fs";
@@ -14,6 +15,7 @@ import path from "node:path";
 import { geoArea, geoAzimuthalEqualArea, geoCentroid, geoMercator, geoPath } from "d3-geo";
 import * as client from "topojson-client";
 import { loadRegions } from "./lib/regions.mjs";
+import { locator } from "./lib/locator.mjs";
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "..");
 const DATA = path.join(ROOT, "public", "data");
@@ -281,6 +283,8 @@ const add = (entry, geom) => {
   // always matches the area the puzzles use
   const old = previous.get(id);
   const s = shapeFiles(geom);
+  const loc = locator(DATA, entry, geom, s.lat, s.lon);
+  if (loc) fs.writeFileSync(path.join(OUT, "loc", `${id}.json`), JSON.stringify(loc));
   const changed = old && (Math.abs(area / old.a - 1) > 0.02 || Math.abs(s.mercArea / old.m - 1) > 0.02);
   if (changed && oldOutlines.has(id)) {
     fs.writeFileSync(path.join(OUT, "shapes", `${id}.json`), oldOutlines.get(id));
@@ -323,6 +327,7 @@ if (fs.existsSync(path.join(OUT, "shapes")))
   for (const f of fs.readdirSync(path.join(OUT, "shapes"))) oldOutlines.set(f.replace(/\.json$/, ""), fs.readFileSync(path.join(OUT, "shapes", f)));
 fs.rmSync(OUT, { recursive: true, force: true });
 fs.mkdirSync(path.join(OUT, "shapes"), { recursive: true });
+fs.mkdirSync(path.join(OUT, "loc"), { recursive: true });
 
 // Present-day countries: 5,000 km² and up (30,000 before Oct 21, 10,000 before Oct 22), excluding disputed shapes.
 // Antarctica joins as a continent (from Oct 22): web maps draw it about 24 times too big, so it makes the best trap of all.

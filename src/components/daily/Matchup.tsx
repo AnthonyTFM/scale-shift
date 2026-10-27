@@ -2,13 +2,14 @@
 
 // The "which is bigger?" matchup card and its reveal, shared by the daily challenge and endless mode.
 import { useEffect, useRef, useState } from "react";
-import { gapText, isRegion, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
+import { gapText, isRegion, nameInSentence, sizeLine, stretch, times, type PoolEntry, type Question } from "@/lib/daily";
 import { dailyContext } from "@/content/daily-context";
 import { regionContext } from "@/content/region-context";
 import { formatArea, type AreaUnit } from "@/lib/format";
 import { preferredUnit } from "@/lib/units";
 import { mapUrl } from "@/lib/share";
 import { POOL_V as V } from "@/lib/pool-version";
+import { sizeAgainst, yardstickFor } from "@/lib/yardstick";
 import { setSound, soundOn } from "@/lib/sound";
 import { mainBox, mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
 import { dailyCopy } from "@/content/daily";
@@ -27,6 +28,10 @@ const TILE =
 // the two shapes on the game tiles: bright fills (they are drawings, not text); a pale tint of the same colour for how a
 // web map draws them, so the two read as before and after of one shape
 const COLORS = ["#FF5B4A", "#2F6BFF"];
+// the familiar place for scale (a dashed ink outline), and the land on the small "where is it" maps
+const DASH = "#1d2140";
+const LAND = "#efe6d6";
+const PARENT = "#d6c9ae";
 /** a web map stretches land by less than this: "about right" (and never "1.1× too big") */
 const ABOUT_RIGHT = 1.15;
 
@@ -57,6 +62,30 @@ export async function loadShapes(questions: Question[]): Promise<Record<string, 
   const entry = new Map(questions.flatMap((q) => q.options).map((o) => [o.id, o]));
   return Object.fromEntries(ids.map((id, i) => [id, withMapDrawing(files[i], entry.get(id)!)]));
 }
+
+// one fetch per file, however many cards ask for it
+const cached = <T,>(load: (id: string) => Promise<T>) => {
+  const files = new Map<string, Promise<T>>();
+  return (id: string) => {
+    let p = files.get(id);
+    if (!p) files.set(id, (p = load(id)));
+    return p;
+  };
+};
+
+/** A shape's small "where is it" map (scripts/lib/locator.mjs), or null where there is none (Antarctica). */
+type Loc = { land: string; parent?: string; me: string; dot?: [number, number] };
+const loadLoc = cached((id) =>
+  fetch(`/data/daily/loc/${id}.json${V}`)
+    .then((r) => (r.ok ? (r.json() as Promise<Loc>) : null))
+    .catch(() => null),
+);
+const loadShapeFile = cached((id) =>
+  fetch(`/data/daily/shapes/${id}.json${V}`).then((r) => {
+    if (!r.ok) throw new Error(id);
+    return r.json() as Promise<ShapeFile>;
+  }),
+);
 
 /** Same height as the progress dots plus the first question card, so nothing below jumps when the game appears. */
 export function Skeleton({ label, pills }: { label: string; /** room for endless mode's score bar instead of the dots */ pills?: boolean }) {
@@ -133,6 +162,24 @@ export function QuestionCard({
   // compare fairly side by side, and each real shape shrinks from its map version by exactly what the strip says. A
   // web map never draws land smaller than it is, so the map drawings set the scale and frame the tiles before answering.
   const span = Math.max(...q.options.flatMap((o) => [size(shapes[o.id].merc), size(shapes[o.id].ea)])) * 1.12;
+  // a familiar place for scale, shown once answered: a dashed outline in both tiles (when it fits them) and a line each
+  const [yard, setYard] = useState<{ q: Question; e: PoolEntry; ea: Outline } | null>(null);
+  useEffect(() => {
+    let live = true;
+    loadPool()
+      .then((pool) => {
+        const e = yardstickFor(q.options, pool);
+        return e && loadShapeFile(e.id).then((f) => live && setYard({ q, e, ea: f.ea }));
+      })
+      .catch(() => {
+        /* no yardstick: the reveal works without it */
+      });
+    return () => {
+      live = false;
+    };
+  }, [q]);
+  const scale = yard?.q === q ? yard : null;
+  const yardDrawn = scale && size(scale.ea) <= span * 0.98 ? scale.ea : undefined;
 
   const big = q.options[q.answer];
   const small = q.options[1 - q.answer];
@@ -234,9 +281,14 @@ export function QuestionCard({
                 revealed={answered}
                 rewind={rewind}
                 color={COLORS[i]}
+                yard={yardDrawn}
               />
+              {/* the name, and a small map of where the place is (drawn like a normal web map, so it gives no size away) */}
               <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
-              <span className="mt-0.5 block text-xs leading-snug text-muted">{o.sub}</span>
+              <span className="mt-0.5 flex items-start justify-between gap-2">
+                <span className="min-w-0 text-xs leading-snug text-muted">{o.sub}</span>
+                <Locator id={o.id} color={COLORS[i]} />
+              </span>
               {answered ? (
                 <>
                   <TrueArea from={o.m} to={o.a} unit={unit} />
@@ -285,6 +337,7 @@ export function QuestionCard({
             <p id="daily-verdict-size" className="mt-2 font-semibold leading-snug">
               {sizeLine(big, small)}
             </p>
+            {scale ? <ScaleRows options={q.options} yard={scale.e} drawn={!!yardDrawn} /> : null}
             <StretchStrip options={q.options} title={stripTitle} />
           </div>
         ) : null}
@@ -310,6 +363,33 @@ export function QuestionCard({
         </div>
       ) : null}
     </section>
+  );
+}
+
+/** Each shape's size next to a familiar place (the dashed outline in the tiles), in plain words. */
+function ScaleRows({ options, yard, drawn }: { options: Question["options"]; yard: PoolEntry; drawn: boolean }) {
+  return (
+    <div className="mt-3 rounded-2xl bg-white/80 p-3 ring-1 ring-ink/10">
+      <p className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wide text-ink-soft">
+        {drawn ? (
+          <svg aria-hidden="true" viewBox="0 0 22 10" className="h-2.5 w-5 shrink-0">
+            <path d="M1 5h20" stroke={DASH} strokeWidth="2" strokeDasharray="4 3" />
+          </svg>
+        ) : null}
+        {reveal.forScale(nameInSentence(yard))}
+      </p>
+      <ul className="mt-2 space-y-1 text-[13px] leading-snug text-ink-soft sm:text-sm">
+        {options.map((o, i) => (
+          <li key={o.id} className="flex items-baseline gap-2">
+            <span aria-hidden="true" className="size-2.5 shrink-0 translate-y-px rounded-full" style={{ background: COLORS[i] }} />
+            <span>
+              <strong className="text-ink">{o.n}</strong>: {sizeAgainst(o, yard)}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {drawn ? <p className="mt-1.5 text-xs text-muted">{reveal.forScaleNote}</p> : null}
+    </div>
   );
 }
 
@@ -382,6 +462,30 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
   );
 }
 
+/** Where a place is: a small web-map-style map with the place in its colour (a region inside its own country). */
+function Locator({ id, color }: { id: string; color: string }) {
+  const [loc, setLoc] = useState<Loc | null>(null);
+  useEffect(() => {
+    let live = true;
+    loadLoc(id).then((l) => live && setLoc(l));
+    return () => {
+      live = false;
+    };
+  }, [id]);
+  return (
+    <svg viewBox="0 0 100 66" aria-hidden="true" className="aspect-[100/66] w-14 shrink-0 rounded-md bg-tile ring-1 ring-line sm:w-20">
+      {loc ? (
+        <>
+          <path d={loc.land} fill={LAND} />
+          {loc.parent ? <path d={loc.parent} fill={PARENT} /> : null}
+          <path d={loc.me} fill={color} stroke={color} strokeWidth={0.6} strokeLinejoin="round" />
+          {loc.dot ? <circle cx={loc.dot[0]} cy={loc.dot[1]} r={6} fill="none" stroke={color} strokeWidth={1.6} /> : null}
+        </>
+      ) : null}
+    </svg>
+  );
+}
+
 // framed and drawn on the main landmass, so far-off islands don't shrink a country to a speck
 const size = (o: Outline) => {
   const [x0, y0, x1, y1] = mainBox(o);
@@ -393,7 +497,7 @@ const size = (o: Outline) => {
  * tint of its own colour ("fill"), or a faint outline over the real shape ("line"), so it shows even where the real
  * shape covers it.
  */
-function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: "fill" | "line" }) {
+function Shape({ outline, span, color, ghost }: { outline: Outline; span: number; color: string; ghost?: "fill" | "line" | "dash" }) {
   const { d, b: [x0, y0, x1, y1] } = mainPart(outline);
   const k = 100 / span;
   const tiny = size(outline) < span * 0.06;
@@ -402,11 +506,12 @@ function Shape({ outline, span, color, ghost }: { outline: Outline; span: number
       <path
         d={d}
         transform={`translate(50 50) scale(${k}) translate(${-(x0 + x1) / 2} ${-(y0 + y1) / 2})`}
-        fill={ghost === "line" ? "none" : color}
+        fill={ghost === "line" || ghost === "dash" ? "none" : color}
         fillOpacity={ghost ? 0.22 : 0.88}
         stroke={color}
-        strokeWidth={ghost === "line" ? 1.25 : 1}
-        strokeOpacity={ghost === "fill" ? 0 : ghost ? 0.6 : 1}
+        strokeWidth={ghost === "line" ? 1.25 : ghost === "dash" ? 1.6 : 1}
+        strokeOpacity={ghost === "fill" ? 0 : ghost === "line" ? 0.6 : 1}
+        strokeDasharray={ghost === "dash" ? "5 4" : undefined}
         vectorEffect="non-scaling-stroke"
         fillRule="evenodd"
         strokeLinejoin="round"
@@ -428,6 +533,7 @@ function RevealTile({
   revealed,
   rewind,
   color,
+  yard,
 }: {
   map: Outline;
   real: Outline;
@@ -436,6 +542,8 @@ function RevealTile({
   revealed: boolean;
   rewind: boolean;
   color: string;
+  /** a familiar place at the same scale, drawn dashed once the real shape has settled */
+  yard?: Outline;
 }) {
   const area = (o: Outline) => {
     const [x0, y0, x1, y1] = mainBox(o);
@@ -459,6 +567,11 @@ function RevealTile({
         <g style={{ opacity: shown ? 1 : 0, transition: shown ? "opacity 0.2s ease" : "none" }}>
           <Shape outline={map} span={span} color={color} ghost="line" />
         </g>
+        {yard ? (
+          <g style={{ opacity: shown ? 1 : 0, transition: shown ? "opacity 0.4s ease 1.2s" : "none" }}>
+            <Shape outline={yard} span={span} color={DASH} ghost="dash" />
+          </g>
+        ) : null}
       </svg>
     </span>
   );
