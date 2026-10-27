@@ -36,7 +36,7 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
           }}
           aria-label={`${label}. Go to a specific year`}
           title="Go to a specific year"
-          className="group flex items-center gap-1.5 rounded-md hover:text-accent"
+          className="group flex min-h-6 items-center gap-1.5 rounded-md hover:text-accent"
         >
           {label}
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 text-panel-muted group-hover:text-accent" fill="none" stroke="currentColor" strokeWidth="2.5">
@@ -114,12 +114,14 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
   return (
     <div className="pointer-events-auto rounded-2xl bg-panel/95 px-2.5 py-1.5 text-panel-text shadow-float backdrop-blur sm:px-4 sm:py-2">
       <div className="flex items-center gap-2 sm:gap-3">
+        {/* play backward: on wider screens only. On a phone a ◀ beside ▶ reads as "back one era", so phones get the
+            one-step ‹ › buttons instead */}
         <button
           type="button"
           onClick={() => onTogglePlay(-1)}
           aria-label={playing === -1 ? "Pause timeline" : "Play timeline backward"}
           title={playing === -1 ? "Pause" : "Play back in time"}
-          className={`grid size-8 shrink-0 place-items-center rounded-full sm:size-9 ${
+          className={`hidden size-9 shrink-0 place-items-center rounded-full sm:grid ${
             playing === -1 ? "bg-accent text-panel hover:bg-accent-strong" : "bg-white/10 hover:bg-white/15"
           }`}
         >
@@ -151,7 +153,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => go(-1)}
           disabled={i <= 0}
           aria-label="Previous era"
-          className="hidden size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 sm:grid"
+          className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m15 6-6 6 6 6" />
@@ -194,7 +196,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => go(1)}
           disabled={i >= eras.length - 1}
           aria-label="Next era"
-          className="hidden size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 sm:grid"
+          className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30"
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m9 6 6 6-6 6" />
