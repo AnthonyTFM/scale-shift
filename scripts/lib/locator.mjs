@@ -1,6 +1,6 @@
 // The small "where is it" maps beside each name in the daily puzzle and endless mode (public/data/daily/loc/{id}.json).
-// Drawn the way a normal web map draws the world (Mercator), the same as the shapes before the answer, so the little map
-// says where a place is without giving away its real size. A region or US state sits inside its own country (Goiás in
+// Drawn the way a normal web map draws the world (Mercator), and shown only once the player has answered (beside its
+// neighbours a place's size is easy to judge, so it would help the guess). A region or US state sits inside its own country (Goiás in
 // Brazil, Ohio in the lower 48); anything else sits in a window around it, about three times its size, with the land
 // around it. Every map is 100 × 66 units: grey land, the country in a darker grey, the place itself as a path to fill.
 

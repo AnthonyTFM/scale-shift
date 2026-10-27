@@ -283,11 +283,11 @@ export function QuestionCard({
                 color={COLORS[i]}
                 yard={yardDrawn}
               />
-              {/* the name, and a small map of where the place is (drawn like a normal web map, so it gives no size away) */}
+              {/* the name, and once answered, a small map of where the place is (its room is kept before, so nothing moves) */}
               <span className="mt-2 block text-base font-bold leading-tight text-ink [overflow-wrap:anywhere] sm:text-lg">{o.n}</span>
               <span className="mt-0.5 flex items-start justify-between gap-2">
                 <span className="min-w-0 text-xs leading-snug text-muted">{o.sub}</span>
-                <Locator id={o.id} color={COLORS[i]} />
+                <Locator id={o.id} color={COLORS[i]} shown={answered} />
               </span>
               {answered ? (
                 <>
@@ -462,8 +462,12 @@ function WhoIsWho({ options }: { options: Question["options"] }) {
   );
 }
 
-/** Where a place is: a small web-map-style map with the place in its colour (a region inside its own country). */
-function Locator({ id, color }: { id: string; color: string }) {
+/**
+ * Where a place is: a small web-map-style map with the place in its colour (a region inside its own country). Only shown
+ * once answered: next to its country or neighbours, a place's size is easy to judge, so before the answer it would help
+ * the guess. It loads with the round, so it's ready at the reveal.
+ */
+function Locator({ id, color, shown }: { id: string; color: string; shown: boolean }) {
   const [loc, setLoc] = useState<Loc | null>(null);
   useEffect(() => {
     let live = true;
@@ -473,7 +477,11 @@ function Locator({ id, color }: { id: string; color: string }) {
     };
   }, [id]);
   return (
-    <svg viewBox="0 0 100 66" aria-hidden="true" className="aspect-[100/66] w-14 shrink-0 rounded-md bg-tile ring-1 ring-line sm:w-20">
+    <svg
+      viewBox="0 0 100 66"
+      aria-hidden="true"
+      className={`aspect-[100/66] w-14 shrink-0 rounded-md bg-tile ring-1 ring-line sm:w-20 ${shown ? "pop-in reveal-late" : "invisible"}`}
+    >
       {loc ? (
         <>
           <path d={loc.land} fill={LAND} />
