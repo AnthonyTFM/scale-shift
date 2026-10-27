@@ -71,9 +71,8 @@ export const dailyCopy = {
     drawnTooBig: (x: string) => `map ${x}× too big`,
     drawnAboutRight: "map about right",
     stretchNote: "The farther from the equator, the more a web map blows land up.",
-    // after the answer: a familiar place, drawn as a dashed outline in both tiles, with each shape's size next to it
+    // after the answer: each shape's size next to a familiar place, in words
     forScale: (name: string) => `For scale: ${name}`,
-    forScaleNote: "The dashed outline in each tile is the same place at the same scale.",
     scaleSame: (name: string) => `about the same size as ${name}`,
     scaleTimes: (x: string, name: string) => `about ${x}× the size of ${name}`,
     scaleFraction: (part: string, name: string) => `about ${part} the size of ${name}`,
