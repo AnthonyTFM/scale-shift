@@ -61,16 +61,27 @@ export default function AboutPage() {
         <h2>Where the borders come from</h2>
         <ul>
           <li>
-            <strong>2000 BCE to 1960:</strong>{" "}
+            <strong>2000 BCE to 1783:</strong>{" "}
             <a href="https://github.com/aourednik/historical-basemaps" rel="noopener noreferrer">
               historical-basemaps
             </a>{" "}
             by André Ourednik and contributors (GPL-3.0). Each feature carries a border-precision rating, which we show on the map as solid
-            (precise) or dashed (approximate) lines. Our processed copies stay under the same license (see the{" "}
-            <a href="/data/LICENSE.txt">data license</a>).
+            (precise) or dashed (approximate) lines. Where it leaves a state out, draws it inside a neighbour or keeps it after it fell, we
+            redraw the state from Cliopatria (below), whose outlines also fill land it leaves blank. On the 1783 map, Rupert&apos;s Land, the
+            Spanish viceroyalties of South America and the Guianas follow OpenHistoricalMap&apos;s outlines for that year. Our processed
+            copies stay under the same license (see the <a href="/data/LICENSE.txt">data license</a>).
           </li>
           <li>
-            <strong>Europe in 1900 and 1914:</strong>{" "}
+            <strong>1800 to 1960:</strong>{" "}
+            <a href="https://github.com/Seshat-Global-History-Databank/cliopatria" rel="noopener noreferrer">
+              Cliopatria
+            </a>{" "}
+            by the Seshat Global History Databank (CC BY 4.0), the world&apos;s states digitised from historical atlases (Bennett et al.,{" "}
+            <em>Scientific Data</em>, 2025), with OpenHistoricalMap&apos;s dated borders laid over it and, in Europe from 1815 to 1914,
+            HistoGIS&apos;s. These eleven maps use no historical-basemaps data.
+          </li>
+          <li>
+            <strong>Europe from 1815 to 1914:</strong>{" "}
             <a href="https://histogis.acdh.oeaw.ac.at/" rel="noopener noreferrer">
               HistoGIS
             </a>{" "}
@@ -78,12 +89,13 @@ export default function AboutPage() {
             the time.
           </li>
           <li>
-            <strong>Europe from 1920 to 1960:</strong>{" "}
+            <strong>1800 to 1960, and parts of 1783:</strong>{" "}
             <a href="https://www.openhistoricalmap.org/" rel="noopener noreferrer">
               OpenHistoricalMap
             </a>{" "}
-            contributors (public domain, CC0), which dates every border change to the day. It also gives the French zone of Morocco, the
-            Hatay State and Manchukuo.
+            contributors (public domain, CC0), which dates every border change to the day. Some of its border lines are CC BY 4.0, from
+            national mapping agencies such as Spain&apos;s IGN, Slovenia&apos;s GURS and Norway&apos;s Kartverket (all listed in the{" "}
+            <a href="/data/LICENSE.txt">data license</a>).
           </li>
           <li>
             <strong>1994, 2000, 2010 and the present day:</strong>{" "}
@@ -99,7 +111,8 @@ export default function AboutPage() {
             <a href="https://icr.ethz.ch/data/cshapes/" rel="noopener noreferrer">
               CShapes 2.0
             </a>{" "}
-            (ETH Zurich), the academic standard for country borders since 1886, to find and correct errors.
+            (ETH Zurich), the academic standard for country borders since 1886, to find and correct errors. Each map before 1800 was
+            compared with Cliopatria for its year.
           </li>
           <li>
             <strong>Flags:</strong>{" "}

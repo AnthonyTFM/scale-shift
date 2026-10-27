@@ -1,0 +1,3900 @@
+{
+ "1800": [
+  [
+   2693946,
+   "Russian Empire"
+  ],
+  [
+   2889977,
+   "Qing Empire",
+   {
+    "adopts": [
+     "Qing Dynasty"
+    ]
+   }
+  ],
+  [
+   2845866,
+   "Viceroyalty of New Spain",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Spain's claim reached far north of the land it held; much of it was held by Indigenous nations such as the Comanche."
+    }
+   }
+  ],
+  [
+   2860719,
+   "State of Brazil",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2875952,
+   "Viceroyalty of the Río de la Plata",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2861322,
+   "Rupert's Land",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "The Hudson's Bay Company's charter territory, around its trading posts; First Nations held most of the land."
+    }
+   }
+  ],
+  [
+   2828330,
+   "Colony of New South Wales",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "Britain's claim to eastern Australia. Its settlements were around Sydney; Aboriginal nations held most of the land."
+    }
+   }
+  ],
+  [
+   2875951,
+   "Viceroyalty of Peru",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Spain's viceroyalty, drawn with Chile, which was run on its own from 1798. Spain's claim to Patagonia was not held: Mapuche and Tehuelche nations ruled the south."
+    }
+   }
+  ],
+  [
+   2848719,
+   "State of Grão-Pará and Rio Negro",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2696595,
+   "Denmark–Norway"
+  ],
+  [
+   2849532,
+   "Kazakh Khanate"
+  ],
+  [
+   2861203,
+   "Louisiana",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Returned to France in secret in October 1800 (Treaty of San Ildefonso); Spain went on running it until 1803, when France sold it to the United States."
+    }
+   }
+  ],
+  [
+   2742953,
+   "United States of America"
+  ],
+  [
+   2964943,
+   "Viceroyalty of New Granada",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2694887,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2851143,
+   "Russian America",
+   {
+    "props": {
+     "s": "Russian Empire"
+    }
+   }
+  ],
+  [
+   2965452,
+   "Maratha Confederacy",
+   {
+    "props": {
+     "w": "Maratha states under the Peshwa at Pune: Scindia, Holkar, the Bhonsles of Nagpur and the Gaekwads of Baroda. Scindia held Delhi, where the Mughal emperor lived under his protection."
+    },
+    "adopts": [
+     "Maratha Empire"
+    ]
+   }
+  ],
+  [
+   2842587,
+   "Captaincy General of Venezuela",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2830999,
+   "Province of Lower Canada",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2834876,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2851880,
+   "Sweden",
+   {
+    "adopts": [
+     "Swedish Empire"
+    ]
+   }
+  ],
+  [
+   2748398,
+   "French Republic"
+  ],
+  [
+   2878363,
+   "Spain"
+  ],
+  [
+   2692912,
+   "Comancheria"
+  ],
+  [
+   2861415,
+   "Regency of Algiers"
+  ],
+  [
+   2963549,
+   "Morocco"
+  ],
+  [
+   2889893,
+   "Tokugawa Shogunate"
+  ],
+  [
+   2847600,
+   "Rajputana",
+   {
+    "adopts": [
+     "Mughal Empire"
+    ]
+   }
+  ],
+  [
+   2962057,
+   "Portuguese Angola",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2748626,
+   "Kingdom of Prussia"
+  ],
+  [
+   2831002,
+   "Province of Upper Canada",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2851361,
+   "Emirate of Bukhara"
+  ],
+  [
+   2860776,
+   "Captaincy General of the Philippines",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2698449,
+   "Kingdom of Great Britain"
+  ],
+  [
+   2918507,
+   "Đại Việt",
+   {
+    "adopts": [
+     "Tây Sơn dynasty"
+    ]
+   }
+  ],
+  [
+   2694486,
+   "Joseon"
+  ],
+  [
+   2922445,
+   "Khanate of Kalat"
+  ],
+  [
+   2953509,
+   "Shoshone"
+  ],
+  [
+   2851349,
+   "Khanate of Khiva"
+  ],
+  [
+   2851355,
+   "Khanate of Kokand"
+  ],
+  [
+   2871333,
+   "Sultanate of Banjar"
+  ],
+  [
+   2806842,
+   "Suriname",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "A Dutch colony, held by Britain from 1799 to 1802 and again from 1804 to 1816."
+    }
+   }
+  ],
+  [
+   2922476,
+   "Sindh"
+  ],
+  [
+   2922298,
+   "Carnatic Sultanate"
+  ],
+  [
+   2848235,
+   "Company Raj",
+   {
+    "props": {
+     "w": "The East India Company's land, shown with Hyderabad, Mysore and Travancore: states under its protection that kept their own rulers."
+    },
+    "adopts": [
+     "British Empire"
+    ]
+   }
+  ],
+  [
+   2961073,
+   "Sultanate of Brunei"
+  ],
+  [
+   2923110,
+   "Majeerteen Sultanate"
+  ],
+  [
+   2861327,
+   "Newfoundland Colony",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2920986,
+   "Omani Empire",
+   {
+    "adopts": [
+     "Sultanate of Oman"
+    ]
+   }
+  ],
+  [
+   2830930,
+   "Colony of New Brunswick",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2878364,
+   "Kingdom of Portugal"
+  ],
+  [
+   2962053,
+   "Kingdom of Kongo"
+  ],
+  [
+   2861194,
+   "Colony of French Guiana",
+   {
+    "props": {
+     "s": "French Republic"
+    }
+   }
+  ],
+  [
+   2920979,
+   "Sultanate of Qishn and Socotra"
+  ],
+  [
+   2697729,
+   "Kingdom of Ireland"
+  ],
+  [
+   2750744,
+   "Kingdom of Naples",
+   {
+    "adopts": [
+     "Kingdom of Naples (Napoleonic)"
+    ]
+   }
+  ],
+  [
+   2860769,
+   "Sultanate of Sulu"
+  ],
+  [
+   2948780,
+   "Sultanate of Tidore",
+   {
+    "partsIn": [
+     [
+      127,
+      -2.3,
+      131.5,
+      1
+     ],
+     [
+      129.3,
+      -4.7,
+      131.8,
+      -2.7
+     ]
+    ],
+    "props": {
+     "w": "Prince Nuku drove out the Dutch-backed sultan in 1797 and ruled Tidore with British support until his death in 1805; the Dutch took it back in 1806. Shown without the coasts and islands of New Guinea that its sultans claimed."
+    }
+   }
+  ],
+  [
+   2841730,
+   "Saint-Domingue",
+   {
+    "props": {
+     "s": "French Republic",
+     "w": "A French colony run by Toussaint Louverture, who had ended slavery there; he took the Spanish east of the island in 1801, and it won independence as Haiti in 1804."
+    }
+   }
+  ],
+  [
+   2748646,
+   "Cochinchina"
+  ],
+  [
+   2965979,
+   "Circassia"
+  ],
+  [
+   2906074,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2914608,
+   "Rozvi"
+  ],
+  [
+   2860763,
+   "Sultanate of Maguindanao"
+  ],
+  [
+   2851961,
+   "Kingdom of Kartli-Kakheti",
+   {
+    "adopts": [
+     "Kingdom of Georgia"
+    ]
+   }
+  ],
+  [
+   2869648,
+   "Imamate of Futa Toro"
+  ],
+  [
+   2848055,
+   "Colony of Berbice",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "A Dutch colony, held by Britain from 1796 to 1802."
+    }
+   }
+  ],
+  [
+   2857300,
+   "Bahawalpur State"
+  ],
+  [
+   2830922,
+   "Colony of Nova Scotia",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2832287,
+   "Cisalpine Republic"
+  ],
+  [
+   2852249,
+   "Helvetic Republic"
+  ],
+  [
+   2863642,
+   "Kingdom of Rwanda"
+  ],
+  [
+   2962010,
+   "Portuguese Cape Verde",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2830728,
+   "J'rai"
+  ],
+  [
+   2864416,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2750678,
+   "Papal States"
+  ],
+  [
+   2810045,
+   "Batavian Republic"
+  ],
+  [
+   2750114,
+   "Kingdom of Sicily"
+  ],
+  [
+   2863640,
+   "Kingdom of Burundi"
+  ],
+  [
+   2961021,
+   "Kingdom of Sardinia"
+  ],
+  [
+   2923682,
+   "Manipur State"
+  ],
+  [
+   2832269,
+   "Grand Duchy of Tuscany"
+  ],
+  [
+   2879271,
+   "Kingdom of Jolof"
+  ],
+  [
+   2914815,
+   "Kingdom of Dahomey"
+  ],
+  [
+   2848468,
+   "British Bencoolen",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2879806,
+   "Bundu"
+  ],
+  [
+   2879270,
+   "Kingdom of Saloum"
+  ],
+  [
+   2856878,
+   "Shilluk Kingdom"
+  ],
+  [
+   2840195,
+   "Hawaiian Kingdom",
+   {
+    "adopts": [
+     "Kingdom of Hawaï'i"
+    ]
+   }
+  ],
+  [
+   2848063,
+   "Colony of Demerara",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "A Dutch colony, held by Britain from 1796 to 1802."
+    }
+   }
+  ],
+  [
+   2879282,
+   "Kingdom of Cayor"
+  ],
+  [
+   2832950,
+   "Colony of the Bahamas",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2745639,
+   "Principality of Thuận Thành"
+  ],
+  [
+   2879807,
+   "Kingdom of Niani"
+  ],
+  [
+   2831981,
+   "Colony of Jamaica",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2830912,
+   "Colony of Cape Breton",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2848070,
+   "Colony of Essequibo",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "A Dutch colony, held by Britain from 1796 to 1802."
+    }
+   }
+  ],
+  [
+   2921516,
+   "Sultanate of Lahej"
+  ],
+  [
+   2879278,
+   "Kingdom of Baol"
+  ],
+  [
+   2748794,
+   "British Settlements on the Bay of Honduras",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2800011,
+   "Duchy of Parma and Piacenza"
+  ],
+  [
+   2914604,
+   "Kingdom of Kakongo"
+  ],
+  [
+   2828430,
+   "Danish Gold Coast",
+   {
+    "props": {
+     "s": "Denmark–Norway"
+    }
+   }
+  ],
+  [
+   2830904,
+   "Prince Edward Island Colony",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2879269,
+   "Kingdom of Waalo"
+  ],
+  [
+   2879810,
+   "Kingdom of Wuli"
+  ],
+  [
+   2750805,
+   "Ligurian Republic"
+  ],
+  [
+   2834830,
+   "Colony of Trinidad",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2857706,
+   "Prince-Bishopric of Montenegro"
+  ],
+  [
+   2860392,
+   "Spanish Guinea",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2922243,
+   "Kingdom of Coorg"
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2914603,
+   "Kingdom of Ngoyo"
+  ],
+  [
+   2865903,
+   "La Réunion",
+   {
+    "props": {
+     "s": "French Republic"
+    }
+   }
+  ],
+  [
+   2827695,
+   "Septinsular Republic"
+  ],
+  [
+   2959473,
+   "Captaincy General of the Azores",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine"
+  ],
+  [
+   2860735,
+   "Confederate States of Lanao"
+  ],
+  [
+   2831876,
+   "Isle de France",
+   {
+    "props": {
+     "s": "French Republic"
+    }
+   }
+  ],
+  [
+   2890079,
+   "Ryukyu Kingdom"
+  ],
+  [
+   2921509,
+   "Haushabi Sultanate"
+  ],
+  [
+   2861179,
+   "Colony of Guadeloupe",
+   {
+    "props": {
+     "s": "French Republic"
+    }
+   }
+  ],
+  [
+   2831730,
+   "Walvis Bay Colony",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2923778,
+   "Kahlur State"
+  ],
+  [
+   2860166,
+   "Republic of Lucca"
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2834763,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2830352,
+   "Republic of Ragusa"
+  ],
+  [
+   2834744,
+   "Colony of Dominica",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2865813,
+   "Sultanate of Ndzuwani"
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2834805,
+   "Colony of Saint Lucia",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2961641,
+   "French India",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain",
+     "w": "French trading towns, held by Britain from 1793 to 1816, apart from 1802–03."
+    }
+   }
+  ],
+  [
+   2961064,
+   "Principality of Piombino"
+  ],
+  [
+   2739874,
+   "Andorra"
+  ],
+  [
+   2865810,
+   "Sultanate of Maore"
+  ],
+  [
+   2832946,
+   "Colony of Barbados",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2959468,
+   "Madeira",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2959470,
+   "Madeira",
+   {
+    "props": {
+     "s": "Kingdom of Portugal"
+    }
+   }
+  ],
+  [
+   2696415,
+   "Danish West Indies",
+   {
+    "props": {
+     "s": "Denmark–Norway"
+    }
+   }
+  ],
+  [
+   2834756,
+   "Colony of Grenada",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2834820,
+   "Colony of St Vincent and the Grenadines",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2801184,
+   "British Protectorate of Malta",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2834833,
+   "Colony of Tobago",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2848196,
+   "Saint Helena Colony",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "Kingdom of Great Britain"
+    }
+   }
+  ],
+  [
+   2853735,
+   "San Marino"
+  ],
+  [
+   2874736,
+   "Sultanate of the Maldive Islands"
+  ]
+ ],
+ "1815": [
+  [
+   2746527,
+   "Russian Empire"
+  ],
+  [
+   2889977,
+   "Qing Empire",
+   {
+    "adopts": [
+     "Qing Dynasty"
+    ]
+   }
+  ],
+  [
+   2963149,
+   "United Kingdom of Portugal, Brazil and the Algarves"
+  ],
+  [
+   2845863,
+   "Viceroyalty of New Spain",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Spain's claim reached far north of the land it held; much of it was held by Indigenous nations such as the Comanche."
+    }
+   }
+  ],
+  [
+   2800401,
+   "United States of America"
+  ],
+  [
+   2861322,
+   "Rupert's Land",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "The Hudson's Bay Company's charter territory, around its trading posts; First Nations held most of the land."
+    }
+   }
+  ],
+  [
+   2846197,
+   "Colony of New South Wales",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Britain's claim to eastern Australia. Its settlements were around Sydney; Aboriginal nations held most of the land."
+    }
+   }
+  ],
+  [
+   2848682,
+   "United Provinces of the Río de la Plata"
+  ],
+  [
+   2850563,
+   "Viceroyalty of Peru",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Spain's viceroyalty, drawn with Chile, which royalists retook in 1814. Spain's claim to Patagonia was not held: Mapuche and Tehuelche nations ruled the south."
+    }
+   }
+  ],
+  [
+   2848719,
+   "State of Grão-Pará and Rio Negro",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2849532,
+   "Kazakh Khanate"
+  ],
+  [
+   2870400,
+   "Denmark"
+  ],
+  [
+   2848983,
+   "Viceroyalty of New Granada",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2694888,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2851143,
+   "Russian America",
+   {
+    "props": {
+     "s": "Russian Empire"
+    }
+   }
+  ],
+  [
+   2848335,
+   "Company Raj",
+   {
+    "props": {
+     "w": "The East India Company's land, shown with Hyderabad, Mysore, Travancore, Baroda and other states under its protection that kept their own rulers."
+    },
+    "adopts": [
+     "British Empire"
+    ]
+   }
+  ],
+  [
+   2831217,
+   "Columbia District",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "The North West Company's fur-trade country on the Columbia River. Britain and the United States both claimed it (from 1818 they shared it); First Nations held the land."
+    }
+   }
+  ],
+  [
+   2842583,
+   "Captaincy General of Venezuela",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2834879,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2830999,
+   "Province of Lower Canada",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848691,
+   "Paraguay"
+  ],
+  [
+   2860700,
+   "Federal League"
+  ],
+  [
+   2691739,
+   "Cape Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2692912,
+   "Comancheria"
+  ],
+  [
+   2861415,
+   "Regency of Algiers"
+  ],
+  [
+   2869649,
+   "Sokoto Caliphate"
+  ],
+  [
+   2963549,
+   "Morocco"
+  ],
+  [
+   2889893,
+   "Tokugawa Shogunate"
+  ],
+  [
+   2871332,
+   "Sultanate of Banjar"
+  ],
+  [
+   2847600,
+   "Rajputana",
+   {
+    "adopts": [
+     "Mughal Empire"
+    ]
+   }
+  ],
+  [
+   2962057,
+   "Portuguese Angola",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2831002,
+   "Province of Upper Canada",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2748645,
+   "Đại Việt",
+   {
+    "adopts": [
+     "Nguyễn dynasty"
+    ]
+   }
+  ],
+  [
+   2694593,
+   "Kingdom of Prussia"
+  ],
+  [
+   2831213,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "The North West Company's fur-trade district west of the Rockies, around its posts; First Nations held the land."
+    }
+   }
+  ],
+  [
+   2851361,
+   "Emirate of Bukhara"
+  ],
+  [
+   2828531,
+   "Red River Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland",
+     "w": "Lord Selkirk's settlement, on land the Hudson's Bay Company granted him in 1811."
+    }
+   }
+  ],
+  [
+   2860776,
+   "Captaincy General of the Philippines",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2694486,
+   "Joseon"
+  ],
+  [
+   2922445,
+   "Khanate of Kalat"
+  ],
+  [
+   2953509,
+   "Shoshone"
+  ],
+  [
+   2851349,
+   "Khanate of Khiva"
+  ],
+  [
+   2851355,
+   "Khanate of Kokand"
+  ],
+  [
+   2806842,
+   "Suriname",
+   {
+    "props": {
+     "s": "United Kingdom of the Netherlands",
+     "w": "Returned to the Netherlands by the Convention of London (1814); Britain, which had held it since 1804, handed it back in 1816."
+    }
+   }
+  ],
+  [
+   2922476,
+   "Sindh"
+  ],
+  [
+   2961073,
+   "Sultanate of Brunei"
+  ],
+  [
+   2923110,
+   "Majeerteen Sultanate"
+  ],
+  [
+   2861327,
+   "Newfoundland Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2920986,
+   "Omani Empire",
+   {
+    "adopts": [
+     "Sultanate of Oman"
+    ]
+   }
+  ],
+  [
+   2830930,
+   "Colony of New Brunswick",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2962053,
+   "Kingdom of Kongo"
+  ],
+  [
+   2861194,
+   "Colony of French Guiana",
+   {
+    "props": {
+     "s": "Kingdom of France"
+    }
+   }
+  ],
+  [
+   2920979,
+   "Sultanate of Qishn and Socotra"
+  ],
+  [
+   2860769,
+   "Sultanate of Sulu"
+  ],
+  [
+   2848313,
+   "British Ceylon",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848332,
+   "Awadh"
+  ],
+  [
+   2906074,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2914608,
+   "Rozvi"
+  ],
+  [
+   2860763,
+   "Sultanate of Maguindanao"
+  ],
+  [
+   2869648,
+   "Imamate of Futa Toro"
+  ],
+  [
+   2848053,
+   "Colony of Berbice",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2857300,
+   "Bahawalpur State"
+  ],
+  [
+   2830922,
+   "Colony of Nova Scotia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2745246,
+   "Hanover"
+  ],
+  [
+   2863642,
+   "Kingdom of Rwanda"
+  ],
+  [
+   2841726,
+   "Kingdom of Haiti"
+  ],
+  [
+   2962010,
+   "Portuguese Cape Verde",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2830728,
+   "J'rai"
+  ],
+  [
+   2864416,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2863640,
+   "Kingdom of Burundi"
+  ],
+  [
+   2848059,
+   "Colony of Demerara-Essequibo",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2923682,
+   "Manipur State"
+  ],
+  [
+   2879271,
+   "Kingdom of Jolof"
+  ],
+  [
+   2914815,
+   "Kingdom of Dahomey"
+  ],
+  [
+   2692832,
+   "Louisiana Neutral Ground"
+  ],
+  [
+   2848468,
+   "British Bencoolen",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2661271,
+   "Württemberg",
+   {
+    "adopts": [
+     "Kingdom of Württemberg"
+    ]
+   }
+  ],
+  [
+   2879806,
+   "Bundu"
+  ],
+  [
+   2879270,
+   "Kingdom of Saloum"
+  ],
+  [
+   2856878,
+   "Shilluk Kingdom"
+  ],
+  [
+   2840195,
+   "Hawaiian Kingdom",
+   {
+    "adopts": [
+     "Kingdom of Hawaï'i"
+    ]
+   }
+  ],
+  [
+   2744913,
+   "Baden",
+   {
+    "adopts": [
+     "Grand Duchy of Baden"
+    ]
+   }
+  ],
+  [
+   2879282,
+   "Kingdom of Cayor"
+  ],
+  [
+   2830658,
+   "Grand Duchy of Mecklenburg-Schwerin",
+   {
+    "adopts": [
+     "Duchy of Mecklenburg"
+    ]
+   }
+  ],
+  [
+   2832950,
+   "Colony of the Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2745639,
+   "Principality of Thuận Thành"
+  ],
+  [
+   2879807,
+   "Kingdom of Niani"
+  ],
+  [
+   2841724,
+   "Republic of Haiti"
+  ],
+  [
+   2831981,
+   "Colony of Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2830912,
+   "Colony of Cape Breton",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2745247,
+   "Electorate of Hesse"
+  ],
+  [
+   2661272,
+   "Grand Duchy of Hesse"
+  ],
+  [
+   2921516,
+   "Sultanate of Lahej"
+  ],
+  [
+   2879278,
+   "Kingdom of Baol"
+  ],
+  [
+   2748794,
+   "British Settlements on the Bay of Honduras",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2914604,
+   "Kingdom of Kakongo"
+  ],
+  [
+   2828430,
+   "Danish Gold Coast",
+   {
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2697612,
+   "Oldenburg"
+  ],
+  [
+   2830904,
+   "Prince Edward Island Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879269,
+   "Kingdom of Waalo"
+  ],
+  [
+   2879810,
+   "Kingdom of Wuli"
+  ],
+  [
+   2834830,
+   "Colony of Trinidad",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690443,
+   "Nassau"
+  ],
+  [
+   2860392,
+   "Spanish Guinea",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2922243,
+   "Kingdom of Coorg"
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2691497,
+   "Brunswick"
+  ],
+  [
+   2914603,
+   "Kingdom of Ngoyo"
+  ],
+  [
+   2694810,
+   "Grand Duchy of Mecklenburg-Strelitz"
+  ],
+  [
+   2865902,
+   "Isle Bourbon",
+   {
+    "props": {
+     "s": "Kingdom of France"
+    }
+   }
+  ],
+  [
+   2827696,
+   "United States of the Ionian Islands",
+   {
+    "adopts": [
+     "Septinsular Republic"
+    ]
+   }
+  ],
+  [
+   2959473,
+   "Captaincy General of the Azores",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2831875,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine"
+  ],
+  [
+   2860735,
+   "Confederate States of Lanao"
+  ],
+  [
+   2890079,
+   "Ryukyu Kingdom"
+  ],
+  [
+   2921509,
+   "Haushabi Sultanate"
+  ],
+  [
+   2831730,
+   "Walvis Bay Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2806794,
+   "Principality of Lippe"
+  ],
+  [
+   2806795,
+   "Waldeck"
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2831863,
+   "Principality of Schwarzburg-Rudolstadt"
+  ],
+  [
+   2834763,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694607,
+   "Hohenzollern-Sigmaringen"
+  ],
+  [
+   2830677,
+   "Principality of Schwarzburg-Sondershausen"
+  ],
+  [
+   2809697,
+   "Duchy of Anhalt-Dessau"
+  ],
+  [
+   2808603,
+   "Duchy of Anhalt-Bernburg"
+  ],
+  [
+   2834744,
+   "Colony of Dominica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808604,
+   "Duchy of Anhalt-Köthen"
+  ],
+  [
+   2865813,
+   "Sultanate of Ndzuwani"
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834804,
+   "Colony of Saint Lucia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2961641,
+   "French India",
+   {
+    "props": {
+     "s": "Kingdom of France",
+     "w": "Returned to France by the 1814 Treaty of Paris; Britain handed the towns back in 1816–17."
+    }
+   }
+  ],
+  [
+   2865810,
+   "Sultanate of Maore"
+  ],
+  [
+   2856441,
+   "Free and Hanseatic City of Hamburg"
+  ],
+  [
+   2748578,
+   "Free and Hanseatic City of Lübeck"
+  ],
+  [
+   2832946,
+   "Colony of Barbados",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2959468,
+   "Madeira",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2959470,
+   "Madeira",
+   {
+    "props": {
+     "s": "United Kingdom of Portugal, Brazil and the Algarves"
+    }
+   }
+  ],
+  [
+   2690420,
+   "Schaumburg-Lippe"
+  ],
+  [
+   2696415,
+   "Danish West Indies",
+   {
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2831855,
+   "Principality of Reuss-Greiz"
+  ],
+  [
+   2834756,
+   "Colony of Grenada",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2834820,
+   "Colony of St Vincent and the Grenadines",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2691499,
+   "Bremen"
+  ],
+  [
+   2690441,
+   "Hesse-Homburg"
+  ],
+  [
+   2698293,
+   "Hohenzollern-Hechingen"
+  ],
+  [
+   2834833,
+   "Colony of Tobago",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "Kingdom of France"
+    }
+   }
+  ],
+  [
+   2690440,
+   "Frankfur"
+  ],
+  [
+   2848196,
+   "Saint Helena Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2690422,
+   "Pyrmont"
+  ],
+  [
+   2874736,
+   "Sultanate of the Maldive Islands"
+  ]
+ ],
+ "1878": [
+  [
+   2851154,
+   "Russian Empire"
+  ],
+  [
+   2961277,
+   "Qing Empire",
+   {
+    "adopts": [
+     "Qing Dynasty"
+    ]
+   }
+  ],
+  [
+   2874795,
+   "United States of America"
+  ],
+  [
+   2831033,
+   "Dominion of Canada",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860728,
+   "Empire of Brazil"
+  ],
+  [
+   2848219,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828316,
+   "Colony of Western Australia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828319,
+   "Colony of South Australia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2869935,
+   "Denmark"
+  ],
+  [
+   2863121,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Confederation"
+    ]
+   }
+  ],
+  [
+   2841217,
+   "Mexico"
+  ],
+  [
+   2864437,
+   "Dutch East Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2828313,
+   "Colony of Queensland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860946,
+   "Bolivia"
+  ],
+  [
+   2694889,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2848970,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2851021,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2842572,
+   "United States of Venezuela",
+   {
+    "adopts": [
+     "Venezuela"
+    ]
+   }
+  ],
+  [
+   2828323,
+   "Colony of New South Wales",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874875,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2822864,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Emirate of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2848856,
+   "Ecuador"
+  ],
+  [
+   2828440,
+   "Cape Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2958072,
+   "Turkmen Tribes"
+  ],
+  [
+   2863122,
+   "Paraguay"
+  ],
+  [
+   2869649,
+   "Sokoto Caliphate"
+  ],
+  [
+   2963549,
+   "Morocco"
+  ],
+  [
+   2961279,
+   "Empire of Japan"
+  ],
+  [
+   2949553,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2962057,
+   "Portuguese Angola",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2920532,
+   "Đại Nam",
+   {
+    "adopts": [
+     "Nguyễn dynasty"
+    ]
+   }
+  ],
+  [
+   2828466,
+   "Transvaal Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846163,
+   "Colony of New Zealand",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848486,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2841332,
+   "Captaincy General of the Philippines",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2796705,
+   "Colony of Victoria",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694486,
+   "Joseon"
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2828508,
+   "Crown Colony of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2923111,
+   "Sultanate of Hobyo"
+  ],
+  [
+   2691740,
+   "Orange Free State",
+   {
+    "adopts": [
+     "Free Orange State"
+    ]
+   }
+  ],
+  [
+   2845855,
+   "Spanish West Indies",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Cuba and Puerto Rico, Spain's last colonies in the Americas until 1898."
+    }
+   }
+  ],
+  [
+   2808172,
+   "Honduras"
+  ],
+  [
+   2923110,
+   "Majeerteen Sultanate"
+  ],
+  [
+   2905974,
+   "Sultanate of Muscat and Oman",
+   {
+    "adopts": [
+     "Sultanate of Oman"
+    ]
+   }
+  ],
+  [
+   2918031,
+   "Sultanate of Dar al Kuti"
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2871202,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2807642,
+   "Guatemala"
+  ],
+  [
+   2961078,
+   "Raj of Sarawak",
+   {
+    "adopts": [
+     "Kingdom of Sarawak"
+    ]
+   }
+  ],
+  [
+   2861194,
+   "Colony of French Guiana",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2920979,
+   "Sultanate of Qishn and Socotra"
+  ],
+  [
+   2828775,
+   "Colony of Sierra Leone",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848104,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828331,
+   "Colony of Tasmania",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848313,
+   "British Ceylon",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2860763,
+   "Sultanate of Maguindanao",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2920528,
+   "Colony of Cochinchina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2841713,
+   "Dominican Republic"
+  ],
+  [
+   2691742,
+   "Colony of Natal",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    },
+    "adopts": [
+     "Natalia Republic"
+    ]
+   }
+  ],
+  [
+   2857300,
+   "Bahawalpur State"
+  ],
+  [
+   2961070,
+   "Sultanate of Brunei"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2863642,
+   "Kingdom of Rwanda"
+  ],
+  [
+   2962010,
+   "Portuguese Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2830728,
+   "J'rai"
+  ],
+  [
+   2841719,
+   "Republic of Haiti",
+   {
+    "adopts": [
+     "Empire of Haiti"
+    ]
+   }
+  ],
+  [
+   2808118,
+   "Mosquito Reserve"
+  ],
+  [
+   2863640,
+   "Kingdom of Burundi"
+  ],
+  [
+   2923682,
+   "Manipur State"
+  ],
+  [
+   2807603,
+   "British Honduras Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808164,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2879271,
+   "Kingdom of Jolof"
+  ],
+  [
+   2914815,
+   "Kingdom of Dahomey"
+  ],
+  [
+   2848462,
+   "Perak Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846243,
+   "British Western Pacific Territories",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879806,
+   "Bundu"
+  ],
+  [
+   2874842,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Colony of Fiji",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2841938,
+   "Chan Santa Cruz"
+  ],
+  [
+   2874796,
+   "Hawaiian Kingdom",
+   {
+    "adopts": [
+     "Kingdom of Hawaï'i"
+    ]
+   }
+  ],
+  [
+   2864415,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2879282,
+   "Kingdom of Cayor"
+  ],
+  [
+   2834851,
+   "Colony of the Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879807,
+   "Kingdom of Niani"
+  ],
+  [
+   2834850,
+   "Colony of Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia Colony and Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848463,
+   "Selangor Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej"
+  ],
+  [
+   2848461,
+   "Negri Sembilan Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860391,
+   "Spanish Guinea",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2914604,
+   "Kingdom of Kakongo"
+  ],
+  [
+   2879810,
+   "Kingdom of Wuli"
+  ],
+  [
+   2865994,
+   "Obock Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2834830,
+   "Colony of Trinidad",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848280,
+   "Colony of the Straits Settlement",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2914603,
+   "Kingdom of Ngoyo"
+  ],
+  [
+   2831533,
+   "Sultanate of Zanzibar"
+  ],
+  [
+   2860768,
+   "Sultanate of Sulu"
+  ],
+  [
+   2865901,
+   "La Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831875,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine"
+  ],
+  [
+   2860735,
+   "Confederate States of Lanao"
+  ],
+  [
+   2921509,
+   "Haushabi Sultanate"
+  ],
+  [
+   2832948,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Colony of Guadeloupe",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2805384,
+   "Morocco"
+  ],
+  [
+   2831730,
+   "Walvis Bay Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2876350,
+   "Tahiti Protectorate"
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "adopts": [
+     "House of Khalifa"
+    ]
+   }
+  ],
+  [
+   2921512,
+   "Alawi Sheikhdom"
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865806,
+   "Sultanate of Ndzuwani"
+  ],
+  [
+   2876348,
+   "Tahuatu Protectorate"
+  ],
+  [
+   2846201,
+   "Kingdom of Tonga"
+  ],
+  [
+   2865798,
+   "Mayotte",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2696415,
+   "Danish West Indies",
+   {
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2865801,
+   "French Nosy Be",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865799,
+   "Nosy Boraha",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865808,
+   "Sultanate of Mwali"
+  ],
+  [
+   2848195,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2693204,
+   "British Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874736,
+   "Sultanate of the Maldive Islands"
+  ]
+ ],
+ "1880": [
+  [
+   2851154,
+   "Russian Empire"
+  ],
+  [
+   2961277,
+   "Qing Empire",
+   {
+    "adopts": [
+     "Qing Dynasty"
+    ]
+   }
+  ],
+  [
+   2831052,
+   "Dominion of Canada",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874795,
+   "United States of America"
+  ],
+  [
+   2860728,
+   "Empire of Brazil"
+  ],
+  [
+   2923781,
+   "British Raj",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828316,
+   "Colony of Western Australia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828319,
+   "Colony of South Australia",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2869935,
+   "Denmark"
+  ],
+  [
+   2863121,
+   "Argentina",
+   {
+    "adopts": [
+     "Argentine Confederation"
+    ]
+   }
+  ],
+  [
+   2841217,
+   "Mexico"
+  ],
+  [
+   2864437,
+   "Dutch East Indies",
+   {
+    "props": {
+     "s": "Netherlands"
+    }
+   }
+  ],
+  [
+   2828313,
+   "Colony of Queensland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860946,
+   "Bolivia"
+  ],
+  [
+   2694889,
+   "Persia",
+   {
+    "adopts": [
+     "Qajar Dynasty"
+    ]
+   }
+  ],
+  [
+   2848970,
+   "Colombia",
+   {
+    "adopts": [
+     "Republic of Colombia"
+    ]
+   }
+  ],
+  [
+   2851021,
+   "Peru",
+   {
+    "adopts": [
+     "Republic of Peru"
+    ]
+   }
+  ],
+  [
+   2842572,
+   "United States of Venezuela",
+   {
+    "adopts": [
+     "Venezuela"
+    ]
+   }
+  ],
+  [
+   2846198,
+   "Colony of New South Wales",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874875,
+   "Rattanakosin Kingdom"
+  ],
+  [
+   2822864,
+   "Afghanistan",
+   {
+    "adopts": [
+     "Emirate of Afghanistan"
+    ]
+   }
+  ],
+  [
+   2848856,
+   "Ecuador"
+  ],
+  [
+   2828440,
+   "Cape Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2958072,
+   "Turkmen Tribes"
+  ],
+  [
+   2863122,
+   "Paraguay"
+  ],
+  [
+   2869649,
+   "Sokoto Caliphate"
+  ],
+  [
+   2963549,
+   "Morocco"
+  ],
+  [
+   2694481,
+   "Empire of Japan"
+  ],
+  [
+   2949553,
+   "Chile",
+   {
+    "adopts": [
+     "Republic of Chile"
+    ]
+   }
+  ],
+  [
+   2962057,
+   "Portuguese Angola",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2920532,
+   "Đại Nam",
+   {
+    "adopts": [
+     "Nguyễn dynasty"
+    ]
+   }
+  ],
+  [
+   2828466,
+   "Transvaal Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846163,
+   "Colony of New Zealand",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848486,
+   "Aden Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2841332,
+   "Captaincy General of the Philippines",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2796705,
+   "Colony of Victoria",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2694486,
+   "Joseon"
+  ],
+  [
+   2802055,
+   "Uruguay",
+   {
+    "adopts": [
+     "Oriental Republic of Uruguay"
+    ]
+   }
+  ],
+  [
+   2828508,
+   "Crown Colony of Newfoundland",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2893390,
+   "Nepal"
+  ],
+  [
+   2923111,
+   "Sultanate of Hobyo"
+  ],
+  [
+   2691740,
+   "Orange Free State",
+   {
+    "adopts": [
+     "Free Orange State"
+    ]
+   }
+  ],
+  [
+   2845855,
+   "Spanish West Indies",
+   {
+    "props": {
+     "s": "Spain",
+     "w": "Cuba and Puerto Rico, Spain's last colonies in the Americas until 1898."
+    }
+   }
+  ],
+  [
+   2808172,
+   "Honduras"
+  ],
+  [
+   2923110,
+   "Majeerteen Sultanate"
+  ],
+  [
+   2905974,
+   "Sultanate of Muscat and Oman",
+   {
+    "adopts": [
+     "Sultanate of Oman"
+    ]
+   }
+  ],
+  [
+   2918031,
+   "Sultanate of Dar al Kuti"
+  ],
+  [
+   2828769,
+   "Liberia",
+   {
+    "adopts": [
+     "Republic of Liberia"
+    ]
+   }
+  ],
+  [
+   2871202,
+   "Nicaragua",
+   {
+    "adopts": [
+     "Republic of Nicaragua"
+    ]
+   }
+  ],
+  [
+   2807642,
+   "Guatemala"
+  ],
+  [
+   2961078,
+   "Raj of Sarawak",
+   {
+    "adopts": [
+     "Kingdom of Sarawak"
+    ]
+   }
+  ],
+  [
+   2861194,
+   "Colony of French Guiana",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2920979,
+   "Sultanate of Qishn and Socotra"
+  ],
+  [
+   2828775,
+   "Colony of Sierra Leone",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848104,
+   "British Guiana",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846199,
+   "Colony of Tasmania",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848313,
+   "British Ceylon",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2828425,
+   "Gold Coast Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808163,
+   "Costa Rica",
+   {
+    "adopts": [
+     "Republic of Costa Rica"
+    ]
+   }
+  ],
+  [
+   2860763,
+   "Sultanate of Maguindanao",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2920528,
+   "Colony of Cochinchina",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2841713,
+   "Dominican Republic"
+  ],
+  [
+   2691742,
+   "Colony of Natal",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    },
+    "adopts": [
+     "Natalia Republic"
+    ]
+   }
+  ],
+  [
+   2961070,
+   "Sultanate of Brunei"
+  ],
+  [
+   2906073,
+   "Bhutan",
+   {
+    "adopts": [
+     "Kingdom of Bhutan"
+    ]
+   }
+  ],
+  [
+   2863642,
+   "Kingdom of Rwanda"
+  ],
+  [
+   2830728,
+   "J'rai"
+  ],
+  [
+   2803504,
+   "Portuguese Guinea",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2841719,
+   "Republic of Haiti",
+   {
+    "adopts": [
+     "Empire of Haiti"
+    ]
+   }
+  ],
+  [
+   2808118,
+   "Mosquito Reserve"
+  ],
+  [
+   2863640,
+   "Kingdom of Burundi"
+  ],
+  [
+   2923682,
+   "Manipur State"
+  ],
+  [
+   2807603,
+   "British Honduras Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2808164,
+   "El Salvador",
+   {
+    "adopts": [
+     "Republic of El Salvador"
+    ]
+   }
+  ],
+  [
+   2879271,
+   "Kingdom of Jolof"
+  ],
+  [
+   2914815,
+   "Kingdom of Dahomey"
+  ],
+  [
+   2848462,
+   "Perak Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2846243,
+   "British Western Pacific Territories",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879806,
+   "Bundu"
+  ],
+  [
+   2874842,
+   "New Caledonia",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2846213,
+   "Colony of Fiji",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2841938,
+   "Chan Santa Cruz"
+  ],
+  [
+   2874796,
+   "Hawaiian Kingdom",
+   {
+    "adopts": [
+     "Kingdom of Hawaï'i"
+    ]
+   }
+  ],
+  [
+   2864415,
+   "Portuguese Timor",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2879282,
+   "Kingdom of Cayor"
+  ],
+  [
+   2834851,
+   "Colony of the Bahamas",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879807,
+   "Kingdom of Niani"
+  ],
+  [
+   2834850,
+   "Colony of Jamaica",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2803502,
+   "Gambia Colony and Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848463,
+   "Selangor Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2921515,
+   "Sultanate of Lahej"
+  ],
+  [
+   2848461,
+   "Negri Sembilan Protectorate",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2860391,
+   "Spanish Guinea",
+   {
+    "props": {
+     "s": "Spain"
+    }
+   }
+  ],
+  [
+   2914604,
+   "Kingdom of Kakongo"
+  ],
+  [
+   2879810,
+   "Kingdom of Wuli"
+  ],
+  [
+   2865994,
+   "Obock Colony",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2834830,
+   "Colony of Trinidad",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2965458,
+   "Portuguese India",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2962009,
+   "Portuguese Cape Verde",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2848280,
+   "Colony of the Straits Settlement",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2914603,
+   "Kingdom of Ngoyo"
+  ],
+  [
+   2831533,
+   "Sultanate of Zanzibar"
+  ],
+  [
+   2860768,
+   "Sultanate of Sulu"
+  ],
+  [
+   2865901,
+   "La Réunion",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831875,
+   "British Mauritius",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2879275,
+   "Kingdom of Sine"
+  ],
+  [
+   2860735,
+   "Confederate States of Lanao"
+  ],
+  [
+   2921509,
+   "Haushabi Sultanate"
+  ],
+  [
+   2832948,
+   "British Windward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2832972,
+   "British Leeward Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2861172,
+   "Colony of Guadeloupe",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2805384,
+   "Morocco"
+  ],
+  [
+   2831730,
+   "Walvis Bay Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2876349,
+   "Tahiti Colony"
+  ],
+  [
+   2962074,
+   "Portuguese São Tomé and Príncipe",
+   {
+    "props": {
+     "s": "Portugal"
+    }
+   }
+  ],
+  [
+   2693293,
+   "Isle of Man",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2848318,
+   "Protectorate of Bahrain",
+   {
+    "adopts": [
+     "House of Khalifa"
+    ]
+   }
+  ],
+  [
+   2921512,
+   "Alawi Sheikhdom"
+  ],
+  [
+   2961649,
+   "French Settlements in India",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865806,
+   "Sultanate of Ndzuwani"
+  ],
+  [
+   2876348,
+   "Tahuatu Protectorate"
+  ],
+  [
+   2846201,
+   "Kingdom of Tonga"
+  ],
+  [
+   2865798,
+   "Mayotte",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2696415,
+   "Danish West Indies",
+   {
+    "props": {
+     "s": "Denmark"
+    }
+   }
+  ],
+  [
+   2865801,
+   "French Nosy Be",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2831970,
+   "Cayman Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831312,
+   "Saint Pierre and Miquelon",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865799,
+   "Nosy Boraha",
+   {
+    "props": {
+     "s": "France"
+    }
+   }
+  ],
+  [
+   2865808,
+   "Sultanate of Mwali"
+  ],
+  [
+   2848195,
+   "Saint Helena Crown Colony",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2693204,
+   "British Hong Kong",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2831964,
+   "Colony of Bermuda",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
+  ],
+  [
+   2874736,
+   "Sultanate of the Maldive Islands"
+  ]
+ ],
+ "_readme": "OpenHistoricalMap countries laid over the Cliopatria base on the maps from 1800 to 1880, by map: [relation id, our name, options], largest first (where two overlap, the later one wins). Options: props (ruler s, note w) for the shape, partsIn (only the relation's parts whose middle lies in these lon/lat boxes), adopts (Cliopatria polities that are the same country: they take this name). Generated from OHM and checked against Cliopatria and HistoGIS; relations left out are listed in `left out` (every map) and `left out by map`.",
+ "left out": {
+  "2696467": "Holy Roman Empire: one shape over its member states, which would hide the Habsburg lands; Cliopatria draws the members",
+  "2698118": "Ottoman Empire (1878-80): as above",
+  "2698260": "Mozambique, 1752-1836: drawn at the borders agreed in 1891, while Portugal held the coast and the Zambezi valley; Cliopatria's outline is used",
+  "2698261": "Mozambique, 1836-1891: as above",
+  "2746402": "Austria-Hungary (1878-80): HistoGIS draws it",
+  "2746683": "Ottoman Empire (1815): as above",
+  "2746685": "Ottoman Empire: includes Egypt and Libya, which ran their own affairs; Cliopatria and HistoGIS draw it instead",
+  "2748545": "Luxembourg (1878-80): HistoGIS draws it",
+  "2798802": "Switzerland (1878-80): HistoGIS draws it",
+  "2801185": "Malta: HistoGIS draws it",
+  "2828299": "Jersey: too small to show",
+  "2831205": "British Arctic Territories before 1880: a claim over Inuit land, not yet British",
+  "2831207": "North-West Territories before 1870: a later British territory drawn over Indigenous land",
+  "2839982": "Bateke Protectorate: drawn at the later extent of the French Congo",
+  "2856857": "German Reich (1878-80): HistoGIS draws it",
+  "2860736": "Spanish Philippines: duplicates the Captaincy General of the Philippines",
+  "2861459": "Upper River (Haut-Fleuve): drawn at the later extent of French Sudan, not the posts France held",
+  "2865803": "Kingdom of Imerina, 1750-1885: one outline over all of Madagascar, while the kingdom grew from the central highlands; Cliopatria's outlines are used",
+  "2883430": "Netherlands (1878-80): HistoGIS draws it",
+  "2918515": "French Tourane: promised to France in 1787 but never handed over; a French concession only from 1888",
+  "2923744": "Mughal Empire in 1800: drawn at its nominal extent over most of India; the emperor held only the country around Delhi",
+  "2923782": "Bahawalpur State: duplicate"
+ },
+ "left out by map": {
+  "1800": {
+   "2801004": "British Ceylon, 1796-1802: drawn over the whole island but a small hole at Kandy, while the Kingdom of Kandy held the hill country until 1815; Cliopatria's coast and kingdom are used",
+   "2801147": "Dutch East Indies, 1800-1810: drawn over all of today's Indonesia and western New Guinea, while the Dutch held Java and scattered posts and Britain held Ambon, Banda and Padang; Cliopatria's outline of the posts is used",
+   "2847598": "Awadh, 1722-1801: one outline for eighty years, which in 1800 runs over Benares (British from 1775), the upper Doab (Scindia's) and Bundelkhand; Cliopatria's outline for 1800 is used",
+   "2948781": "Sultanate of Tidore, 1797-1806: a gap in its border (two lines across south Halmahera); its outline from 1806 on (2948780), the same but for that line, is used"
+  },
+  "1815": {
+   "2828775": "Colony of Sierra Leone, 1808-1896: drawn at the borders of the 1896 protectorate, while the colony was the Freetown peninsula; Cliopatria's outline is used",
+   "2848265": "Dutch East Indies, 1815-1824: drawn over all of today's Indonesia, while Britain still held the Dutch posts (Java until August 1816, the Moluccas until 1817); Cliopatria's outlines of them are drawn as British",
+   "2965452": "Maratha Confederacy, 1788-1818: one outline, traced from a map of 1792, so it still holds Delhi, the Doab, Cuttack and Gujarat, taken by the British in 1803-05; Cliopatria's outline for 1815 is used"
+  },
+  "1878": {
+   "2828665": "Lagos Colony, 1862-1906: drawn far inland over the Yoruba states, which were independent until the 1890s; Cliopatria's outline is used"
+  },
+  "1880": {
+   "2828665": "Lagos Colony: as for 1878"
+  }
+ }
+}
