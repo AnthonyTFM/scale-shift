@@ -87,6 +87,9 @@ export function rng(seed: string) {
 
 // ---------- question building ----------
 
+/** A region of another country (a Canadian province, a Chinese province...), as opposed to a US state. */
+export const isRegion = (e: Pick<PoolEntry, "era">) => e.era.startsWith("adm1-");
+
 export const ratio = (x: PoolEntry, y: PoolEntry) => Math.max(x.a, y.a) / Math.min(x.a, y.a);
 
 /** Rules each question type must meet: [first pick, second pick, does the pair qualify?] */
@@ -119,11 +122,16 @@ export function buildQuestions(allShapes: PoolEntry[], seed: string): Question[]
   const r = rng(`atlas-daily:${seed}`);
   const used = new Set<string>();
   const out: Question[] = [];
+  // once regions of other countries are in the pool (from Oct 29), the "state" round is a US state half the time and a
+  // region the other half, so familiar US states don't vanish under 136 regions. Before that the pool has no regions and
+  // this draws nothing from the random numbers, so every earlier day keeps its questions.
+  const hasRegions = pool.some(isRegion);
   for (const kind of SLOTS) {
     const [firstOk, secondOk, pairOk] = RULES[kind];
+    const half = kind === "state" && hasRegions ? (r() < 0.5 ? (e: PoolEntry) => !isRegion(e) : isRegion) : () => true;
     for (let attempt = 0; attempt < 60; attempt++) {
       const first = pick(
-        pool.filter((e) => firstOk(e) && !used.has(e.id)),
+        pool.filter((e) => firstOk(e) && half(e) && !used.has(e.id)),
         r,
       );
       if (!first) break;
@@ -158,7 +166,8 @@ export const stretch = (e: PoolEntry) => e.m / e.a;
 // historical places named like countries or regions, which read without "the"
 const NO_ARTICLE =
   /^(Alexander|Austria-Hungary|British North America|Kievan Rus)|^(Assyria|Babylonia|Bactria|Magadha|Qajar Persia|Ptolemaic Egypt|Rhodesia|Denmark-Norway|Sweden–Norway|French (West|Equatorial) Africa|French Indochina|German (Kamerun|South-West Africa)|Rupert's Land)(?=$| \()/;
-const NEEDS_ARTICLE = /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon)/;
+const NEEDS_ARTICLE =
+  /^(United |Central African|Dominican|Czech Republic|Philippines|Netherlands|Republic of|Democratic|Gambia|Bahamas|Solomon|Northern Territory|Northwest Territories|Federal District|State of Mexico)/;
 
 /** Name as it reads mid-sentence: "the Roman Empire", "the United States", "the contiguous United States", "Brazil". */
 export function nameInSentence(e: Pick<PoolEntry, "n" | "kind">) {

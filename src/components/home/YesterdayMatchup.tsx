@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import dataVersion from "@/data/data-version.json";
+import { POOL_V as V } from "@/lib/pool-version";
 import { home } from "@/content/home";
 import { mainPart, withMapDrawing, type Outline, type ShapeFile } from "@/lib/outline";
 import {
@@ -22,7 +22,6 @@ import {
 /** Yesterday's pick: the question as soon as the puzzle list is in, the drawings once both shape files are. */
 type Pick = { date: string; day: number; q: Question; shapes?: [ShapeFile, ShapeFile] };
 
-const V = `?v=${dataVersion.v}`;
 // the daily game's shape colours (fills only, never text)
 const COLORS = ["#FF5B4A", "#2F6BFF"];
 const W = 200;
