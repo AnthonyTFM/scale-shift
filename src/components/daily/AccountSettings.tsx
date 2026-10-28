@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isOffensive } from "@/lib/name-filter";
 import { signInOn } from "@/lib/sign-in";
 import { accountCopy } from "@/content/account";
@@ -8,7 +8,7 @@ import { account as L } from "@/content/legal";
 import { PersonIcon } from "@/components/site/Icons";
 import { useAccount } from "./SignInProvider";
 import { useAccountInfo } from "./useAccountInfo";
-import { SignInSheet } from "./JoinDialog";
+import { clearJoinFlow, SignInSheet } from "./JoinDialog";
 import { DeleteData } from "./AccountBar";
 
 const A = accountCopy.page;
@@ -17,11 +17,34 @@ const card = "rounded-[24px] border-2 border-line bg-white p-5 shadow-[0_6px_0_0
 /** The account page: sign in, or change your username and reminder emails, sign out and delete your data. */
 export function AccountSettings() {
   const { isLoaded, isSignedIn, openSignIn, opening, openFailed } = useAccount();
-  const { info, saveName, saveReminders } = useAccountInfo();
+  const { info, failed, refresh, saveName, saveReminders } = useAccountInfo();
   const [open, setOpen] = useState(false);
   const [deleted, setDeleted] = useState(false);
+  // between "Continue" and the sign-in window, and whether that window failed to open
+  const [awaiting, setAwaiting] = useState(false);
+  const [signInFailed, setSignInFailed] = useState(false);
+
+  // the sign-in window never opened (blocked or offline): bring the pop-up back with a retry
+  useEffect(() => {
+    if (!awaiting || !openFailed) return;
+    clearJoinFlow();
+    queueMicrotask(() => {
+      setAwaiting(false);
+      setSignInFailed(true);
+      setOpen(true);
+    });
+  }, [awaiting, openFailed]);
 
   if (!signInOn) return <p className="text-ink-soft">{A.signedOutLead}</p>;
+  if (isSignedIn && failed)
+    return (
+      <p role="alert" className={`${card} font-semibold text-danger`}>
+        {accountCopy.errors.load}{" "}
+        <button type="button" onClick={refresh} className="inline-flex min-h-11 items-center text-primary hover:underline">
+          {accountCopy.errors.retry}
+        </button>
+      </p>
+    );
   if (!isLoaded || (isSignedIn && info === undefined))
     return (
       <p role="status" className={`${card} text-muted`}>
@@ -45,22 +68,30 @@ export function AccountSettings() {
         <button
           type="button"
           aria-haspopup="dialog"
-          disabled={opening}
-          onClick={() => setOpen(true)}
+          disabled={awaiting && opening}
+          onClick={() => {
+            setSignInFailed(false);
+            setAwaiting(false);
+            setOpen(true);
+          }}
           className="btn btn-gold btn-lg mt-5 w-full sm:w-auto sm:px-8"
         >
-          {opening ? accountCopy.welcome.saving : A.signIn}
+          {awaiting && opening ? A.opening : A.signIn}
         </button>
         <SignInSheet
           open={open}
           title={A.signedOutTitle}
           lead={A.signedOutLead}
-          failed={!!openFailed}
+          failed={signInFailed}
           onClose={() => setOpen(false)}
           onContinue={() => {
+            setSignInFailed(false);
             // close first: the sign-in window can't take focus over a modal pop-up
             setOpen(false);
-            requestAnimationFrame(() => openSignIn("/account"));
+            requestAnimationFrame(() => {
+              openSignIn("/account");
+              setAwaiting(true);
+            });
           }}
         />
       </div>
@@ -77,27 +108,32 @@ export function AccountSettings() {
 
 function NameCard({ name, onSave }: { name: string | null; onSave: (name: string) => Promise<string> }) {
   const [value, setValue] = useState(name ?? "");
+  const [saved, setSaved] = useState(name);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);
-  const changed = value.trim() !== (name ?? "");
   return (
     <form
       className={card}
       onSubmit={async (e) => {
         e.preventDefault();
-        const v = value.trim();
-        if (v.length < 3) return setNote({ ok: false, text: "Use 3 to 16 characters." });
-        if (isOffensive(v)) return setNote({ ok: false, text: "Please pick a different username." });
+        const v = value.trim().replace(/\s+/g, " ");
+        if (v === saved) return setNote({ ok: true, text: A.nameSame });
+        if (v.length < 3) return setNote({ ok: false, text: accountCopy.errors.nameLength });
+        if (isOffensive(v)) return setNote({ ok: false, text: accountCopy.errors.nameOffensive });
         setBusy(true);
         const error = await onSave(v);
         setBusy(false);
+        if (!error) {
+          setSaved(v);
+          setValue(v);
+        }
         setNote(error ? { ok: false, text: error } : { ok: true, text: A.nameSaved });
       }}
     >
       <label htmlFor="account-name" className="font-display text-xl text-ink">
         {A.nameTitle}
       </label>
-      <p className="text-sm text-muted">{name ? A.nameLead : `${A.noName}. ${A.nameLead}`}</p>
+      <p className="text-sm text-muted">{saved ? A.nameLead : A.nameLeadNone}</p>
       <div className="mt-3 flex gap-2">
         <input
           id="account-name"
@@ -113,11 +149,11 @@ function NameCard({ name, onSave }: { name: string | null; onSave: (name: string
           aria-invalid={note && !note.ok ? true : undefined}
           className="h-12 min-w-0 flex-1 rounded-xl border-2 border-line bg-white px-3 text-lg text-ink focus:border-primary"
         />
-        <button type="submit" disabled={busy || !changed} className="btn btn-primary h-12 shrink-0 px-5">
+        <button type="submit" disabled={busy} className="btn btn-primary h-12 shrink-0 px-5">
           {busy ? accountCopy.welcome.saving : A.nameSave}
         </button>
       </div>
-      <p id="account-name-note" role="status" className={`mt-2 text-sm empty:hidden ${note?.ok ? "font-semibold text-ink" : "font-semibold text-danger"}`}>
+      <p id="account-name-note" role="status" className={`mt-2 min-h-5 text-sm ${note?.ok ? "font-semibold text-ink" : "font-semibold text-danger"}`}>
         {note?.text ?? ""}
       </p>
     </form>
@@ -146,7 +182,7 @@ function RemindCard({ on, onSave }: { on: boolean; onSave: (on: boolean) => Prom
         />
         <span>{A.remind}</span>
       </label>
-      <p role="status" className="text-sm text-muted empty:hidden">
+      <p role="status" className="min-h-5 text-sm text-muted">
         {note}
       </p>
     </div>

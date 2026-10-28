@@ -11,7 +11,7 @@ import { clearJoinFlow, SignInSheet, startJoinFlow, takeJoinFlow } from "./JoinD
 import { dailyCopy } from "@/content/daily";
 import { accountCopy } from "@/content/account";
 import { useAccountInfo } from "./useAccountInfo";
-import { WelcomeSheet, wasWelcomed } from "./WelcomeSheet";
+import { WelcomeSheet } from "./WelcomeSheet";
 import { FlameIcon, MarkIcon } from "@/components/site/Icons";
 
 const t = dailyCopy.save;
@@ -31,7 +31,8 @@ export function SaveStreak(props: Props) {
 
 function Save({ date, choices }: Props) {
   const { isLoaded, isSignedIn, openSignIn, opening, openFailed } = useAccount();
-  const { info, refresh, saveName, saveReminders } = useAccountInfo();
+  // loaded after each save (the player surely exists by then), not on sign-in as well, so two answers can't race
+  const { info, refresh, saveName, saveReminders, markWelcomed } = useAccountInfo({ auto: false });
   // the one-time welcome pop-up, for this player
   const [welcome, setWelcome] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -60,9 +61,13 @@ function Save({ date, choices }: Props) {
       if (data.player) rememberPlayer(data.player);
       setStatus("saved");
       if (!data.duplicate) track("streak_saved");
-      // now that the player surely exists: a first-timer with no username gets the welcome pop-up, once
+      // now that the player surely exists: a player with no username who hasn't been welcomed (on any device) gets the
+      // welcome pop-up, once; it's marked as seen as it opens, so a closed tab doesn't bring it back
       const me = await refresh();
-      if (me && !me.name && !wasWelcomed(me.id)) setWelcome(me.id);
+      if (me && !me.name && !me.welcomed) {
+        setWelcome(me.id);
+        markWelcomed();
+      }
     } catch {
       setError(t.failed);
       setStatus("error");

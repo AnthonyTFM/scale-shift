@@ -32,12 +32,15 @@ export const accountCopy = {
     signedOutLead:
       "Your daily streak and results follow you to any phone or computer, and you get a username for the Best streaks board. Daily scores stay private.",
     signIn: "Sign in",
+    opening: "Opening sign-in…",
+    signInFailed: "Sign-in didn't open. Check your connection (or an ad blocker) and try again.",
     nameTitle: "Username",
     nameLead: "What everyone sees on the Best streaks board.",
     namePlaceholder: "e.g. MapWizard",
     nameSave: "Save",
     nameSaved: "Saved. The board shows your new name.",
-    noName: "No username yet",
+    nameSame: "That's already your username.",
+    nameLeadNone: "You haven't picked one yet. It's what everyone sees on the Best streaks board.",
     emailsTitle: "Emails",
     remind: "Email me when a new daily challenge is up",
     remindOn: "Done. We'll email you when a new challenge is up.",
@@ -55,5 +58,9 @@ export const accountCopy = {
   errors: {
     network: "Couldn't reach the server. Please try again.",
     generic: "Couldn't save that. Please try again.",
+    nameLength: "Use 3 to 16 characters.",
+    nameOffensive: "Please pick a different username.",
+    load: "Couldn't load your account.",
+    retry: "Try again",
   },
 };

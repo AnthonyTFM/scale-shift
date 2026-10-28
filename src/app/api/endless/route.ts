@@ -89,10 +89,12 @@ export async function POST(request: Request) {
         if (!(await store.claimEmail(mail.key, player, mail.email))) return fail("That email is already signed up on another device or browser.", 422, "email");
       }
     }
-    if (!(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
+    // a name picked on the account page wins over one sent with a run (an older results card could send the old one)
+    const stored = await store.nameOf(player);
+    if (!stored && !(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
     // a brand-new player: the same cap on new players per network as the daily. A player with no nickname yet who saved
     // today's daily score was already counted for today by the daily.
-    if (!(await store.nameOf(player)) && !(await store.has(run.date, player))) {
+    if (!stored && !(await store.has(run.date, player))) {
       const n = await store.bumpNetwork(run.date, networkKey(ipOf(request), run.date));
       if (n > NEW_PLAYERS_PER_NETWORK) return fail("Too many new players from this network today. Try again tomorrow.", 429);
     }
@@ -101,7 +103,7 @@ export async function POST(request: Request) {
     const before = await store.endlessRun(body.seed as string, player, run.streak, run.over);
     if (before && (before.p !== player || run.streak < before.n || (before.over && run.streak !== before.n)))
       return fail("That run is already over. Start a new one.", 422);
-    await store.setName(player, name);
+    if (!stored) await store.setName(player, name);
     await store.endlessPost(run.date, player, run.streak, Date.now());
     const all = await endlessBoard(null, 0, player);
     return Response.json({
@@ -112,7 +114,7 @@ export async function POST(request: Request) {
       total: all.me ? all.total : all.total + 1,
       // a better run from before is the one on the board
       duplicate: (all.me?.score ?? run.streak) > run.streak,
-      player: { id: player, name },
+      player: { id: player, name: stored ?? name },
     } satisfies EndlessSubmitResult);
   } catch (e) {
     console.error("[endless] write failed", e);
