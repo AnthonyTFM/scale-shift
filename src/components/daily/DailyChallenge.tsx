@@ -33,6 +33,7 @@ import { challengeMessage } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { dailyCopy } from "@/content/daily";
 import { ClockIcon, FlameIcon, MapIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
+import { SkyHeader } from "@/components/site/SkyHeader";
 import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
@@ -462,27 +463,30 @@ function Results({
       aria-labelledby="daily-done"
       className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7"
     >
-      {/* the day and when the next five arrive, in one line */}
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">Daily #{dayNumber(round.date)}</p>
-        <Countdown />
-      </div>
-      {/* the score beside its title, then one tile per question */}
-      <div className="mt-2 flex items-center justify-center gap-4">
-        <p aria-hidden="true" className="pop-in font-display text-6xl leading-none text-ink sm:text-7xl">
-          {score}
-          <span className="text-primary">/</span>
-          {total}
-        </p>
-        <div className="min-w-0">
-          <h2 id="daily-done" className="font-display text-2xl leading-tight text-ink sm:text-3xl">
-            <span className="sr-only">{R.scoreSr(score, total)} </span>
-            {R.title(score, total)}
-          </h2>
-          <p className="text-sm leading-snug text-muted">{verdict}</p>
+      <SkyHeader>
+        {/* the day and when the next five arrive, in one line */}
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-white/90">Daily #{dayNumber(round.date)}</p>
+          <Countdown />
         </div>
-      </div>
-      <ol className="mt-4 flex justify-center gap-2 sm:gap-3">
+        {/* the score beside its title */}
+        <div className="mt-2 flex items-center justify-center gap-4">
+          <p aria-hidden="true" className="pop-in font-display text-6xl leading-none sm:text-7xl">
+            {score}
+            <span className="text-gold">/</span>
+            {total}
+          </p>
+          <div className="min-w-0">
+            <h2 id="daily-done" className="font-display text-2xl leading-tight sm:text-3xl">
+              <span className="sr-only">{R.scoreSr(score, total)} </span>
+              {R.title(score, total)}
+            </h2>
+            <p className="text-sm leading-snug text-white/85">{verdict}</p>
+          </div>
+        </div>
+      </SkyHeader>
+      {/* one tile per question, sitting on the horizon */}
+      <ol className="relative -mt-7 flex justify-center gap-2 sm:gap-3">
         {marks.map((right, i) => (
           <li
             key={i}
@@ -641,17 +645,17 @@ function Countdown() {
   if (left === null) return null;
   if (left === 0) {
     return (
-      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center text-xs font-semibold text-primary hover:underline">
+      <button type="button" onClick={() => location.reload()} className="inline-flex min-h-11 items-center text-xs font-semibold text-white hover:underline">
         {dailyCopy.nextReadyShort} <span aria-hidden="true">→</span>
       </button>
     );
   }
   const t = Math.floor(left / 1000);
   return (
-    <p className="inline-flex items-center gap-1 text-xs font-semibold text-muted">
+    <p className="inline-flex items-center gap-1 text-xs font-semibold text-white/85">
       <ClockIcon className="size-3.5" />
       {dailyCopy.nextIn}{" "}
-      <span className="tabular-nums text-ink" suppressHydrationWarning>
+      <span className="tabular-nums text-white" suppressHydrationWarning>
         {dailyCopy.nextTime(Math.floor(t / 3600), Math.floor((t % 3600) / 60))}
       </span>
     </p>
