@@ -94,6 +94,9 @@ interface Store {
   playerOfEmail(emailKey: string): Promise<string | null>;
   nameOf(id: string): Promise<string | null>;
   remindersOn(id: string): Promise<boolean>;
+  /** has this player seen the one-time welcome pop-up (username and reminders) on any device? */
+  welcomed(id: string): Promise<boolean>;
+  setWelcomed(id: string): Promise<void>;
   /** the player a signed-in account plays as */
   playerOfAccount(accountId: string): Promise<string | null>;
   /** tie a signed-in account to a player; returns the player it's tied to (the first one wins) */
@@ -220,6 +223,13 @@ function redisStore(url: string, token: string): Store {
       const [r] = await run([["HEXISTS", "lb2:reminders", id]]);
       return Number(r) === 1;
     },
+    async welcomed(id) {
+      const [r] = await run([["SISMEMBER", "lb2:welcomed", id]]);
+      return Number(r) === 1;
+    },
+    async setWelcomed(id) {
+      await run([["SADD", "lb2:welcomed", id]]);
+    },
     async playerOfAccount(accountId) {
       const [id] = await run([["HGET", "lb2:accounts", accountId]]);
       return typeof id === "string" ? id : null;
@@ -342,7 +352,7 @@ function redisStore(url: string, token: string): Store {
       const [seeds] = await run([["SMEMBERS", `lb2:endless:runs-of:${id}`]]);
       for (const seed of (seeds as string[]) ?? []) cmds.push(["DEL", `lb2:endless:run:${seed}`]);
       cmds.push(["ZREM", "lb2:endless:all", id], ["DEL", `lb2:endless:runs-of:${id}`]);
-      cmds.push(["ZREM", "lb2:points", id], ["HDEL", "lb2:days", id], ["HDEL", "lb2:names", id], ["HDEL", "lb2:emails", id], ["HDEL", "lb2:reminders", id]);
+      cmds.push(["ZREM", "lb2:points", id], ["HDEL", "lb2:days", id], ["HDEL", "lb2:names", id], ["HDEL", "lb2:emails", id], ["HDEL", "lb2:reminders", id], ["SREM", "lb2:welcomed", id]);
       for (const [k, v] of Object.entries(pairs(owners))) if (v === id) cmds.push(["HDEL", "lb2:owners", k]);
       for (const [k, v] of Object.entries(pairs(emailOwners))) if (v === id) cmds.push(["HDEL", "lb2:email-owners", k]);
       if (accountId) cmds.push(["HDEL", "lb2:accounts", accountId]);
@@ -360,6 +370,7 @@ type FileData = {
   emails?: Record<string, string>;
   emailOwners?: Record<string, string>;
   reminders?: Record<string, number>;
+  welcomed?: Record<string, true>;
   accounts?: Record<string, string>;
   /** endless mode: best scores (see endlessScore) per day and of all time, and what each run last posted */
   endless?: { days: Record<string, Record<string, number>>; all: Record<string, number>; runs: Record<string, EndlessRunRecord> };
@@ -441,6 +452,13 @@ function fileStore(file: string): Store {
     async remindersOn(id) {
       return !!(await read()).reminders?.[id];
     },
+    async welcomed(id) {
+      return !!(await read()).welcomed?.[id];
+    },
+    setWelcomed: (id) =>
+      write((d) => {
+        (d.welcomed ??= {})[id] = true;
+      }),
     linkAccount: (accountId, id) =>
       write((d) => {
         const accounts = (d.accounts ??= {});
@@ -524,6 +542,7 @@ function fileStore(file: string): Store {
         delete d.names[id];
         if (d.emails) delete d.emails[id];
         if (d.reminders) delete d.reminders[id];
+        if (d.welcomed) delete d.welcomed[id];
         for (const map of [d.owners, d.emailOwners]) for (const [k, v] of Object.entries(map ?? {})) if (v === id) delete map![k];
         if (accountId && d.accounts) delete d.accounts[accountId];
       }),

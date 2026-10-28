@@ -31,13 +31,8 @@ export const dailyCopy = {
     title: "Save your streak",
     lead: "Sign in and your streak and past results follow you to any phone or computer. Daily scores stay private: they never go on a public board.",
     saving: "Saving your streak…",
-    saved: "Streak saved on every device",
-    savedSub: "Your daily scores are private. Only you see them.",
     failed: "Couldn't save your score. Check your connection and try again.",
     retry: "Try again",
-    remind: "Email me when a new daily challenge is up",
-    signedIn: "Signed in.",
-    signOut: "Sign out",
   },
   // the sign-in pop-up, shared with endless mode's Best streaks board: step 1 the 13+ box and sign-in, step 2 the
   // nickname (endless mode only), then where you landed

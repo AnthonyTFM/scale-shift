@@ -5,8 +5,10 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { menu } from "@/content/site";
+import { accountCopy as A } from "@/content/account";
+import { maybeSignedIn, signInOn } from "@/lib/sign-in";
 import { Wordmark } from "./Wordmark";
-import { FlameIcon, MapIcon, TargetIcon, TrophyIcon } from "./Icons";
+import { FlameIcon, MapIcon, PersonIcon, TargetIcon, TrophyIcon } from "./Icons";
 
 const ICONS = { map: MapIcon, target: TargetIcon, trophy: TrophyIcon, flame: FlameIcon } as const;
 
@@ -59,6 +61,8 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
   }, [open]);
 
   const close = () => setOpen(false);
+  // read when the menu opens (the cookie isn't there on the server)
+  const signedIn = open && maybeSignedIn();
   const here = (href: string) => (pathname === href ? "page" : undefined);
 
   return (
@@ -101,6 +105,21 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                 </svg>
               </button>
             </div>
+            {/* your account: username, reminder emails, sign out (or sign in) */}
+            {signInOn ? (
+              <Link
+                href="/account"
+                onClick={close}
+                aria-current={here("/account")}
+                className="press-card mt-4 flex items-center gap-3 rounded-[20px] px-3 py-2.5 hover:bg-white aria-[current=page]:border-primary"
+              >
+                <PersonIcon className="size-9" />
+                <span className="min-w-0">
+                  <span className="block font-display text-base leading-tight">{signedIn ? A.menuSignedIn : A.menuSignedOut}</span>
+                  <span className="block text-sm text-muted">{signedIn ? A.menuBlurbSignedIn : A.menuBlurbSignedOut}</span>
+                </span>
+              </Link>
+            ) : null}
             <nav aria-label="Site" className="mt-5">
               <ul className="space-y-2">
                 {menu.main.map((item) => (

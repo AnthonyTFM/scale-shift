@@ -8,7 +8,7 @@ const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split
 
 /**
  * GET → who is signed in: { signIn: false } when sign-in is off, { player: null } when signed out or not on the board yet,
- * or { player: { id, name, reminders } }. The email is never returned.
+ * or { player: { id, name, reminders, welcomed } }. The email is never returned.
  * GET ?today=YYYY-MM-DD also returns days: { date: { c, s } }, their results, so another device shows the same ones.
  */
 export async function GET(request: Request) {
@@ -20,15 +20,33 @@ export async function GET(request: Request) {
     if (!id) return Response.json({ signIn: true, player: null }, { headers: { "Cache-Control": "no-store" } });
     const store = getStore();
     const today = new URL(request.url).searchParams.get("today");
-    const [name, reminders, days] = await Promise.all([
+    const [name, reminders, welcomed, days] = await Promise.all([
       store.nameOf(id),
       store.remindersOn(id),
+      store.welcomed(id),
       isDateKey(today) && isPlayableDate(today) ? playerHistory(id, today) : null,
     ]);
-    return Response.json({ signIn: true, player: { id, name, reminders }, ...(days ? { days } : {}) }, { headers: { "Cache-Control": "no-store" } });
+    return Response.json({ signIn: true, player: { id, name, reminders, welcomed }, ...(days ? { days } : {}) }, { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     console.error("[leaderboard] me failed", e);
     return Response.json({ error: "The leaderboard is unavailable right now." }, { status: 503 });
+  }
+}
+
+/** POST { welcomed: true } → the signed-in player has seen the welcome pop-up, so no other device shows it again. */
+export async function POST(request: Request) {
+  await connection();
+  if (!signInEnabled()) return Response.json({ ok: false }, { status: 400 });
+  if (await limited("lb-welcomed", ipOf(request), 20)) return Response.json({ ok: false }, { status: 429 });
+  try {
+    const user = await verifiedUser();
+    const id = user ? await existingPlayer(user) : null;
+    if (!id) return Response.json({ ok: false }, { status: 401 });
+    await getStore().setWelcomed(id);
+    return Response.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+  } catch (e) {
+    console.error("[leaderboard] welcomed failed", e);
+    return Response.json({ ok: false }, { status: 503 });
   }
 }
 

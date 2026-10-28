@@ -115,7 +115,7 @@ function Bar() {
 }
 
 /** "Delete my data": a second tap confirms, then the server removes the player and the sign-in account. */
-function DeleteData({ onDeleted }: { onDeleted: () => void }) {
+export function DeleteData({ onDeleted }: { onDeleted: () => void }) {
   const [step, setStep] = useState<"idle" | "confirm" | "deleting" | "error">("idle");
   const [error, setError] = useState("");
   const keep = useRef<HTMLButtonElement>(null);

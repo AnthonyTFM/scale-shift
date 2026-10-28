@@ -77,7 +77,7 @@ export function useJoinTo<R extends SubmitResult = SubmitResult>(target: JoinTar
         return false;
       }
       if (data.player) rememberPlayer(data.player);
-      setMe((m) => ({ id: data.player?.id ?? m?.id ?? "", name, reminders: m?.reminders ?? false }));
+      setMe((m) => ({ id: data.player?.id ?? m?.id ?? "", name: data.player?.name ?? name, reminders: m?.reminders ?? false }));
       setResult(data as Extract<R, { ok: true }>);
       setStatus("done");
       setEditing(false);

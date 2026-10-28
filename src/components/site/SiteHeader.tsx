@@ -3,6 +3,9 @@ import { site } from "@/content/site";
 import { HeaderNav } from "./HeaderNav";
 import { SiteMenu } from "./SiteMenu";
 import { Wordmark } from "./Wordmark";
+import { PersonIcon } from "./Icons";
+import { accountCopy } from "@/content/account";
+import { signInOn } from "@/lib/sign-in";
 
 export function SiteHeader() {
   return (
@@ -19,6 +22,12 @@ export function SiteHeader() {
           Open the map
         </Link>
         <SiteMenu variant="header" />
+        {/* wide screens have no menu button: the account sits in its place, top right */}
+        {signInOn ? (
+          <Link href="/account" aria-label={accountCopy.headerSr} title={accountCopy.headerSr} className="hidden size-11 place-items-center rounded-xl hover:bg-white xl:grid">
+            <PersonIcon className="size-8" />
+          </Link>
+        ) : null}
       </div>
     </header>
   );

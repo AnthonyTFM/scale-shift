@@ -179,3 +179,14 @@ export function ClockIcon({ className = "size-5" }: IconProps) {
     </svg>
   );
 }
+
+/** A person in a circle: your account. */
+export function PersonIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <circle cx="12" cy="12" r="9.25" fill="#EAF3FF" stroke="#1A47B0" strokeWidth="1.5" />
+      <circle cx="12" cy="9.5" r="3.25" fill="#2F6BFF" stroke="#1A47B0" strokeWidth="1.3" />
+      <path d="M5.8 18.6c1.3-2.4 3.5-3.8 6.2-3.8s4.9 1.4 6.2 3.8" fill="#2F6BFF" stroke="#1A47B0" strokeWidth="1.3" strokeLinecap="round" />
+    </svg>
+  );
+}
