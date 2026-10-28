@@ -49,7 +49,7 @@ export const home = {
     // the two game tiles at the top (src/components/home/HeroPlay.tsx and HeroEndless.tsx): one stat line each
     playEyebrow: (day: number) => `Daily #${day}`,
     playTitle: "Which is bigger?",
-    playNew: "5 matchups · 2 min",
+    playNew: "5 matchups\u00a0· 2\u00a0min",
     playStreakSr: (n: number) => `${n}-day streak`,
     playTodaySr: (score: number, total: number) => `${score} out of ${total} today`,
     playToday: "today",
@@ -63,7 +63,7 @@ export const home = {
     endlessTitle: "How long can you last?",
     endlessNew: "Until your first miss",
     endlessBestSr: (n: number) => `Your best: ${n} in a row`,
-    endlessTopLine: (n: number) => `#1: ${n}`,
+    endlessTopLine: (n: number) => `Record: ${n}`,
     endlessTopSr: (n: number, name: string) => `Best ever: ${n} in a row, by ${name}`,
     endlessCta: "Play",
     endlessCtaLong: "Play endless mode",

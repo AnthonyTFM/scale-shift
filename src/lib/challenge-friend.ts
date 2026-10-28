@@ -1,14 +1,12 @@
 import { challengeHash } from "@/lib/challenge";
 import { dayNumber, localDateKey } from "@/lib/daily";
 import { loadPlayer } from "@/lib/player";
-import { site } from "@/content/site";
 
-export type ShareMessage = { kind: "challenge" | "score"; text: string; url: string };
+export type ShareMessage = { kind: "score"; text: string; url: string };
 
-/** The "beat my score" message for a daily challenge (today's unless a date is given). */
-export function challengeMessage(score: number, total = 5, date = localDateKey()): ShareMessage {
-  const url = `${location.origin}/daily${challengeHash(dayNumber(date), score, loadPlayer()?.name ?? null)}`;
-  return { kind: "challenge", url, text: `I got ${score}/${total} on today's ${site.name} challenge. Think you can beat me?\n${url}` };
+/** The daily's link with your score in it (today's unless a date is given): a friend who opens it sees the score to beat. */
+export function challengeUrl(score: number, date = localDateKey()) {
+  return `${location.origin}/daily${challengeHash(dayNumber(date), score, loadPlayer()?.name ?? null)}`;
 }
 
 /** Phones open their own share sheet. Returns false when the caller should show the share box instead. */

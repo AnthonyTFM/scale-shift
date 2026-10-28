@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { events, eventTypeLabels, statusLabels, type EventType, type TerritoryEvent } from "@/content/events";
+import { events, eventTypeLabels, statusLabels, timelineCopy as T, type EventType, type TerritoryEvent } from "@/content/events";
 import { EventCard } from "@/components/EventCard";
 import { formatYear } from "@/lib/eras";
 
@@ -23,6 +23,8 @@ export function TimelineFilter() {
   const [type, setType] = useState<"all" | EventType>("all");
   const [q, setQ] = useState("");
   const [order, setOrder] = useState<"oldest" | "newest">("oldest");
+  // phones: Status and Type stay folded until asked for
+  const [open, setOpen] = useState(false);
 
   const list = useMemo(() => {
     const query = q.trim().toLowerCase();
@@ -49,57 +51,61 @@ export function TimelineFilter() {
   return (
     <div>
       <form role="search" onSubmit={(e) => e.preventDefault()} className="card grid gap-3 p-4 md:grid-cols-3">
-        <label className="text-sm font-semibold text-ink md:col-span-3">
-          Search events
-          <input
-            type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="e.g. Texas, treaty, Poland"
-            className="field mt-1"
-          />
-        </label>
-        <label className="text-sm font-semibold text-ink">
-          Status
-          <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className="field mt-1">
-            <option value="all">Any status</option>
-            {Object.entries(statusLabels).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-sm font-semibold text-ink">
-          Type
-          <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="field mt-1">
-            <option value="all">Any type</option>
-            {types.map((t) => (
-              <option key={t} value={t}>
-                {eventTypeLabels[t]}
-              </option>
-            ))}
-          </select>
-        </label>
-        <div className="flex items-end">
+        <div className="flex items-end gap-2 md:col-span-3">
+          <label className="min-w-0 flex-1 text-sm font-semibold text-ink">
+            {T.search}
+            <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={T.searchPlaceholder} className="field mt-1" />
+          </label>
           <button
             type="button"
-            onClick={reset}
-            className="btn btn-white mb-0 w-full"
+            aria-expanded={open}
+            aria-controls="timeline-filters"
+            onClick={() => setOpen((o) => !o)}
+            className="btn btn-white shrink-0 px-4 md:hidden"
           >
-            Reset filters
+            {T.filter}
+            {T.filterCount(Number(status !== "all") + Number(type !== "all"))}
           </button>
+        </div>
+        <div id="timeline-filters" className={`${open ? "grid" : "hidden"} gap-3 md:contents`}>
+          <label className="text-sm font-semibold text-ink">
+            {T.status}
+            <select value={status} onChange={(e) => setStatus(e.target.value as typeof status)} className="field mt-1">
+              <option value="all">{T.anyStatus}</option>
+              {Object.entries(statusLabels).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-sm font-semibold text-ink">
+            {T.type}
+            <select value={type} onChange={(e) => setType(e.target.value as typeof type)} className="field mt-1">
+              <option value="all">{T.anyType}</option>
+              {types.map((t) => (
+                <option key={t} value={t}>
+                  {eventTypeLabels[t]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex items-end">
+            <button type="button" onClick={reset} className="btn btn-white mb-0 w-full">
+              {T.reset}
+            </button>
+          </div>
         </div>
       </form>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-muted" aria-live="polite">
-          Showing {list.length} of {events.length} events, {order === "oldest" ? "oldest first" : "newest first"}
+          {T.showing(list.length, events.length, order === "oldest")}
         </p>
-        <div role="group" aria-label="Order" className="flex rounded-2xl border-2 border-line bg-white p-1 text-sm font-semibold">
+        <div role="group" aria-label={T.order} className="flex rounded-2xl border-2 border-line bg-white p-1 text-sm font-semibold">
           {(
             [
-              ["oldest", "Oldest first"],
-              ["newest", "Newest first"],
+              ["oldest", T.oldest],
+              ["newest", T.newest],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -115,7 +121,7 @@ export function TimelineFilter() {
         </div>
       </div>
       {sections.length > 0 ? (
-        <nav aria-label="Jump to a period" className="mt-4">
+        <nav aria-label={T.jump} className="mt-4">
           {/* one row you can swipe on phones, wrapping on wider screens; the padding keeps focus rings from being cut off, and
               `relative` keeps the hidden screen-reader words inside the row (otherwise they widen the page) */}
           <ul className="relative -mx-4 -my-1.5 flex gap-2 overflow-x-auto px-4 py-1.5 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0">
@@ -128,7 +134,7 @@ export function TimelineFilter() {
                   {p.label}{" "}
                   <span className="font-normal text-muted">
                     {p.items.length}
-                    <span className="sr-only"> {p.items.length === 1 ? "event" : "events"}</span>
+                    <span className="sr-only"> {T.events(p.items.length)}</span>
                   </span>
                 </a>
               </li>
@@ -137,9 +143,9 @@ export function TimelineFilter() {
         </nav>
       ) : (
         <div className="card mt-6 p-6 text-center">
-          <p className="font-semibold text-ink">No events match.</p>
+          <p className="font-semibold text-ink">{T.none}</p>
           <button type="button" onClick={reset} className="btn btn-white mt-3">
-            Reset filters
+            {T.reset}
           </button>
         </div>
       )}
@@ -152,7 +158,7 @@ export function TimelineFilter() {
             <h2 id={p.id} className="scroll-mt-24 font-display text-2xl text-ink md:text-3xl">
               <span id={`${p.id}-h`}>{p.label}</span>{" "}
               <span className="font-sans text-base font-semibold text-muted">
-                {p.items.length} {p.items.length === 1 ? "event" : "events"}
+                {p.items.length} {T.events(p.items.length)}
               </span>
             </h2>
             <Events list={shown} />
@@ -160,16 +166,17 @@ export function TimelineFilter() {
               // a native fold: works without scripts, and the browser's find-in-page opens it
               <details className="group mt-5 sm:ml-24">
                 <summary className="btn btn-white w-full cursor-pointer list-none sm:w-auto [&::-webkit-details-marker]:hidden">
-                  <span className="group-open:hidden">
-                    Show {rest.length} more from {p.label}
-                  </span>
-                  <span className="hidden group-open:inline">Show fewer</span>
+                  <span className="group-open:hidden">{T.more(rest.length, p.label)}</span>
+                  <span className="hidden group-open:inline">{T.fewer}</span>
                 </summary>
                 <div className="sm:-ml-24">
                   <Events list={rest} />
                   {/* after a long list, a way back up without scrolling */}
-                  <a href={`#${p.id}`} className="mt-4 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-link hover:underline sm:ml-24">
-                    Back to the start of {p.label} <span aria-hidden="true">↑</span>
+                  <a
+                    href={`#${p.id}`}
+                    className="mt-4 inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-link hover:underline sm:ml-24"
+                  >
+                    {T.back(p.label)} <span aria-hidden="true">↑</span>
                   </a>
                 </div>
               </details>
@@ -188,7 +195,9 @@ function Events({ list }: { list: TerritoryEvent[] }) {
       {list.map((ev) => (
         <li key={ev.id} className="relative">
           <span aria-hidden="true" className="absolute -left-[33px] top-6 size-3 rounded-full bg-primary ring-4 ring-paper sm:-left-[41px]" />
-          <p className="mb-1 font-display text-lg text-ink sm:absolute sm:-left-36 sm:top-4 sm:mb-0 sm:w-24 sm:text-right">{formatYear(ev.taken, ev.approx)}</p>
+          <p className="mb-1 font-display text-lg text-ink sm:absolute sm:-left-36 sm:top-4 sm:mb-0 sm:w-24 sm:text-right">
+            {formatYear(ev.taken, ev.approx)}
+          </p>
           <EventCard ev={ev} headingLevel={3} />
         </li>
       ))}

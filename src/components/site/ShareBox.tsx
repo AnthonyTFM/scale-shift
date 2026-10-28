@@ -14,7 +14,7 @@ export function useShareBox() {
   const [copied, setCopied] = useState(false);
 
   const share = async (m: ShareMessage, from: string) => {
-    track(m.kind === "challenge" ? "daily_challenge_friend" : "daily_share", { from });
+    track("daily_share", { from });
     if (await nativeShare(m.text)) return;
     let ok = true;
     try {
@@ -81,7 +81,7 @@ function ShareBox({ msg, copied, onCopied, onClose }: { msg: ShareMessage | null
       <div className="p-5">
         <div className="flex items-start justify-between gap-3">
           <h2 id="share-box-title" className="font-display text-2xl">
-            {msg.kind === "challenge" ? t.challengeTitle : t.scoreTitle}
+            {t.scoreTitle}
           </h2>
           <button type="button" onClick={onClose} aria-label={t.close} className="grid size-11 place-items-center rounded-xl hover:bg-paper">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2">
