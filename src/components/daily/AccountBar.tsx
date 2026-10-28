@@ -5,6 +5,7 @@ import { useAccount } from "./SignInProvider";
 import { forgetPlayer, rememberPlayer } from "@/lib/player";
 import { signInOn } from "@/lib/sign-in";
 import { account as A } from "@/content/legal";
+import { accountCopy } from "@/content/account";
 import { AgeCheck, useAgeOk } from "./AgeCheck";
 
 const DELETED = "lb-deleted";
@@ -86,7 +87,7 @@ function Bar() {
           </>
         ) : (
           <>
-            <span>Keep your nickname on every device:</span>
+            <span>{accountCopy.boardPrompt}</span>
             <button
               type="button"
               onClick={() => {

@@ -37,7 +37,7 @@ const PROMPTS: Record<QuestionKind, string> = {
   close: "Which country is bigger?",
   state: "Which is bigger?",
   history: "Then vs. now: which is bigger?",
-  history2: "Empire vs. empire: which was bigger?",
+  history2: "Back in history: which was bigger?",
 };
 
 /**

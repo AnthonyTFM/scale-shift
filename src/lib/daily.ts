@@ -39,10 +39,10 @@ const SLOTS: QuestionKind[] = ["trap", "state", "history", "close", "history2"];
 
 const PROMPTS: Record<QuestionKind, string> = {
   trap: "Which country is bigger in real life?",
-  close: "Close call: which country is bigger?",
+  close: "Tricky one: which country is bigger?",
   state: "Which is bigger?",
   history: "Then vs. now: which is bigger?",
-  history2: "Empire vs. empire: which was bigger?",
+  history2: "Back in history: which was bigger?",
 };
 
 // ---------- dates ----------

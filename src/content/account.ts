@@ -14,7 +14,7 @@ export const accountCopy = {
     lead: "Your streak is saved on every device. Two quick things, both optional:",
     nameLabel: "Pick a username",
     nameHint: "Shown on the Best streaks board. 3 to 16 characters, not your full real name.",
-    remind: "Email me when a new daily challenge is up",
+    remind: "Email me when a new daily challenge is up (starting soon)",
     remindHint: "Unsubscribe any time with one click.",
     done: "Done",
     saving: "Saving…",
@@ -38,12 +38,12 @@ export const accountCopy = {
     nameLead: "What everyone sees on the Best streaks board.",
     namePlaceholder: "e.g. MapWizard",
     nameSave: "Save",
-    nameSaved: "Saved. The board shows your new name.",
+    nameSaved: "Saved. This is the name the Best streaks board shows.",
     nameSame: "That's already your username.",
     nameLeadNone: "You haven't picked one yet. It's what everyone sees on the Best streaks board.",
     emailsTitle: "Emails",
-    remind: "Email me when a new daily challenge is up",
-    remindOn: "Done. We'll email you when a new challenge is up.",
+    remind: "Email me when a new daily challenge is up (starting soon)",
+    remindOn: "Done. You're on the list for reminder emails, which start soon.",
     remindOff: "Done. No more reminder emails.",
     signedInAs: "Signed in",
     signOut: "Sign out",
@@ -54,6 +54,21 @@ export const accountCopy = {
   saved: "Streak saved on every device",
   savedAs: (name: string) => `Signed in as ${name}`,
   manage: "Account settings",
+
+  // the leaderboard page, signed out
+  boardPrompt: "Pick a username for the Best streaks board, saved on every device:",
+
+  // the page after a reminder-email unsubscribe link
+  unsubscribe: {
+    eyebrow: "Reminder emails",
+    title: "You're unsubscribed",
+    lead: "You won't get any more daily challenge reminders. Your streak and scores stay saved.",
+    failedTitle: "That link didn't work",
+    failedLead:
+      "The unsubscribe link was incomplete. Sign in and turn reminders off on your account page (Menu → Your account), or contact us and we'll do it for you.",
+    play: "Play today's five",
+    contact: "Contact us",
+  },
 
   errors: {
     network: "Couldn't reach the server. Please try again.",
