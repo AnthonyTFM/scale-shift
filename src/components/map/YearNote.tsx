@@ -26,7 +26,7 @@ export function YearNote({ year, eraKey, onEra, onFocus, onClose }: Props) {
   const asked = formatYear(year);
 
   return (
-    <section aria-label={`Borders in ${asked}`} className="pointer-events-auto relative z-10 mb-2 rounded-2xl bg-white p-3 text-ink shadow-float sm:p-4">
+    <section aria-label={`Borders in ${asked}`} className="pointer-events-auto mb-2 rounded-2xl max-sm:mb-3.5 bg-white p-3 text-ink shadow-float sm:p-4">
       <div className="flex items-start gap-2">
         <div className="min-w-0 flex-1 text-sm">
           <p className="font-bold">
