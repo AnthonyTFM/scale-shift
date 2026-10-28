@@ -245,7 +245,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Azerbaijan, eastern Türkiye, Turkmenistan and Afghanistan",
   },
   "Chagatai Khanate": {
-    what: "The Mongol khanate of Genghis Khan's son Chagatai, in Central Asia, shown here as its eastern branch, Moghulistan.",
+    what: "The Mongol khanate of Genghis Khan's son Chagatai, in Central Asia.",
     today: "Western China (Xinjiang), Kyrgyzstan and southeastern Kazakhstan",
   },
   "Sultanate of Delhi": {
