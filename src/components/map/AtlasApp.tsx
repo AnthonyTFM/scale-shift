@@ -884,8 +884,12 @@ export default function AtlasApp() {
         </div>
       </div>
 
-      {/* Timeline */}
-      <div ref={timelineRef} className="pointer-events-none absolute inset-x-3 bottom-3 z-20 mx-auto max-w-3xl">
+      {/* Timeline. Phones: raised above the phone column (z-30) while the year box shows an error, which pokes out above
+          the bar, but kept below the focused search panel and the intro (z-40) */}
+      <div
+        ref={timelineRef}
+        className="pointer-events-none absolute inset-x-3 bottom-3 z-20 mx-auto max-w-3xl max-sm:has-[#year-error]:z-[35]"
+      >
         {yearAsked && yearAsked.era === era ? (
           <YearNote
             year={yearAsked.year}
