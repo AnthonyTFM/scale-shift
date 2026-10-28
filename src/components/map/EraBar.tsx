@@ -232,7 +232,6 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           type="button"
           onClick={onChanges}
           aria-expanded={changesOpen}
-          title="What changed?"
           className={`grid size-11 shrink-0 place-items-center rounded-lg bg-white/10 font-semibold hover:bg-white/15 sm:block sm:size-auto sm:px-3 sm:py-2 sm:text-sm ${HIDE_UNDER_YEAR_BOX}`}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 sm:hidden" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
