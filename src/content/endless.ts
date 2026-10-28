@@ -27,18 +27,18 @@ export const endlessCopy = {
   loadingNext: "Loading…",
   seeRun: "See my run",
   results: {
-    eyebrow: "Endless run",
     inARow: (n: number) => (n === 1 ? "right answer" : "right answers in a row"),
     scoreSr: (n: number, best: boolean) => `You got ${n} in a row${best ? ", a new best" : ""}.`,
     title: (n: number) =>
       n >= 20 ? "Ruler of the world!" : n >= 12 ? "Emperor!" : n >= 7 ? "Empire builder!" : n >= 3 ? "Regional power" : "The map fooled you",
-    verdict: (round: number) => `Your run ended on round ${round}.`,
     newBest: "New best!",
-    // the next goal, under the streak: always within reach
-    // a countdown while it's close; a far-off best is just named, so it never reads as a mountain
+    // the next goal, under the streak: a countdown while it's close; a far-off one is just named, so it never reads
+    // as a mountain
     goalBest: (more: number, best: number) => (more <= 5 ? `${more} more to beat your best (${best})` : `Your best: ${best} in a row`),
     goalFirst: "Get one right to start your streak",
-    goalRank: (more: number, place: number) => `${more} more ${more === 1 ? "takes" : "take"} #${place} of all time`,
+    goalRank: (more: number, target: number, place: number) =>
+      more <= 5 ? `${more} more ${more === 1 ? "takes" : "take"} #${place} of all time` : `${target} in a row takes #${place} of all time`,
+    goalNext: (n: number) => `Next goal: ${n} in a row`,
     goalTop: "That's #1 of all time!",
     playAgain: "Play again",
     // under Play again on computers
@@ -68,6 +68,8 @@ export const endlessCopy = {
     // with the board loaded: where this run would land, and one tap to post it
     joinWould: (rank: number) => `This run would be #${rank} of all time`,
     joinWouldHint: "Sign in to post it.",
+    // signed in already, with no nickname yet
+    joinWouldName: "Pick a nickname to post it.",
     joinPost: "Post it",
     join: "Join",
     opening: "Opening sign-in…",

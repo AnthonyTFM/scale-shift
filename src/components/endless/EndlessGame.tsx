@@ -6,6 +6,7 @@ import { site } from "@/content/site";
 import { endlessCopy as t } from "@/content/endless";
 import { track } from "@/lib/analytics";
 import { loadPlayer } from "@/lib/player";
+import type { EndlessPlace } from "@/lib/leaderboard-types";
 import { loadSave, localDateKey, nameInSentence, sizeParts, type PoolEntry, type Question } from "@/lib/daily";
 import { avoidOf, endlessQuestion, LEVELS, levelOf, loadEndless, loadSeen, newSeed, rememberSeen, streakOf, writeEndless, type EndlessSave } from "@/lib/endless";
 import type { ShapeFile } from "@/lib/outline";
@@ -325,7 +326,7 @@ function grid(streak: number) {
 
 /**
  * The end of a run, built to send you straight back in: the streak, the next goal (your best, or the next place on the
- * Best streaks board), one big Play again (focused; Enter replays), where this run ranks of all time, and the matchup
+ * Best streaks board), one big Play again (Enter replays), where this run ranks of all time, and the matchup
  * that ended it, with a "so close" when it was a close call. Nothing else.
  */
 function Results({ run, streak, best, onAgain }: { run: Run; streak: number; best: number; onAgain: () => void }) {
@@ -333,30 +334,34 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
   const newBest = streak > run.bestBefore && streak > 0;
   const miss = run.questions[streak];
   const [dailyDone, setDailyDone] = useState(false);
-  // the Best streaks board, for "this run would be #4 of all time" and the next place to beat
-  const [board, setBoard] = useState<{ scores: number[] } | null>(null);
+  // where this run lands on the Best streaks board, and the next place up (undefined while loading, null if it failed)
+  const [place, setPlace] = useState<EndlessPlace | null | undefined>(undefined);
 
   useEffect(() => {
     queueMicrotask(() => setDailyDone(typeof loadSave().days[localDateKey()]?.s === "number"));
-    // without the player's own row: this run takes its place (and, signed in, may already be posted)
-    const me = loadPlayer()?.id;
-    fetch(`/api/endless?scope=all&limit=100${me ? `&player=${encodeURIComponent(me)}` : ""}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((b: { rows?: { score: number; me?: boolean }[] } | null) => b?.rows && setBoard({ scores: b.rows.filter((r) => !r.me).map((r) => r.score) }))
-      .catch(() => {});
+    // counted over the whole board, without the player's own row: this run would replace it (and, signed in, may
+    // already be posted)
+    if (streak > 0) {
+      const me = loadPlayer()?.id;
+      fetch(`/api/endless?place=${streak}${me ? `&player=${encodeURIComponent(me)}` : ""}`)
+        .then((r) => (r.ok ? (r.json() as Promise<EndlessPlace>) : null))
+        .then((p) => setPlace(p && typeof p.rank === "number" ? p : null))
+        .catch(() => setPlace(null));
+    }
     if (!newBest) return;
     play("perfect");
     buzz([20, 40, 20, 40, 80]);
     const id = setTimeout(confetti, reducedMotion() ? 0 : 300);
     return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newBest]);
 
-  // Enter plays again, unless you're typing or a pop-up is open
+  // a plain Enter plays again, unless something else has focus or a pop-up (or the sign-in window) is open
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key !== "Enter" || e.repeat || e.defaultPrevented) return;
+      if (e.key !== "Enter" || e.repeat || e.defaultPrevented || e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       const el = document.activeElement as HTMLElement | null;
-      if (document.querySelector("dialog[open]") || (el && el !== document.body && el.id !== "endless-done")) return;
+      if (document.querySelector('dialog[open], [role="dialog"], [aria-modal="true"]') || (el && el !== document.body && el.id !== "endless-done")) return;
       e.preventDefault();
       onAgain();
     };
@@ -364,15 +369,13 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
     return () => window.removeEventListener("keydown", onKey);
   }, [onAgain]);
 
-  // where this run lands: after everyone with more (ties go to whoever got there first)
-  const rank = board && streak > 0 ? 1 + board.scores.filter((n) => n >= streak).length : null;
-  // the next place up: the lowest score above this run
-  const above = board ? board.scores.filter((n) => n >= streak).sort((a, b) => a - b)[0] : undefined;
+  const rank = place?.rank ?? null;
   const goal = (() => {
     if (!newBest) return best > 0 ? R.goalBest(best - streak + 1, best) : R.goalFirst;
-    // one past the next score up takes the first place held at that score
-    if (above !== undefined) return R.goalRank(above - streak + 1, 1 + board!.scores.filter((n) => n > above).length);
-    return board ? R.goalTop : null;
+    // a new best: the next place on the board, once it's in (or just the next number, if the board can't be read)
+    if (place === undefined) return null;
+    if (!place) return R.goalNext(streak + 1);
+    return place.next ? R.goalRank(place.next.score - streak + 1, place.next.score + 1, place.next.place) : R.goalTop;
   })();
   // a close call: the miss was within 15%
   const gap = miss ? Math.max(miss.options[0].a, miss.options[1].a) / Math.min(miss.options[0].a, miss.options[1].a) - 1 : 1;
@@ -409,7 +412,9 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
         </div>
       </div>
       {/* the next goal, always within reach */}
-      <p className="mt-3 min-h-7 text-center font-display text-lg leading-snug text-ink">{goal}</p>
+      <p aria-live="polite" className="mt-3 min-h-7 text-center font-display text-lg leading-snug text-ink">
+        {goal}
+      </p>
 
       {/* straight back in */}
       <div className="mt-3 flex gap-2">

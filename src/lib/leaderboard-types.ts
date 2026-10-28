@@ -14,5 +14,7 @@ export type SubmitResult =
 
 /** Endless mode's best streaks, for one day (`date`) or of all time (`date` null). `score` is the streak. */
 export type EndlessBoard = { date: string | null; total: number; rows: DayRow[]; me?: DayRow | null };
+/** Where an endless streak would rank of all time, and the next score up with the place one more than it takes. */
+export type EndlessPlace = { rank: number; next: { score: number; place: number } | null };
 /** Posting an endless run answers with the player's best streak of all time (`score`) and its rank of all time. */
 export type EndlessSubmitResult = SubmitResult;

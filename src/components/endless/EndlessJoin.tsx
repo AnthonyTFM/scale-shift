@@ -115,7 +115,7 @@ function SignedIn({ seed, token, choices, streak, wouldRank }: Props) {
         <TrophyIcon className="size-9" />
         <span className="min-w-0 flex-1">
           <span className="block font-display text-lg leading-tight text-ink">{wouldRank ? t.joinWould(wouldRank) : t.joinCta}</span>
-          <span className="block text-sm text-muted">{wouldRank ? t.joinWouldHint : t.joinHint}</span>
+          <span className="block text-sm text-muted">{wouldRank ? (isSignedIn ? t.joinWouldName : t.joinWouldHint) : t.joinHint}</span>
         </span>
         <button
           type="button"

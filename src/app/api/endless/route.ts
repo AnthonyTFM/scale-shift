@@ -1,9 +1,9 @@
 import { connection } from "next/server";
-import { checkEmail, checkName, endlessBoard, getStore, isDateKey, isPlayerId, nameKey, networkKey, NEW_PLAYERS_PER_NETWORK, storeKind } from "@/lib/leaderboard";
+import { checkEmail, checkName, endlessBoard, endlessPlace, ENDLESS_REVIEW_OVER, getStore, isDateKey, isPlayerId, nameKey, networkKey, NEW_PLAYERS_PER_NETWORK, storeKind } from "@/lib/leaderboard";
 import type { EndlessSubmitResult } from "@/lib/leaderboard-types";
 import { markRun } from "@/lib/endless-server";
 import { rateLimited } from "@/lib/submissions";
-import { playerFor, signInEnabled, verifiedUser } from "@/lib/account";
+import { existingPlayer, playerFor, signInEnabled, verifiedUser } from "@/lib/account";
 import { limited } from "@/lib/rate-limit";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
@@ -11,6 +11,8 @@ const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split
 /**
  * GET /api/endless?scope=day&date=2026-10-26&limit=50&player=<id>   one day's best streaks
  * GET /api/endless?scope=all&limit=50&player=<id>                   best streaks of all time
+ * GET /api/endless?place=14&player=<id>                             where a streak of 14 would rank of all time, and
+ *                                                                    the next score up (the player's own row left out)
  */
 export async function GET(request: Request) {
   await connection();
@@ -22,6 +24,14 @@ export async function GET(request: Request) {
   // boards read without a player are the same for everyone: Vercel's CDN may serve them for up to 20 seconds
   const headers = { "Cache-Control": "no-store", "X-Leaderboard-Store": storeKind(), ...(me ? {} : { "Vercel-CDN-Cache-Control": "max-age=10, stale-while-revalidate=10" }) };
   try {
+    const place = Number(q.get("place"));
+    if (q.has("place")) {
+      if (!Number.isInteger(place) || place < 1 || place > ENDLESS_REVIEW_OVER) return Response.json({ error: "Use place=<streak>." }, { status: 400 });
+      // signed in, the account's player (this browser may not know its ID yet); never creates one
+      const user = signInEnabled() ? await verifiedUser() : null;
+      const self = (user ? await existingPlayer(user) : null) ?? me;
+      return Response.json(await endlessPlace(place, self), { headers: { ...headers, "Vercel-CDN-Cache-Control": "no-store" } });
+    }
     if (q.get("scope") === "all") return Response.json(await endlessBoard(null, limit, me), { headers });
     const date = q.get("date");
     if (!isDateKey(date)) return Response.json({ error: "Use date=YYYY-MM-DD." }, { status: 400 });
