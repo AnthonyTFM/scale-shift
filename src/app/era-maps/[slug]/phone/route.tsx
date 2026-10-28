@@ -19,8 +19,9 @@ async function eraPhoneMap(key: string) {
   "use cache";
   cacheLife("max");
   const { svg } = equalAreaMapSvg(key, WIDTH);
-  // high quality: the borders are hairlines (some dashed), which stronger compression smears
-  return new Uint8Array(await sharp(Buffer.from(svg)).webp({ quality: 90 }).toBuffer());
+  // quality 80: about 55 KB, which keeps a phone's first load under 2.5 s; the hairline borders were checked sharp at it
+  // on a 3× screen (90 made it 80 KB, slow enough to put first load just over)
+  return new Uint8Array(await sharp(Buffer.from(svg)).webp({ quality: 80 }).toBuffer());
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
