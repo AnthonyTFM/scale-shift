@@ -50,50 +50,63 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
       </p>
     );
   }
+  // phones: the box covers the whole timeline bar while you type (44px controls, room for the hint), and the spacer keeps
+  // the bar's height so nothing moves
   return (
-    <form
-      className="relative flex items-center gap-1.5"
-      onSubmit={(e) => {
-        e.preventDefault();
-        const y = parseYear(inputRef.current?.value ?? "");
-        if (y === null) return setError("Try a year like 1453 or 300 BCE");
-        if (y < -2000) return setError("Our maps start in 2000 BCE");
-        if (y > new Date().getFullYear()) return setError("That's in the future");
-        setEditing(false);
-        onYear(y);
-      }}
-    >
-      <label htmlFor="year-input" className="sr-only">
-        Go to year
-      </label>
-      <input
-        id="year-input"
-        ref={inputRef}
-        inputMode="text"
-        autoComplete="off"
-        placeholder="e.g. 1453 or 300 BCE"
-        aria-invalid={!!error}
-        aria-describedby={error ? "year-error" : undefined}
-        onKeyDown={(e) => e.key === "Escape" && setEditing(false)}
-        onChange={() => error && setError("")}
-        className="h-8 w-36 rounded-md bg-white px-2 font-sans text-sm text-ink placeholder:text-muted aria-invalid:ring-2 aria-invalid:ring-rose-400 sm:w-44"
-      />
-      <button type="submit" className="h-8 rounded-md bg-accent px-2.5 text-xs font-bold text-panel hover:bg-accent-strong">
-        Go
-      </button>
-      <button type="button" onClick={() => setEditing(false)} aria-label="Cancel" className="h-8 px-1 text-xs text-panel-muted hover:text-white">
-        ✕
-      </button>
-      {error ? (
-        <span
-          id="year-error"
-          role="alert"
-          className="absolute bottom-full left-0 mb-3 whitespace-nowrap rounded-md bg-rose-600 px-2 py-1 font-sans text-xs font-semibold text-white shadow-float"
+    <>
+      <span aria-hidden="true" className="block h-6 sm:hidden" />
+      <form
+        className="relative flex items-center gap-1.5 max-sm:absolute max-sm:inset-0 max-sm:z-10 max-sm:gap-2 max-sm:rounded-2xl max-sm:bg-panel max-sm:px-2.5"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const y = parseYear(inputRef.current?.value ?? "");
+          if (y === null) return setError("Try a year like 1453 or 300 BCE");
+          if (y < -2000) return setError("Our maps start in 2000 BCE");
+          if (y > new Date().getFullYear()) return setError("That's in the future");
+          setEditing(false);
+          onYear(y);
+        }}
+      >
+        <label htmlFor="year-input" className="sr-only">
+          Go to year
+        </label>
+        <input
+          id="year-input"
+          ref={inputRef}
+          inputMode="text"
+          autoComplete="off"
+          placeholder="e.g. 1453 or 300 BCE"
+          aria-invalid={!!error}
+          aria-describedby={error ? "year-error" : undefined}
+          onKeyDown={(e) => e.key === "Escape" && setEditing(false)}
+          onChange={() => error && setError("")}
+          className="h-8 w-36 rounded-md bg-white px-2 font-sans text-sm text-ink placeholder:text-muted aria-invalid:ring-2 aria-invalid:ring-rose-400 max-sm:h-11 max-sm:w-auto max-sm:min-w-0 max-sm:flex-1 max-sm:rounded-lg max-sm:px-3 max-sm:text-base sm:w-44"
+        />
+        <button
+          type="submit"
+          className="h-8 rounded-md bg-accent px-2.5 text-xs font-bold text-panel hover:bg-accent-strong max-sm:h-11 max-sm:shrink-0 max-sm:rounded-lg max-sm:px-4 max-sm:text-sm"
         >
-          {error}
-        </span>
-      ) : null}
-    </form>
+          Go
+        </button>
+        <button
+          type="button"
+          onClick={() => setEditing(false)}
+          aria-label="Cancel"
+          className="h-8 px-1 text-xs text-panel-muted hover:text-white max-sm:grid max-sm:size-11 max-sm:shrink-0 max-sm:place-items-center max-sm:px-0 max-sm:text-base"
+        >
+          ✕
+        </button>
+        {error ? (
+          <span
+            id="year-error"
+            role="alert"
+            className="absolute bottom-full left-0 mb-3 whitespace-nowrap rounded-md bg-rose-600 px-2 py-1 font-sans text-xs font-semibold text-white shadow-float"
+          >
+            {error}
+          </span>
+        ) : null}
+      </form>
+    </>
   );
 }
 
@@ -114,7 +127,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
     onEra(eras[n].key);
   };
   return (
-    <div className="pointer-events-auto rounded-2xl bg-panel/95 px-2.5 py-1.5 text-panel-text shadow-float backdrop-blur sm:px-4 sm:py-2">
+    <div className="pointer-events-auto relative rounded-2xl bg-panel/95 px-2.5 py-1.5 text-panel-text shadow-float backdrop-blur sm:px-4 sm:py-2">
       <div className="flex items-center gap-2 sm:gap-3">
         {/* play backward: on wider screens only. On a phone a ◀ beside ▶ reads as "back one era", so phones get the
             one-step ‹ › buttons instead */}
