@@ -36,7 +36,9 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
           }}
           aria-label={`${label}. Go to a specific year`}
           title="Go to a specific year"
-          className="group flex min-h-6 items-center gap-1.5 rounded-md hover:text-accent"
+          // phones: the slider sits right under the name, so the tap area grows 20px upwards instead (44px tall in all)
+          // and the bar keeps its height
+          className="group relative flex min-h-6 items-center gap-1.5 rounded-md hover:text-accent max-sm:before:absolute max-sm:before:inset-x-0 max-sm:before:-top-5 max-sm:before:bottom-0"
         >
           {label}
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 text-panel-muted group-hover:text-accent" fill="none" stroke="currentColor" strokeWidth="2.5">
