@@ -95,7 +95,7 @@ export function HeroPlay() {
             </span>
           </Link>
           {/* after playing: when the next five arrive */}
-          <p className="mt-1.5 flex min-h-4 items-center gap-1 text-xs font-semibold text-muted">
+          <p className="hero-next mt-1.5 flex min-h-4 items-center gap-1 text-xs font-semibold text-muted">
             {s?.done && left ? (
               <>
                 <ClockIcon className="size-3.5" /> {left.ms < 60_000 ? t.nextReady : t.nextIn(left.h, left.m)}

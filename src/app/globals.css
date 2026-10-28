@@ -473,8 +473,16 @@ html:not(.returning) .hero-endless h2 {
 }
 html:not(.returning) .hero-endless > p:nth-of-type(2) {
   margin-top: 0;
-  min-height: 0;
+  min-height: 1.5rem;
+}
+html:not(.returning) .hero-endless > p:nth-of-type(2) span {
   font-size: 0.875rem;
+}
+/* phones: one line in the strip, what the game is; the record waits for a wider screen */
+@media (max-width: 767px) {
+  html:not(.returning) .hero-endless > p:nth-of-type(2) > span + span {
+    display: none;
+  }
 }
 html:not(.returning) .hero-endless > div:last-child {
   grid-column: 2;
@@ -486,7 +494,7 @@ html:not(.returning) .hero-endless > div:last-child > p {
   display: none;
 }
 /* the empty "next five" line has nothing to say before a first round */
-html:not(.returning) .hero-daily p:empty {
+html:not(.returning) .hero-next:empty {
   display: none;
 }
 /* wider screens: both tiles become banners (words left, button right), the daily the bigger one */

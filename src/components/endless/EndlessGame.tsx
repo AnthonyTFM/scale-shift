@@ -213,6 +213,8 @@ export function EndlessGame() {
     const n = streakOf(run.questions, choices);
     // passing the old best, or reaching a hotter flame: a longer buzz
     if (right && ((run.bestBefore > 0 && n === run.bestBefore + 1) || n === 10 || n === 25)) buzz([20, 40, 60]);
+    // a played run makes this a returning player: the homepage shows both games side by side from now on
+    document.documentElement.classList.add("returning");
     const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, b: run.bestBefore, c: choices, ...(run.token ? { t: run.token } : {}), ...(right ? {} : { over: true, e: Date.now() }) } };
     writeEndless(updated);
     if (!right) track("endless_end", { streak: n });
@@ -309,8 +311,8 @@ function ScoreBar({ ref, streak, best, level, newBest }: { ref: React.Ref<HTMLDi
         ))}
       </ol>
       {/* the five bars in words, so a new player knows what they measure */}
-      <p key={level} className="pop-in mt-1 text-center text-xs font-bold text-ink">
-        {t.levelSr(level + 1, LEVELS.length, t.levels[level])}
+      <p key={level} className="pop-in mt-1 text-center text-xs font-bold text-ink [@media(max-height:500px)]:sr-only">
+        {t.level(level + 1, LEVELS.length, t.levels[level])}
       </p>
       {/* said once, the moment the run passes the old best */}
       <p className="sr-only" aria-live="polite">

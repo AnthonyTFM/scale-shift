@@ -12,7 +12,7 @@ export const endlessCopy = {
   retry: "Try again",
   // one name per level in src/lib/endless.ts (LEVELS)
   levels: ["Warm-up", "Getting closer", "Tricky", "Close calls", "Razor thin"],
-  levelSr: (n: number, total: number, name: string) => `Level ${n} of ${total}: ${name}`,
+  level: (n: number, total: number, name: string) => `Level ${n} of ${total}: ${name}`,
   round: (n: number) => `Round ${n}`,
   // the score bar that stays on screen while playing: big streak, best, level, and the rules in one line
   hudStreak: "in a row",
