@@ -53,7 +53,7 @@ export function newSeed(date: string) {
 /** The shapes a run can use: those in the daily pool on the date in its seed. */
 function poolFor(all: PoolEntry[], seed: string) {
   const date = seed.slice(0, 10);
-  return all.filter((e) => !e.since || e.since <= date);
+  return all.filter((e) => (!e.since || e.since <= date) && (!e.until || date < e.until));
 }
 
 const same = (e: PoolEntry) => e.n.replace(/^Contiguous /, "");

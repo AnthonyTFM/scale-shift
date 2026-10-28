@@ -321,6 +321,15 @@ const previous = (() => {
 })();
 const firstDay = new Date(Date.now() + 2 * 86_400_000).toISOString().slice(0, 10);
 
+// Retired shapes stay in the pool (puzzles pick by position) but no puzzle or endless run uses them from this date on.
+// Pick a date no time zone has reached yet, so no day anyone has played changes.
+const RETIRED = {
+  // the map now draws the Chagatai Khanate of 1492 as Moghulistan (about 1.59M km²); this frozen entry kept the old
+  // outline (8.37M km², about 5× too big)
+  "chagatai-khanate-1492": "2026-10-30",
+};
+for (const [id, until] of Object.entries(RETIRED)) if (previous.has(id)) previous.get(id).until ??= until;
+
 // outlines of frozen shapes the map data no longer has (renamed or removed) are kept as they are
 const oldOutlines = new Map();
 if (fs.existsSync(path.join(OUT, "shapes")))
