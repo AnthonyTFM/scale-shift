@@ -223,7 +223,7 @@ export class MapEngine {
   private cache: BaseCache | null = null;
   /** the tiles of the zoom level just left, shown under the new level's tiles until those are all drawn */
   private standIn: BaseCache | null = null;
-  /** the map has been drawn complete once (before that there is nothing to keep on screen while tiles fill in) */
+  /** the map has been drawn complete with an era once (before that there is nothing to keep on screen while tiles fill in) */
   private painted = false;
   /** draw every tile now, with no time limit (for a saved picture) */
   private fullDraw = false;
@@ -335,22 +335,16 @@ export class MapEngine {
   }
   setStates(states: Layer | null) {
     this.states = states;
-    this.cache = null;
-    this.dropStandIn();
-    this.markBase();
+    this.retile("states");
   }
   setClaims(list: ClaimShape[]) {
     this.claims = list;
-    this.cache = null;
-    this.dropStandIn();
-    this.markBase();
+    this.retile("claims");
   }
   /** Big lakes, drawn as water over every era so they never appear or vanish between snapshots. */
   setLakes(list: Lake[]) {
     this.lakes = list;
-    this.cache = null;
-    this.dropStandIn();
-    this.markBase();
+    this.retile("lakes");
   }
   setLabels(on: boolean) {
     this.labels = on;
@@ -458,6 +452,27 @@ export class MapEngine {
   private markBase() {
     this.baseDirty = true;
     this.schedule();
+  }
+  /**
+   * Lakes, Antarctic claims or US state lines arrived or changed: the tiles are drawn again, but the shapes' outlines at
+   * this zoom are kept (working them out is the slow part). The map opens with the era, then the lakes, the claims and
+   * the state lines arrive one after another, and starting over each time froze a mid-range phone for 150–300 ms each.
+   */
+  private retile(part: "states" | "claims" | "lakes") {
+    this.dropStandIn();
+    const c = this.cache;
+    if (c) {
+      this.recycle(...c.tiles.values());
+      const fresh = this.buildCache(c.layer, c.k);
+      this.cache = {
+        ...c,
+        tiles: new Map(),
+        states: part === "states" ? fresh.states : c.states,
+        claims: part === "claims" ? fresh.claims : c.claims,
+        lakes: part === "lakes" ? fresh.lakes : c.lakes,
+      };
+    }
+    this.markBase();
   }
   private markTop() {
     this.topDirty = true;
@@ -603,8 +618,7 @@ export class MapEngine {
   }
 
   /** Works out each shape's box at this zoom. Outlines are converted to screen units later, the first time a tile needs them. */
-  private buildCache(layer = this.layer): BaseCache {
-    const k = this.view.k;
+  private buildCache(layer = this.layer, k = this.view.k): BaseCache {
     const proj = geoMercator()
       .rotate([-CUT_CENTER, 0])
       .scale(k)
@@ -720,7 +734,8 @@ export class MapEngine {
     // if its kept tiles cover every gap (flying to the other side of the world, they don't)
     const covered = !!standIn && gaps.every(([x, y, w, h]) => this.standInCovers(standIn, x, y, w, h));
     const deadline = live && !this.sweep && gaps.length && (covered || (!standIn && !this.painted)) ? performance.now() + 10 : Infinity;
-    if (covered && deadline !== Infinity) {
+    const underGaps = covered && deadline !== Infinity;
+    if (underGaps) {
       // only under the gaps: elsewhere the new tiles' crisp lines would show the old, scaled ones through them
       ctx.save();
       ctx.beginPath();
@@ -729,14 +744,24 @@ export class MapEngine {
       this.drawStandIn(standIn, ctx);
       ctx.restore();
     }
+    // out of time this frame while working out a tile's outlines: no more new tiles until the next frame
+    let busy = false;
     for (const { ox, oy, half, i, j } of onScreen) {
       shown++;
       // ready tiles are always drawn; a missing one only while there's time left this frame (and always the first)
-      if (!c.tiles.has(`${i},${j}`) && drawn > 0 && performance.now() > deadline) {
-        pending = true;
-        continue;
+      if (!c.tiles.has(`${i},${j}`)) {
+        if (busy || (drawn > 0 && performance.now() > deadline)) {
+          pending = true;
+          continue;
+        }
+        // with a time limit, a tile's outlines are worked out a few at a time first, so one tile full of big shapes
+        // can't hold the page up (a ~140 ms freeze on a mid-range phone when the map opened)
+        if (deadline !== Infinity && !this.outlinesReady(c, i, j, deadline)) {
+          busy = pending = true;
+          continue;
+        }
+        drawn++;
       }
-      if (!c.tiles.has(`${i},${j}`)) drawn++;
       const tile = this.tile(c, i, j);
       const src = (c.size + 2 * pad) * c.dpr;
       ctx.drawImage(tile, 0, 0, src, src, ox + s * (i * c.size - half - pad), oy + s * (j * c.size - half - pad), s * (c.size + 2 * pad), s * (c.size + 2 * pad));
@@ -749,7 +774,12 @@ export class MapEngine {
       return;
     }
     if (ctx === this.bctx) {
-      this.painted = true;
+      // only once there's an era: the empty sea drawn while it loads doesn't count, or its tiles would all be drawn in one
+      // go when it arrives (a 300 ms freeze on a mid-range phone) instead of a few a frame
+      if (c.layer) this.painted = true;
+      // the old level was drawn under the last new tiles this frame and shows through their sea (its coastlines a little
+      // off the new ones): one more frame without it, or those tiles keep a doubled coastline until the map next moves
+      if (underGaps) this.markBase();
       this.dropStandIn();
     }
     if (missing && !this.prefetchTimer) this.prefetchTimer = window.setTimeout(this.prefetch, 0);
@@ -796,7 +826,8 @@ export class MapEngine {
       for (let j = j0; j <= j1; j++)
         for (let i = i0; i <= i1; i++) {
           if (c.tiles.has(`${i},${j}`)) continue;
-          if (performance.now() - start > 6) {
+          // the tile's outlines first, a few at a time, so one tile full of big shapes doesn't overrun the slot
+          if (performance.now() - start > 6 || !this.outlinesReady(c, i, j, start + 6)) {
             this.prefetchTimer = window.setTimeout(this.prefetch, 0);
             return;
           }
@@ -825,12 +856,38 @@ export class MapEngine {
     for (const t of tiles) if (this.tilePool.length < 16) this.tilePool.push(t);
   }
 
-  private renderTile(c: BaseCache, i: number, j: number) {
+  /** A tile's area in the cache's units, and a test for boxes that reach into it. */
+  private tileArea(c: BaseCache, i: number, j: number) {
     const pad = TILE_PAD;
     const half = Math.ceil(Math.PI * c.k / 2) * 2;
     const x0 = i * c.size - half - pad;
     const y0 = j * c.size - half - pad;
     const span = c.size + 2 * pad;
+    const hits = (b: [number, number, number, number]) => b[0] < x0 + span && b[2] > x0 && b[1] < y0 + span && b[3] > y0;
+    return { x0, y0, span, hits };
+  }
+
+  /**
+   * Works out the outlines a tile needs (fills and borders) until the deadline, at least one per call so the map always
+   * gets on. True when they are all ready.
+   */
+  private outlinesReady(c: BaseCache, i: number, j: number, deadline: number) {
+    const { hits } = this.tileArea(c, i, j);
+    let made = 0;
+    for (const { f, box } of c.shapes) {
+      if (!hits(box)) continue;
+      const outline = !(f.props.m || f.sliced);
+      if (c.paths.has(f) && (!outline || c.outlines.has(f))) continue;
+      if (made > 0 && performance.now() > deadline) return false;
+      this.cachedPath(c, f);
+      if (outline) this.cachedOutline(c, f);
+      made++;
+    }
+    return true;
+  }
+
+  private renderTile(c: BaseCache, i: number, j: number) {
+    const { x0, y0, span, hits } = this.tileArea(c, i, j);
     const tile = this.tilePool.pop() ?? document.createElement("canvas");
     const px = Math.ceil(span * c.dpr);
     if (tile.width !== px || tile.height !== px) tile.width = tile.height = px;
@@ -838,7 +895,6 @@ export class MapEngine {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, px, px);
     ctx.setTransform(c.dpr, 0, 0, c.dpr, -x0 * c.dpr, -y0 * c.dpr);
-    const hits = (b: [number, number, number, number]) => b[0] < x0 + span && b[2] > x0 && b[1] < y0 + span && b[3] > y0;
     const shapes = c.shapes.filter((sh) => hits(sh.box)).map((sh) => ({ ...sh, p2d: this.cachedPath(c, sh.f) }));
 
     // pass 1: fill, and stroke in the same colour to seal hairline gaps between neighbouring shapes
