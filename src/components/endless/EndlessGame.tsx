@@ -410,7 +410,7 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
               <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
               {R.title(streak)}
             </h2>
-            <p className="text-sm text-white/85">{R.inARow(streak)}</p>
+            <p className="text-sm">{R.inARow(streak)}</p>
           </div>
         </div>
       </SkyHeader>

@@ -481,7 +481,7 @@ function Results({
               <span className="sr-only">{R.scoreSr(score, total)} </span>
               {R.title(score, total)}
             </h2>
-            <p className="text-sm leading-snug text-white/85">{verdict}</p>
+            <p className="text-sm leading-snug">{verdict}</p>
           </div>
         </div>
       </SkyHeader>
