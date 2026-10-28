@@ -14,9 +14,9 @@ const earthBand = { key: "Link", value: "</globe-still.svg>; rel=preload; as=ima
 const pageOnly = { missing: [{ type: "header" as const, key: "rsc" }] };
 
 const nextConfig: NextConfig = {
-  // which build this is (the commit on Vercel): an open tab compares it with /api/version and picks up a newer one at
-  // the next safe moment (see src/components/site/UpdateCheck.tsx)
-  env: { BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA || "dev" },
+  // which build this is (the deployment on Vercel, so a redeploy after changing settings counts too): an open tab
+  // compares it with /api/version and picks up a newer one at the next safe moment (src/components/site/UpdateCheck.tsx)
+  env: { BUILD_ID: process.env.VERCEL_DEPLOYMENT_ID || process.env.VERCEL_GIT_COMMIT_SHA || "dev" },
   cacheComponents: true,
   // React would put eager images (the homepage globe) into a Link header that Vercel also sends on the homepage's
   // prefetch responses, so every page downloaded them. Off: React's preloads go in each page's <head> instead.

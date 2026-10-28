@@ -8,12 +8,15 @@ const EVERY = 10 * 60_000;
 /** never ask more often than this (a tab flicking between apps) */
 const GAP = 60_000;
 
+/** pages where reloading can't lose anything you typed (forms, search boxes and the map are left alone) */
+const RELOADABLE = /^\/(?:|daily|endless|leaderboard|eras(?:\/[^/]+)?)$/;
+
 /**
  * A daily game is often left open in a tab for days, which would keep running the old version. This asks, in the
- * background, which build is live; once a newer one is out, it arrives at the next safe moment, never mid-round:
- * - the next link to another page loads it fresh (a full page load instead of an in-app one);
- * - coming back to the tab reloads it, unless a round is in play (see PlayingMark), a pop-up is open, or it's the map
- *   (where your dragged shapes would go).
+ * background, which build is live (when the tab comes back, and every 10 minutes while it's visible). Once a newer one
+ * is out, coming back to the tab reloads it, but only at a safe moment: on a game or browsing page, with no round in
+ * play (see PlayingMark) and no pop-up open. Elsewhere the new version arrives with the next link: Next.js itself does
+ * a full page load when the live build differs from the tab's.
  */
 export function UpdateCheck() {
   useEffect(() => {
@@ -31,30 +34,20 @@ export function UpdateCheck() {
         /* offline: ask again later */
       }
     };
-    const safe = () => !document.documentElement.dataset.playing && !location.pathname.startsWith("/map") && !document.querySelector("dialog[open], [aria-modal='true']");
+    const safe = () =>
+      RELOADABLE.test(location.pathname) &&
+      !document.documentElement.dataset.playing &&
+      !document.querySelector('dialog[open], [role="dialog"], [aria-modal="true"]');
     const onVisible = async () => {
       if (document.visibilityState !== "visible") return;
       await check();
       if (stale && safe()) location.reload();
     };
-    // with a new version out, a link to another page loads it fresh (capture phase: before the in-app navigation)
-    const onClick = (e: MouseEvent) => {
-      if (!stale || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-      const a = (e.target as Element | null)?.closest?.("a");
-      if (!a || !a.href || a.target || a.hasAttribute("download")) return;
-      const url = new URL(a.href, location.href);
-      if (url.origin !== location.origin || (url.pathname === location.pathname && url.search === location.search)) return;
-      e.preventDefault();
-      e.stopPropagation();
-      location.assign(url.href);
-    };
     const id = setInterval(() => document.visibilityState === "visible" && check(), EVERY);
     document.addEventListener("visibilitychange", onVisible);
-    document.addEventListener("click", onClick, true);
     return () => {
       clearInterval(id);
       document.removeEventListener("visibilitychange", onVisible);
-      document.removeEventListener("click", onClick, true);
     };
   }, []);
   return null;

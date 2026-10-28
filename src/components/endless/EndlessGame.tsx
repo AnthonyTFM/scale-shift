@@ -241,8 +241,9 @@ export function EndlessGame() {
 
   return (
     <div ref={top} className="flex flex-col">
-      {/* a run under way: no update reload mid-run */}
-      <PlayingMark on={!run.done && run.choices.length > 0} />
+      {/* a run under way, or its results (a reload there would replay the celebration or start a new run): no update
+          reload; the new version arrives with the next page */}
+      <PlayingMark on={run.choices.length > 0} />
       {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} />}
       {run.done ? (
         <Results
