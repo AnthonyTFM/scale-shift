@@ -55,6 +55,21 @@ export const accountCopy = {
   savedAs: (name: string) => `Signed in as ${name}`,
   manage: "Account settings",
 
+  // the leaderboard page, signed out
+  boardPrompt: "Pick a username for the Best streaks board, saved on every device:",
+
+  // the page after a reminder-email unsubscribe link
+  unsubscribe: {
+    eyebrow: "Reminder emails",
+    title: "You're unsubscribed",
+    lead: "You won't get any more daily challenge reminders. Your streak and scores stay saved.",
+    failedTitle: "That link didn't work",
+    failedLead:
+      "The unsubscribe link was incomplete. Sign in and turn reminders off on your account page (Menu → Your account), or contact us and we'll do it for you.",
+    play: "Play today's five",
+    contact: "Contact us",
+  },
+
   errors: {
     network: "Couldn't reach the server. Please try again.",
     generic: "Couldn't save that. Please try again.",

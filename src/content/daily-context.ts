@@ -13,7 +13,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Italy, Spain, France, Greece, Türkiye, Egypt, England and Wales, and more",
   },
   "Western Roman Empire": {
-    what: "The western part of the Roman Empire after the empire split in 395 CE. It fell in 476.",
+    what: "The Roman Empire in the west, ruled from Milan and then Ravenna after the empire split in 395 CE. It fell in 476.",
     today: "Italy, France, Spain, Portugal, England and Wales, coastal North Africa, Switzerland, Belgium, southern Germany, Austria, western Hungary, Slovenia, Croatia and Bosnia",
   },
   "Byzantine Empire": {
@@ -29,7 +29,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Türkiye, Afghanistan, Pakistan, Syria and Central Asia, and Egypt (which was independent from 404 to 343 BCE)",
   },
   "Seleucid Kingdom": {
-    what: "A Greek-ruled kingdom carved from the eastern part of Alexander's empire by Seleucus, one of his generals.",
+    what: "A Greek-ruled kingdom founded by Seleucus, one of Alexander the Great's generals, after Alexander died in 323 BCE.",
     today: "Iran, Iraq, Syria and Afghanistan, plus parts of Türkiye, Turkmenistan, Uzbekistan and Tajikistan",
   },
   "Parthian Empire": {
@@ -45,7 +45,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Tunisia, plus coastal Libya, Algeria and Morocco, southern Spain, Sardinia, western Sicily, Malta and Ibiza",
   },
   "Mauryan Empire": {
-    what: "An Indian empire founded by Chandragupta Maurya (c. 322–185 BCE). By his own account, its emperor Ashoka conquered Kalinga around 261 BCE, killing 100,000 people and deporting 150,000, then turned to Buddhism and spread it.",
+    what: "An Indian empire (c. 322–185 BCE) founded by Chandragupta Maurya. By his own account, its emperor Ashoka conquered Kalinga around 261 BCE, killing 100,000 people and deporting 150,000, then turned to Buddhism and spread it.",
     today: "India, Pakistan, Bangladesh and Nepal",
   },
   "Gupta Empire": {
@@ -65,7 +65,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "India, Pakistan, Bangladesh and Myanmar",
   },
   Han: {
-    what: "A Chinese dynasty (206 BCE–220 CE), so central to Chinese history that most Chinese people still call themselves Han.",
+    what: "A Chinese dynasty (206 BCE–220 CE), so central to Chinese history that China's main ethnic group is still called Han.",
     today: "China, plus northern Vietnam and North Korea",
   },
   "Sui Empire": {
@@ -101,11 +101,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Cambodia, Thailand, Laos and southern Vietnam",
   },
   "Empire of Japan": {
-    what: "Japan's empire before and during the Second World War. By 1938 it ruled Korea and Taiwan, held Manchuria and had invaded China, where its troops massacred civilians and prisoners at Nanjing in 1937–38 (estimates run from about 100,000 to China's official 300,000). Its army forced 20,000–200,000 women (estimates vary), many of them Korean, into sexual slavery.",
+    what: "Japan's empire before and during the Second World War. It invaded China in 1937, and its troops massacred civilians and prisoners at Nanjing in 1937–38 (estimates run from about 100,000 to China's official 300,000). Its army forced 20,000–200,000 women (estimates vary), many of them Korean, into sexual slavery.",
     today: "Japan, North and South Korea, Taiwan, much of northern and eastern China, and Russia's southern Sakhalin and Kuril Islands",
   },
   "Umayyad Caliphate": {
-    what: "The first Muslim dynasty to rule an empire, from Damascus (661–750). Its armies reached Spain in 711.",
+    what: "The first Muslim dynasty to rule an empire, from Damascus (661–750). It built the Dome of the Rock in Jerusalem.",
     today: "Syria, Iraq, Iran, Saudi Arabia, Egypt, North Africa, Israel and Palestine, Jordan, Afghanistan, Turkmenistan and the Caucasus",
   },
   "Abbasid Caliphate": {
@@ -121,7 +121,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Turkmenistan, Syria and eastern Türkiye",
   },
   "Ottoman Empire": {
-    what: "A Turkish empire (c. 1299–1922) that took Constantinople in 1453 and ruled on three continents. During the First World War its government carried out the Armenian Genocide: about 1 million Armenians died in 1915–16, and most estimates for 1915–18 run to 1.3–1.5 million. Türkiye rejects the word genocide.",
+    what: "A Turkish empire (c. 1299–1922) that took Constantinople (today's Istanbul) in 1453 and made it its capital. During the First World War its government carried out the Armenian Genocide: about 1 million Armenians died in 1915–16, and most estimates for 1915–18 run to 1.3–1.5 million. Türkiye rejects the word genocide.",
     today: "Türkiye, the Balkans, the Middle East, Egypt and coastal North Africa, plus Hungary, southern Ukraine, parts of the Caucasus and the Red Sea coast of Sudan and Eritrea",
   },
   "Safavid Empire": {
@@ -245,11 +245,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Azerbaijan, eastern Türkiye, Turkmenistan and Afghanistan",
   },
   "Chagatai Khanate": {
-    what: "The Mongol khanate of Genghis Khan's son Chagatai, in Central Asia.",
+    what: "The Mongol khanate of Genghis Khan's son Chagatai, in Central Asia, shown here as its eastern branch, Moghulistan.",
     today: "Western China (Xinjiang), Kyrgyzstan and southeastern Kazakhstan",
   },
   "Sultanate of Delhi": {
-    what: "A Muslim sultanate ruled from Delhi from 1206 to 1526 by five dynasties. Bengal broke away by the 1350s, Jaunpur, Malwa and Gujarat between 1394 and 1407, and Timur sacked Delhi in 1398.",
+    what: "A Muslim sultanate ruled from Delhi from 1206 to 1526 by five dynasties. Timur sacked Delhi in 1398, and Babur defeated its last sultan at Panipat in 1526.",
     today: "India, Pakistan and Bangladesh",
   },
   "Vijayanagara": {
@@ -301,7 +301,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Russia, plus parts of Ukraine and Kazakhstan",
   },
   "Frankish Kingdom": {
-    what: "The kingdom of the Franks, a Germanic people whose king Clovis (died 511) united the Franks and became a Christian. It later became Charlemagne's empire.",
+    what: "The kingdom of the Franks, a Germanic people whose king Clovis (died 511) united the Franks and became a Christian.",
     today: "France, Belgium, the Netherlands, Switzerland and western Germany",
   },
   "Austrian Empire": {
@@ -385,7 +385,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Mainly Iran, plus Armenia and Azerbaijan's Nakhchivan",
   },
   "Union of South Africa": {
-    what: "A British dominion formed in 1910 from four colonies, which also ran neighboring South West Africa from 1915. Its Natives Land Act of 1913 restricted Black South Africans, most of the population, to about 7% of the land, and from 1948 its government enforced apartheid. It became a republic in 1961.",
+    what: "A British dominion formed in 1910 from four colonies. Its Natives Land Act of 1913 restricted Black South Africans, most of the population, to about 7% of the land, and from 1948 its government enforced apartheid. It became a republic in 1961.",
     today: "South Africa and Namibia",
   },
   "Karkhanids": {
