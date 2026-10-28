@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { cacheLife } from "next/cache";
 import { eraByKey, eras, eraSlug, keyFromSlug } from "@/lib/eras";
 import { equalAreaMapSvg } from "@/lib/og-map";
 
@@ -10,13 +11,16 @@ export function generateStaticParams() {
 const WIDTH = 1080;
 
 /**
- * The era map as a picture for phones. The vector map (../map) is around 200 KB with thousands of outlines, which a
- * phone takes seconds to draw; this is a fraction of that and shows at once. Cached, so it's made at build time.
+ * The era map as a picture for phones. The vector map (../map) is 300–500 KB with thousands of outlines, which a phone
+ * takes seconds to draw; this is a fraction of that and shows at once. Made at build time, and kept until the next
+ * deploy (it can only change with the map data).
  */
 async function eraPhoneMap(key: string) {
   "use cache";
+  cacheLife("max");
   const { svg } = equalAreaMapSvg(key, WIDTH);
-  return new Uint8Array(await sharp(Buffer.from(svg)).webp({ quality: 80 }).toBuffer());
+  // high quality: the borders are hairlines (some dashed), which stronger compression smears
+  return new Uint8Array(await sharp(Buffer.from(svg)).webp({ quality: 90 }).toBuffer());
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ slug: string }> }) {

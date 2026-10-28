@@ -120,10 +120,10 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
       />
       <div className="mx-auto max-w-6xl px-4 py-12">
         {/* an equal-area map, so every shape shows at its true size: vector art from tablets up (sharp on any screen), a
-            light picture on phones (the vector map takes a phone seconds to draw). Versioned, so a map data rebuild shows
+            light picture on phones, held upright or sideways (the vector map takes a phone seconds to draw). Versioned, so a map data rebuild shows
             up straight away. */}
         <picture>
-          <source media="(min-width: 640px)" type="image/svg+xml" srcSet={`/era-maps/${slug}/map?v=${dataVersion.v}`} />
+          <source media="(min-width: 640px) and (min-height: 500px)" type="image/svg+xml" srcSet={`/era-maps/${slug}/map?v=${dataVersion.v}`} />
           <img
             src={`/era-maps/${slug}/phone?v=${dataVersion.v}`}
             fetchPriority="high"

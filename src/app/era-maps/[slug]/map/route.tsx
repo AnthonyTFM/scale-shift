@@ -1,3 +1,4 @@
+import { cacheLife } from "next/cache";
 import { eraByKey, eras, eraSlug, keyFromSlug } from "@/lib/eras";
 import { equalAreaMapSvg } from "@/lib/og-map";
 
@@ -8,6 +9,8 @@ export function generateStaticParams() {
 /** The era's borders on an equal-area map, as vector art: sharp on any screen. Cached, so it's made at build time. */
 async function eraMap(key: string) {
   "use cache";
+  // only changes with the map data, i.e. at a deploy
+  cacheLife("max");
   return equalAreaMapSvg(key).svg;
 }
 

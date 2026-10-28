@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { cacheLife } from "next/cache";
 import { eraByKey, eras, eraSlug, keyFromSlug } from "@/lib/eras";
 import { equalAreaMapSvg } from "@/lib/og-map";
 
@@ -12,6 +13,8 @@ const WIDTH = 600;
 /** A small picture of the era map for the cards on /eras. Cached, so it's made at build time. */
 async function eraThumb(key: string) {
   "use cache";
+  // only changes with the map data, i.e. at a deploy
+  cacheLife("max");
   const { svg } = equalAreaMapSvg(key, WIDTH);
   return new Uint8Array(await sharp(Buffer.from(svg)).webp({ quality: 85 }).toBuffer());
 }
