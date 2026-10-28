@@ -23,11 +23,18 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
   const [editing, setEditing] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  // closing puts keyboard focus back on the era name instead of losing it
+  const close = () => {
+    setEditing(false);
+    requestAnimationFrame(() => buttonRef.current?.focus());
+  };
 
   if (!editing) {
     return (
       <p className="flex items-center gap-1.5 font-display text-lg leading-none sm:text-2xl" aria-live="polite">
         <button
+          ref={buttonRef}
           type="button"
           onClick={() => {
             setEditing(true);
@@ -63,9 +70,10 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
           if (y === null) return setError("Try a year like 1453 or 300 BCE");
           if (y < -2000) return setError("Our maps start in 2000 BCE");
           if (y > new Date().getFullYear()) return setError("That's in the future");
-          setEditing(false);
+          close();
           onYear(y);
         }}
+        onKeyDown={(e) => e.key === "Escape" && close()}
       >
         <label htmlFor="year-input" className="sr-only">
           Go to year
@@ -78,19 +86,18 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
           placeholder="e.g. 1453 or 300 BCE"
           aria-invalid={!!error}
           aria-describedby={error ? "year-error" : undefined}
-          onKeyDown={(e) => e.key === "Escape" && setEditing(false)}
           onChange={() => error && setError("")}
-          className="h-8 w-36 rounded-md bg-white px-2 font-sans text-sm text-ink placeholder:text-muted aria-invalid:ring-2 aria-invalid:ring-rose-400 max-sm:h-11 max-sm:w-auto max-sm:min-w-0 max-sm:flex-1 max-sm:rounded-lg max-sm:px-3 max-sm:text-base sm:w-44"
+          className="h-8 w-36 rounded-md bg-white px-2 font-sans text-sm text-ink placeholder:text-muted aria-invalid:ring-2 aria-invalid:ring-rose-400 max-sm:h-11 max-sm:w-auto max-sm:min-w-0 max-sm:flex-1 max-sm:rounded-lg max-sm:px-3 max-sm:text-base max-sm:placeholder:text-sm sm:w-44"
         />
         <button
           type="submit"
-          className="h-8 rounded-md bg-accent px-2.5 text-xs font-bold text-panel hover:bg-accent-strong max-sm:h-11 max-sm:shrink-0 max-sm:rounded-lg max-sm:px-4 max-sm:text-sm"
+          className="h-8 rounded-md bg-accent px-2.5 text-xs font-bold text-panel hover:bg-accent-strong max-sm:h-11 max-sm:shrink-0 max-sm:rounded-lg max-sm:px-3.5 max-sm:text-sm"
         >
           Go
         </button>
         <button
           type="button"
-          onClick={() => setEditing(false)}
+          onClick={close}
           aria-label="Cancel"
           className="h-8 px-1 text-xs text-panel-muted hover:text-white max-sm:grid max-sm:size-11 max-sm:shrink-0 max-sm:place-items-center max-sm:px-0 max-sm:text-base"
         >
@@ -100,7 +107,7 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
           <span
             id="year-error"
             role="alert"
-            className="absolute bottom-full left-0 mb-3 whitespace-nowrap rounded-md bg-rose-600 px-2 py-1 font-sans text-xs font-semibold text-white shadow-float"
+            className="pointer-events-none absolute bottom-full left-0 mb-3 whitespace-nowrap rounded-md bg-rose-600 px-2 py-1 font-sans text-xs font-semibold text-white shadow-float"
           >
             {error}
           </span>
@@ -109,6 +116,9 @@ function YearBox({ label, loading, onYear }: { label?: string; loading: boolean;
     </>
   );
 }
+
+/** phones: while the year box covers the bar, the controls under it leave the tab order and the accessibility tree */
+const HIDE_UNDER_YEAR_BOX = "max-sm:group-has-[#year-input]/bar:invisible";
 
 function PauseIcon() {
   return (
@@ -127,7 +137,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
     onEra(eras[n].key);
   };
   return (
-    <div className="pointer-events-auto relative rounded-2xl bg-panel/95 px-2.5 py-1.5 text-panel-text shadow-float backdrop-blur sm:px-4 sm:py-2">
+    <div className="group/bar pointer-events-auto relative rounded-2xl bg-panel/95 px-2.5 py-1.5 text-panel-text shadow-float backdrop-blur sm:px-4 sm:py-2">
       <div className="flex items-center gap-2 sm:gap-3">
         {/* play backward: on wider screens only. On a phone a ◀ beside ▶ reads as "back one era", so phones get the
             one-step ‹ › buttons instead */}
@@ -153,7 +163,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => onTogglePlay(1)}
           aria-label={playing === 1 ? "Pause timeline" : "Play timeline"}
           title={playing === 1 ? "Pause" : "Play forward in time"}
-          className="grid size-9 shrink-0 place-items-center rounded-full bg-accent sm:size-10 text-panel hover:bg-accent-strong"
+          className={`grid size-9 shrink-0 place-items-center rounded-full bg-accent sm:size-10 text-panel hover:bg-accent-strong ${HIDE_UNDER_YEAR_BOX}`}
         >
           {playing === 1 ? (
             <PauseIcon />
@@ -168,7 +178,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => go(-1)}
           disabled={i <= 0}
           aria-label="Previous era"
-          className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30"
+          className={`grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 ${HIDE_UNDER_YEAR_BOX}`}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m15 6-6 6 6 6" />
@@ -190,7 +200,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           </label>
           <input
             id="era-range"
-            className="era-range"
+            className={`era-range ${HIDE_UNDER_YEAR_BOX}`}
             type="range"
             min={0}
             max={eras.length - 1}
@@ -211,7 +221,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => go(1)}
           disabled={i >= eras.length - 1}
           aria-label="Next era"
-          className="grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30"
+          className={`grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 ${HIDE_UNDER_YEAR_BOX}`}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m9 6 6 6-6 6" />
@@ -221,7 +231,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           type="button"
           onClick={onChanges}
           aria-expanded={changesOpen}
-          className="shrink-0 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/15 sm:px-3 sm:py-2 sm:text-sm"
+          className={`shrink-0 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/15 sm:px-3 sm:py-2 sm:text-sm ${HIDE_UNDER_YEAR_BOX}`}
         >
           What changed?
         </button>
