@@ -26,16 +26,24 @@ function lineageLists(root) {
   return [...text.matchAll(/names:\s*\[([^\]]*)\]/g)].map(([, list]) => [...list.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => JSON.parse(`"${m[1]}"`)));
 }
 
-/** The era pages' two lists (src/content/peoples.ts, a TS file, so read as text): names that are peoples, and names in
- * neither list (several states drawn as one shape, or Antarctica). */
-function eraLists(root) {
-  const text = fs.readFileSync(path.join(root, "src/content/peoples.ts"), "utf8");
-  const list = (key) => {
-    const m = new RegExp(`${key}:\\s*\\[([^\\]]*)\\]`).exec(text);
-    if (!m) throw new Error(`src/content/peoples.ts: no ${key} list`);
-    return new Set([...m[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((s) => JSON.parse(`"${s[1]}"`)));
+/** The era pages' two lists (src/content/era-lists.json): for an era's year, is a name a people, in neither list (several
+ * states drawn as one shape, Antarctica, a state drawn before it existed) or a state (anything not listed)? */
+function eraLists(root, named, eras) {
+  const doc = JSON.parse(fs.readFileSync(path.join(root, "src/content/era-lists.json"), "utf8"));
+  const read = (list) => list.map((x) => (typeof x === "string" ? { n: x } : x));
+  const peoples = read(doc.peoples);
+  const neither = read(doc.neither);
+  // every listed name must be on some map, or a typo would quietly leave a people among the states
+  const mapped = new Set(named.flatMap((m) => [...m.keys()]));
+  const missing = [...peoples, ...neither].map((x) => x.n).filter((n) => !mapped.has(n));
+  if (missing.length) throw new Error(`src/content/era-lists.json: not in any era file: ${missing.join(", ")}`);
+  const covers = (x, year) => (x.from === undefined || year >= x.from) && (x.until === undefined || year < x.until);
+  return (n, i) => {
+    const year = eras[i].year === "present" ? Infinity : eras[i].year;
+    if (peoples.some((x) => x.n === n && covers(x, year))) return "people";
+    if (neither.some((x) => x.n === n && covers(x, year))) return "neither";
+    return "state";
   };
-  return { peoples: list("peoples"), neither: list("neither") };
 }
 
 /** One node per name and status: "c:" + name for shapes with a ruler, so a colony never joins a state. */
@@ -179,7 +187,7 @@ export function eraStatsFromFiles(root, eras) {
     nodes.push(byNode);
   }
   const groupOf = countryGroups(nodes, lineageLists(root));
-  const lists = eraLists(root);
+  const kind = eraLists(root, named, eras);
   // per era: country → its area (all its names; a second one is at most a sliver) and the name it goes by (the biggest)
   const countries = nodes.map((m) => {
     const out = new Map();
@@ -214,8 +222,8 @@ export function eraStatsFromFiles(root, eras) {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 12)
         .map(([n, a]) => ({ n, a: r(a) }));
-    out.top = largest((n) => !lists.peoples.has(n) && !lists.neither.has(n));
-    out.peoples = largest((n) => lists.peoples.has(n));
+    out.top = largest((n) => kind(n, i) === "state");
+    out.peoples = largest((n) => kind(n, i) === "people");
     if (i === 0) return out;
     const now = countries[i];
     const before = countries[i - 1];

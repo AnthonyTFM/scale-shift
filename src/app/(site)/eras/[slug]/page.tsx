@@ -139,8 +139,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         {s?.top.length ? (
           <Largest
             id="largest"
-            title={e.key === "present" ? "Largest countries today" : `Largest states in ${e.label}`}
-            column={e.key === "present" ? "Country" : "State"}
+            title={e.key === "present" ? "Largest countries and territories today" : `Largest states in ${e.label}`}
+            column={e.key === "present" ? "Country or territory" : "State"}
             rows={s.top}
           />
         ) : null}

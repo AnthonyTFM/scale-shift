@@ -1,18 +1,18 @@
-// Which mapped names are peoples rather than states, for the era pages' two "Largest" lists (read as text by
-// scripts/lib/era-stats.mjs, then `npm run data:stats`). Names must match the map data exactly.
-//
-// The rule: a name for a people, culture or way of life (hunter-gatherers, herders, an archaeological culture, a tribal
-// confederation) is a people. A polity that historians treat as a state at that date stays a state, even when it
-// carries a people's name: the Xiongnu empire, the Avar and Khazar khaganates, the Uyghur khaganate of 800, the
-// Ostrogoths and Visigoths of 500 (kingdoms in Italy and Spain). A lump of several states drawn as one shape is in
-// neither list, and neither is Antarctica.
-
-export const eraLists = {
-  peoples: [
+{
+  "_about": [
+    "Which mapped names are peoples rather than states, for the era pages' two \"Largest\" lists. Read by scripts/lib/era-stats.mjs; run `npm run data:stats` after a change. Names must match the map data exactly (the build fails otherwise).",
+    "The rule: a name for a people, culture or way of life (hunter-gatherers, herders, an archaeological culture, a tribal confederation) is a people. A polity that historians treat as a state at that date stays a state, even when it carries a people's name (the Avar and Khazar khaganates, the Ostrogoth and Visigoth kingdoms of 500). A lump of several states drawn as one shape is in neither list, and so are Antarctica and a state the source draws before it existed.",
+    "An entry is a name, or { n, from?, until?, why }: it applies to eras from the year `from` and before the year `until` (BCE years negative); outside that range the name counts as a state. Anything not listed is a state."
+  ],
+  "peoples": [
     "Adena Culture",
     "Afanasevo",
     "Ainu",
-    "Alans",
+    {
+      "n": "Alans",
+      "until": 800,
+      "why": "Nomads until the kingdom of Alania in the North Caucasus (from the 800s)."
+    },
     "Amazon hunter-gatherers",
     "Amorites",
     "Anasazi",
@@ -56,6 +56,10 @@ export const eraLists = {
     "Cree",
     "Cuman Khanates",
     "Cuman-Kipchak confederation",
+    {
+      "n": "Cushites",
+      "why": "Cushitic-speaking peoples of the Horn of Africa, not one state."
+    },
     "Cycladic",
     "Dakapeng culture",
     "Dene and Inuit",
@@ -71,12 +75,21 @@ export const eraLists = {
     "Gandhara grave culture",
     "Germanic tribes",
     "Goths",
-    // 1000 BCE: the Greek Dark Ages, between the Mycenaean palaces and the city-states
-    "Greeks",
+    {
+      "n": "Greeks",
+      "why": "1000 BCE: the Greek Dark Ages, between the Mycenaean palaces and the city-states"
+    },
+    {
+      "n": "Guanches",
+      "why": "The first people of the Canary Islands, in chiefdoms, never one state."
+    },
     "Günün a atük (Günün a küna)",
     "Hallstatt culture",
-    // 2000 BCE, before the Hittite kingdom (about 1650 BCE)
-    "Hittites",
+    {
+      "n": "Hittites",
+      "until": -1650,
+      "why": "A people until the Hittite kingdom, founded about 1650 BCE; a state in 1500 BCE."
+    },
     "Hopewell Culture",
     "Hunters-gatherers",
     "Hurrians",
@@ -89,6 +102,11 @@ export const eraLists = {
     "Jurchens and Amur peoples",
     "Jōmon",
     "Karasuk culture",
+    {
+      "n": "Karluks",
+      "until": 766,
+      "why": "A tribal confederation under the Turkic khaganates until the Karluk yabghu state (766)."
+    },
     "Khitans",
     "Khoisan",
     "Koreans",
@@ -104,11 +122,12 @@ export const eraLists = {
     "Manioc farmers",
     "Mesoamerican hunter-gatherers and maïze farmers",
     "Milograd culture",
-    "Minoan",
     "Mogollon",
     "Mon-Khmer",
-    // 1100, before Genghis Khan united them in 1206
-    "Mongol tribes",
+    {
+      "n": "Mongol tribes",
+      "why": "1100, before Genghis Khan united them in 1206"
+    },
     "Mongols",
     "N. European Bronze Age cultures",
     "Nairi",
@@ -132,8 +151,11 @@ export const eraLists = {
     "Patagonian shellfish and marine mammal hunters",
     "Permians",
     "Peshemegs",
-    // 1500–700 BCE: mostly before the Phrygian kingdom of Midas
-    "Phrygians",
+    {
+      "n": "Phrygians",
+      "until": -750,
+      "why": "A people until the Phrygian kingdom of the 700s BCE (King Midas); a state in 700 BCE."
+    },
     "Plain bison hunters",
     "Plain-Pottery culture",
     "Plateau fichers and hunter gatherers",
@@ -162,13 +184,20 @@ export const eraLists = {
     "Sinic",
     "Sintashta",
     "Slavonic tribes",
+    {
+      "n": "Southern Xiongnu",
+      "until": 304,
+      "why": "A people settled inside China under Han and Jin officials until Liu Yuan founded Han-Zhao in 304."
+    },
     "Subarctic forest hunter-gatherers",
     "Swift Creek Culture",
     "Sámi",
     "T'atsaot'ine",
     "Tasmanian hunter-gatherers",
-    // 2000 and 200 BCE, long before the first Thai kingdoms
-    "Thai",
+    {
+      "n": "Thai",
+      "why": "2000 and 200 BCE, long before the first Thai kingdoms"
+    },
     "Thrace",
     "Thule",
     "Tibetans",
@@ -185,25 +214,51 @@ export const eraLists = {
     "Urnfield cultures",
     "Valdivia",
     "Vazimba",
-    "Vedic Aryans",
+    {
+      "n": "Vedic Aryans",
+      "until": -1200,
+      "why": "Vedic tribes; from about 1200 BCE several kingdoms (Kuru, Panchala), so in neither list."
+    },
     "West African cereal farmers",
-    "Wu",
-    // 100 and 200 CE: a confederation of tribes, broken up after its leader Tanshihuai died about 181
-    "Xianbei",
+    {
+      "n": "Wu",
+      "until": -585,
+      "why": "Peoples of the lower Yangtze until Wu rose as a kingdom under Shoumeng (585 BCE); a state in 500 BCE, when it took the Chu capital (506 BCE)."
+    },
+    {
+      "n": "Xianbei",
+      "why": "100 and 200 CE: a confederation of tribes, broken up after its leader Tanshihuai died about 181"
+    },
+    {
+      "n": "Xiongnu",
+      "until": -209,
+      "why": "Steppe peoples until Modu Chanyu founded the Xiongnu state in 209 BCE."
+    },
     "Xionites",
     "Yayoi",
-    "Yue",
+    {
+      "n": "Yue",
+      "from": -334,
+      "why": "The kingdom of Yue (it conquered Wu in 473 BCE) until Chu defeated it, traditionally in 334 BCE; after that, the Yue peoples."
+    },
     "Yuezhi",
-    "Únětice",
+    "Únětice"
   ],
-  // several states drawn as one shape, or no one's land: in neither list
-  neither: [
+  "neither": [
     "Antarctica",
     "Armenian and Caucasian kingdoms",
+    {
+      "n": "Banu Ghaniya and Arab tribes",
+      "why": "A dynasty and the Arab tribes it fought beside, drawn as one shape."
+    },
     "Canaan",
     "Canaanite city-states",
     "city-states",
     "Elamite and Zagros states",
+    {
+      "n": "Etruscans",
+      "why": "A league of city-states, not one state."
+    },
     "Gangetic kingdoms",
     "Greek city-states",
     "Greek colonies",
@@ -211,13 +266,27 @@ export const eraLists = {
     "Hindu kingdoms and republics",
     "Hindu states",
     "Hurrian Kingdoms",
+    {
+      "n": "Ifat",
+      "until": 1285,
+      "why": "The source draws it before the sultanate was founded (about 1285)."
+    },
     "Indo-Greek kingdoms",
     "Islamic and Hindu states",
     "Khalkha Mongols",
+    {
+      "n": "Kingdom of Sukhotai",
+      "until": 1238,
+      "why": "The source draws it before it was founded (about 1238)."
+    },
     "Mahratta states",
     "Malaysian Islamic states",
     "Mauryan successor states",
     "Maya chiefdoms and states",
+    {
+      "n": "Minoan",
+      "why": "The palace states of Crete, drawn as one shape."
+    },
     "minor Hindu kingdoms",
     "minor states under Indian influence",
     "Mycenaean Greece",
@@ -229,6 +298,16 @@ export const eraLists = {
     "state societies and Aramaean kingdoms",
     "Tarim Basin kingdoms",
     "Tibetan kingdoms",
-    "Zhou royal domain and minor states",
-  ],
-};
+    {
+      "n": "Uyghurs",
+      "from": 840,
+      "why": "After the Uyghur khaganate fell in 840: two Uyghur states (Ganzhou and Qocho) drawn as one shape."
+    },
+    {
+      "n": "Vedic Aryans",
+      "from": -1200,
+      "why": "Several kingdoms (Kuru, Panchala and others) drawn as one shape."
+    },
+    "Zhou royal domain and minor states"
+  ]
+}
