@@ -60,7 +60,7 @@ export function HeroEndless() {
   }, []);
 
   return (
-    <div className="flex flex-col rounded-card bg-[linear-gradient(160deg,var(--color-gold-soft),var(--color-gold-pale))] p-4 text-ink shadow-float ring-1 ring-gold/70 sm:p-5">
+    <div className="hero-endless flex flex-col rounded-card bg-[linear-gradient(160deg,var(--color-gold-soft),var(--color-gold-pale))] p-4 text-ink shadow-float ring-1 ring-gold/70 sm:p-5">
       <p className="flex min-h-4 items-center gap-1 text-xs font-bold uppercase tracking-wide text-ink-soft">
         <FlameIcon className="flame-flicker size-4" /> {t.endlessEyebrow}
       </p>

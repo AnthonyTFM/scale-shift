@@ -157,14 +157,12 @@ export const dailyCopy = {
       misses === 0
         ? "Perfect round. Bet the map fools you at least once."
         : `The map fooled me ${misses === 1 ? "once" : misses === 2 ? "twice" : `${misses} times`}. Can you beat it?`,
-    // the quieter ways to share, under the Share button
+    // the quieter way to share, under the Share button
     picture: "Share a picture",
-    challenge: "Challenge a friend",
-    // beside Share: endless mode is the next thing to play (the full name is for screen readers)
-    endless: "Keep playing: endless mode",
-    endlessShort: "Endless",
-    // after "Endless" for screen readers, so the button's name starts with what it shows
-    endlessSr: "mode: keep playing",
+    // beside Share: endless mode is the next thing to play
+    endlessShort: "Keep playing",
+    // after "Keep playing" for screen readers, so the button's name starts with what it shows
+    endlessSr: "in endless mode",
     answersToggle: (n: number) => `See the ${n} answers`,
     dragOnMap: "Compare sizes on the map",
     pictureSaved: "Picture saved. Post it anywhere.",

@@ -392,10 +392,6 @@ function Results({
   // how many days you've scored 0, 1 … 5
   const spread = [0, 1, 2, 3, 4, 5].map((n) => Object.values(save.days).filter((d) => d.s === n).length);
 
-  const challengeFriend = () => {
-    shareBox.share(challengeMessage(score, total, round.date), "results");
-  };
-
   const shareImage = async () => {
     track("daily_share_image", { score });
     const blob = await resultImage({ day: dayNumber(round.date), score, marks, title: R.title(score, total), verdict, streak: s.streak });
@@ -417,8 +413,9 @@ function Results({
     setCopied(R.pictureSaved);
   };
 
+  // one Share for both: the link carries your score, so a friend who opens it sees the score to beat
   const share = () => {
-    const url = `${location.origin}/daily`;
+    const { url } = challengeMessage(score, total, round.date);
     const text = `${R.shareHead(site.name, dayNumber(today), score, total, s.streak)}\n${grid}\n${R.shareDare(total - score)}\n${url}`;
     shareBox.share({ kind: "score", url, text }, "results");
   };
@@ -527,16 +524,10 @@ function Results({
           <span className="sr-only"> {R.endlessSr}</span> <span aria-hidden="true">→</span>
         </Link>
       </div>
-      {/* the other ways to share, quietly */}
-      <p className="mt-2 flex flex-wrap items-center justify-center gap-x-4 text-sm">
+      {/* sharing as a picture, quietly */}
+      <p className="mt-2 flex justify-center text-sm">
         <button type="button" onClick={shareImage} className="min-h-11 font-semibold text-primary hover:underline">
           {R.picture}
-        </button>
-        <span aria-hidden="true" className="text-muted">
-          ·
-        </span>
-        <button type="button" onClick={challengeFriend} className="min-h-11 font-semibold text-primary hover:underline">
-          {R.challenge}
         </button>
       </p>
       <p aria-live="polite" className="whitespace-pre-line text-center text-sm font-semibold text-green-text">

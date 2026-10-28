@@ -102,10 +102,10 @@ export default function HomePage() {
           <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
             <HeroPlay />
             <HeroEndless />
-            <div className="col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start">
+            <div className="hero-board col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start">
               <HeroLeaderboard />
             </div>
-            <div className="col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2 lg:self-start">
+            <div className="hero-yday col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2 lg:self-start">
               <YesterdayMatchup />
             </div>
           </div>

@@ -258,7 +258,7 @@ export function EndlessGame() {
       ) : (
         <QuestionCard
           key={run.step}
-          eyebrow={t.round(run.step + 1, t.levels[level])}
+          eyebrow={t.round(run.step + 1)}
           q={q}
           shapes={run.shapes}
           picked={run.choices[run.step]}
@@ -308,7 +308,10 @@ function ScoreBar({ ref, streak, best, level, newBest }: { ref: React.Ref<HTMLDi
           <li key={i} className={`block h-2.5 rounded-full ${i < level ? "bg-green" : i === level ? "pop-in bg-primary" : "bg-beige"}`} />
         ))}
       </ol>
-      <p className="sr-only">{t.levelSr(level + 1, LEVELS.length, t.levels[level])}</p>
+      {/* the five bars in words, so a new player knows what they measure */}
+      <p key={level} className="pop-in mt-1 text-center text-xs font-bold text-ink">
+        {t.levelSr(level + 1, LEVELS.length, t.levels[level])}
+      </p>
       {/* said once, the moment the run passes the old best */}
       <p className="sr-only" aria-live="polite">
         {newBest ? t.hudNewBestSr : ""}

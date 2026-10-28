@@ -1751,6 +1751,30 @@ export const eventTypeLabels: Record<EventType, string> = {
   cession: "Handover",
 };
 
+/** Words for the /timeline list and its filters (src/components/site/TimelineFilter.tsx). */
+export const timelineCopy = {
+  search: "Search events",
+  searchPlaceholder: "e.g. Texas, treaty, Poland",
+  // phones: Status and Type fold behind this button, with how many are set
+  filter: "Filter",
+  filterCount: (n: number) => (n ? ` (${n})` : ""),
+  status: "Status",
+  anyStatus: "Any status",
+  type: "Type",
+  anyType: "Any type",
+  reset: "Reset filters",
+  showing: (n: number, total: number, oldest: boolean) => `Showing ${n} of ${total} events, ${oldest ? "oldest first" : "newest first"}`,
+  order: "Order",
+  oldest: "Oldest first",
+  newest: "Newest first",
+  jump: "Jump to a period",
+  events: (n: number) => (n === 1 ? "event" : "events"),
+  none: "No events match.",
+  more: (n: number, period: string) => `Show ${n} more from ${period}`,
+  fewer: "Show fewer",
+  back: (period: string) => `Back to the start of ${period}`,
+};
+
 export const statusLabels = {
   formal: "Made official",
   force: "Held by force",

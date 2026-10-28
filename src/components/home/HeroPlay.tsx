@@ -53,7 +53,7 @@ export function HeroPlay() {
 
   return (
     <ViewTransition name="daily-card" share="morph" default="none">
-      <div className="flex flex-col rounded-card bg-card p-4 text-ink shadow-float ring-1 ring-line sm:p-5">
+      <div className="hero-daily flex flex-col rounded-card bg-card p-4 text-ink shadow-float ring-1 ring-line sm:p-5">
         <p className="min-h-4 text-xs font-bold uppercase tracking-wide text-primary">{s ? t.playEyebrow(s.day) : null}</p>
         <h2 className="mt-1 font-display text-xl leading-tight sm:text-2xl md:text-3xl">
           <Link href="/daily" transitionTypes={["to-daily"]} className="hover:underline">
