@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { appCopy } from "@/content/site";
 import { presetCategories, presets, type Preset } from "@/content/presets";
 
-/** `byKeyboard`: closed with Escape, or a button pressed from the keyboard (or a screen reader) rather than tapped */
+/** `byKeyboard`: closed with the Escape key, or a button pressed from the keyboard (or a screen reader) rather than tapped */
 type Props = { onClose: (byKeyboard: boolean) => void; onPreset: (p: Preset, byKeyboard: boolean) => void };
 
 const picks = {
@@ -17,21 +17,40 @@ export function IntroCard({ onClose, onPreset }: Props) {
   // the map behind can't be reached while it's open. Until the page's script runs it shows as a plain card (not-open:),
   // so first-time visitors see it in the first paint
   const ref = useRef<HTMLDialogElement>(null);
+  const onCloseRef = useRef(onClose);
   useEffect(() => {
+    onCloseRef.current = onClose;
+  });
+  // only a real Escape key press counts as the keyboard: Android's back gesture closes the dialog too
+  const escPressed = useRef(false);
+  // opens whenever the page is shown and closes quietly when it's hidden or left: with Cache Components, Next keeps /map
+  // alive (hidden) after you navigate away, and a dialog left open would stay "open" on every other page
+  useLayoutEffect(() => {
     const d = ref.current;
     // returning visitors: the root layout's script hides the intro before paint, so never make the page modal behind it
-    if (!d || d.open || !d.getClientRects().length) return;
-    d.showModal();
+    if (!d || !d.getClientRects().length) return;
+    // a close event queued by an earlier hide can arrive after the dialog is open again: ignore it
+    const closed = () => {
+      if (!d.open) onCloseRef.current(escPressed.current);
+    };
+    d.addEventListener("close", closed);
+    if (!d.open) d.showModal();
     // focus the card itself rather than its first button
     d.focus({ preventScroll: true });
+    return () => {
+      d.removeEventListener("close", closed);
+      if (d.open) d.close();
+    };
   }, []);
   return (
     <dialog
       ref={ref}
       tabIndex={-1}
       aria-labelledby="intro-title"
-      // only Escape closes the dialog itself; the buttons close it by unmounting it
-      onClose={() => onClose(true)}
+      // only Escape or the phone's back gesture close the dialog itself; the buttons close it by unmounting it
+      onKeyDown={(e) => {
+        if (e.key === "Escape") escPressed.current = true;
+      }}
       // no focus ring on the card itself (the global :focus-visible rule would draw one on open, even for touch users);
       // the buttons inside keep theirs
       style={{ outline: "none" }}
