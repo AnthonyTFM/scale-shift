@@ -41,7 +41,7 @@ export function PageHero({
           <div aria-hidden="true" className="pointer-events-none absolute -bottom-[1240px] left-1/2 w-[1320px] -translate-x-1/2 lg:hidden">
             <div className="absolute inset-[1.7%] rounded-full bg-[radial-gradient(circle_at_50%_0%,#f1f8ff,#a9d3f0_30%)] shadow-[0_0_40px_12px_rgba(96,165,250,0.55)]" />
             {/* eslint-disable-next-line @next/next/no-img-element -- a fixed decorative SVG, nothing to optimise */}
-            <img src="/globe-still.svg" alt="" width={480} height={480} loading="lazy" className="relative h-auto w-full" />
+            <img src="/globe-still.svg" alt="" width={480} height={480} decoding="async" className="relative h-auto w-full" />
           </div>
           <SpaceGlobe />
         </>

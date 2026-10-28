@@ -521,3 +521,7 @@ body:has(#endless-done) .endless-intro {
 .space-hero a.text-primary {
   color: #93c5fd;
 }
+/* the brand-blue focus ring is too dark to see on space: light blue there */
+.space-hero :focus-visible {
+  outline-color: #93c5fd;
+}

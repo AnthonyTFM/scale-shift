@@ -20,7 +20,7 @@ export function SpaceGlobe() {
   const wide = useSyncExternalStore(subscribe, () => window.matchMedia(WIDE).matches, () => false);
   if (!wide) return null;
   return (
-    <div aria-hidden="true" className="pointer-events-none absolute -bottom-[250px] -right-[200px] w-[440px] xl:-bottom-[330px] xl:-right-[140px] xl:w-[620px]">
+    <div aria-hidden="true" className="pointer-events-none absolute -bottom-[250px] -right-[200px] w-[440px] xl:-bottom-[330px] xl:-right-[140px] xl:w-[540px]">
       <div className="absolute inset-2 rounded-full shadow-[0_0_36px_10px_rgba(96,165,250,0.55)]" />
       <GlobeLazy label="" />
     </div>
