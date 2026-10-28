@@ -34,6 +34,7 @@ import { useShareBox } from "@/components/site/ShareBox";
 import { dailyCopy } from "@/content/daily";
 import { ClockIcon, FlameIcon, MapIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
 import { SkyHeader } from "@/components/site/SkyHeader";
+import { PlayingMark } from "@/components/site/UpdateCheck";
 import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
@@ -213,6 +214,8 @@ export function DailyChallenge() {
         </p>
       ) : null}
       <DoneMark finished={finished} />
+      {/* answered at least one, not finished: no update reload mid-round */}
+      <PlayingMark on={!finished && choices.length > 0} />
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
       {/* on phones above the game, where it still fits; on wider screens below it, so both tiles stay on a laptop's first screen */}
       {signInOn && !finished ? (
