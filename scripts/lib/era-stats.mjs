@@ -26,6 +26,18 @@ function lineageLists(root) {
   return [...text.matchAll(/names:\s*\[([^\]]*)\]/g)].map(([, list]) => [...list.matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((m) => JSON.parse(`"${m[1]}"`)));
 }
 
+/** The era pages' two lists (src/content/peoples.ts, a TS file, so read as text): names that are peoples, and names in
+ * neither list (several states drawn as one shape, or Antarctica). */
+function eraLists(root) {
+  const text = fs.readFileSync(path.join(root, "src/content/peoples.ts"), "utf8");
+  const list = (key) => {
+    const m = new RegExp(`${key}:\\s*\\[([^\\]]*)\\]`).exec(text);
+    if (!m) throw new Error(`src/content/peoples.ts: no ${key} list`);
+    return new Set([...m[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((s) => JSON.parse(`"${s[1]}"`)));
+  };
+  return { peoples: list("peoples"), neither: list("neither") };
+}
+
 /** One node per name and status: "c:" + name for shapes with a ruler, so a colony never joins a state. */
 const nodeOf = (p) => (p.s ? `c:${p.n}` : p.n);
 const nameOf = (node) => (node.startsWith("c:") ? node.slice(2) : node);
@@ -167,6 +179,7 @@ export function eraStatsFromFiles(root, eras) {
     nodes.push(byNode);
   }
   const groupOf = countryGroups(nodes, lineageLists(root));
+  const lists = eraLists(root);
   // per era: country → its area (all its names; a second one is at most a sliver) and the name it goes by (the biggest)
   const countries = nodes.map((m) => {
     const out = new Map();
@@ -193,11 +206,16 @@ export function eraStatsFromFiles(root, eras) {
   });
   const r = Math.round;
   return eras.map((era, i) => {
-    const out = { key: era.key, top: [], gained: [], lost: [], appeared: [], vanished: [] };
-    out.top = [...named[i].entries()]
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 12)
-      .map(([n, a]) => ({ n, a: r(a) }));
+    // two "Largest" lists: states (top) and peoples without fixed borders; shapes with a ruler are colonies, so states
+    const out = { key: era.key, top: [], peoples: [], gained: [], lost: [], appeared: [], vanished: [] };
+    const largest = (keep) =>
+      [...named[i].entries()]
+        .filter(([n]) => keep(n))
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 12)
+        .map(([n, a]) => ({ n, a: r(a) }));
+    out.top = largest((n) => !lists.peoples.has(n) && !lists.neither.has(n));
+    out.peoples = largest((n) => lists.peoples.has(n));
     if (i === 0) return out;
     const now = countries[i];
     const before = countries[i - 1];
