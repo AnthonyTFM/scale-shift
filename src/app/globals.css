@@ -280,25 +280,6 @@ body {
   display: none;
 }
 
-/* Page headers: a light daylight band with a soft blue world silhouette behind the heading (class name kept so every
-   page header follows). */
-.ocean-band {
-  background-color: var(--color-paper);
-  background-image:
-    url("/world.svg"),
-    radial-gradient(ellipse at 85% 0%, rgba(37, 99, 235, 0.12), transparent 60%),
-    linear-gradient(180deg, #eaf3ff 0%, #f6f7f8 55%, var(--color-paper) 100%);
-  background-repeat: no-repeat;
-  background-position:
-    right -6rem center,
-    center,
-    center;
-  background-size:
-    min(1100px, 140%) auto,
-    cover,
-    cover;
-}
-
 /* ---------- daily game ---------- */
 /* chunky buttons and tiles that press down when tapped */
 .press {
@@ -534,4 +515,13 @@ body:has(#endless-done) .endless-intro {
   .space-stars-bright {
     animation: none;
   }
+}
+
+/* links written into a page header's lead (PageHero) keep their brand class; on space they need the light blue */
+.space-hero a.text-primary {
+  color: #93c5fd;
+}
+/* the brand-blue focus ring is too dark to see on space: light blue there */
+.space-hero :focus-visible {
+  outline-color: #93c5fd;
 }

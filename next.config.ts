@@ -5,9 +5,11 @@ const dataVersion = (JSON.parse(readFileSync("./src/data/data-version.json", "ut
 const dailyVersion = (JSON.parse(readFileSync("./src/data/daily-version.json", "utf8")) as { v: string }).v;
 // the same stamp as POOL_V in src/lib/pool-version.ts, so the preloaded puzzle list is the one the page fetches
 const poolV = `?v=${dataVersion}.${dailyVersion}`;
-// pages with the world-map band at the top (PageHero). A new page with a PageHero needs adding here.
-const HERO_PAGES = "about|contact|daily|disputes|endless|eras|how-it-works|leaderboard|privacy|size|teachers|terms|timeline|unsubscribed";
-const worldBand = { key: "Link", value: "</world.svg>; rel=preload; as=image; fetchpriority=high" };
+// pages with a full space header (PageHero without `compact`): the Earth's still picture is in their first screen (the
+// curve on phones, the spinning globe's placeholder on wide screens). A new page with a full PageHero needs adding here;
+// compact headers (daily, endless, leaderboard, size, account) are just stars and preload no image.
+const HERO_PAGES = "about|contact|disputes|eras|how-it-works|privacy|teachers|terms|timeline|unsubscribed";
+const earthBand = { key: "Link", value: "</globe-still.svg>; rel=preload; as=image; fetchpriority=high" };
 // only on the page itself: the router's prefetch requests (sent with an RSC header) would apply them on other pages
 const pageOnly = { missing: [{ type: "header" as const, key: "rsc" }] };
 
@@ -56,15 +58,14 @@ const nextConfig: NextConfig = {
           },
         ],
       },
-      { source: `/:page(${HERO_PAGES})`, ...pageOnly, headers: [worldBand] },
-      { source: "/eras/:slug", ...pageOnly, headers: [worldBand] },
-      { source: "/size/:slug", ...pageOnly, headers: [worldBand] },
-      { source: "/unsubscribed/error", ...pageOnly, headers: [worldBand] },
+      { source: `/:page(${HERO_PAGES})`, ...pageOnly, headers: [earthBand] },
+      { source: "/eras/:slug", ...pageOnly, headers: [earthBand] },
+      { source: "/unsubscribed/error", ...pageOnly, headers: [earthBand] },
       {
         // the games can't start until the puzzle list arrives: fetch it with the page, not after the scripts
         source: "/:page(daily|endless)",
         ...pageOnly,
-        headers: [{ key: "Link", value: `</world.svg>; rel=preload; as=image; fetchpriority=high, </data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous` }],
+        headers: [{ key: "Link", value: `</data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous` }],
       },
       {
         source: "/:file(world.svg|globe-still.svg)",
