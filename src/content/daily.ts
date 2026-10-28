@@ -48,7 +48,7 @@ export const dailyCopy = {
     nameLead: "This is what everyone sees on the Best streaks board.",
     nameLabel: "Nickname",
     nameHint: "3 to 16 characters. Not your full real name.",
-    remind: "Email me when a new daily challenge is up",
+    remind: "Email me when a new daily challenge is up (starting soon)",
     optional: "(optional; unsubscribe any time with one click)",
     posting: "Posting…",
     notYou: "Not you?",

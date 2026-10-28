@@ -31,8 +31,8 @@ export const regionContext: Record<string, string> = {
 
   // Mexico
   Sonora: "In northwest Mexico, bordering Arizona, with the Sonoran Desert and a coast on the Gulf of California.",
-  "Baja California": "The northern half of Mexico's Baja California peninsula, bordering California, with Tijuana as its main border city.",
-  "Baja California Sur": "The southern half of Mexico's Baja California peninsula, with the beach resorts of Los Cabos.",
+  "Baja California": "The northern part of Mexico's Baja California peninsula, bordering California, with Tijuana as its main border city.",
+  "Baja California Sur": "The southern part of Mexico's Baja California peninsula, with the beach resorts of Los Cabos.",
   Chihuahua: "In northern Mexico, bordering Texas and New Mexico, home to the deep Copper Canyon.",
   Coahuila: "In northern Mexico along the Texas border, a dry land of deserts and mountains.",
   "Nuevo León": "In northeast Mexico, sharing part of the Rio Grande border with Texas, home to the industrial city of Monterrey.",
@@ -63,7 +63,7 @@ export const regionContext: Record<string, string> = {
 
   // Brazil
   Amazonas: "In Brazil's northwest, mostly covered by the Amazon rainforest, with the city of Manaus.",
-  Pará: "Covers much of the lower Amazon in northern Brazil, where the river meets the Atlantic near Belém.",
+  Pará: "Along the lower Amazon in northern Brazil, where the river meets the Atlantic near Belém.",
   Roraima: "Brazil's northernmost state, bordering Venezuela and Guyana, with the flat-topped Mount Roraima on its border.",
   Amapá: "A rainforest state on Brazil's northern coast, bordering French Guiana and crossed by the equator.",
   Acre: "A rainforest state in Brazil's far west, bordering Peru and Bolivia.",
@@ -91,7 +91,7 @@ export const regionContext: Record<string, string> = {
   "Rio Grande do Sul": "Brazil's southernmost state, bordering Uruguay and Argentina, with Porto Alegre as its capital.",
 
   // India
-  Rajasthan: "In northwest India, covering most of the Thar Desert, and full of old forts and palaces.",
+  Rajasthan: "In northwest India, home to the Thar Desert and full of old forts and palaces.",
   Gujarat: "On India's west coast next to Pakistan, with the white salt flats of the Rann of Kutch.",
   Punjab: "In northwest India on the Pakistan border, home to the Golden Temple in Amritsar.",
   Haryana: "In northern India, wrapped around much of Delhi, with the business city of Gurugram.",
@@ -142,7 +142,7 @@ export const regionContext: Record<string, string> = {
   Anhui: "In eastern China, home to Huangshan, the Yellow Mountains, famous for granite peaks and seas of clouds.",
   Zhejiang: "On China's east coast just south of Shanghai, with the lake city of Hangzhou.",
   Hubei: "In central China on the Yangtze River, home to the city of Wuhan and the Three Gorges Dam.",
-  Jiangxi: "In southeast China, home to Poyang Lake, the country's largest freshwater lake.",
+  Jiangxi: "In southeast China, home to Poyang Lake, where flocks of cranes spend the winter.",
   Hunan: "In south-central China, home to the tall sandstone pillars of Zhangjiajie and famously spicy food.",
   Fujian: "On China's southeast coast, facing the island of Taiwan across the Taiwan Strait. Taiwan still governs the Kinmen and Matsu islands just off its coast.",
   Guangdong: "On China's southern coast near Hong Kong, home to the cities of Guangzhou and Shenzhen.",

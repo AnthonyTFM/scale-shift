@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "Why do countries change size when I drag them?",
-    a: "Web maps use the Mercator projection, which stretches areas more and more toward the poles (by 1/cos² of the latitude). When you drag a shape, we move it across the globe and redraw it, so you see how big it really is at its new latitude.",
+    a: "Web maps use the Mercator projection, which stretches areas more and more toward the poles (by 1/cos² of the latitude). When you drag a shape, we move it across the globe and redraw it, so you see how big a web map would draw it at its new latitude. Its real size stays the same.",
   },
   {
     q: "How accurate are the historical borders?",

@@ -470,7 +470,7 @@ function Results({
         {/* the day and when the next five arrive, in one line */}
         <div className="flex items-center justify-between gap-3">
           <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-white/90">Daily #{dayNumber(round.date)}</p>
-          <Countdown />
+          <Countdown date={round.date} />
         </div>
         {/* the score beside its title */}
         <div className="mt-2 flex items-center justify-center gap-4">
@@ -633,18 +633,20 @@ function Results({
   );
 }
 
-function Countdown() {
+/**
+ * Time left on this round's day (`date`, the player's local day): counted to the midnight that ends that day, not to the
+ * next midnight from now, so a tab left open past midnight says the new five are ready instead of counting a fresh day.
+ */
+function Countdown({ date }: { date: string }) {
   const [left, setLeft] = useState<number | null>(null);
   useEffect(() => {
-    const tick = () => {
-      const now = new Date();
-      const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      setLeft(Math.max(0, midnight.getTime() - now.getTime()));
-    };
+    const [y, m, d] = date.split("-").map(Number);
+    const end = new Date(y, m - 1, d + 1).getTime();
+    const tick = () => setLeft(Math.max(0, end - Date.now()));
     const id = setInterval(tick, 1000);
     queueMicrotask(tick);
     return () => clearInterval(id);
-  }, []);
+  }, [date]);
   if (left === null) return null;
   if (left === 0) {
     return (

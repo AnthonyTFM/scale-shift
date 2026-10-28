@@ -6,7 +6,7 @@ export const endlessCopy = {
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Web maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
-  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser, and signed-in players' runs go on the all-time Best streaks board.",
+  note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your best run is saved in this browser. Sign in and pick a username, and your best run goes on the Best streaks board.",
   loading: "Loading endless mode",
   failed: "We couldn't load endless mode.",
   retry: "Try again",

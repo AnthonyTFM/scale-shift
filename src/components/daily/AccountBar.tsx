@@ -86,7 +86,7 @@ function Bar() {
           </>
         ) : (
           <>
-            <span>Keep your nickname on every device:</span>
+            <span>Want your name on the Best streaks board?</span>
             <button
               type="button"
               onClick={() => {

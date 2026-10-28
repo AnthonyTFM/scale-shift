@@ -2,16 +2,18 @@
 // so players know what each one was. Keyed by the name in the map data (see HISTORY in scripts/build-daily.mjs).
 // what  = what it was, with rough dates
 // today = the modern countries its land is in (for the snapshot used in the game)
+// No size words ("largest", "small", "most of", "half of", "by 1200 it held only…"): the note shows before the player
+// answers, so it mustn't hint at which is bigger.
 
 export type DailyContext = { what: string; today: string };
 
 export const dailyContext: Record<string, DailyContext> = {
   "Roman Empire": {
-    what: "An empire ruled from Rome that came to circle the whole Mediterranean Sea.",
+    what: "An empire ruled from Rome, with the Mediterranean Sea at its center.",
     today: "Italy, Spain, France, Greece, Türkiye, Egypt, England and Wales, and more",
   },
   "Western Roman Empire": {
-    what: "The western half of the Roman Empire after the empire split in 395 CE. It fell in 476.",
+    what: "The western part of the Roman Empire after the empire split in 395 CE. It fell in 476.",
     today: "Italy, France, Spain, Portugal, England and Wales, coastal North Africa, Switzerland, Belgium, southern Germany, Austria, western Hungary, Slovenia, Croatia and Bosnia",
   },
   "Byzantine Empire": {
@@ -43,7 +45,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Tunisia, plus coastal Libya, Algeria and Morocco, southern Spain, Sardinia, western Sicily, Malta and Ibiza",
   },
   "Mauryan Empire": {
-    what: "The first empire to unite most of South Asia (c. 322–185 BCE). By his own account, its emperor Ashoka conquered Kalinga around 261 BCE, killing 100,000 people and deporting 150,000, then turned to Buddhism and spread it.",
+    what: "An Indian empire founded by Chandragupta Maurya (c. 322–185 BCE). By his own account, its emperor Ashoka conquered Kalinga around 261 BCE, killing 100,000 people and deporting 150,000, then turned to Buddhism and spread it.",
     today: "India, Pakistan, Bangladesh and Nepal",
   },
   "Gupta Empire": {
@@ -51,11 +53,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Northern India, Bangladesh and Nepal",
   },
   "Mughal Empire": {
-    what: "A Muslim dynasty founded in 1526 that ruled most of South Asia by about 1700 and built the Taj Mahal. By the 1800s its emperor held little more than Delhi, and Britain exiled the last one after the revolt of 1857.",
+    what: "A Muslim dynasty founded in 1526 that built the Taj Mahal. Its power faded in the 1700s, and Britain exiled the last emperor after the revolt of 1857.",
     today: "India, Pakistan, Bangladesh and eastern Afghanistan",
   },
   "Maratha Confederacy": {
-    what: "A Hindu power from western India that took over much of the subcontinent as the Mughals declined. Britain defeated it in 1818.",
+    what: "A Hindu power from western India that rose as the Mughals declined. Britain defeated it in 1818.",
     today: "Central and western India",
   },
   "British Raj": {
@@ -63,7 +65,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "India, Pakistan, Bangladesh and Myanmar",
   },
   Han: {
-    what: "A Chinese dynasty (206 BCE–220 CE), so central to Chinese history that China's largest ethnic group is still called Han.",
+    what: "A Chinese dynasty (206 BCE–220 CE), so central to Chinese history that most Chinese people still call themselves Han.",
     today: "China, plus northern Vietnam and North Korea",
   },
   "Sui Empire": {
@@ -75,7 +77,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "China, plus northern Vietnam",
   },
   "Song Empire": {
-    what: "A Chinese dynasty (960–1279) known for movable-type printing, the first written gunpowder formula and the first government-issued paper money. By 1200 it held only the south.",
+    what: "A Chinese dynasty (960–1279) known for movable-type printing, the first written gunpowder formula and the first government-issued paper money.",
     today: "Southern and central China",
   },
   "Great Khanate": {
@@ -195,7 +197,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Mexico, the US Southwest (California, Texas, Arizona, New Mexico and more) and Central America from Guatemala to Costa Rica",
   },
   "Viceroyalty of Peru": {
-    what: "Spain's colony in South America, ruled from Lima. In 1715 it covered most of Spanish South America. Under the mita, Indigenous villages had to send men in turns to the silver mines of Potosí, where thousands died.",
+    what: "Spain's colony in South America, ruled from Lima. Under the mita, Indigenous villages had to send men in turns to the silver mines of Potosí, where thousands died.",
     today: "Peru, Bolivia, Chile, Argentina, Colombia, Ecuador and more",
   },
   "Empire of Brazil": {
@@ -207,7 +209,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Canada",
   },
   "Assyria": {
-    what: "An ancient kingdom on the upper Tigris River around the city of Ashur. Around 1500 BCE it was still small; its famous empire came centuries later.",
+    what: "An ancient kingdom on the upper Tigris River, named after its chief city and god, Ashur.",
     today: "Northern Iraq, with edges in Syria and Türkiye",
   },
   "Babylonia": {
@@ -243,7 +245,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Iran, Iraq, Azerbaijan, eastern Türkiye, Turkmenistan and Afghanistan",
   },
   "Chagatai Khanate": {
-    what: "The Mongol khanate of Genghis Khan's son Chagatai. By 1492 only its eastern branch, Moghulistan, survived.",
+    what: "The Mongol khanate of Genghis Khan's son Chagatai, in Central Asia.",
     today: "Western China (Xinjiang), Kyrgyzstan and southeastern Kazakhstan",
   },
   "Sultanate of Delhi": {
@@ -251,7 +253,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "India, Pakistan and Bangladesh",
   },
   "Vijayanagara": {
-    what: "A Hindu empire of southern India (1336–1646). Its capital at Hampi was one of the world's largest cities around 1500.",
+    what: "A Hindu empire of southern India (1336–1646). Its capital at Hampi was one of the world's most populous cities around 1500.",
     today: "Southern India (Karnataka, Andhra Pradesh and Tamil Nadu)",
   },
   "Chola Empire": {
@@ -295,11 +297,11 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Central Mexico",
   },
   "Tsardom of Muscovy": {
-    what: "Russia under its tsars, already stretching across Siberia to the Pacific. Peter the Great renamed it the Russian Empire in 1721.",
+    what: "Russia under its tsars, ruled from Moscow until Peter the Great moved the capital to St. Petersburg in 1712. He renamed it the Russian Empire in 1721.",
     today: "Russia, plus parts of Ukraine and Kazakhstan",
   },
   "Frankish Kingdom": {
-    what: "The kingdom of the Franks, a Germanic people whose king Clovis (died 511) united most of Gaul. It later grew into Charlemagne's empire.",
+    what: "The kingdom of the Franks, a Germanic people whose king Clovis (died 511) united the Franks and became a Christian. It later became Charlemagne's empire.",
     today: "France, Belgium, the Netherlands, Switzerland and western Germany",
   },
   "Austrian Empire": {
@@ -427,7 +429,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Northern India and Bangladesh",
   },
   "Roman Republic": {
-    what: "Rome before the emperors, run by elected consuls and the Senate. By 100 BCE it ruled much of the Mediterranean coast.",
+    what: "Rome before the emperors, run by elected consuls and the Senate.",
     today: "Italy, Spain, Portugal, southern France, Greece, Albania, North Macedonia, western Türkiye and Tunisia",
   },
   "Shang": {
@@ -447,7 +449,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Ethiopia",
   },
   "Sokoto Caliphate": {
-    what: "A Fulani Islamic state founded by Usman dan Fodio in 1804 and conquered by the British in 1903. It was one of the largest slave societies of the 1800s, with at least 1 million enslaved people by 1900 (historian Paul Lovejoy's estimate).",
+    what: "A Fulani Islamic state founded by Usman dan Fodio in 1804 and conquered by the British in 1903. It held at least 1 million enslaved people by 1900 (historian Paul Lovejoy's estimate), among the most of any society of the 1800s.",
     today: "Northern Nigeria, plus parts of Niger, Burkina Faso and Cameroon",
   },
   "Khiva Khanate": {
@@ -483,7 +485,7 @@ export const dailyContext: Record<string, DailyContext> = {
     today: "Myanmar",
   },
   "Caliphate of Córdoba": {
-    what: "Muslim Spain (al-Andalus) under the Umayyad caliphs (929–1031). Their capital, Córdoba, was one of Europe's largest and richest cities.",
+    what: "Muslim Spain (al-Andalus) under the Umayyad caliphs (929–1031). Their capital, Córdoba, was one of Europe's most populous and richest cities.",
     today: "Spain, Portugal, northern Morocco and western Algeria",
   },
 };

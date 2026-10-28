@@ -124,6 +124,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
             up straight away. */}
         <picture>
           <source media="(min-width: 640px) and (min-height: 500px)" type="image/svg+xml" srcSet={`/era-maps/${slug}/map?v=${dataVersion.v}`} />
+          {/* a phone held sideways: the picture twice as wide, so it stays sharp */}
+          <source media="(min-width: 640px)" type="image/webp" srcSet={`/era-maps/${slug}/wide?v=${dataVersion.v}`} />
           <img
             src={`/era-maps/${slug}/phone?v=${dataVersion.v}`}
             fetchPriority="high"
