@@ -193,9 +193,8 @@ function SignedInCard({ onDeleted }: { onDeleted: () => void }) {
   const { signOut } = useAccount();
   return (
     <div className={card}>
-      <h2 className="font-display text-xl text-ink">{A.dangerTitle}</h2>
+      <h2 className="font-display text-xl text-ink">{A.cardTitle}</h2>
       <p className="mt-1 flex flex-wrap items-center gap-x-4 text-sm text-ink-soft">
-        <span>{A.signedInAs}</span>
         <button type="button" onClick={() => signOut("/account")} className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
           {A.signOut}
         </button>

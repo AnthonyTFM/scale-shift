@@ -37,7 +37,7 @@ export const menu = {
   main: [
     { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "target" as const },
     { href: "/endless", label: "Endless mode", blurb: "Closer and closer, until your first miss", icon: "flame" as const },
-    { href: "/leaderboard", label: "Leaderboard", blurb: "The longest endless streaks", icon: "trophy" as const },
+    { href: "/leaderboard", label: "Leaderboard", blurb: "The best streaks in endless mode", icon: "trophy" as const },
     { href: "/map", label: "Map", blurb: "Drag any country to see its real size", icon: "map" as const },
   ],
   historyTitle: "History",
@@ -54,7 +54,7 @@ export const appCopy = {
   searchPlaceholder: "Try Roman Empire, Texas, Brazil",
   introTitle: "Maps lie about size.",
   introBody:
-    "Most web maps stretch land more and more as it nears the poles. Search for any country or empire, drag it across the map and watch it shrink or grow to its real size. Use the timeline to travel from 2000 BCE to today.",
+    "Most web maps stretch land more and more as it nears the poles. Search for any country or empire, drag it across the map and watch it shrink or grow as the stretch changes. Its real size never does. Use the timeline to travel from 2000 BCE to today.",
   introCta: "Start exploring",
   whoRuledTitle: "Who ruled here?",
   whoRuledHint: "Tap or click any land to see who ruled it in every era.",

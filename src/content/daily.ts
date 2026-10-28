@@ -31,11 +31,11 @@ export const dailyCopy = {
     title: "Save your streak",
     lead: "Sign in and your streak and past results follow you to any phone or computer. Daily scores stay private: they never go on a public board.",
     saving: "Saving your streak…",
-    failed: "Couldn't save your score. Check your connection and try again.",
+    failed: "Couldn't save your streak. Check your connection and try again.",
     retry: "Try again",
   },
   // the sign-in pop-up, shared with endless mode's Best streaks board: step 1 the 13+ box and sign-in, step 2 the
-  // nickname (endless mode only), then where you landed
+  // username (endless mode only), then where you landed
   joinDialog: {
     step: (n: number) => `Step ${n} of 2`,
     continue: "Continue with email or Google",
@@ -44,9 +44,9 @@ export const dailyCopy = {
     failed: "Sign-in didn't open. Check your connection (or an ad blocker) and try again.",
     retry: "Try again",
     notNow: "Not now",
-    nameTitle: "Pick a nickname",
+    nameTitle: "Pick a username",
     nameLead: "This is what everyone sees on the Best streaks board.",
-    nameLabel: "Nickname",
+    nameLabel: "Username",
     nameHint: "3 to 16 characters. Not your full real name.",
     remind: "Email me when a new daily challenge is up (starting soon)",
     optional: "(optional; unsubscribe any time with one click)",
@@ -58,7 +58,7 @@ export const dailyCopy = {
   // the reveal after each answer
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
-    ask: "Drawn the way a normal web map shows them. Don't trust your eyes.",
+    ask: "Drawn the way a normal map shows them. Don't trust your eyes.",
     // after the answer, in place of `ask`: which drawing is which, and tapping a tile plays the shrink again
     watch: "Pale: size on a normal map. Solid: real size. Tap to replay.",
     right: "You got it!",
@@ -69,18 +69,18 @@ export const dailyCopy = {
     // under each name once answered: the result in plain words
     biggerBy: (gap: string) => `${gap} bigger`,
     smaller: "Smaller",
-    // the strip in the verdict: how far each place is from the equator, and how much a web map stretches it
+    // the strip in the verdict: how far each place is from the equator, and how much a normal map stretches it
     // the strip's title: the map showed the smaller one as bigger (fooled you / misleads), or it didn't
     stretchTitle: "Why the map fooled you",
     stretchTitleRight: "Why the map misleads",
-    stretchTitleHonest: "How a web map stretches these two",
-    stretchTitleBoth: "Both near the equator: web maps get these about right",
+    stretchTitleHonest: "How a normal map stretches these two",
+    stretchTitleBoth: "Both near the equator: normal maps get these about right",
     equator: "Equator",
     pole: "Pole",
-    stretchRow: (lat: number, stretch: string) => `${lat}°, ${stretch}`,
-    drawnTooBig: (x: string) => `map ${x}× too big`,
-    drawnAboutRight: "map about right",
-    stretchNote: "The farther from the equator, the more a web map blows land up.",
+    stretchRow: (lat: number, stretch: string) => `${lat}° from the equator, ${stretch}`,
+    drawnTooBig: (x: string) => `drawn ${x}× too big`,
+    drawnAboutRight: "drawn about right",
+    stretchNote: "The farther from the equator, the more a normal map blows land up.",
     // after the answer: each shape's size next to a familiar place, in words
     forScale: (name: string) => `For scale: ${name}`,
     scaleSame: (name: string) => `about the same size as ${name}`,

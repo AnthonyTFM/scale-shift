@@ -197,7 +197,7 @@ export const presets: Preset[] = [
     id: "ottoman-vs-turkiye",
     category: "controversial",
     title: "Ottoman Empire 1600 vs Türkiye",
-    hook: "It once reached from Algeria to Iraq and from Hungary to Yemen. Today it's Anatolia and a corner of Europe.",
+    hook: "It once reached from Algeria to Iraq and from Hungary to Yemen. Türkiye today is Anatolia and a corner of Europe.",
     baseEra: "present",
     shapes: [
       { era: "1600", name: "Ottoman Empire" },
@@ -208,7 +208,7 @@ export const presets: Preset[] = [
     id: "western-sahara-vs-uk",
     category: "controversial",
     title: "Western Sahara",
-    hook: "The only African territory still on the UN's decolonization list, mostly held by Morocco since 1975–79. Bigger than the UK.",
+    hook: "The only African territory the UN still lists as not yet self-governing, mostly held by Morocco since 1975–79. Bigger than the UK.",
     baseEra: "present",
     shapes: [
       { era: "2010", name: "Western Sahara" },

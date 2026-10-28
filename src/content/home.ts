@@ -12,7 +12,7 @@ export const home = {
   // "More to explore": the rest of the site, one line each (the two games and the map have their own cards above)
   explore: {
     title: "More to explore",
-    leaderboard: "The longest endless streaks",
+    leaderboard: "The best streaks in endless mode",
     eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
     timeline: (n: number) => `${n} times land changed hands`,
     disputes: (n: number) => `${n} places, from Crimea to Antarctica`,
@@ -66,7 +66,7 @@ export const home = {
     endlessTopLine: (n: number) => `#1: ${n}`,
     endlessTopSr: (n: number, name: string) => `Best ever: ${n} in a row, by ${name}`,
     endlessCta: "Play",
-    endlessCtaLong: "Play endless",
+    endlessCtaLong: "Play endless mode",
     endlessCtaBeat: (n: number) => `Beat ${n}`,
     endlessCtaBeatLong: (n: number) => `Beat your ${n} in a row`,
     // the button's name for screen readers: starts with the short label on phones ("Beat 12"), as WCAG 2.5.3 asks
@@ -78,7 +78,7 @@ export const home = {
     boardCta: "Full leaderboard",
     // the leaderboard card: endless mode's Best streaks (daily scores are private)
     streakEmpty: "No streaks yet. Start the first run!",
-    streakTitle: "Best streaks ever",
+    streakTitle: "Best streaks",
     streakPlayers: (n: number) => `${n} ${n === 1 ? "player" : "players"}`,
     streakSr: (n: number) => `${n} in a row`,
     // someone already on the Best streaks board

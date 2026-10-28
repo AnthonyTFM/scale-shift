@@ -17,15 +17,15 @@ export const metadata: Metadata = {
 const faqs = [
   {
     q: "Why do countries change size when I drag them?",
-    a: "Web maps use the Mercator projection, which stretches areas more and more toward the poles (by 1/cos² of the latitude). When you drag a shape, we move it across the globe and redraw it, so you see how big a web map would draw it at its new latitude. Its real size stays the same.",
+    a: "Web maps use the Mercator projection, which stretches areas more and more toward the poles (by 1 ÷ cos²(latitude)). When you drag a shape, we move it across the globe and redraw it, so you see how big a web map would draw it at its new latitude. Its real size stays the same.",
   },
   {
     q: "How accurate are the historical borders?",
     a: "Before about 1650 the source marks almost every border as approximate. From 1650 it rates most borders as precise, set by treaties. Many peoples had no fixed borders at all, so those lines are scholarly estimates of zones of control.",
   },
   {
-    q: "What do 'taken' and 'made official' mean?",
-    a: "'Taken' is when control on the ground changed: an army arrived, a flag went up, or a declaration was made. 'Made official' is when it was formalized by a treaty, a purchase, or recognition by the former owner or other states. Some were made official decades later; some never were.",
+    q: "What do “taken” and “made official” mean?",
+    a: "“Taken” is when control on the ground changed: an army arrived, a flag went up, or a declaration was made. “Made official” is when it was formalized by a treaty, a purchase, or recognition by the former owner or other states. Some were made official decades later; some never were.",
   },
   {
     q: "How do you draw disputed territories?",

@@ -38,7 +38,7 @@ export async function POST(request: Request) {
     if (old === name) return Response.json({ ok: true, player: { id: player, name } }, { headers: { "Cache-Control": "no-store" } });
     // each rename keeps the old name reserved: a few a day, so no one can hoard names
     if (old && (await limited("lb-rename", player, 5, 24 * 60 * 60_000))) return fail("That's enough renames for today. Try again tomorrow.", 429);
-    if (!(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422);
+    if (!(await store.claimName(nameKey(name), player))) return fail("That username is taken. Please pick another.", 422);
     // a brand-new name on the board: the same cap on new players per network as the daily and endless (both skip a
     // player who already has a name)
     if (!old) {

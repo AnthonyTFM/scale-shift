@@ -124,7 +124,7 @@ export default function TeachersPage() {
                 ))}
                 <p>
                   <Link href="/how-it-works" className="inline-flex min-h-11 items-center font-semibold text-link hover:underline">
-                    How {site.name} shows true sizes →
+                    How {site.name} shows real sizes →
                   </Link>
                 </p>
               </div>

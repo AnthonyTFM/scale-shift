@@ -78,7 +78,7 @@ export async function POST(request: Request) {
   if (error) return fail(error, 422, "name");
   if (!isDateKey(body.date) || !isPlayableDate(body.date)) return fail("Only today's challenge can be saved.", 422);
   const score = scoreAnswers(body.date, body.choices);
-  if (score === null) return fail("Those answers don't match today's questions.", 422);
+  if (score === null) return fail("Those answers don't match today's matchups.", 422);
 
   try {
     const store = getStore();
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
       }
     }
     // a nickname belongs to the first player who used it, so a second browser can't post under the same name
-    if (named && !(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
+    if (named && !(await store.claimName(nameKey(name), player))) return fail("That username is taken. Please pick another.", 422, "name");
     // a brand-new score for today: cap how many different players one network can add per day
     if (!(await store.has(body.date, player))) {
       const n = await store.bumpNetwork(body.date, networkKey(ipOf(request), body.date));

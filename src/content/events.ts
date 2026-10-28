@@ -781,7 +781,7 @@ export const events: TerritoryEvent[] = [
     lat: -35.27,
     polities: ["New Zealand"],
     summary:
-      "British officials and Māori chiefs sign it, but the English and Māori texts differ on sovereignty. The New Zealand Wars follow, and the 1863 New Zealand Settlements Act lets the government confiscate land from tribes it calls 'in rebellion', mostly in Waikato and Taranaki. What was agreed is still debated and underpins settlements today.",
+      "British officials and Māori chiefs sign it, but the English and Māori texts differ on sovereignty. The New Zealand Wars follow, and the 1863 New Zealand Settlements Act lets the government confiscate land from tribes it calls “in rebellion”, mostly in Waikato and Taranaki. What was agreed is still debated and underpins settlements today.",
   },
   {
     id: "hong-kong-ceded",
@@ -984,7 +984,7 @@ export const events: TerritoryEvent[] = [
     lat: 37.57,
     polities: ["Empire of Japan", "Korea"],
     summary:
-      "Korea becomes a protectorate in 1905 and is annexed in 1910 by treaties signed under duress. A 1965 Japan–South Korea treaty declared them 'already null and void', wording the two sides read differently: Japan says the treaties were valid when signed and lapsed in 1948, while South Korea says they were void from the start.",
+      "Korea becomes a protectorate in 1905 and is annexed in 1910 by treaties signed under duress. A 1965 Japan–South Korea treaty declared them “already null and void”, wording the two sides read differently: Japan says the treaties were valid when signed and lapsed in 1948, while South Korea says they were void from the start.",
   },
   {
     id: "versailles",
@@ -1198,7 +1198,7 @@ export const events: TerritoryEvent[] = [
     lat: 32.08,
     polities: ["Israel"],
     summary:
-      "During the 1947–49 war more than 700,000 Palestinian Arabs, about half the Arab population, flee or are expelled, and Israel bars their return; Palestinians call it the Nakba ('catastrophe'). The causes are debated: Israel's traditional account stresses flight, while Palestinian accounts and many historians stress expulsion. The 1949 armistice lines (the 'Green Line') were ceasefire lines, not agreed borders, and several of Israel's borders remain unsettled.",
+      "During the 1947–49 war more than 700,000 Palestinian Arabs, about half the Arab population, flee or are expelled, and Israel bars their return; Palestinians call it the Nakba (“catastrophe”). The causes are debated: Israel's traditional account stresses flight, while Palestinian accounts and many historians stress expulsion. The 1949 armistice lines (the “Green Line”) were ceasefire lines, not agreed borders, and several of Israel's borders remain unsettled.",
   },
   {
     id: "prc-founded",
@@ -1226,7 +1226,7 @@ export const events: TerritoryEvent[] = [
     lat: 29.65,
     polities: ["China"],
     summary:
-      "PLA forces defeat the Tibetan army at Chamdo in October 1950, and Tibetan delegates sign the agreement in 1951. China calls this the 'peaceful liberation' of Tibet and says the agreement was freely made. The Dalai Lama repudiated it after fleeing in 1959, saying it was signed under duress, and the Tibetan government-in-exile calls it an invasion. Tibet is internationally recognized as part of China.",
+      "PLA forces defeat the Tibetan army at Chamdo in October 1950, and Tibetan delegates sign the agreement in 1951. China calls this the “peaceful liberation” of Tibet and says the agreement was freely made. The Dalai Lama repudiated it after fleeing in 1959, saying it was signed under duress, and the Tibetan government-in-exile calls it an invasion. Tibet is internationally recognized as part of China.",
   },
   {
     id: "year-of-africa",
@@ -1468,7 +1468,7 @@ export const events: TerritoryEvent[] = [
     lat: 45.3,
     polities: ["Crimea", "Russia", "Ukraine"],
     summary:
-      "Russian forces take control in February–March 2014, and Russia declares annexation on March 18, citing a March 16 referendum held under Russian military control. UN General Assembly Resolution 68/262 (100 votes in favor) said the referendum had 'no validity' and affirmed Ukraine's territorial integrity, and most countries do not recognize the annexation.",
+      "Russian forces take control in February–March 2014, and Russia declares annexation on March 18, citing a March 16 referendum held under Russian military control. UN General Assembly Resolution 68/262 (100 votes in favor) said the referendum had “no validity” and affirmed Ukraine's territorial integrity, and most countries do not recognize the annexation.",
   },
   {
     id: "india-bangladesh-enclaves",
@@ -1572,7 +1572,7 @@ export const events: TerritoryEvent[] = [
     lat: 48.21,
     polities: ["Austria Hungary",  "Austria",  "Czechoslovakia",  "Yugoslavia",  "Poland",  "Hungary"],
     summary:
-      "As World War I ends in autumn 1918, Czechoslovakia, Poland and the State of Slovenes, Croats and Serbs declare independence and Hungary leaves the union. On December 1 the South Slav state joins Serbia to form the Kingdom of Serbs, Croats and Slovenes (later Yugoslavia). Saint-Germain (1919) and Trianon (1920) fix the new borders.",
+      "As the First World War ends in autumn 1918, Czechoslovakia, Poland and the State of Slovenes, Croats and Serbs declare independence and Hungary leaves the union. On December 1 the South Slav state joins Serbia to form the Kingdom of Serbs, Croats and Slovenes (later Yugoslavia). Saint-Germain (1919) and Trianon (1920) fix the new borders.",
   },
   {
     id: "manchuria-1931",
@@ -1734,7 +1734,7 @@ export const events: TerritoryEvent[] = [
     lat: 80.83,
     polities: ["Canada",  "Denmark",  "Greenland"],
     summary:
-      "Ending the good-humored 'Whisky War', in which each side left bottles of whisky or schnapps on the island, a 2022 agreement splits the 1.3 km² rock between Canada and Greenland (part of the Kingdom of Denmark), giving Canada and Denmark a land border.",
+      "Ending the good-humored “Whisky War”, in which each side left bottles of whisky or schnapps on the island, a 2022 agreement splits the 1.3 km² rock between Canada and Greenland (part of the Kingdom of Denmark), giving Canada and Denmark a land border.",
   },
 ];
 

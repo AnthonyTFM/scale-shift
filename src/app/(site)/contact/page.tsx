@@ -27,7 +27,7 @@ export default function ContactPage() {
             <h2 className="font-bold text-ink">What makes a great report</h2>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               <li>The place and the year or era</li>
-              <li>What it shows vs. what it should show</li>
+              <li>What it shows vs what it should show</li>
               <li>A source: an encyclopedia, a treaty text, or a scholarly atlas</li>
             </ul>
           </div>

@@ -36,7 +36,7 @@ export function checkName(raw: unknown): { name: string; error?: string } {
   const name = (typeof raw === "string" ? raw : "").normalize("NFKC").replace(/\s+/g, " ").trim();
   if (name.length < 3 || name.length > 16) return { name, error: "Use 3 to 16 characters." };
   if (!/^[\p{L}\p{N}][\p{L}\p{N} _.-]*$/u.test(name)) return { name, error: "Use letters, numbers, spaces, dots, dashes or underscores." };
-  if (isOffensive(name)) return { name, error: "Please pick a different nickname." };
+  if (isOffensive(name)) return { name, error: "Please pick a different username." };
   return { name };
 }
 

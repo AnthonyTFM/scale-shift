@@ -28,7 +28,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "Annexation not recognized by most UN members. UN General Assembly Resolution 68/262 (March 27, 2014; 100 votes to 11, with 58 abstentions) affirmed Ukraine's borders.",
     summary:
-      "Unmarked Russian troops seized Crimea's parliament on February 27, 2014. After a 'referendum' held under Russian military control on March 16, Russia declared Crimea annexed on March 18. Russia says Crimeans chose to join it; Ukraine and most of the world call it an illegal annexation. This map draws Crimea as its own striped shape, not as part of either country.",
+      "Unmarked Russian troops seized Crimea's parliament on February 27, 2014. After a “referendum” held under Russian military control on March 16, Russia declared Crimea annexed on March 18. Russia says Crimeans chose to join it; Ukraine and most of the world call it an illegal annexation. This map draws Crimea as its own striped shape, not as part of either country.",
     polities: ["Crimea", "Russia", "Ukraine"],
   },
   {
@@ -42,7 +42,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "Russia claims to have annexed Donetsk, Luhansk, Zaporizhzhia and Kherson oblasts (September 30, 2022), though it does not hold all of them. UN General Assembly Resolution ES-11/4 (October 12, 2022; 143 votes to 5) called the annexation invalid.",
     summary:
-      "Fighting in Donetsk and Luhansk began in 2014, and Russia's full-scale invasion followed on February 24, 2022. Counting Crimea, Russia held about a fifth of Ukraine in mid-2026 (ISW and DeepState data). In July 2025 the European Court of Human Rights ruled that Russia itself had controlled the separatist 'people's republics' since 2014 and was responsible for shooting down flight MH17. Front lines shift, so they are not drawn; the map shows Ukraine's internationally recognized border.",
+      "Fighting in Donetsk and Luhansk began in 2014, and Russia's full-scale invasion followed on February 24, 2022. Counting Crimea, Russia held about a fifth of Ukraine in mid-2026 (ISW and DeepState data). In July 2025 the European Court of Human Rights ruled that Russia itself had controlled the separatist “people's republics” since 2014 and was responsible for shooting down flight MH17. Front lines shift, so they are not drawn; the map shows Ukraine's internationally recognized border.",
     polities: ["Ukraine", "Russia"],
   },
   {
@@ -70,7 +70,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "Occupied by Israel since 1967. Israel annexed East Jerusalem by law in 1980; UN Security Council Resolution 478 declared that null and void. An ICJ advisory opinion (July 19, 2024) found Israel's continued presence in these territories unlawful; Israel rejects it. Palestine has been a UN non-member observer state since 2012 and was recognized by 157 of 193 UN members as of September 2025.",
     summary:
-      "Israel pulled its settlers out of Gaza in 2005, and Hamas has ruled it since 2007. After the Hamas-led attack on Israel on October 7, 2023, Israel went to war in Gaza. Under the October 2025 ceasefire, Israeli forces held 53% of Gaza behind a 'Yellow Line'; by September 2026, UN OCHA said Palestinians were left with less than 40% of it. Israel calls the West Bank disputed and Jerusalem its undivided capital; Palestinians seek a state in all these territories, with East Jerusalem as its capital.",
+      "Israel pulled its settlers out of Gaza in 2005, and Hamas has ruled it since 2007. After the Hamas-led attack on Israel on October 7, 2023, Israel went to war in Gaza. Under the October 2025 ceasefire, Israeli forces held 53% of Gaza behind a “Yellow Line”; by September 2026, UN OCHA said Palestinians were left with less than 40% of it. Israel calls the West Bank disputed and Jerusalem its undivided capital; Palestinians seek a state in all these territories, with East Jerusalem as its capital.",
     polities: ["Palestine", "Israel"],
   },
   {
@@ -97,7 +97,7 @@ export const disputes: Dispute[] = [
     taken: 1951,
     formalStatus: "China has never accepted the McMahon Line (1914 Simla Convention).",
     summary:
-      "India took over Tawang from Tibetan officials in February 1951. China calls the area Zangnan ('South Tibet'), claims almost all of it, and has given Chinese names to places there several times since 2017; India rejects them. Chinese troops overran much of the area in the 1962 war, then withdrew.",
+      "India took over Tawang from Tibetan officials in February 1951. China calls the area Zangnan (“South Tibet”), claims almost all of it, and has given Chinese names to places there several times since 2017; India rejects them. Chinese troops overran much of the area in the 1962 war, then withdrew.",
     polities: ["India", "China"],
   },
   {
@@ -125,7 +125,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "UN non-self-governing territory. The US recognized Moroccan sovereignty in 2020, and in 2025 the UN Security Council (Resolution 2797) called for talks based on Morocco's autonomy plan. Morocco calls it its Southern Provinces; the Polisario wants the independence referendum promised in 1991, which was never held. The Sahrawi Republic is a member of the African Union.",
     summary:
-      "In October 1975 the ICJ found no tie of territorial sovereignty between the land and Morocco or Mauritania. Weeks later, Spain handed it to both in the Madrid Accords (November 14, 1975). The Polisario fought both; Mauritania pulled out in 1979 and Morocco took its southern share. A UN ceasefire held from 1991 until fighting resumed in November 2020. The source data draws Morocco-administered land as part of Morocco and labels only the Polisario-held east 'Western Sahara', so Morocco's area here includes the disputed part.",
+      "In October 1975 the ICJ found no tie of territorial sovereignty between the land and Morocco or Mauritania. Weeks later, Spain handed it to both in the Madrid Accords (November 14, 1975). The Polisario fought both; Mauritania pulled out in 1979 and Morocco took its southern share. A UN ceasefire held from 1991 until fighting resumed in November 2020. The source data draws Morocco-administered land as part of Morocco and labels only the Polisario-held east “Western Sahara”, so Morocco's area here includes the disputed part.",
     polities: ["Western Sahara", "Morocco"],
   },
   {
@@ -219,7 +219,7 @@ export const disputes: Dispute[] = [
     taken: 1945,
     formalStatus: "No Japan–Russia peace treaty has ever been signed.",
     summary:
-      "Iturup, Kunashir, Shikotan and the Habomai islets, which Japan calls the Northern Territories. Soviet forces occupied them from August 28 to September 5, 1945, after Japan announced its surrender, and deported the Japanese residents by 1949. In 1956 the USSR offered to return Shikotan and the Habomais once a peace treaty was signed, which never happened. Russia says it gained the islands lawfully at the end of World War II.",
+      "Iturup, Kunashir, Shikotan and the Habomai islets, which Japan calls the Northern Territories. Soviet forces occupied them from August 28 to September 5, 1945, after Japan announced its surrender, and deported the Japanese residents by 1949. In 1956 the USSR offered to return Shikotan and the Habomais once a peace treaty was signed, which never happened. Russia says it gained the islands lawfully at the end of the Second World War.",
     polities: ["Russia", "Japan"],
   },
   {
@@ -233,7 +233,7 @@ export const disputes: Dispute[] = [
     formalStatus:
       "Set by an 1899 arbitral award. Venezuela calls the award a fraud and says the 1966 Geneva Agreement requires a negotiated deal. The International Court of Justice heard the case in May 2026; its judgment was still pending in October 2026.",
     summary:
-      "The region makes up more than 70% of Guyana's territory. In 2023, Venezuela held a referendum on annexing it. In May 2025, despite an ICJ order not to, Venezuela elected a 'governor' for the region in a vote held on its own side of the border.",
+      "The region makes up more than 70% of Guyana's territory. In 2023, Venezuela held a referendum on annexing it. In May 2025, despite an ICJ order not to, Venezuela elected a “governor” for the region in a vote held on its own side of the border.",
     polities: ["Guyana", "Venezuela"],
   },
   {
@@ -298,7 +298,7 @@ export const disputes: Dispute[] = [
     taken: 1972,
     formalStatus: "Administered by Japan since the United States returned Okinawa in 1972; China and Taiwan both claim them.",
     summary:
-      "Uninhabited islands in the East China Sea. Japan says it incorporated them in January 1895 as land no one owned, separately from the treaty that gave it Taiwan that April. China and Taiwan say they appear in Ming-dynasty records and were taken along with Taiwan, so they should have been returned after World War II. The US administered them from 1945 to 1972. China and Taiwan first pressed their claims publicly in 1971, after a 1968–69 UN-backed survey reported possible oil and gas. Japan bought three of the islands from a private owner in 2012, and Chinese coast guard ships have patrolled nearby regularly since.",
+      "Uninhabited islands in the East China Sea. Japan says it incorporated them in January 1895 as land no one owned, separately from the treaty that gave it Taiwan that April. China and Taiwan say they appear in Ming-dynasty records and were taken along with Taiwan, so they should have been returned after the Second World War. The US administered them from 1945 to 1972. China and Taiwan first pressed their claims publicly in 1971, after a 1968–69 UN-backed survey reported possible oil and gas. Japan bought three of the islands from a private owner in 2012, and Chinese coast guard ships have patrolled nearby regularly since.",
     polities: ["Japan", "China", "Taiwan"],
   },
   {
@@ -310,7 +310,7 @@ export const disputes: Dispute[] = [
     claimedBy: ["China", "Taiwan", "Vietnam", "Philippines", "Malaysia", "Brunei"],
     taken: 1988,
     formalStatus:
-      "No agreed sovereignty. On July 12, 2016, an arbitral tribunal (Philippines v. China, under the UN Law of the Sea) found no legal basis for China's claimed historic rights inside its 'nine-dash line'; China and Taiwan reject the ruling.",
+      "No agreed sovereignty. On July 12, 2016, an arbitral tribunal (Philippines v. China, under the UN Law of the Sea) found no legal basis for China's claimed historic rights inside its “nine-dash line”; China and Taiwan reject the ruling.",
     summary:
       "More than 100 reefs and islets in the South China Sea, claimed in whole or part by six governments. Occupations date from 1946 (Taiwan's garrison on Itu Aba) to the 1990s. China took six reefs in early 1988, killing 64 Vietnamese sailors at Johnson South Reef on March 14, 1988. It took Mischief Reef, claimed by the Philippines, in 1995, and has built artificial islands there since 2013.",
     polities: ["China", "Taiwan", "Vietnam", "Philippines", "Malaysia", "Brunei"],
