@@ -528,6 +528,9 @@ export default function AtlasApp() {
   };
 
   const eraMeta = eraByKey(era);
+  // after the intro closes from the keyboard, keyboard users carry on from the map (after a tap, focus stays put, so no
+  // focus ring or crosshair appears on the map)
+  const focusMapSoon = () => requestAnimationFrame(() => mapRef.current?.focus({ preventScroll: true }));
 
   return (
     <div className="fixed inset-0 overflow-hidden bg-[#9FCBE0] text-ink">
@@ -935,16 +938,18 @@ export default function AtlasApp() {
       </div>
 
       {showIntro ? (
-        <div data-intro className="absolute inset-0 z-40 grid place-items-center bg-slate-900/30 p-4">
-          <div className="w-full max-w-md">
-            <IntroCard
-              onClose={() => {
-                setShowIntro(false);
-                writeStorage(INTRO_KEY, "1");
-              }}
-              onPreset={applyPreset}
-            />
-          </div>
+        <div data-intro className="absolute inset-0 z-40 grid place-items-center bg-slate-900/30">
+          <IntroCard
+            onClose={(byKeyboard) => {
+              setShowIntro(false);
+              writeStorage(INTRO_KEY, "1");
+              if (byKeyboard) focusMapSoon();
+            }}
+            onPreset={(p, byKeyboard) => {
+              void applyPreset(p);
+              if (byKeyboard) focusMapSoon();
+            }}
+          />
         </div>
       ) : null}
 
