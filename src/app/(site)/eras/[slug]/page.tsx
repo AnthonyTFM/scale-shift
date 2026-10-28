@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import statsData from "@/data/era-stats.json";
@@ -120,19 +119,20 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         }
       />
       <div className="mx-auto max-w-6xl px-4 py-12">
-        {/* vector art on an equal-area map, so it's sharp on any screen and shows every shape at its true size */}
-        <Image
-          // versioned so a map data rebuild shows up straight away
-          src={`/era-maps/${slug}/map?v=${dataVersion.v}`}
-          fetchPriority="high"
-          // next/image loads lazily by default, which would cancel the high priority
-          loading="eager"
-          unoptimized
-          alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, drawn so each country shows at its real size`}
-          width={1200}
-          height={equalAreaHeight(1200)}
-          className="card w-full bg-white p-3 sm:p-5"
-        />
+        {/* an equal-area map, so every shape shows at its true size: vector art from tablets up (sharp on any screen), a
+            light picture on phones, held upright or sideways (the vector map takes a phone seconds to draw). Versioned, so a map data rebuild shows
+            up straight away. */}
+        <picture>
+          <source media="(min-width: 640px) and (min-height: 500px)" type="image/svg+xml" srcSet={`/era-maps/${slug}/map?v=${dataVersion.v}`} />
+          <img
+            src={`/era-maps/${slug}/phone?v=${dataVersion.v}`}
+            fetchPriority="high"
+            alt={`World map of borders ${e.key === "present" ? "today" : `in ${e.label}`}, drawn so each country shows at its real size`}
+            width={1200}
+            height={equalAreaHeight(1200)}
+            className="card h-auto w-full bg-white p-3 sm:p-5"
+          />
+        </picture>
 
         {s?.top.length ? (
           <section aria-labelledby="largest" className="mt-12">
