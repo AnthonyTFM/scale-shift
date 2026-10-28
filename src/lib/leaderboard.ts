@@ -17,7 +17,7 @@ import pool from "@/data/daily-pool.json";
 import { buildQuestions, LAUNCH, shiftDate, type PoolEntry } from "./daily";
 import { isOffensive } from "./name-filter";
 import removed from "@/content/removed-players.json";
-import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow, EndlessBoard, WeekBoard } from "./leaderboard-types";
+import type { AllTimeBoard, AllTimeRow, DayBoard, DayRow, EndlessBoard, EndlessPlace, WeekBoard } from "./leaderboard-types";
 
 // ---------- validation ----------
 
@@ -678,6 +678,19 @@ export async function weekBoard(date: string, limit: number, me: string | null):
  * Endless mode's best streaks: one day's (the day each run started, in the player's time zone, as the daily) or of all
  * time (`date` null). Rows use the daily's shape, with the streak as the score.
  */
+/**
+ * Where a streak of `score` would land on the all-time Best streaks board, over every entry (not just the top rows),
+ * leaving out `me`'s own row, which a better run replaces. Ties share a rank, as on the board. `next` is the closest
+ * score above it and the place one more than that would take.
+ */
+export async function endlessPlace(score: number, me: string | null): Promise<EndlessPlace> {
+  const ns = (await getStore().endlessBests(null)).filter((e) => !hidden(e.name, e.id) && e.n <= ENDLESS_REVIEW_OVER && e.id !== me).map((e) => e.n);
+  const placeOf = (n: number) => 1 + ns.filter((x) => x > n).length;
+  const above = ns.filter((x) => x > score);
+  const next = above.length ? above.reduce((a, b) => Math.min(a, b)) : null;
+  return { rank: placeOf(score), next: next === null ? null : { score: next, place: placeOf(next + 1) } };
+}
+
 export async function endlessBoard(date: string | null, limit: number, me: string | null): Promise<EndlessBoard> {
   // no one gets anywhere near this many right in a row at the closest level: a longer streak waits for a look at the
   // run (add the player to src/content/removed-players.json, or raise this)

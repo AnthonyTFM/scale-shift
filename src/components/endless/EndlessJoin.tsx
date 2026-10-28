@@ -15,7 +15,7 @@ import { useJoinTo } from "@/components/daily/useJoin";
 const t = endlessCopy.board;
 
 /** A finished run the server handed out, ready to post. */
-type Props = { seed: string; token: string; choices: number[]; streak: number };
+type Props = { seed: string; token: string; choices: number[]; streak: number; /** where this run would land, once the board is in */ wouldRank?: number | null };
 
 // the all-time Best streaks board's top five, with this player marked
 const boardUrl = (id: string) => `/api/endless?scope=all&limit=5&player=${id}`;
@@ -28,7 +28,7 @@ export function EndlessJoin(props: Props) {
   return signInOn ? <SignedIn {...props} /> : <SavedPlayer {...props} />;
 }
 
-function SignedIn({ seed, token, choices, streak }: Props) {
+function SignedIn({ seed, token, choices, streak, wouldRank }: Props) {
   const { isLoaded, isSignedIn, openSignIn, opening, openFailed, signOut } = useAccount();
   const join = useJoinTo<EndlessSubmitResult>({ endpoint: "/api/endless", payload: { seed, token, choices }, board: boardUrl });
   const [step, setStep] = useState<JoinStep | null>(null);
@@ -114,8 +114,8 @@ function SignedIn({ seed, token, choices, streak }: Props) {
       <div className="mt-5 flex items-center gap-3 rounded-[22px] border-2 border-primary bg-primary-soft py-3 pl-4 pr-3 shadow-[0_6px_0_0_var(--color-primary-shadow)]">
         <TrophyIcon className="size-9" />
         <span className="min-w-0 flex-1">
-          <span className="block font-display text-lg leading-tight text-ink">{t.joinCta}</span>
-          <span className="block text-sm text-muted">{t.joinHint}</span>
+          <span className="block font-display text-lg leading-tight text-ink">{wouldRank ? t.joinWould(wouldRank) : t.joinCta}</span>
+          <span className="block text-sm text-muted">{wouldRank ? (isSignedIn ? t.joinWouldName : t.joinWouldHint) : t.joinHint}</span>
         </span>
         <button
           type="button"
@@ -131,7 +131,7 @@ function SignedIn({ seed, token, choices, streak }: Props) {
           }}
           className="btn btn-primary mb-1.5 h-12 shrink-0 px-6"
         >
-          {awaiting && opening ? t.opening : t.join}
+          {awaiting && opening ? t.opening : wouldRank ? t.joinPost : t.join}
         </button>
       </div>
       {dialog}

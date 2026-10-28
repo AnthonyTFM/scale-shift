@@ -13,13 +13,16 @@ export const metadata: Metadata = {
 export default function EndlessPage() {
   return (
     <>
-      <PageHero
-        center
-        compact
-        game
-        eyebrow={t.eyebrow}
-        title={t.title}
-      />
+      {/* the intro goes once a run ends: the score and Play again come first (see .endless-intro in globals.css) */}
+      <div className="endless-intro">
+        <PageHero
+          center
+          compact
+          game
+          eyebrow={t.eyebrow}
+          title={t.title}
+        />
+      </div>
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-6 md:pb-10">
         <div className="mx-auto max-w-2xl">
           <SignInProvider>

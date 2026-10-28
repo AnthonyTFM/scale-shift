@@ -5,13 +5,15 @@ import Link from "next/link";
 import { site } from "@/content/site";
 import { endlessCopy as t } from "@/content/endless";
 import { track } from "@/lib/analytics";
+import { loadPlayer } from "@/lib/player";
+import type { EndlessPlace } from "@/lib/leaderboard-types";
 import { loadSave, localDateKey, nameInSentence, sizeParts, type PoolEntry, type Question } from "@/lib/daily";
 import { avoidOf, endlessQuestion, LEVELS, levelOf, loadEndless, loadSeen, newSeed, rememberSeen, streakOf, writeEndless, type EndlessSave } from "@/lib/endless";
 import type { ShapeFile } from "@/lib/outline";
 import { play } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
 import { useShareBox } from "@/components/site/ShareBox";
-import { FlameIcon, flameTier, MarkIcon, TrophyIcon } from "@/components/site/Icons";
+import { FlameIcon, flameTier, MapIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "@/components/daily/Matchup";
 import { EndlessJoin } from "./EndlessJoin";
 
@@ -322,26 +324,62 @@ function grid(streak: number) {
   return rows.join("\n");
 }
 
+/**
+ * The end of a run, built to send you straight back in: the streak, the next goal (your best, or the next place on the
+ * Best streaks board), one big Play again (Enter replays), where this run ranks of all time, and the matchup
+ * that ended it, with a "so close" when it was a close call. Nothing else.
+ */
 function Results({ run, streak, best, onAgain }: { run: Run; streak: number; best: number; onAgain: () => void }) {
   const shareBox = useShareBox();
   const newBest = streak > run.bestBefore && streak > 0;
   const miss = run.questions[streak];
-  const played = run.questions.slice(0, run.choices.length);
-  const level = levelOf(streak + 1);
-  const [runs, setRuns] = useState<number | null>(null);
   const [dailyDone, setDailyDone] = useState(false);
+  // where this run lands on the Best streaks board, and the next place up (undefined while loading, null if it failed)
+  const [place, setPlace] = useState<EndlessPlace | null | undefined>(undefined);
 
   useEffect(() => {
-    queueMicrotask(() => {
-      setRuns(loadEndless().runs);
-      setDailyDone(typeof loadSave().days[localDateKey()]?.s === "number");
-    });
+    queueMicrotask(() => setDailyDone(typeof loadSave().days[localDateKey()]?.s === "number"));
+    // counted over the whole board, without the player's own row: this run would replace it (and, signed in, may
+    // already be posted)
+    if (streak > 0) {
+      const me = loadPlayer()?.id;
+      fetch(`/api/endless?place=${streak}${me ? `&player=${encodeURIComponent(me)}` : ""}`)
+        .then((r) => (r.ok ? (r.json() as Promise<EndlessPlace>) : null))
+        .then((p) => setPlace(p && typeof p.rank === "number" ? p : null))
+        .catch(() => setPlace(null));
+    }
     if (!newBest) return;
     play("perfect");
     buzz([20, 40, 20, 40, 80]);
     const id = setTimeout(confetti, reducedMotion() ? 0 : 300);
     return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newBest]);
+
+  // a plain Enter plays again, unless something else has focus or a pop-up (or the sign-in window) is open
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Enter" || e.repeat || e.defaultPrevented || e.isComposing || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
+      const el = document.activeElement as HTMLElement | null;
+      if (document.querySelector('dialog[open], [role="dialog"], [aria-modal="true"]') || (el && el !== document.body && el.id !== "endless-done")) return;
+      e.preventDefault();
+      onAgain();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onAgain]);
+
+  const rank = place?.rank ?? null;
+  const goal = (() => {
+    if (!newBest) return best > 0 ? R.goalBest(best - streak + 1, best) : R.goalFirst;
+    // a new best: the next place on the board, once it's in (or just the next number, if the board can't be read)
+    if (place === undefined) return null;
+    if (!place) return R.goalNext(streak + 1);
+    return place.next ? R.goalRank(place.next.score - streak + 1, place.next.score + 1, place.next.place) : R.goalTop;
+  })();
+  // a close call: the miss was within 15%
+  const gap = miss ? Math.max(miss.options[0].a, miss.options[1].a) / Math.min(miss.options[0].a, miss.options[1].a) - 1 : 1;
+  const close = gap < 0.15;
 
   const share = () => {
     const url = `${location.origin}/endless`;
@@ -351,83 +389,80 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
 
   return (
     <section aria-labelledby="endless-done" className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7">
-      <div className="text-center">
-        <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">{R.eyebrow}</p>
-        <p aria-hidden="true" className="pop-in mt-1 font-display text-[5.5rem] leading-none text-ink sm:text-8xl">
-          {streak}
-        </p>
-        <p aria-hidden="true" className="font-bold text-muted">
-          {R.inARow(streak)}
-        </p>
-        {newBest ? (
-          <p className="pop-in mx-auto mt-3 inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-[0_3px_0_0_var(--color-gold-shadow)]">
+      {newBest ? (
+        <p className="flex justify-center">
+          <span className="pop-in inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-[0_3px_0_0_var(--color-gold-shadow)]">
             <TrophyIcon className="size-5" />
             {R.newBest}
-          </p>
-        ) : null}
-        <h2 id="endless-done" className="mt-3 font-display text-3xl leading-tight text-ink">
-          <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
-          {R.title(streak)}
-        </h2>
-        <p className="mt-1 text-muted">{R.verdict(streak + 1)}</p>
+          </span>
+        </p>
+      ) : null}
+      {/* the streak beside its title */}
+      <div className={`${newBest ? "mt-3" : ""} flex items-center justify-center gap-4`}>
+        <p aria-hidden="true" className="pop-in flex items-center gap-1 font-display text-7xl leading-none text-ink">
+          {streak > 0 ? <FlameIcon className="size-12" tier={flameTier(streak)} /> : null}
+          {streak}
+        </p>
+        <div className="min-w-0">
+          <h2 id="endless-done" tabIndex={-1} className="font-display text-2xl leading-tight text-ink outline-none sm:text-3xl">
+            <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
+            {R.title(streak)}
+          </h2>
+          <p className="text-sm text-muted">{R.inARow(streak)}</p>
+        </div>
       </div>
+      {/* the next goal, always within reach */}
+      <p aria-live="polite" className="mt-3 min-h-7 text-center font-display text-lg leading-snug text-ink">
+        {goal}
+      </p>
 
-      {/* straight back in: the first thing under the score, so a run restarts in one tap */}
-      <button type="button" onClick={onAgain} className="btn btn-gold btn-lg mt-5 w-full">
-        {R.playAgain} <span aria-hidden="true">→</span>
-      </button>
-
-      <dl className="mt-6 grid grid-cols-3 gap-2 text-center sm:gap-3">
-        {[
-          [R.best, best, R.bestSub],
-          // with storage blocked nothing is counted, but this run still happened
-          [R.runs, runs === null ? "—" : Math.max(1, runs), R.runsSub],
-          [R.level, `${level + 1}/${LEVELS.length}`, t.levels[level]],
-        ].map(([k, v, sub]) => (
-          <div key={String(k)} className="flex flex-col rounded-[20px] border-2 border-line bg-paper px-2 py-3">
-            <dt className="order-1 whitespace-nowrap text-[11px] font-bold uppercase tracking-normal text-muted">{k}</dt>
-            <dd className="order-2 font-display text-[1.7rem] leading-tight text-ink">{v}</dd>
-            <dd className="order-3 text-xs text-muted">{sub}</dd>
-          </div>
-        ))}
-      </dl>
-
-      {/* the run goes on the Best streaks board if the server handed it out (and at least one answer was right) */}
-      {run.token && streak > 0 ? <EndlessJoin seed={run.seed} token={run.token} choices={run.choices} streak={streak} /> : null}
-
-      {/* a run that missed the first matchup has nothing to share: just the daily */}
-      <div className={`mt-3 grid gap-2 ${streak > 0 ? "grid-cols-2" : ""}`}>
+      {/* straight back in */}
+      <div className="mt-3 flex gap-2">
+        <button type="button" onClick={onAgain} className="btn btn-gold btn-lg min-w-0 flex-1">
+          {R.playAgain} <span aria-hidden="true">→</span>
+        </button>
         {streak > 0 ? (
-          <button type="button" onClick={share} className="btn btn-primary h-12 px-2 text-sm sm:text-base">
-            <span className="sm:hidden">{R.shareShort}</span>
-            <span className="hidden sm:inline">{R.share}</span>
+          <button type="button" onClick={share} aria-label={R.share} className="btn btn-white btn-lg shrink-0 px-4">
+            <ShareIcon className="size-6" />
           </button>
         ) : null}
-        <Link href="/daily" className="btn btn-white h-12 px-2 text-sm sm:text-base">
-          {dailyDone ? R.dailyDone : R.dailyPlay}
-        </Link>
       </div>
+      <p className="mt-1.5 hidden text-center text-xs text-muted pointer-fine:block">{R.enterHint}</p>
       {shareBox.box}
 
+      {/* where this run ranks of all time; signed in, it's posted straight away */}
+      {streak > 0 ? (
+        run.token ? (
+          <EndlessJoin seed={run.seed} token={run.token} choices={run.choices} streak={streak} wouldRank={rank} />
+        ) : rank ? (
+          <p className="mt-4 flex items-center justify-center gap-2 text-center font-semibold text-ink">
+            <TrophyIcon className="size-6" /> {R.wouldRank(rank)}
+          </p>
+        ) : null
+      ) : null}
+
+      {/* the one that ended it: a close call says so */}
       {miss ? (
-        <>
-          <h3 className="mt-7 font-display text-xl text-ink">{R.missTitle}</h3>
+        <div className="mt-5 rounded-2xl bg-paper px-4 py-1 ring-1 ring-line">
+          <p className="pt-2.5 text-xs font-bold uppercase tracking-wide text-muted">{close ? R.soClose(Math.max(1, Math.round(gap * 100))) : R.missTitle}</p>
           <Answer q={miss} right={false} />
-        </>
+        </div>
       ) : null}
-      {played.length > 1 ? (
-        <details className="mt-4 rounded-2xl border-2 border-line px-4 py-1">
-          <summary className="flex min-h-11 cursor-pointer items-center font-semibold text-ink">{R.allTitle(played.length)}</summary>
-          <ol className="divide-y divide-line">
-            {played.map((pq, i) => (
-              <li key={i}>
-                <Answer q={pq} right={run.choices[i] === pq.answer} />
-              </li>
-            ))}
-          </ol>
-        </details>
-      ) : null}
+
+      <p className="mt-4 text-center text-sm">
+        <Link href="/daily" className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
+          {dailyDone ? R.dailyDone : R.dailyPlay} <span aria-hidden="true">&nbsp;→</span>
+        </Link>
+      </p>
     </section>
+  );
+}
+
+function ShareIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={className} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 15V3M7.5 7.5 12 3l4.5 4.5M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7" />
+    </svg>
   );
 }
 
@@ -438,16 +473,21 @@ function Answer({ q, right }: { q: Question; right: boolean }) {
   const line = sizeParts(big, small);
   const href = mapHref(q);
   return (
-    <div className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 gap-y-1 py-2.5 text-sm sm:flex sm:flex-wrap">
-      <MarkIcon right={right} className="size-5 translate-y-1" />
+    <div className="flex items-start gap-3 py-2.5 text-sm">
+      <MarkIcon right={right} className="mt-0.5 size-5" />
       <span className="min-w-0 flex-1 text-ink">
         <strong>{line.big}</strong> <span className="text-muted">({big.sub})</span> {line.link} <strong>{line.small}</strong>{" "}
         <span className="text-muted">({small.sub})</span>
       </span>
       {/* not for a region yet: the map can't draw those */}
       {href ? (
-        <Link href={href} aria-label={R.dragOnMapSr(nameInSentence(big), nameInSentence(small))} className="col-start-2 font-semibold text-primary hover:underline">
-          {R.dragOnMap} →
+        <Link
+          href={href}
+          aria-label={R.dragOnMapSr(nameInSentence(big), nameInSentence(small))}
+          title={R.dragOnMap}
+          className="-my-2 grid size-11 shrink-0 place-items-center rounded-lg text-primary hover:bg-primary-soft"
+        >
+          <MapIcon className="size-6" />
         </Link>
       ) : null}
     </div>
