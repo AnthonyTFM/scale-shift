@@ -163,7 +163,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => onTogglePlay(1)}
           aria-label={playing === 1 ? "Pause timeline" : "Play timeline"}
           title={playing === 1 ? "Pause" : "Play forward in time"}
-          className={`grid size-9 shrink-0 place-items-center rounded-full bg-accent sm:size-10 text-panel hover:bg-accent-strong ${HIDE_UNDER_YEAR_BOX}`}
+          className={`grid size-11 shrink-0 place-items-center rounded-full bg-accent text-panel hover:bg-accent-strong sm:size-10 ${HIDE_UNDER_YEAR_BOX}`}
         >
           {playing === 1 ? (
             <PauseIcon />
@@ -178,7 +178,7 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => go(-1)}
           disabled={i <= 0}
           aria-label="Previous era"
-          className={`grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 ${HIDE_UNDER_YEAR_BOX}`}
+          className={`grid size-11 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 sm:size-9 ${HIDE_UNDER_YEAR_BOX}`}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m15 6-6 6 6 6" />
@@ -221,19 +221,24 @@ export function EraBar({ era, loading, playing, onEra, onTogglePlay, onChanges, 
           onClick={() => go(1)}
           disabled={i >= eras.length - 1}
           aria-label="Next era"
-          className={`grid size-9 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 ${HIDE_UNDER_YEAR_BOX}`}
+          className={`grid size-11 shrink-0 place-items-center rounded-lg hover:bg-white/10 disabled:opacity-30 sm:size-9 ${HIDE_UNDER_YEAR_BOX}`}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="m9 6 6 6-6 6" />
           </svg>
         </button>
+        {/* phones: an icon button (44px), so the era name and the slider get the room; the words stay for screen readers */}
         <button
           type="button"
           onClick={onChanges}
           aria-expanded={changesOpen}
-          className={`shrink-0 rounded-lg bg-white/10 px-2.5 py-1.5 text-xs font-semibold hover:bg-white/15 sm:px-3 sm:py-2 sm:text-sm ${HIDE_UNDER_YEAR_BOX}`}
+          title="What changed?"
+          className={`grid size-11 shrink-0 place-items-center rounded-lg bg-white/10 font-semibold hover:bg-white/15 sm:block sm:size-auto sm:px-3 sm:py-2 sm:text-sm ${HIDE_UNDER_YEAR_BOX}`}
         >
-          What changed?
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 sm:hidden" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M12 4v8M8 8h8M8 18h8" />
+          </svg>
+          <span className="max-sm:sr-only">What changed?</span>
         </button>
       </div>
     </div>
