@@ -15,7 +15,7 @@ import { breadcrumbJsonLd, JsonLd, PageHero } from "@/components/site/PageHero";
 // `after`: the state it follows on from in the snapshot before (a rename or a successor)
 type Change = { n: string; after?: string; from: number; to: number };
 type Named = { n: string; a: number };
-type Stats = { key: string; top: Named[]; gained: Change[]; lost: Change[]; appeared: Named[]; vanished: Named[] };
+type Stats = { key: string; top: Named[]; peoples: Named[]; gained: Change[]; lost: Change[]; appeared: Named[]; vanished: Named[] };
 const stats = statsData as Stats[];
 
 /** Earth's land area excluding Antarctica is ~134.6M km²; including it, ~148.9M km². */
@@ -28,10 +28,10 @@ export function generateStaticParams() {
 function summary(key: string) {
   const e = eraByKey(key)!;
   const s = stats.find((x) => x.key === key);
-  const top = s?.top.filter((t) => t.n !== "Antarctica").slice(0, 3).map((t) => t.n) ?? [];
+  const top = s?.top.slice(0, 3).map((t) => t.n) ?? [];
   return (
     eraIntros[key] ??
-    `${e.count} states, peoples and territories are mapped in ${eraPhrase(e)}. The largest are ${top.length > 1 ? `${top.slice(0, -1).join(", ")} and ${top.at(-1)}` : top[0]}.`
+    `${e.count} states, peoples and territories are mapped in ${eraPhrase(e)}. The largest states are ${top.length > 1 ? `${top.slice(0, -1).join(", ")} and ${top.at(-1)}` : top[0]}.`
   );
 }
 
@@ -137,47 +137,22 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         </picture>
 
         {s?.top.length ? (
-          <section aria-labelledby="largest" className="mt-12">
-            <h2 id="largest" className="font-display text-2xl text-ink md:text-3xl">
-              Largest {e.key === "present" ? "countries today" : `in ${e.label}`}
-            </h2>
-            <p className="mt-1 text-sm text-muted">Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica included.</p>
-            <div tabIndex={0} role="region" aria-label={`Table: largest ${e.key === "present" ? "countries today" : `in ${e.label}`}`} className="mt-4 overflow-x-auto card">
-              {/* phones: two-line rows (area under the name), no sideways scroll; wider screens: four columns */}
-              <table className="w-full text-left text-sm sm:min-w-[520px]">
-                <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
-                  <tr>
-                    <th scope="col" className="py-3 pl-3 pr-1 sm:px-4">
-                      #
-                    </th>
-                    <th scope="col" className="px-2 py-3 sm:px-4">
-                      State or people
-                    </th>
-                    <th scope="col" className="hidden px-4 py-3 sm:table-cell">
-                      Area
-                    </th>
-                    <th scope="col" className="py-3 pl-1 pr-3 text-right sm:px-4">
-                      <span className="sm:hidden">Land</span>
-                      <span className="hidden sm:inline">Share of land</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-line">
-                  {s.top.map((t, n) => (
-                    <tr key={t.n}>
-                      <td className="py-2.5 pl-3 pr-1 align-top text-muted sm:px-4">{n + 1}</td>
-                      <th scope="row" className="px-2 py-2.5 font-semibold text-ink sm:px-4">
-                        {t.n}
-                        <span className="block text-sm font-normal text-ink-soft sm:hidden">{formatBothShort(t.a)}</span>
-                      </th>
-                      <td className="hidden px-4 py-2.5 text-ink-soft sm:table-cell">{formatBoth(t.a)}</td>
-                      <td className="py-2.5 pl-1 pr-3 text-right align-top tabular-nums text-ink-soft sm:px-4">{((t.a / LAND_KM2) * 100).toFixed(1)}%</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
+          <Largest
+            id="largest"
+            title={e.key === "present" ? "Largest countries and territories today" : `Largest states in ${e.label}`}
+            column={e.key === "present" ? "Country or territory" : "State"}
+            rows={s.top}
+          />
+        ) : null}
+        {/* peoples only where the source draws them: from 1800 the maps show states, and land no state held is blank */}
+        {typeof e.year === "number" && e.year < 1800 && s?.peoples.length ? (
+          <Largest
+            id="largest-peoples"
+            title={`Largest lands of peoples without fixed borders in ${e.label}`}
+            column="People"
+            note="Hunter-gatherers, herders, tribal confederations and early farming cultures. Their outlines are scholars' estimates of where they lived, not borders."
+            rows={s.peoples}
+          />
         ) : null}
 
         {s && prev && key !== "present" ? (
@@ -234,5 +209,54 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
         </nav>
       </div>
     </>
+  );
+}
+
+/** One "Largest" table: rank, name, area and share of Earth's land (two-line rows on phones, four columns wider). */
+function Largest({ id, title, column, note, rows }: { id: string; title: string; column: string; note?: string; rows: Named[] }) {
+  return (
+    <section aria-labelledby={id} className="mt-12">
+      <h2 id={id} className="font-display text-2xl text-ink md:text-3xl">
+        {title}
+      </h2>
+      <p className="mt-1 text-sm text-muted">
+        {note ? `${note} ` : ""}Approximate areas, measured from the map outlines. Share of land counts all of Earth&apos;s land, Antarctica
+        included.
+      </p>
+      <div tabIndex={0} role="region" aria-label={`Table: ${title.toLowerCase()}`} className="mt-4 overflow-x-auto card">
+        <table className="w-full text-left text-sm sm:min-w-[520px]">
+          <thead className="border-b border-line bg-paper text-xs uppercase tracking-wide text-muted">
+            <tr>
+              <th scope="col" className="py-3 pl-3 pr-1 sm:px-4">
+                #
+              </th>
+              <th scope="col" className="px-2 py-3 sm:px-4">
+                {column}
+              </th>
+              <th scope="col" className="hidden px-4 py-3 sm:table-cell">
+                Area
+              </th>
+              <th scope="col" className="py-3 pl-1 pr-3 text-right sm:px-4">
+                <span className="sm:hidden">Land</span>
+                <span className="hidden sm:inline">Share of land</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-line">
+            {rows.map((t, n) => (
+              <tr key={t.n}>
+                <td className="py-2.5 pl-3 pr-1 align-top text-muted sm:px-4">{n + 1}</td>
+                <th scope="row" className="px-2 py-2.5 font-semibold text-ink sm:px-4">
+                  {t.n}
+                  <span className="block text-sm font-normal text-ink-soft sm:hidden">{formatBothShort(t.a)}</span>
+                </th>
+                <td className="hidden px-4 py-2.5 text-ink-soft sm:table-cell">{formatBoth(t.a)}</td>
+                <td className="py-2.5 pl-1 pr-3 text-right align-top tabular-nums text-ink-soft sm:px-4">{((t.a / LAND_KM2) * 100).toFixed(1)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
