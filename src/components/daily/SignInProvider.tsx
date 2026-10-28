@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, lazy, Suspense, useCallback, useContext, useEffect, useRef, useState } from "react";
-import { signInOn } from "@/lib/sign-in";
+import { maybeSignedIn, signInOn } from "@/lib/sign-in";
 
 /** What the daily game and leaderboard need from sign-in, whether or not Clerk has loaded. */
 export type Account = {
@@ -41,9 +41,6 @@ const ClerkBridge = lazy(() =>
     return new Promise<never>(() => {});
   }),
 );
-
-/** Clerk sets this cookie to the time of the last sign-in, and to 0 when signed out. */
-const maybeSignedIn = () => /(?:^|;\s*)__client_uat(?:_[^=]*)?=[1-9]/.test(document.cookie);
 
 /** Set when a sign-in window opens: a sign-in that leaves the page (Google) comes back to a fresh page load. */
 export const SIGNIN_RETURN = "signin-return";

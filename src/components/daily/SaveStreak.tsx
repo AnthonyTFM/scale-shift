@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import type { SubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, rememberPlayer } from "@/lib/player";
 import { track } from "@/lib/analytics";
@@ -8,6 +9,9 @@ import { signInOn } from "@/lib/sign-in";
 import { useAccount } from "./SignInProvider";
 import { clearJoinFlow, SignInSheet, startJoinFlow, takeJoinFlow } from "./JoinDialog";
 import { dailyCopy } from "@/content/daily";
+import { accountCopy } from "@/content/account";
+import { useAccountInfo } from "./useAccountInfo";
+import { WelcomeSheet, wasWelcomed } from "./WelcomeSheet";
 import { FlameIcon, MarkIcon } from "@/components/site/Icons";
 
 const t = dailyCopy.save;
@@ -17,21 +21,24 @@ type Props = { date: string; choices: number[] };
 /**
  * After the daily round. Daily scores are private, the way Wordle's are: there is no public daily board. Signing in is
  * what keeps your streak and results on every device, so that's the offer. Signed in, today's score is saved straight
- * away (no nickname needed). Without sign-in (running locally without Clerk), the streak lives in this browser only.
+ * away (no nickname needed). The first time, a pop-up welcomes them and offers a username and reminder emails (see
+ * WelcomeSheet); after that, both live on the account page. Without sign-in (running locally without Clerk), the streak
+ * lives in this browser only.
  */
 export function SaveStreak(props: Props) {
   return signInOn ? <Save {...props} /> : null;
 }
 
 function Save({ date, choices }: Props) {
-  const { isLoaded, isSignedIn, openSignIn, opening, openFailed, signOut } = useAccount();
+  const { isLoaded, isSignedIn, openSignIn, opening, openFailed } = useAccount();
+  const { info, refresh, saveName, saveReminders } = useAccountInfo();
+  // the one-time welcome pop-up, for this player
+  const [welcome, setWelcome] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   // between "Continue" and the sign-in window (the pop-up is closed meanwhile), and whether that window failed to open
   const [awaiting, setAwaiting] = useState(false);
   const [failed, setFailed] = useState(false);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
-  const [reminders, setReminders] = useState<boolean | null>(null);
-  const [remindNote, setRemindNote] = useState("");
   const [error, setError] = useState("");
   const sent = useRef(false);
   const card = useRef<HTMLDivElement>(null);
@@ -53,12 +60,9 @@ function Save({ date, choices }: Props) {
       if (data.player) rememberPlayer(data.player);
       setStatus("saved");
       if (!data.duplicate) track("streak_saved");
-      // the reminder setting, now that the player surely exists
-      // (left unknown if that fails, rather than shown unticked)
-      const me = await fetch("/api/leaderboard/me")
-        .then((r) => (r.ok ? r.json() : null))
-        .catch(() => null);
-      if (me?.player) setReminders(!!me.player.reminders);
+      // now that the player surely exists: a first-timer with no username gets the welcome pop-up, once
+      const me = await refresh();
+      if (me && !me.name && !wasWelcomed(me.id)) setWelcome(me.id);
     } catch {
       setError(t.failed);
       setStatus("error");
@@ -72,8 +76,7 @@ function Save({ date, choices }: Props) {
       sent.current = false;
       queueMicrotask(() => {
         setStatus("idle");
-        setReminders(null);
-        setRemindNote("");
+        setWelcome(null);
       });
       return;
     }
@@ -95,27 +98,6 @@ function Save({ date, choices }: Props) {
       setOpen(true);
     });
   }, [awaiting, openFailed]);
-
-  const setReminder = async (on: boolean) => {
-    setRemindNote("");
-    setReminders(on);
-    const undo = (note: string) => {
-      setReminders(!on);
-      setRemindNote(note);
-    };
-    try {
-      const res = await fetch("/api/leaderboard/reminders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ on }),
-      });
-      const data = (await res.json()) as { ok: boolean; error?: string };
-      if (!data.ok) return undo(data.error ?? "Couldn't save that. Please try again.");
-      setRemindNote(on ? "Done. We'll email you when a new challenge is up." : "Done. No more reminder emails.");
-    } catch {
-      undo("Couldn't reach the server. Please try again.");
-    }
-  };
 
   const sheet = (
     <SignInSheet
@@ -146,7 +128,7 @@ function Save({ date, choices }: Props) {
 
   if (isSignedIn)
     return (
-      <div ref={card} tabIndex={-1} className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4 outline-none">
+      <div ref={card} tabIndex={-1} className="mt-5 rounded-[20px] border-2 border-line bg-paper px-4 py-3 outline-none">
         <div aria-live="polite">
           {status === "error" ? (
             <p role="alert" className="text-sm font-semibold text-danger">
@@ -156,32 +138,29 @@ function Save({ date, choices }: Props) {
               </button>
             </p>
           ) : status === "saved" ? (
-            <div className="flex items-start gap-3">
-              <MarkIcon right className="size-8 shrink-0" />
-              <div>
-                <p className="font-display text-lg leading-tight text-ink">{t.saved}</p>
-                <p className="text-sm text-muted">{t.savedSub}</p>
-              </div>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <MarkIcon right className="size-6" />
+              <p className="min-w-0 flex-1">
+                <span className="block font-display text-base leading-tight text-ink">{accountCopy.saved}</span>
+                {info?.name ? <span className="block text-xs text-muted">{accountCopy.savedAs(info.name)}</span> : null}
+              </p>
+              <Link href="/account" className="inline-flex min-h-11 items-center text-sm font-semibold text-primary hover:underline">
+                {accountCopy.manage} <span aria-hidden="true">&nbsp;→</span>
+              </Link>
             </div>
           ) : (
             <p className="text-sm text-muted">{t.saving}</p>
           )}
         </div>
-        {reminders !== null ? (
-          <label className="mt-3 flex items-start gap-2 text-sm text-ink-soft">
-            <input type="checkbox" checked={reminders} onChange={(e) => setReminder(e.target.checked)} className="mt-0.5 size-4 shrink-0 accent-primary" />
-            <span>{t.remind}</span>
-          </label>
-        ) : null}
-        <p role="status" className="mt-1 text-xs text-muted empty:hidden">
-          {remindNote}
-        </p>
-        <p className="mt-2 text-xs text-muted">
-          {t.signedIn}{" "}
-          <button type="button" onClick={() => signOut("/daily")} className="min-h-11 font-semibold text-primary hover:underline">
-            {t.signOut}
-          </button>
-        </p>
+        <WelcomeSheet
+          player={welcome}
+          onSaveName={saveName}
+          onSaveReminders={saveReminders}
+          onClose={() => {
+            setWelcome(null);
+            requestAnimationFrame(() => card.current?.focus());
+          }}
+        />
       </div>
     );
 

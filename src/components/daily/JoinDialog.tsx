@@ -125,8 +125,8 @@ export function SignInSheet({
   );
 }
 
-/** The pop-up itself, open while `step` is set. */
-function Sheet({ step, titleId, onClose, children }: { step: JoinStep | null; titleId: string; onClose: () => void; children: React.ReactNode }) {
+/** The pop-up itself, open while `step` is set (also the one-time welcome pop-up, see WelcomeSheet). */
+export function Sheet({ step, titleId, onClose, children }: { step: JoinStep | null; titleId: string; onClose: () => void; children: React.ReactNode }) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {

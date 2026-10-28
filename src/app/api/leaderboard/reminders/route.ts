@@ -1,5 +1,5 @@
 import { getStore, isPlayerId } from "@/lib/leaderboard";
-import { existingPlayer, signInEnabled, verifiedUser } from "@/lib/account";
+import { playerFor, signInEnabled, verifiedUser } from "@/lib/account";
 import { limited } from "@/lib/rate-limit";
 
 const ipOf = (request: Request) => request.headers.get("x-forwarded-for")?.split(",")[0].trim() || request.headers.get("x-real-ip") || "local";
@@ -17,12 +17,13 @@ export async function POST(request: Request) {
   if (typeof body.on !== "boolean") return fail("Something went wrong. Reload the page and try again.", 400);
   try {
     const store = getStore();
-    let player: string | null;
+    let player: string;
     if (signInEnabled()) {
       // with sign-in on, only the signed-in person can change their own reminders
       const user = await verifiedUser();
-      player = user ? await existingPlayer(user) : null;
-      if (!player) return fail("Sign in and post a score first.", 401);
+      if (!user) return fail("Sign in first.", 401);
+      // a brand-new account becomes a player here, so the welcome pop-up can set reminders before any score is saved
+      player = await playerFor(user, body.player);
     } else {
       if (!isPlayerId(body.player)) return fail("Something went wrong. Reload the page and try again.", 400);
       player = body.player;
