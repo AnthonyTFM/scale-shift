@@ -91,7 +91,7 @@ export default function AtlasApp() {
   const [ready, setReady] = useState(false);
   /** phones: how far above the screen's bottom the sheets, the selected-shape bar and the toast start (above the timeline
    * and its year note) */
-  const [stackBottom, setStackBottom] = useState(124);
+  const [stackBottom, setStackBottom] = useState(130);
   /** bumped after a search pick, to move keyboard focus to the picked shape */
   const [focusAsk, setFocusAsk] = useState(0);
 
@@ -454,11 +454,12 @@ export default function AtlasApp() {
     if (selected && !index) needIndex();
   }, [selected, index, needIndex]);
 
-  // phones: keep the bottom column clear of the timeline, which grows when the year note opens
+  // phones: keep the bottom column clear of the timeline, which grows when the year note opens. The 14px gap above the
+  // timeline (12px offset + 14) is where the era name's tap area reaches up to its full 44px (EraBar)
   useEffect(() => {
     const el = timelineRef.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setStackBottom(el.offsetHeight + 20));
+    const ro = new ResizeObserver(() => setStackBottom(el.offsetHeight + 26));
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
