@@ -320,7 +320,9 @@ export class MapEngine {
     this.cache = null;
     this.dropStandIn();
     if (prev && layer && prev !== layer && !busy) this.sweep = this.startSweep(prev, prevCache, layer);
-    if (prevCache) this.recycle(...prevCache.tiles.values());
+    // the first era: the sea drawn while it loaded (with the lakes and claims) stays under its tiles until they're all in
+    if (prevCache && !prev && layer) this.standIn = prevCache;
+    else if (prevCache) this.recycle(...prevCache.tiles.values());
     this.markBase();
   }
 
@@ -459,10 +461,15 @@ export class MapEngine {
    * the state lines arrive one after another, and starting over each time froze a mid-range phone for 150–300 ms each.
    */
   private retile(part: "states" | "claims" | "lakes") {
-    this.dropStandIn();
     const c = this.cache;
     if (c) {
-      this.recycle(...c.tiles.values());
+      // what's on screen stays under the new tiles until they're all drawn (same era and zoom, so it lines up). An old
+      // zoom level already standing in for a zoom still filling in carries on, unless it's only the sea drawn before the
+      // first era
+      if (!this.standIn || !this.standIn.layer) {
+        this.dropStandIn();
+        this.standIn = c;
+      } else this.recycle(...c.tiles.values());
       const fresh = this.buildCache(c.layer, c.k);
       this.cache = {
         ...c,
@@ -569,13 +576,14 @@ export class MapEngine {
     if (this.sweep) this.drawSweep(this.sweep, cache, projs);
     else {
       this.drawTiles(cache);
-      this.drawHighlight(cache);
+      // names and the highlight only once the land under them is drawn: the first era fills in over a few frames
+      if (this.painted) this.drawHighlight(cache);
       this.drawLines();
       if (this.labels) {
         const feats = this.labelFeats(cache);
         const states = this.showStates() ? this.states : null;
         for (const proj of projs) {
-          this.paintLabels(ctx, this.planLabels(proj, feats, states));
+          if (this.painted) this.paintLabels(ctx, this.planLabels(proj, feats, states));
           this.drawClaimLabels(ctx, proj);
         }
       }
@@ -702,7 +710,10 @@ export class MapEngine {
     const s = this.view.k / c.k;
     const pad = TILE_PAD;
     const live = ctx === this.bctx && !this.fullDraw;
-    const standIn = this.standIn && this.standIn.layer === c.layer && this.standIn.dpr === c.dpr && c.k >= this.standIn.k * 0.999 ? this.standIn : null;
+    const standIn =
+      this.standIn && (this.standIn.layer === c.layer || !this.standIn.layer) && this.standIn.dpr === c.dpr && c.k >= this.standIn.k * 0.999
+        ? this.standIn
+        : null;
     let missing = false;
     let pending = false;
     let drawn = 0;
@@ -733,8 +744,9 @@ export class MapEngine {
     // a few tiles a frame only where something shows in the meantime: nothing yet (first opening) or the old level,
     // if its kept tiles cover every gap (flying to the other side of the world, they don't)
     const covered = !!standIn && gaps.every(([x, y, w, h]) => this.standInCovers(standIn, x, y, w, h));
-    const deadline = live && !this.sweep && gaps.length && (covered || (!standIn && !this.painted)) ? performance.now() + 10 : Infinity;
-    const underGaps = covered && deadline !== Infinity;
+    const deadline = live && !this.sweep && gaps.length && (covered || !this.painted) ? performance.now() + 10 : Infinity;
+    // under the gaps, whatever the stand-in has (all of them once the map has been drawn; on first opening, what there is)
+    const underGaps = !!standIn && deadline !== Infinity;
     if (underGaps) {
       // only under the gaps: elsewhere the new tiles' crisp lines would show the old, scaled ones through them
       ctx.save();
