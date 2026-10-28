@@ -58,7 +58,7 @@ export const dailyCopy = {
   // the reveal after each answer
   reveal: {
     round: (n: number, total: number) => `Round ${n} of ${total}`,
-    ask: "Drawn the way a normal web map shows them. Don't trust your eyes.",
+    ask: "Drawn the way a normal map shows them. Don't trust your eyes.",
     // after the answer, in place of `ask`: which drawing is which, and tapping a tile plays the shrink again
     watch: "Pale: size on a normal map. Solid: real size. Tap to replay.",
     right: "You got it!",

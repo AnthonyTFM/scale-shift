@@ -13,7 +13,7 @@ export const home = {
   explore: {
     title: "More to explore",
     leaderboard: "The best streaks in endless mode",
-    eras: (n: number) => `${n} maps, 2000 BCE to today`,
+    eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
     timeline: (n: number) => `${n} times land changed hands`,
     disputes: (n: number) => `${n} places, from Crimea to Antarctica`,
     teachers: "Everything for the classroom",

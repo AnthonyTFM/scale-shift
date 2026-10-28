@@ -14,7 +14,7 @@ export const eraIntros: Record<string, string> = {
   "1200":
     "The world stands on the eve of the Mongol conquests. Within decades, Genghis Khan and his heirs build the biggest unbroken land empire the world has ever seen.",
   "1492":
-    "Columbus reaches the Caribbean. Within a generation, Spanish enslavement, forced labor and new diseases would kill most of the Taíno of Hispaniola. This snapshot also maps hundreds of Indigenous nations across the Americas and Australia, which is why it holds far more shapes than the eras around it.",
+    "Columbus reaches the Caribbean. Within a generation, Spanish enslavement, forced labor and new diseases kill most of the Taíno of Hispaniola. This snapshot also maps hundreds of Indigenous nations across the Americas and Australia, which is why it holds far more shapes than the eras around it.",
   "1783":
     "The Treaty of Paris recognizes the United States. Spain claims most of North America west of the Mississippi, though Indigenous nations such as the Comanche control much of it on the ground, and the Mughal Empire is breaking apart as the East India Company grabs more land.",
   "1815":
@@ -30,7 +30,7 @@ export const eraIntros: Record<string, string> = {
   "1960":
     "The Year of Africa: 17 African countries win independence. The Cold War splits Europe in two.",
   "1994":
-    "The Soviet Union, Yugoslavia and Czechoslovakia have broken up into 22 countries in just a few years. In Rwanda, Hutu extremists killed about 800,000 people, mostly Tutsi, in about 100 days from April 1994 (the UN's estimate), and war is tearing Bosnia apart.",
+    "The Soviet Union, Yugoslavia and Czechoslovakia have broken up into 22 countries in just a few years. In Rwanda, Hutu extremists kill about 800,000 people, mostly Tutsi, in about 100 days from April 1994 (the UN's estimate), and war is tearing Bosnia apart.",
   present:
     "Today's borders, as drawn by Natural Earth. Striped areas show places where who runs the land and who the world says owns it don't match.",
 };

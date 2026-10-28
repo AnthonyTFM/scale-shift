@@ -46,7 +46,7 @@ export const accountCopy = {
     remindOn: "Done. You're on the list for reminder emails, which start soon.",
     remindOff: "Done. No more reminder emails.",
     signOut: "Sign out",
-    dangerTitle: "Signed in",
+    cardTitle: "Your sign-in and data",
   },
 
   // the short line on the daily results once a streak is saved
