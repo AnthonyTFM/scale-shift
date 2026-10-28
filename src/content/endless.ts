@@ -37,7 +37,7 @@ export const endlessCopy = {
     goalBest: (more: number, best: number) => (more <= 5 ? `${more} more to beat your best (${best})` : `Your best: ${best} in a row`),
     goalFirst: "Get one right to start your streak",
     goalRank: (more: number, target: number, place: number) =>
-      more <= 5 ? `${more} more ${more === 1 ? "takes" : "take"} #${place} of all time` : `${target} in a row takes #${place} of all time`,
+      more <= 5 ? `${more} more to reach #${place} of all time` : `Reach ${target} in a row for #${place} of all time`,
     goalNext: (n: number) => `Next goal: ${n} in a row`,
     goalTop: "That's #1 of all time!",
     playAgain: "Play again",
@@ -61,15 +61,15 @@ export const endlessCopy = {
   },
   // the Best streaks board: on the results screen and the leaderboard page
   board: {
-    title: "Best streaks ever",
+    title: "Best streaks",
     seeAll: "See all",
     joinCta: "Get on the Best streaks board",
     joinHint: "See where your run ranks.",
     // with the board loaded: where this run would land, and one tap to post it
     joinWould: (rank: number) => `This run would be #${rank} of all time`,
     joinWouldHint: "Sign in to post it.",
-    // signed in already, with no nickname yet
-    joinWouldName: "Pick a nickname to post it.",
+    // signed in already, with no username yet
+    joinWouldName: "Pick a username to post it.",
     joinPost: "Post it",
     join: "Join",
     opening: "Opening sign-in…",
@@ -92,7 +92,7 @@ export const endlessCopy = {
       post: "Post my streak",
     },
     // the leaderboard page (the Best streaks board)
-    allCaption: "Best streaks ever",
+    allCaption: "Best streaks",
     streak: "Streak",
     note: "Your longest run of right answers in endless mode. Ties share a rank; whoever got there first is listed first.",
     emptyAll: "No streaks posted yet. Play endless mode to be the first.",

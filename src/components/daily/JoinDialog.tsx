@@ -255,7 +255,7 @@ function NameStep({ titleId, join, text, onPosted }: { titleId: string; join: Jo
         e.preventDefault();
         const name = nameRef.current?.value.trim() ?? "";
         if (name.length < 3) return (setStatus("error"), setError("Use 3 to 16 characters."));
-        if (isOffensive(name)) return (setStatus("error"), setError("Please pick a different nickname."));
+        if (isOffensive(name)) return (setStatus("error"), setError("Please pick a different username."));
         if (await submit(name, remindRef.current?.checked ?? false)) onPosted();
       }}
     >

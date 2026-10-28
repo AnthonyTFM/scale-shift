@@ -18,7 +18,7 @@ const steps = [
   { title: "Travel in time", body: "Use the timeline at the bottom, or press play. Shapes you haven't moved switch to each era's borders." },
   { title: "Ask “who ruled here?”", body: "Tap or click any land to see who controlled that spot in every era, plus the events that changed it. On today's map, any border dispute is shown first." },
   { title: "Try a comparison", body: "Open the Comparisons tab to load the most surprising sizes and the most controversial borders in one click." },
-  { title: "Share", body: "The Share button copies a link to exactly what you see, or downloads a PNG." },
+  { title: "Share", body: "The Share button copies a link to exactly what you see, or saves it as a picture." },
 ];
 
 const keys = [

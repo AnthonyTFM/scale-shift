@@ -45,9 +45,8 @@ export const accountCopy = {
     remind: "Email me when a new daily challenge is up (starting soon)",
     remindOn: "Done. You're on the list for reminder emails, which start soon.",
     remindOff: "Done. No more reminder emails.",
-    signedInAs: "Signed in",
     signOut: "Sign out",
-    dangerTitle: "Your data",
+    dangerTitle: "Signed in",
   },
 
   // the short line on the daily results once a streak is saved

@@ -4,7 +4,7 @@ import { PageHero } from "@/components/site/PageHero";
 import { TimelineFilter } from "@/components/site/TimelineFilter";
 
 export const metadata: Metadata = {
-  title: "When land changed hands: taken vs. made official",
+  title: "When land changed hands: taken vs made official",
   description: `${events.length} territorial changes from 1550 BCE to today. For each one: the year control changed and the year it was made official by treaty or recognition, if ever.`,
   alternates: { canonical: "/timeline" },
 };

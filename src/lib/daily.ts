@@ -41,7 +41,7 @@ const PROMPTS: Record<QuestionKind, string> = {
   trap: "Which country is bigger in real life?",
   close: "Tricky one: which country is bigger?",
   state: "Which is bigger?",
-  history: "Then vs. now: which is bigger?",
+  history: "Then vs now: which is bigger?",
   history2: "Back in history: which was bigger?",
 };
 

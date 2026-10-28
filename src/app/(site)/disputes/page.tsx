@@ -8,7 +8,7 @@ import { mapLink } from "@/lib/share";
 import { PageHero } from "@/components/site/PageHero";
 
 export const metadata: Metadata = {
-  title: "Disputed borders: who controls vs. who claims",
+  title: "Disputed borders: who controls vs who claims",
   description:
     "Crimea, Kashmir, Taiwan, Western Sahara, Golan Heights and more: who controls each territory, since when, who claims it and whether that control has ever been formally recognized.",
   alternates: { canonical: "/disputes" },
@@ -19,7 +19,7 @@ export default function DisputesPage() {
     <>
       <PageHero
         eyebrow="Present day"
-        title="Disputed borders: control vs. recognition"
+        title="Disputed borders: control vs recognition"
         lead={
           <p>
             Maps have to choose a line. Ours draws who actually controls the land (from Natural Earth). Tap any country on today&apos;s map and

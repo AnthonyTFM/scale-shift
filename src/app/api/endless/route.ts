@@ -91,7 +91,7 @@ export async function POST(request: Request) {
     }
     // a name picked on the account page wins over one sent with a run (an older results card could send the old one)
     const stored = await store.nameOf(player);
-    if (!stored && !(await store.claimName(nameKey(name), player))) return fail("That nickname is taken. Please pick another.", 422, "name");
+    if (!stored && !(await store.claimName(nameKey(name), player))) return fail("That username is taken. Please pick another.", 422, "name");
     // a brand-new player: the same cap on new players per network as the daily. A player with no nickname yet who saved
     // today's daily score was already counted for today by the daily.
     if (!stored && !(await store.has(run.date, player))) {

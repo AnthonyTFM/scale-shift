@@ -4,7 +4,7 @@ import { site } from "./site";
 export const teachers = {
   eyebrow: "For teachers",
   title: `Everything on ${site.name}, in one place`,
-  lead: "A quick reference for the classroom: why world maps get sizes wrong, real areas for today's countries, 4,000 years of borders and today's disputes. Free, no sign-up, no ads.",
+  lead: "A quick reference for the classroom: why world maps get sizes wrong, real areas for today's countries, 4,000 years of borders and today's disputes. Free, no sign-in needed, no ads.",
   jump: [
     { id: "why", label: "Why maps distort" },
     { id: "sizes", label: "Real sizes" },
@@ -63,11 +63,11 @@ export const teachers = {
   inClass: {
     title: "Using it in class",
     tips: [
-      ["On a projector", "Open the map full screen. Drag any country or empire to another latitude and the class watches it grow or shrink to its real size."],
+      ["On a projector", "Open the map full screen. Drag any country or empire to another latitude and the class watches the map stretch or shrink it. Its real size never changes."],
       ["Share a set-up", "Arrange shapes on the map, then use Share: the link opens exactly that comparison on every student's device."],
       ["Step through history", "Use the timeline under the map, or open an era page, to show how borders changed in a region."],
       ["Who ruled here?", "Click any spot on land to see who controlled it in every era, with disputes shown first on today's map."],
-      ["Quick warm-up", "The daily challenge is five 'which is bigger?' questions, the same for everyone that day, and takes about two minutes. No sign-in needed to play."],
+      ["Quick warm-up", "The daily challenge is five “which is bigger?” matchups, the same for everyone that day, and takes about two minutes. No sign-in needed to play."],
       ["Any device", "Works in any modern browser on laptops, Chromebooks, tablets and phones. Nothing to install and no student accounts. The optional leaderboard is for ages 13 and up."],
     ] as [string, string][],
   },
