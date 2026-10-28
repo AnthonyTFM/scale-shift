@@ -1332,6 +1332,12 @@ const AROUND_1500 = (year) => [
   EZO("Japan"),
   ...FILL([["Wattasid Sultanate", "Wattasid dynasty"], ["Mali", "Mali Empire"], ["Alwa", "Alodia"], ...(year === 1500 ? [["Korea", "Joseon"]] : [])]),
 ];
+// The source draws the Shang (1500 BCE) and the Zhou (1000 BCE) with one polygon, many times the Shang's land. Each is
+// redrawn from Cliopatria's outline for its year; the rest goes back to the source's label for China's other cultures.
+const SINIC = (state, clio) => [
+  { to: "Sinic", poly: [[95, 18], [126, 18], [126, 47], [95, 47], [95, 18]], from: [state] },
+  { to: state, clio: [clio], from: ["Sinic"] },
+];
 const RUS_1300 = { s: "Khanate of the Golden Horde" };
 const BEFORE_1800 = {
   [-1500]: [
@@ -1342,7 +1348,9 @@ const BEFORE_1800 = {
     // Susa and the Zagros foothills, which the source draws inside Babylonia: the Kassites ruled only Mesopotamia
     { to: "Elam", ne0: ["Iran"], from: ["Babylonia"] },
     { to: "Elamite and Zagros states", poly: [[45, 32.9], [50, 32.9], [50, 36], [45, 36], [45, 32.9]], from: ["Elam"] },
+    ...SINIC("Shang", "Shang Dynasty"),
   ],
+  [-1000]: SINIC("Zhou", "Zhou Dynasty"),
   [-700]: [
     // Assyria's provinces: the source draws them as Aramaean, Neo-Hittite and Israelite lands
     ...SPLIT(["Arameans", "Neo-Hittite states", "Judah"], [["Assyria", "Neo-Assyrian Empire"]]),
@@ -1357,6 +1365,13 @@ const BEFORE_1800 = {
   [-400]: [
     ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Yue"], ["Qi", "Qi"], ["Wei", "Wei"], ["Zhao", "Zhao"], ["Qin", "Qin"], ["Song", "Song"]]),
     ...FILL([["Hadramaut", "Hadhramaut"], ["Saba", "Sabaeans"]]),
+    // Egypt, independent from 404 to 343 BCE: the source keeps it Persian
+    {
+      to: "Egypt",
+      ne0: ["Egypt"],
+      from: ["Achaemenid Empire"],
+      w: "Egypt threw off Persian rule in 404 BCE under Amyrtaeus and stayed independent until the Persians took it back in 343 BCE.",
+    },
   ],
   [-323]: [
     ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Minyue"], ["Qi", "Qi"], ["Wei", "Wei"], ["Qin", "Qin"], ["Zhao", "Zhao"]]),
@@ -1366,6 +1381,8 @@ const BEFORE_1800 = {
     ...SPLIT(ZHOU, [["Chu", "Chu"], ["Yue", "Minyue"], ["Qin", "Qin"], ["Qi", "Qi"], ["Wei", "Wei"], ["Zhao", "Zhao"]]),
     // Kalinga, conquered by Ashoka around 261 BCE
     ...SPLIT("Mauryan Empire", [["Kalinga", "Kalinga"]]),
+    // Gandhara, the Paropamisadae, Arachosia and eastern Gedrosia, which Seleucus ceded to Chandragupta around 303 BCE
+    ...SPLIT("Seleucid Kingdom", [["Mauryan Empire", "Maurya Empire"]]),
     ...FILL([["Yuezhi", "Yuezhi"], ["Scythians", "Scythia"], ["Colchis", "Colchis"]]),
   ],
   [-200]: [
@@ -1390,6 +1407,15 @@ const BEFORE_1800 = {
     },
   ],
   [-100]: [
+    // the Levant and Lower Nubia, which the source still gives the Ptolemies (they lost Coele-Syria at Panium in 200 BCE),
+    // and Cyrenaica, which had its own Ptolemaic king, Apion
+    ...SPLIT("Ptolemaic Kingdom", [
+      ["Judea", "Judea", { w: "The Hasmonean kingdom, independent of the Seleucids from about 110 BCE." }],
+      ["Nabatean Kingdom", "Nabataeans"],
+      ["Seleucid Kingdom", "Seleucid Empire"],
+      ["Meroe", "Kingdom of Kush"],
+      ["Cyrenaica", "Cyrenaica"],
+    ]),
     // Parthia had taken Media (148 BCE) and Mesopotamia (141 BCE): the source still draws them as Seleucid
     ...SPLIT(["Seleucid Kingdom", "Caucasian kingdoms", "Scythians"], [["Parthia", "Parthian Empire"]]),
     ...SPLIT("Caucasian kingdoms", [
@@ -1789,6 +1815,17 @@ const BEFORE_1800 = {
     // the Ming's Liaodong and its garrisons north of the Wall, Moghulistan's east and the Jurchens beyond Liaodong
     ...SPLIT("Northern Yuan", [["Ming Empire", "Ming Dynasty"], ["Chagatai Khanate", "Chagatai Khanate"]]),
     ...JURCHENS("Northern Yuan"),
+    // after Timur's sack the sultans held little beyond Delhi: Gujarat's governor ruled on his own, Khizr Khan held the
+    // Punjab for Timur, and Nepal was never Delhi's (their outlines from the source's 1492 map)
+    {
+      to: "Gujarat Sultanate",
+      source: [1492, "Gujarat"],
+      from: ["Sultanate of Delhi"],
+      w: "Zafar Khan, the governor, ruled Gujarat on his own after Timur's sack of Delhi and took the title of sultan in 1407. Shown with its 1492 borders.",
+    },
+    { to: "Timurid Empire", source: [1492, "Punjab"], from: ["Sultanate of Delhi"] },
+    ...SPLIT("Sultanate of Delhi", [["Timurid Empire", "Timurid Empire"]]),
+    { to: "Nepal", source: [1492, "Nepal"], from: ["Sultanate of Delhi"] },
   ],
   1492: [
     ...AROUND_1500(1492),
