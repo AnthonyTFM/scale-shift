@@ -16,6 +16,7 @@ import { useShareBox } from "@/components/site/ShareBox";
 import { FlameIcon, flameTier, MapIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "@/components/daily/Matchup";
 import { SkyHeader } from "@/components/site/SkyHeader";
+import { PlayingMark } from "@/components/site/UpdateCheck";
 import { EndlessJoin } from "./EndlessJoin";
 
 const R = t.results;
@@ -240,6 +241,9 @@ export function EndlessGame() {
 
   return (
     <div ref={top} className="flex flex-col">
+      {/* a run under way, or its results (a reload there would replay the celebration or start a new run): no update
+          reload; the new version arrives with the next page */}
+      <PlayingMark on={run.choices.length > 0} />
       {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} />}
       {run.done ? (
         <Results

@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { Bricolage_Grotesque, Inter } from "next/font/google";
 import { site } from "@/content/site";
+import { UpdateCheck } from "@/components/site/UpdateCheck";
 import "./globals.css";
 
 // Inter for body text (variable, 400–800); Bricolage Grotesque ExtraBold for headings, numbers and the wordmark
@@ -42,6 +43,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="min-h-dvh">
         {children}
+        {/* picks up a newer version of the site in a tab left open, at the next safe moment */}
+        <UpdateCheck />
         {/* Vercel Web Analytics: page views without cookies (no consent banner needed); counts only on the live site */}
         <Analytics />
         {GA_ID ? (
