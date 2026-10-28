@@ -483,3 +483,55 @@ body:has(#endless-done) .endless-intro {
   clip: rect(0 0 0 0);
   white-space: nowrap;
 }
+
+/* SkyHeader (results cards): deep space behind the globe. Two layers of stars tiled at different sizes, so no grid
+   shows; the brighter layer twinkles slowly (not for reduced motion). */
+.space-sky {
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 100%, rgba(59, 130, 246, 0.45), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 85% 10%, rgba(139, 92, 246, 0.22), transparent 70%),
+    linear-gradient(180deg, #030616 0%, #0a1033 55%, #12205a 100%);
+}
+.space-stars,
+.space-stars-bright {
+  position: absolute;
+  inset: 0;
+  background-repeat: repeat;
+}
+.space-stars {
+  background-image:
+    radial-gradient(1px 1px at 23px 31px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1px 1px at 71px 97px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 131px 19px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 157px 141px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 41px 163px, rgba(255, 255, 255, 0.6), transparent),
+    radial-gradient(1px 1px at 103px 61px, rgba(191, 219, 254, 0.7), transparent),
+    radial-gradient(1px 1px at 9px 113px, rgba(255, 255, 255, 0.55), transparent),
+    radial-gradient(1px 1px at 89px 151px, rgba(255, 255, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 173px 73px, rgba(255, 255, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 59px 7px, rgba(254, 240, 138, 0.6), transparent),
+    radial-gradient(1px 1px at 127px 109px, rgba(255, 255, 255, 0.6), transparent);
+  background-size: 181px 181px;
+}
+.space-stars-bright {
+  background-image:
+    radial-gradient(1.6px 1.6px at 37px 53px, #fff, transparent),
+    radial-gradient(1.4px 1.4px at 211px 29px, rgba(254, 240, 138, 0.95), transparent),
+    radial-gradient(1.8px 1.8px at 149px 127px, #fff, transparent),
+    radial-gradient(1.3px 1.3px at 263px 181px, rgba(191, 219, 254, 0.95), transparent);
+  background-size: 293px 233px;
+  animation: twinkle 3.2s ease-in-out infinite alternate;
+}
+@keyframes twinkle {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-stars-bright {
+    animation: none;
+  }
+}

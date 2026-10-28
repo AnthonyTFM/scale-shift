@@ -130,8 +130,11 @@ export function Globe({ label, onReady, onGone }: { label: string; onReady?: () 
     const drawn = () => readyCb.current?.();
     const makeCanvas = () => {
       const c = document.createElement("canvas");
-      c.setAttribute("role", "img");
-      c.setAttribute("aria-label", label);
+      // a globe used only as decoration (an empty label) isn't announced as a picture
+      if (label) {
+        c.setAttribute("role", "img");
+        c.setAttribute("aria-label", label);
+      }
       c.className = "relative block";
       box.insertBefore(c, shade.current);
       return c;

@@ -15,6 +15,7 @@ import { buzz, confetti } from "@/lib/celebrate";
 import { useShareBox } from "@/components/site/ShareBox";
 import { FlameIcon, flameTier, MapIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "@/components/daily/Matchup";
+import { SkyHeader } from "@/components/site/SkyHeader";
 import { EndlessJoin } from "./EndlessJoin";
 
 const R = t.results;
@@ -389,28 +390,30 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
 
   return (
     <section aria-labelledby="endless-done" className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7">
-      {newBest ? (
-        <p className="flex justify-center">
-          <span className="pop-in inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-[0_3px_0_0_var(--color-gold-shadow)]">
-            <TrophyIcon className="size-5" />
-            {R.newBest}
-          </span>
-        </p>
-      ) : null}
-      {/* the streak beside its title */}
-      <div className={`${newBest ? "mt-3" : ""} flex items-center justify-center gap-4`}>
-        <p aria-hidden="true" className="pop-in flex items-center gap-1 font-display text-7xl leading-none text-ink">
-          {streak > 0 ? <FlameIcon className="size-12" tier={flameTier(streak)} /> : null}
-          {streak}
-        </p>
-        <div className="min-w-0">
-          <h2 id="endless-done" tabIndex={-1} className="font-display text-2xl leading-tight text-ink outline-none sm:text-3xl">
-            <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
-            {R.title(streak)}
-          </h2>
-          <p className="text-sm text-muted">{R.inARow(streak)}</p>
+      <SkyHeader>
+        {newBest ? (
+          <p className="flex justify-center">
+            <span className="pop-in inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-[0_3px_0_0_var(--color-gold-shadow)] [text-shadow:none]">
+              <TrophyIcon className="size-5" />
+              {R.newBest}
+            </span>
+          </p>
+        ) : null}
+        {/* the streak beside its title */}
+        <div className={`${newBest ? "mt-3" : ""} flex items-center justify-center gap-4`}>
+          <p aria-hidden="true" className="pop-in flex items-center gap-1 font-display text-7xl leading-none">
+            {streak > 0 ? <FlameIcon className="size-12" tier={flameTier(streak)} /> : null}
+            {streak}
+          </p>
+          <div className="min-w-0">
+            <h2 id="endless-done" tabIndex={-1} className="font-display text-2xl leading-tight outline-none sm:text-3xl">
+              <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
+              {R.title(streak)}
+            </h2>
+            <p className="text-sm">{R.inARow(streak)}</p>
+          </div>
         </div>
-      </div>
+      </SkyHeader>
       {/* the next goal, always within reach */}
       <p aria-live="polite" className="mt-3 min-h-7 text-center font-display text-lg leading-snug text-ink">
         {goal}
