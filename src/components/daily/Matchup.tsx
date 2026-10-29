@@ -209,6 +209,18 @@ export function QuestionCard({
     nextRef.current?.focus({ preventScroll: true });
   }, [answered]);
 
+  // the reveal's verdict card: while it's out of sight (below the bar, on a short screen), the bar offers a way to it
+  const verdictRef = useRef<HTMLDivElement>(null);
+  const [verdictInView, setVerdictInView] = useState(true);
+  useEffect(() => {
+    const el = verdictRef.current;
+    if (!answered || !el || typeof IntersectionObserver === "undefined") return;
+    // the bottom 96px are the bar's
+    const io = new IntersectionObserver(([e]) => setVerdictInView(e.isIntersecting), { rootMargin: "0px 0px -96px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [answered]);
+
   return (
     <section
       ref={sectionRef}
@@ -298,6 +310,7 @@ export function QuestionCard({
       <div>
         {answered ? (
           <div
+            ref={verdictRef}
             className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
           >
             <p id="daily-verdict" className="flex items-center gap-2.5 font-display text-2xl leading-tight">
@@ -323,17 +336,29 @@ export function QuestionCard({
         <div
           className="sticky bottom-0 z-30 -mx-4 mt-6 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
         >
-          <button
-            ref={nextRef}
-            type="button"
-            onClick={onNext}
-            disabled={busy}
-            aria-busy={busy}
-            aria-describedby="daily-verdict daily-verdict-size"
-            className="btn btn-primary btn-lg w-full disabled:opacity-100"
-          >
-            {nextLabel} <span aria-hidden="true">→</span>
-          </button>
+          <div className="flex gap-2">
+            {/* only on a tap: the page never moves by itself after an answer */}
+            {verdictInView ? null : (
+              <button
+                type="button"
+                onClick={() => verdictRef.current?.scrollIntoView({ block: "center", behavior: reducedMotion() ? "auto" : "smooth" })}
+                className="btn btn-white btn-lg shrink-0 px-4"
+              >
+                {reveal.seeWhy} <span aria-hidden="true">↓</span>
+              </button>
+            )}
+            <button
+              ref={nextRef}
+              type="button"
+              onClick={onNext}
+              disabled={busy}
+              aria-busy={busy}
+              aria-describedby="daily-verdict daily-verdict-size"
+              className="btn btn-primary btn-lg min-w-0 flex-1 disabled:opacity-100"
+            >
+              {nextLabel} <span aria-hidden="true">→</span>
+            </button>
+          </div>
         </div>
       ) : null}
     </section>

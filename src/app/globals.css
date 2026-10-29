@@ -518,8 +518,9 @@ html:not(.returning) .hero-endless > div:last-child > p {
 
 /* every visit: no empty line under the game buttons before there is something to say (the daily's "next five" line, and
    the endless tile's matching spacer while the daily's line is empty) */
-.hero-next:empty,
-body:has(.hero-next:empty) .hero-endless > div:last-child > p {
+/* (not once today's round is done: the line fills in after the page loads, and must not push things down) */
+html:not(.daily-done) .hero-next:empty,
+html:not(.daily-done) body:has(.hero-next:empty) .hero-endless > div:last-child > p {
   display: none;
 }
 /* returning players on wider screens: the two games as two banners, one under the other, words left and button right,
