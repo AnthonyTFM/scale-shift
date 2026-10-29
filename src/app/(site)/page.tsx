@@ -95,22 +95,22 @@ export default function HomePage() {
           <p aria-hidden="true" className="hero-back font-display text-2xl leading-tight text-ink md:text-3xl">
             {home.hub.welcomeBack}
           </p>
-          {/* phones: the two games side by side, then the Best streaks board (competition first), yesterday's matchup
-              and the map. Wide screens: two columns, each game with its own extra under it: the daily with yesterday's
-              matchup, endless with its Best streaks board; the map across the bottom. Each part is rendered once and
-              placed by the grid; the page order (and screen readers) follow the phone order */}
-          <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
+          {/* phones: the two games side by side, then the Best streaks board (competition first), the map and
+              yesterday's matchup. Computers: the two games as short banners on the left with the map under them and
+              the Best streaks board beside all three, then yesterday's matchup (placed in globals.css, .hero-grid).
+              Each part is rendered once, in the same order at every width, so keyboard order follows the screen */}
+          <div className="hero-grid mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
             <HeroPlay />
             <HeroEndless />
-            <div className="hero-board col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start">
+            <div className="hero-board col-span-2">
               <HeroLeaderboard />
             </div>
-            <div className="hero-yday col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2 lg:self-start">
+            <div className="hero-map col-span-2">
+              <MapCard />
+            </div>
+            <div className="hero-yday col-span-2">
               <YesterdayMatchup />
             </div>
-          </div>
-          <div className="mt-4">
-            <MapCard />
           </div>
         </div>
       </section>
