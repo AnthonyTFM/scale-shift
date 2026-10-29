@@ -493,10 +493,6 @@ html:not(.returning) .hero-endless > div:last-child {
 html:not(.returning) .hero-endless > div:last-child > p {
   display: none;
 }
-/* the empty "next five" line has nothing to say before a first round */
-html:not(.returning) .hero-next:empty {
-  display: none;
-}
 /* wider screens: both tiles become banners (words left, button right), the daily the bigger one */
 @media (min-width: 768px) {
   html:not(.returning) .hero-daily {
@@ -519,9 +515,37 @@ html:not(.returning) .hero-next:empty {
     padding: 1rem 2rem;
   }
 }
+
+/* every visit: no empty line under the game buttons before there is something to say (the daily's "next five" line, and
+   the endless tile's matching spacer while the daily's line is empty) */
+/* (not once today's round is done: the line fills in after the page loads, and must not push things down) */
+html:not(.daily-done) .hero-next:empty,
+html:not(.daily-done) body:has(.hero-next:empty) .hero-endless > div:last-child > p {
+  display: none;
+}
+/* returning players on wider screens: the two games as two banners, one under the other, words left and button right,
+   so no tile is half empty (a first visit makes the daily bigger and endless a strip, above) */
+@media (min-width: 768px) {
+  .hero-daily,
+  .hero-endless {
+    grid-column: span 2 / span 2;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 1.5rem;
+    align-items: center;
+    padding: 1.25rem 2rem;
+  }
+  .hero-daily > div:last-child,
+  .hero-endless > div:last-child {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin: 0;
+    padding: 0;
+  }
+}
 @media (min-width: 1024px) {
-  html:not(.returning) .hero-board,
-  html:not(.returning) .hero-yday {
+  .hero-board,
+  .hero-yday {
     grid-row-start: 3;
   }
 }

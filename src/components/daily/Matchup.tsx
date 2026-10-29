@@ -137,7 +137,6 @@ export function QuestionCard({
   busy,
   onPick,
   onNext,
-  stuckTop,
   exclude,
 }: {
   /** "Round 2 of 5" */
@@ -152,8 +151,6 @@ export function QuestionCard({
   busy?: boolean;
   onPick: (i: number) => void;
   onNext: () => void;
-  /** where the page's sticky top ends (the header, plus endless's score bar), in px from the top of the screen */
-  stuckTop?: () => number;
   /** shapes never to use as the yardstick: the rest of the day's questions, or endless mode's next rounds */
   exclude?: readonly string[];
 }) {
@@ -204,36 +201,25 @@ export function QuestionCard({
     setRewind(true);
     requestAnimationFrame(() => requestAnimationFrame(() => setRewind(false)));
   };
-  const verdictRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-  const barRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     if (!answered) return;
     // keyboard and screen-reader users land on "Next", which reads out the verdict with it (aria-describedby: a live
-    // region filled as focus moves is often dropped); preventScroll keeps the page where it is (the reveal is the thing to watch)
+    // region filled as focus moves is often dropped). The page itself stays put: the player scrolls to the verdict when
+    // they want it, and "Next" is always in the bar at the bottom of the screen
     nextRef.current?.focus({ preventScroll: true });
-    // once the shapes have settled, bring the verdict into view above the bar "Next" sits in at the bottom of the screen,
-    // but never past its own top, and (unless the screen is too short to show both, on a phone held sideways) never so
-    // far that the tops of the shapes slide under the header
-    const id = setTimeout(
-      () => {
-        const grid = gridRef.current?.getBoundingClientRect();
-        const verdict = verdictRef.current?.getBoundingClientRect();
-        if (!grid || !verdict) return;
-        const bar = barRef.current?.getBoundingClientRect().height ?? 80;
-        const short = innerHeight <= 500;
-        const want = Math.min(
-          verdict.bottom + 12 - (innerHeight - bar),
-          verdict.top - (stuckTop?.() ?? (short ? 16 : ROUND_TOP)),
-          short ? Infinity : grid.top - (stuckTop ? stuckTop() + 8 : ROUND_TOP - 16),
-        );
-        if (want > 0) scrollTo({ top: scrollY + want, behavior: reducedMotion() ? "auto" : "smooth" });
-      },
-      reducedMotion() ? 0 : 1400,
-    );
-    return () => clearTimeout(id);
-  }, [answered, stuckTop]);
+  }, [answered]);
+
+  // the reveal's verdict card: while it's out of sight (below the bar, on a short screen), the bar offers a way to it
+  const verdictRef = useRef<HTMLDivElement>(null);
+  const [verdictInView, setVerdictInView] = useState(true);
+  useEffect(() => {
+    const el = verdictRef.current;
+    if (!answered || !el || typeof IntersectionObserver === "undefined") return;
+    // the bottom 96px are the bar's
+    const io = new IntersectionObserver(([e]) => setVerdictInView(e.isIntersecting), { rootMargin: "0px 0px -96px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [answered]);
 
   return (
     <section
@@ -245,13 +231,13 @@ export function QuestionCard({
         <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-primary">{eyebrow}</p>
         <SoundToggle />
       </div>
-      <h2 id="daily-q" className="mt-1 text-center font-display text-[1.7rem] leading-[1.1] text-ink sm:text-4xl">
+      <h2 id="daily-q" className="mt-1 text-center font-display text-[1.45rem] leading-[1.1] text-ink sm:text-4xl">
         {q.prompt}
       </h2>
       {/* the same height before and after answering (`ask` wraps to two lines on phones), so the tiles don't jump */}
       <p className="mt-1.5 flex min-h-10 items-center justify-center text-center text-sm text-muted">{answered ? reveal.watch : reveal.ask}</p>
 
-      <div ref={gridRef} className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
+      <div className="relative mt-4 grid grid-cols-2 gap-3 sm:gap-5">
         {q.options.map((o, i) => {
           const isAnswer = i === q.answer;
           const look = !answered
@@ -321,9 +307,10 @@ export function QuestionCard({
         {answered ? `${verdict(correct)} ${sizeLine(big, small)}` : ""}
       </p>
       {/* the verdict: soft green when you're right, soft red when the map fooled you */}
-      <div ref={verdictRef}>
+      <div>
         {answered ? (
           <div
+            ref={verdictRef}
             className={`pop-in reveal-late mt-5 rounded-[22px] p-4 text-ink ring-1 sm:p-5 ${correct ? "bg-green-soft ring-green/40" : "bg-red-soft ring-red/40"}`}
           >
             <p id="daily-verdict" className="flex items-center gap-2.5 font-display text-2xl leading-tight">
@@ -347,20 +334,31 @@ export function QuestionCard({
         // a bar pinned to the bottom of the screen while the reveal is longer than the screen, so moving on is always one
         // tap; the fade above it shows the reveal carries on underneath
         <div
-          ref={barRef}
           className="sticky bottom-0 z-30 -mx-4 mt-6 bg-white px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 before:pointer-events-none before:absolute before:inset-x-0 before:-top-6 before:h-6 before:bg-gradient-to-t before:from-white before:to-transparent sm:-mx-6 sm:px-6"
         >
-          <button
-            ref={nextRef}
-            type="button"
-            onClick={onNext}
-            disabled={busy}
-            aria-busy={busy}
-            aria-describedby="daily-verdict daily-verdict-size"
-            className="btn btn-primary btn-lg w-full disabled:opacity-100"
-          >
-            {nextLabel} <span aria-hidden="true">→</span>
-          </button>
+          <div className="flex gap-2">
+            {/* only on a tap: the page never moves by itself after an answer */}
+            {verdictInView ? null : (
+              <button
+                type="button"
+                onClick={() => verdictRef.current?.scrollIntoView({ block: "center", behavior: reducedMotion() ? "auto" : "smooth" })}
+                className="btn btn-white btn-lg shrink-0 px-4"
+              >
+                {reveal.seeWhy} <span aria-hidden="true">↓</span>
+              </button>
+            )}
+            <button
+              ref={nextRef}
+              type="button"
+              onClick={onNext}
+              disabled={busy}
+              aria-busy={busy}
+              aria-describedby="daily-verdict daily-verdict-size"
+              className="btn btn-primary btn-lg min-w-0 flex-1 disabled:opacity-100"
+            >
+              {nextLabel} <span aria-hidden="true">→</span>
+            </button>
+          </div>
         </div>
       ) : null}
     </section>

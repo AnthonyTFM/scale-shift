@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { site } from "@/content/site";
 import { endlessCopy as t } from "@/content/endless";
@@ -129,9 +129,8 @@ export function EndlessGame() {
   // set when the player moves on, so the next question (or the results) takes focus; not on first load
   const advanced = useRef(false);
   const top = useRef<HTMLDivElement>(null);
-  // the score bar, pinned under the header: after an answer, the reveal scrolls in below it, not under it
+  // the score bar, pinned under the header
   const hud = useRef<HTMLDivElement>(null);
-  const stuckTop = useCallback(() => (hud.current?.getBoundingClientRect().bottom ?? ROUND_TOP) + 8, []);
   // the next round's drawings, fetched while the current one is played
   const nextShapes = useRef<{ key: string; shapes: Promise<Record<string, ShapeFile>> } | null>(null);
 
@@ -269,7 +268,6 @@ export function EndlessGame() {
           busy={busy}
           onPick={answer}
           onNext={next}
-          stuckTop={stuckTop}
           exclude={comingUp(run)}
         />
       )}

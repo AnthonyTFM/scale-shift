@@ -65,6 +65,8 @@ export const dailyCopy = {
     wrong: "Not quite!",
     perfect: "5 for 5! Perfect round!",
     next: "Next round",
+    // beside Next while the explanation is below the screen
+    seeWhy: "See why",
     seeResults: "See my results",
     // under each name once answered: the result in plain words
     biggerBy: (gap: string) => `${gap} bigger`,
