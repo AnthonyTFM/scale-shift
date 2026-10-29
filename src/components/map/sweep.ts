@@ -551,21 +551,28 @@ export function sweepFrame(p: SweepPlan, t: number, cs: number, area: PathSink):
 }
 
 /**
- * Adds to `area`, as rectangles in pixels (`cs` per cell), the cells where only one era has land: coasts the two sources
- * draw differently and land one of them leaves out. One cell wider all round, so the old coastline's edge is covered too.
- * The old era fades out there over the sweep instead of vanishing on its first frame. Returns false when there are none.
+ * Adds to `area`, as rectangles in pixels (`cs` per cell), the cells along every coast of either era and wherever only
+ * one era has land: the two sources draw coasts a little differently, and one may leave land out. One cell wider all
+ * round, so the old coastline's edge is covered too. The old era blends into the new one there as the sweep starts,
+ * instead of vanishing on its first frame. Land the moving border reaches (and the cells switching with it) is left to the border, so no old
+ * colour lingers behind it. Returns false when there are none.
  */
 export function landDiffers(p: SweepPlan, cs: number, area: PathSink) {
-  const { gw, gh, a, b, changing } = p;
+  const { gw, gh, a, b, when, front } = p;
+  const free = (i: number) => when[i] === 0 && front[i] === 0;
   const mark = new Uint8Array(gw * gh);
   let any = false;
   for (let y = 0, i = 0; y < gh; y++)
     for (let x = 0; x < gw; x++, i++) {
-      if (!a[i] === !b[i]) continue;
+      if (!free(i)) continue;
+      // land in one era only, or land and sea side by side in either
+      let seed = !a[i] !== !b[i];
+      if (!seed && x + 1 < gw) seed = !a[i] !== !a[i + 1] || !b[i] !== !b[i + 1];
+      if (!seed && y + 1 < gh) seed = !a[i] !== !a[i + gw] || !b[i] !== !b[i + gw];
+      if (!seed) continue;
       any = true;
-      // land changing hands next to it is left to the moving border
       for (let ny = Math.max(0, y - 1); ny <= Math.min(gh - 1, y + 1); ny++)
-        for (let nx = Math.max(0, x - 1); nx <= Math.min(gw - 1, x + 1); nx++) if (!changing[ny * gw + nx]) mark[ny * gw + nx] = 1;
+        for (let nx = Math.max(0, x - 1); nx <= Math.min(gw - 1, x + 1); nx++) if (free(ny * gw + nx)) mark[ny * gw + nx] = 1;
     }
   if (!any) return false;
   for (let y = 0; y < gh; y++) {

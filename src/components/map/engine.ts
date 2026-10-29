@@ -79,6 +79,9 @@ const CUT_CENTER = 11.5;
 const TILE_PAD = 2;
 /** How much of a sweep (eased, 0–1) the moving border takes to fade in at the start and out at the end. */
 const FRONT_FADE = 0.08;
+/** How much of a sweep's time (0–1) the coasts take to blend from the old era's to the new one's. Kept short: while
+ * both show, a coast the two sources draw differently looks doubled. */
+const COAST_FADE = 0.2;
 
 /** Everything needed to draw the world at one zoom level: shape boxes, outlines made on demand and bitmap tiles. */
 type BaseCache = {
@@ -109,7 +112,7 @@ type Sweep = {
   plan: SweepPlan;
   /** grid cell size, CSS pixels */ cs: number;
   /** the old era's land, borders and lakes as they were on screen (no names) */ old: HTMLCanvasElement;
-  /** the old era's picture where only one era has land (coasts the two sources draw differently), faded out as it goes */
+  /** the old era's picture along the coasts and where only one era has land, blended into the new era as the sweep starts */
   coast: HTMLCanvasElement | null;
   from: Layer;
   /** the shape behind each owner number on the grid, old and new (0: sea) */ ownersA: (PolityFeature | null)[];
@@ -1028,8 +1031,9 @@ export class MapEngine {
     this.lastGrid = { layer: next, view: { ...v }, w: this.w, h: this.h, lakes: this.lakes, ...B };
     const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
     const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
-    // Where one era has land and the other sea (the sources' coastlines differ, most of all where the source changes,
-    // 1783 to 1800), the old coast fades out over the sweep: shown as in the new era from the start, it jumped
+    // Along the coasts and where one era has land and the other sea (the sources' coastlines differ, most of all where the
+    // source changes, 1783 to 1800), the old era blends into the new as the sweep starts: shown as in the new era from the
+    // start, it jumped
     const differs = new Path2D();
     let coast: HTMLCanvasElement | null = null;
     if (landDiffers(plan, cs, differs)) {
@@ -1126,8 +1130,8 @@ export class MapEngine {
     const [k, dx, dy] = this.sweepShift(s);
     ctx.save();
     ctx.transform(k, 0, 0, k, dx, dy);
-    if (s.coast) {
-      ctx.globalAlpha = 1 - e;
+    if (s.coast && t < COAST_FADE) {
+      ctx.globalAlpha = 1 - t / COAST_FADE;
       ctx.drawImage(s.coast, 0, 0, this.w, this.h);
       ctx.globalAlpha = 1;
     }
@@ -1162,7 +1166,11 @@ export class MapEngine {
     }
     // on to the next frame; after the last one the map draws normally again, and looks the same
     if (!s.start) s.start = performance.now();
-    if (t >= 1) this.sweep = null;
+    if (t >= 1) {
+      this.sweep = null;
+      // the coast picture is a second screen-sized canvas: freed until the next sweep
+      if (s.coast) s.coast.width = 0;
+    }
     this.markBase();
   }
 
