@@ -41,6 +41,12 @@ export function ownersOf(geoms, canon = new Map(), rulers = new Set()) {
 }
 
 /**
+ * Renames the automatic matching below misses, as [old, new]: one country, one colour. The Khanate of Bukhara grew so
+ * much by 1800 that the Emirate's label point falls outside the khanate's old land.
+ */
+const RENAMED = [["Khanate of Bukhara", "Emirate of Bukhara"]]; // the Manghit khans took the title of emir in 1785
+
+/**
  * One name per country across eras when the sources rename it by adding words: "United Kingdom of Great Britain and
  * Ireland" is the "United Kingdom", the "Empire of Brazil" is "Brazil". A longer name is folded into a shorter one it
  * starts with (whole words) or ends with after "of", unless
@@ -52,6 +58,7 @@ export function eraContext(topos) {
   const rulers = new Set();
   for (const topo of topos) for (const g of topo.objects.p.geometries) if (g.properties?.s) rulers.add(g.properties.s);
   const canon = canonicalNames(topos);
+  for (const [from, to] of RENAMED) canon.set(from, canon.get(to) ?? to);
   lineages(topos, canon, rulers);
   return { canon, rulers };
 }

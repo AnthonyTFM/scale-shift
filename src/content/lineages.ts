@@ -67,6 +67,7 @@ export const lineages: { label: string; names: string[] }[] = [
       "Imperial Japan (Fujiwara)",
       "Shogun Japan (Kamakura)",
       "Japan (Warring States)",
+      "Tokugawa shogunate",
       "Imperial Japan",
       "Empire of Japan",
       "Japan (USA)",
