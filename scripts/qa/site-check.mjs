@@ -1,6 +1,6 @@
 // Read-only health check of a deployed site: every sitemap page on desktop + phone, internal links, key APIs, and
 // how soon a fresh visitor sees countries on the homepage globe. Usage: node site-check.mjs [base-url]
-// Quick check after a merge (about 2 minutes): node site-check.mjs [base-url] --quick [/changed-page …] checks the
+// Quick check after a merge (under a minute): node site-check.mjs [base-url] --quick [/changed-page …] checks the
 // homepage, the map, both games, the leaderboard and any pages named, instead of every page in the sitemap.
 // Needs Chromium: set CHROME to its path (defaults to the cloud sandbox one). Exits 1 when it finds issues.
 import { chromium, request } from "playwright-core";

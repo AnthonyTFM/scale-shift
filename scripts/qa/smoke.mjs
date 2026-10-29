@@ -71,8 +71,10 @@ for (const [tag, viewport] of [["phone", { width: 390, height: 844 }], ["compute
     await next.click();
   }
   await page.locator('section[aria-labelledby="endless-done"]').waitFor({ timeout: 15000 }).catch(() => issues.push(`${tag} /endless: results never showed`));
-  // every player sees the Best streaks board after a run
-  await page.getByText("Best streaks").first().waitFor({ timeout: 10000 }).catch(() => issues.push(`${tag} /endless: no Best streaks board on the results`));
+  // every player sees the Best streaks board after a run, with its rows loaded
+  const results = page.locator('section[aria-labelledby="endless-done"]');
+  await results.getByRole("heading", { name: "Best streaks" }).waitFor({ timeout: 10000 }).catch(() => issues.push(`${tag} /endless: no Best streaks board on the results`));
+  await results.getByText(board.rows[0].name).waitFor({ timeout: 10000 }).catch(() => issues.push(`${tag} /endless: the Best streaks rows never loaded`));
   await shot("endless-results");
   await ctx.close();
 }
