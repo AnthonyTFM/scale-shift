@@ -6,7 +6,7 @@
 //   strips that no source draws: a few km² wedged where three borders meet, a strip a kilometre wide along a border.
 //   foldSpecks gives each one whole to the neighbour it shares most border with. Real territories are not folded: only
 //   pieces smaller than the specks build-data.mjs already drops (SPECK_KM2), or strips with no coast that are narrower
-//   than the file's coordinates can draw (THIN_KM), and never the last piece of a named shape.
+//   than the file's coordinates can draw (THIN_KM), and never a named shape's last piece or the piece its name sits on.
 // Used by build-data.mjs.
 
 import fs from "node:fs";
@@ -18,7 +18,7 @@ import { writeFileRetrying } from "./files.mjs";
 const EARTH_R = 6371.0088;
 const DETAIL = 50; // a small ring keeps the points that each hold at least 1/DETAIL of its area (Visvalingam weight)
 const SPECK_KM2 = 40; // pieces smaller than this are specks (as build-data.mjs drops them: 1e-6 of the sphere)
-const THIN_KM = 1; // area / perimeter: a strip about 2 km wide, the step of the file's coordinates
+const THIN_KM = 1; // no point of a strip lies further than this from its edge: about 2 km wide, the step of the file's coordinates
 const INLAND = 0.5; // ...if less than this share of its outline is coast (a thin spit of land is real: the Curonian Spit)
 
 const polysOf = (g) => (g.type === "Polygon" ? [g.arcs] : g.type === "MultiPolygon" ? g.arcs : []);
@@ -80,6 +80,37 @@ function inRings(x, y, rings) {
   return inside;
 }
 
+/** Squared distance from (x, y) to the segment (x1, y1)–(x2, y2). */
+function dist2(x, y, x1, y1, x2, y2) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const t = dx || dy ? Math.max(0, Math.min(1, ((x - x1) * dx + (y - y1) * dy) / (dx * dx + dy * dy))) : 0;
+  return (x1 + t * dx - x) ** 2 + (y1 + t * dy - y) ** 2;
+}
+
+/**
+ * Whether no point of a polygon lies further than THIN_KM from its edge, sampled on a grid (at most about 4,000 points,
+ * no finer than 0.2 km). Area / perimeter alone calls a piece with a jagged edge a strip when it is several km wide.
+ */
+function narrow(rings) {
+  const lat = rings[0].reduce((t, p) => t + p[1], 0) / rings[0].length;
+  const ky = (Math.PI / 180) * EARTH_R; // km per degree
+  const kx = ky * Math.cos((lat * Math.PI) / 180);
+  const km = rings.map((r) => r.map(([x, y]) => [x * kx, y * ky]));
+  let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+  for (const [x, y] of km[0]) [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
+  if (x1 - x0 > 2000) return false; // runs across the 180° meridian: not a strip worth judging
+  const step = Math.max(0.2, Math.sqrt(((x1 - x0) * (y1 - y0)) / 4000));
+  for (let y = y0 + step / 2; y < y1; y += step)
+    for (let x = x0 + step / 2; x < x1; x += step) {
+      if (!inRings(x, y, km)) continue;
+      let near = false;
+      for (const r of km) for (let i = 1; i < r.length && !near; i++) near = dist2(x, y, r[i - 1][0], r[i - 1][1], r[i][0], r[i][1]) <= THIN_KM ** 2;
+      if (!near) return false;
+    }
+  return true;
+}
+
 /** A polygon's area in km², whichever way its rings run. */
 function polygonKm2(rings) {
   const a = geoArea({ type: "Polygon", coordinates: rings });
@@ -131,7 +162,7 @@ function foldPass(topo) {
           for (const o of others) shared.set(o, (shared.get(o) ?? 0) + km[k]);
         }
       if (!shared.size) return; // an island
-      const thin = area / Math.max(perimeter, 1e-9) < THIN_KM && coast < perimeter * INLAND;
+      const thin = area / Math.max(perimeter, 1e-9) < THIN_KM && coast < perimeter * INLAND && narrow(rings);
       if (area >= SPECK_KM2 && !thin) return;
       const to = [...shared.entries()].sort((x, y) => y[1] - x[1])[0][0];
       specks.push([gi, pi, to, area]);

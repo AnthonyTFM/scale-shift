@@ -796,7 +796,7 @@
         1715,
         1783
       ],
-      "n": "Papuan peoples",
+      "n": "Papuans",
       "why": "Papua New Guinea became a country in 1975."
     },
     {
@@ -2512,7 +2512,7 @@
       "years": [
         1650
       ],
-      "n": "Maya peoples",
+      "n": "Maya",
       "why": "Belize is a later name; British logwood cutters settled the coast from the mid-17th century."
     },
     {
@@ -2748,7 +2748,7 @@
         1783
       ],
       "n": "Imamate of Yemen",
-      "why": "The source's Yemen is the Zaydi imamate, which the map also fills from Cliopatria beside it: one name, so they are one state."
+      "why": "The source's Yemen is the Zaydi imamate (in 1783 less the sultanates of Lahej and Haushabi, drawn from OpenHistoricalMap), which the map also fills from Cliopatria beside it: one name, so they are one state."
     },
     {
       "name": "Segu",
@@ -2893,6 +2893,59 @@
       ],
       "n": "Tokugawa shogunate",
       "why": "Japan was under the Tokugawa shogunate from 1603 to 1868: one name for it from 1650 to 1815."
+    },
+    {
+      "name": "Saami",
+      "years": [
+        -1500,
+        -1000,
+        -700,
+        -500,
+        -400,
+        -323,
+        -300,
+        -200,
+        -100,
+        -1,
+        100,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "n": "Sámi",
+      "why": "One spelling for the Sámi on every map."
+    },
+    {
+      "name": "Darfur",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "n": "Sultanate of Darfur",
+      "why": "The Keira sultanate ruled Darfur from the 17th century: one name with the maps from 1800."
+    },
+    {
+      "name": "Wadai",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "n": "Wadai Empire",
+      "why": "The Wadai sultanate was founded in 1635: one name with the maps from 1800."
+    },
+    {
+      "name": "Funj",
+      "years": [
+        1783
+      ],
+      "n": "Funj Sultanate",
+      "why": "The Funj sultanate of Sennar (1504–1821): one name with the maps before and after."
     },
     {
       "name": "Golconda",

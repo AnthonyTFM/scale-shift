@@ -1271,12 +1271,13 @@ const TRINH_NGUYEN = (year) => [
 ];
 // the island of Sicily, which Cliopatria draws as part of the Crown of Aragon
 const SICILY_ISLAND = { to: "Kingdom of Sicily", clio: ["Crown of Aragon"], pick: [12, 36.4, 15.75, 38.5], from: ["Kingdom of Naples"] };
-// Ezo (Hokkaido) and the southern Kurils, Ainu land: the Matsumae domain held only the southern tip
-const EZO = (from) => ({
+// Ezo (Hokkaido) and the southern Kurils, Ainu land: the Matsumae domain (from 1590; Japanese settlers' forts before)
+// held only the southern tip
+const EZO = (from, w = "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.") => ({
   to: "Ainu",
   poly: [[139.2, 41.9], [139.9, 42.3], [140.95, 41.95], [141.9, 42.2], [143.6, 41.6], [146.8, 43], [151.5, 45.6], [148.5, 46.6], [141.6, 46], [139.2, 43.8], [139.2, 41.9]],
   from: [from],
-  w: "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.",
+  w,
 });
 // the steppe, Burma, the Niger and the Baltic around 1500 (the 1492 and 1500 maps draw them alike)
 // Manchuria and the Amur east of the Greater Khingan: Jurchen and Tungusic land, which the source draws inside the Mongol
@@ -1337,7 +1338,7 @@ const AROUND_1500 = (year) => [
   ...SPLIT("Mali", [["Songhai", "Songhai Empire"]]),
   ...SPLIT("Teutonic Knights", [["Livonian Confederation", "Livonian Conference"]]),
   ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
-  EZO("Japan"),
+  EZO("Japan", "Ainu land. Japanese settlers held only a few forts on the southern tip; Japan took direct control of Ezo (Hokkaido) from 1799."),
   ...FILL([["Wattasid Sultanate", "Wattasid dynasty"], ["Mali", "Mali Empire"], ["Alwa", "Alodia"], ...(year === 1500 ? [["Korea", "Joseon"]] : [])]),
 ];
 // The source draws the Shang (1500 BCE) and the Zhou (1000 BCE) with one polygon, many times the Shang's land. Each is
@@ -1937,8 +1938,8 @@ const BEFORE_1800 = {
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
       ["Imamate of Yemen", "Qasimids"],
-      ["Darfur", "Sultanate of Darfur"],
-      ["Wadai", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
+      ["Wadai Empire", "Wadai Empire"],
       ["Kingdom of Kongo", "Kingdom of Kongo"],
       ["Oman", "Yarubid dynasty"],
       ["Principality of Mingrelia", "Principality of Mingrelia"],
@@ -1972,8 +1973,8 @@ const BEFORE_1800 = {
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
       ["Haudenosaunee Confederacy", "Haudenosaunee"],
-      ["Wadai", "Wadai Empire"],
-      ["Darfur", "Sultanate of Darfur"],
+      ["Wadai Empire", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
       ["Imamate of Yemen", "Qasimids"],
       ["Oman", "Yarubid dynasty"],
       ["Dutch Cape Colony", "Dutch Cape Colony", { s: "Netherlands" }],
@@ -2000,8 +2001,8 @@ const BEFORE_1800 = {
     ...KHIVA,
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
-      ["Wadai", "Wadai Empire"],
-      ["Darfur", "Sultanate of Darfur"],
+      ["Wadai Empire", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
       ["Imamate of Yemen", "Qasimids"],
       ["Korea", "Joseon"],
       ["Oman", "Yarubid dynasty"],
@@ -2064,12 +2065,16 @@ const BEFORE_1800 = {
     { to: "Viceroyalty of the Río de la Plata", ohm: 2860720, from: ["Viceroyalty of Peru", "Paraguay", "Viceroyalty of Brazil"] },
     { to: "Viceroyalty of Peru", ohm: 2850566, from: ["Viceroyalty of New Granada", "Viceroyalty of the Río de la Plata"] },
     { to: "Viceroyalty of New Granada", ohm: 2964943, exact: true, from: ["Viceroyalty of New Granada"] },
+    // the sultanates of Lahej (with Aden) and Haushabi, independent of the Zaydi imams since the early 18th century, which
+    // the source draws inside Yemen: OpenHistoricalMap's outlines, as on the 1800 map
+    { to: "Sultanate of Lahej", ohm: 2921516, from: ["Imamate of Yemen"] },
+    { to: "Haushabi Sultanate", ohm: 2921509, from: ["Imamate of Yemen"] },
     // Saint-Domingue, France's richest colony, which the source leaves unnamed
     { to: "Saint-Domingue", ne0: ["Haiti"], fill: true, s: "France" },
     ...FILL([
-      ["Funj", "Funj Sultanate"],
-      ["Wadai", "Wadai Empire"],
-      ["Darfur", "Sultanate of Darfur"],
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Wadai Empire", "Wadai Empire"],
+      ["Sultanate of Darfur", "Sultanate of Darfur"],
       ["Imamate of Yemen", "Qasimids"],
     ]),
   ],
@@ -2134,7 +2139,7 @@ const TERRITORY = {
     { to: "Lado Enclave", ohm: 2961764, s: "Congo Free State", w: "Leased to King Leopold II for the Congo Free State in 1894; it went back to the Anglo-Egyptian Sudan in 1910, after his death." },
     // OpenHistoricalMap's Khiva leaves out the oasis of Khiva and Urgench itself, today's Khorezm province
     { to: "Khanate of Khiva", ne1: ["Uzbekistan/Khorezm"], s: "Russian Empire" },
-    { to: "Darfur", ne1: ["Central Darfur", "Southern Darfur", "North Darfur", "Western Darfur", "Eastern Darfur"].map((p) => `Sudan/${p}`), w: "A sultanate restored in 1898. Counted as part of Anglo-Egyptian Sudan, it ran its own affairs until Britain conquered it in 1916." },
+    { to: "Sultanate of Darfur", ne1: ["Central Darfur", "Southern Darfur", "North Darfur", "Western Darfur", "Eastern Darfur"].map((p) => `Sudan/${p}`), w: "A sultanate restored in 1898. Counted as part of Anglo-Egyptian Sudan, it ran its own affairs until Britain conquered it in 1916." },
     { to: "Ethiopia", ne0: ["Ethiopia"] },
     { to: "Eritrea", ne0: ["Eritrea"], s: "Italy" },
     { to: "French Somaliland", ne0: ["Djibouti"], s: "France" },
@@ -2150,7 +2155,7 @@ const TERRITORY = {
     { to: "Burundi", ne0: ["Burundi"], s: "Germany", w: "A kingdom under German protection, counted as part of German East Africa." },
     { to: "Congo Free State", ne0: ["Dem. Rep. Congo"], w: "The personal possession of King Leopold II of Belgium, 1885–1908." },
     { to: "French Congo", ne0: ["Gabon", "Congo", "Central African Rep.", "Chad"], s: "France" },
-    { to: "Wadai", ne1: ["Chad/Ouaddaï", "Chad/Wadi Fira"], w: "An independent sultanate until France conquered it in 1909 (shown approximately)." },
+    { to: "Wadai Empire", ne1: ["Chad/Ouaddaï", "Chad/Wadi Fira"], w: "An independent sultanate until France conquered it in 1909 (shown approximately)." },
     { to: "Kamerun", ne0: ["Cameroon"], s: "Germany" },
     { to: "Spanish Guinea", ne0: ["Eq. Guinea"], s: "Spain" },
     { to: "São Tomé and Príncipe", ne0: ["São Tomé and Principe"], s: "Portugal" },
