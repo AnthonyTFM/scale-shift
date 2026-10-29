@@ -70,7 +70,11 @@ export function PageHero({
         {eyebrow ? <p className="text-sm font-bold uppercase tracking-wide text-[#93c5fd]">{eyebrow}</p> : null}
         <h1 className={`mt-1 max-w-3xl font-display ${center ? "mx-auto" : ""} text-3xl leading-tight text-white md:text-[2.5rem]`}>{title}</h1>
         {lead ? (
-          <div className={`leading-relaxed text-[#dbeafe] ${compact ? "mt-1.5 max-w-3xl text-base md:mt-2" : "mt-4 max-w-2xl text-lg"} ${center ? "mx-auto" : ""}`}>{lead}</div>
+          <div
+            className={`leading-relaxed text-[#dbeafe] ${compact ? "mt-1.5 max-w-3xl text-base md:mt-2" : "mt-4 max-w-2xl text-lg"} ${center ? "mx-auto" : ""} ${game ? "max-sm:hidden" : ""}`}
+          >
+            {lead}
+          </div>
         ) : null}
       </div>
     </section>
