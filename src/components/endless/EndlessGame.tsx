@@ -17,7 +17,7 @@ import { FlameIcon, flameTier, MapIcon, MarkIcon, TrophyIcon } from "@/component
 import { loadPool, loadShapes, mapHref, QuestionCard, reducedMotion, ROUND_TOP, Skeleton } from "@/components/daily/Matchup";
 import { SkyHeader } from "@/components/site/SkyHeader";
 import { PlayingMark } from "@/components/site/UpdateCheck";
-import { EndlessJoin } from "./EndlessJoin";
+import { EndlessJoin, RunBoard } from "./EndlessJoin";
 
 const R = t.results;
 
@@ -440,16 +440,19 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
       <p className="mt-1.5 hidden text-center text-xs text-muted pointer-fine:block">{R.enterHint}</p>
       {shareBox.box}
 
-      {/* where this run ranks of all time; signed in, it's posted straight away */}
-      {streak > 0 ? (
-        run.token ? (
-          <EndlessJoin seed={run.seed} token={run.token} choices={run.choices} streak={streak} wouldRank={rank} />
-        ) : rank ? (
-          <p className="mt-4 flex items-center justify-center gap-2 text-center font-semibold text-ink">
-            <TrophyIcon className="size-6" /> {R.wouldRank(rank)}
-          </p>
-        ) : null
-      ) : null}
+      {/* where this run ranks of all time, among the top five (signed in, it's posted straight away) */}
+      {streak > 0 && run.token ? (
+        <EndlessJoin seed={run.seed} token={run.token} choices={run.choices} streak={streak} wouldRank={place === undefined ? undefined : rank} />
+      ) : (
+        <>
+          {rank ? (
+            <p className="mt-4 flex items-center justify-center gap-2 text-center font-semibold text-ink">
+              <TrophyIcon className="size-6" /> {R.wouldRank(rank)}
+            </p>
+          ) : null}
+          <RunBoard streak={streak} rank={streak > 0 ? (place === undefined ? undefined : rank) : null} />
+        </>
+      )}
 
       {/* the one that ended it: a close call says so */}
       {miss ? (
