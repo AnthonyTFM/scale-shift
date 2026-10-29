@@ -567,12 +567,13 @@ html:not(.daily-done) body:has(.hero-next:empty) .hero-endless > div:last-child 
   html:not(.returning) body .hero-grid .hero-daily h2 {
     font-size: 2.25rem;
   }
+  /* the board runs beside both banners and the map, so its height is shared by three rows and no banner stretches */
   html body .hero-grid .hero-board {
     grid-column: 2;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
   }
   html body .hero-grid .hero-map {
-    grid-column: 1 / -1;
+    grid-column: 1;
     grid-row: 3;
   }
   html body .hero-grid .hero-yday {
