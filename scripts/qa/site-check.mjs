@@ -1,5 +1,7 @@
 // Read-only health check of a deployed site: every sitemap page on desktop + phone, internal links, key APIs, and
 // how soon a fresh visitor sees countries on the homepage globe. Usage: node site-check.mjs [base-url]
+// Quick check after a merge (about 2 minutes): node site-check.mjs [base-url] --quick [/changed-page …] checks the
+// homepage, the map, both games, the leaderboard and any pages named, instead of every page in the sitemap.
 // Needs Chromium: set CHROME to its path (defaults to the cloud sandbox one). Exits 1 when it finds issues.
 import { chromium, request } from "playwright-core";
 const CHROME = process.env.CHROME || "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
@@ -16,13 +18,16 @@ const fetch = async (url, opts = {}, tries = 4) => {
   }
   return { ok: r.ok(), status: r.status(), headers: { get: (k) => r.headers()[k.toLowerCase()] ?? null }, text: () => r.text() };
 };
-const BASE = (process.argv[2] || "https://scale-shift.vercel.app").replace(/\/$/, "");
+const args = process.argv.slice(2);
+const QUICK = args.includes("--quick");
+const BASE = (args.find((a) => /^https?:/.test(a)) || "https://scale-shift.vercel.app").replace(/\/$/, "");
+const named = args.filter((a) => a.startsWith("/"));
 const issues = [];
 const note = (s) => issues.push(s);
 const sm = await (await fetch(BASE + "/sitemap.xml")).text();
 let pages = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => new URL(m[1]).pathname);
-pages = [...new Set(["/", "/map", ...pages])];
-console.log(`${pages.length} pages in sitemap`);
+pages = QUICK ? [...new Set(["/", "/map", "/daily", "/endless", "/leaderboard", ...named])] : [...new Set(["/", "/map", ...pages])];
+console.log(QUICK ? `quick check: ${pages.join(" ")}` : `${pages.length} pages in sitemap`);
 const browser = await chromium.launch({ executablePath: CHROME });
 const links = new Set();
 let checked = 0;
@@ -79,7 +84,8 @@ for (const f of ["/robots.txt", "/sitemap.xml", "/manifest.webmanifest", "/data/
 }
 
 // homepage globe: a fresh visitor must see countries quickly, even on a slow phone
-for (const [label, net, cpu, limit] of [["fast", null, 1, 3000], ["slow 4G + slow CPU", { latency: 150, downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8 }, 4, 6000]]) {
+const globeRuns = [["fast", null, 1, 3000], ["slow 4G + slow CPU", { latency: 150, downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8 }, 4, 6000]];
+for (const [label, net, cpu, limit] of QUICK ? globeRuns.slice(0, 1) : globeRuns) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const p = await ctx.newPage();
   const cdp = await ctx.newCDPSession(p);

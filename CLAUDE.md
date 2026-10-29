@@ -4,6 +4,8 @@ Real-size world map with 4,000 years of borders (2000 BCE to today), a daily "wh
 
 **Read `docs/PROJECT.md` at the start of any new task.** It has the goal, decisions, design system, quality bar and roadmap.
 
+**Read `docs/PROCESS.md` before changing anything.** It has the step-by-step for every change: checks, tests, smoke test, review, the site check after deploy, never posting test data to the live site, and the #182 sync tags.
+
 ## Team: shared ownership
 Anthony (Mac) and Evan (Windows) both own the whole project with equal rights. Either can change any file, merge and ship it, including UI, map engine, data and dependency changes. Neither ever needs the other's approval: once CI passes, merge it. Each owner's Claude notifies its owner when the other ships something.
 
@@ -13,7 +15,7 @@ Anthony (Mac) and Evan (Windows) both own the whole project with equal rights. E
 1. `git switch main && git pull`
 2. `git switch -c <short-branch-name>` (e.g. `add-aztec-comparison`)
 3. Make the change.
-4. `npm run lint && npm run typecheck && npm run build && npm run check:data` must all pass (CI runs the same). Fix failures; never skip checks.
+4. `npm run lint && npm run typecheck && npm test && npm run build && npm run check:data` must all pass (CI runs the same, plus a smoke test that plays both games). Fix failures; never skip checks.
 5. Commit with a clear message, then `git push -u origin <branch>`.
 6. `gh pr create` with a short summary: what changed, why, and how to see it.
 7. `gh pr checks --watch` until CI passes. If it fails, fix it and push again.
@@ -36,6 +38,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 ## Read first (technical)
 - This is Next.js 16. APIs differ from older versions: check `node_modules/next/dist/docs/` before using a Next API you're unsure of.
 - `params` is a Promise. With Cache Components, reading `new Date()` or `Math.random()` while a page renders fails the build: do it in an effect or event handler.
+- Turbopack can keep stale CSS in `.next`: if a style change doesn't show up, `rm -rf .next` and build again.
 - React won't run a `<script>` it renders in the browser. Inline scripts belong in the root layout (`src/app/layout.tsx`), which only renders on the server.
 
 ## Where things live
@@ -50,7 +53,9 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 
 ## Commands
 - `npm run dev`: local site at http://localhost:3000
-- `npm run lint && npm run typecheck && npm run build && npm run check:data`: must all pass before a PR
+- `npm run lint && npm run typecheck && npm test && npm run build && npm run check:data`: must all pass before a PR
+- `npm run smoke -- http://localhost:3100 <dir>`: plays the homepage, a daily round and an endless run on a phone and a computer against a local `npm start` (APIs stubbed), with screenshots
+- `npm run daily:snapshot`: records played daily puzzles so `npm test` can prove they never change; run it before touching the daily pool
 - `npm run data`: rebuild map data, Antarctic claims and the daily puzzle pool
 - `npm run data:stats`: rebuild only the era statistics (era pages' "Largest" and "What changed") from the era files, no downloads
 - `npm run leads`: print form submissions (Redis when the Upstash settings are available, else the local file)
