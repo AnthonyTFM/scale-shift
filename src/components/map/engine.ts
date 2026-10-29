@@ -20,7 +20,7 @@ import {
   mercatorInflation,
   EARTH_RADIUS_KM,
 } from "@/lib/geo";
-import { SWEEP_CELLS, SWEEP_MS, type Owner, type SweepPlan, fillRings, planSweep, projectRing, shownSums, sweepFrame } from "./sweep";
+import { SWEEP_CELLS, SWEEP_MS, type Owner, type SweepPlan, fillRings, landDiffers, planSweep, projectRing, shownSums, sweepFrame } from "./sweep";
 
 
 export type Overlay = {
@@ -109,6 +109,8 @@ type Sweep = {
   plan: SweepPlan;
   /** grid cell size, CSS pixels */ cs: number;
   /** the old era's land, borders and lakes as they were on screen (no names) */ old: HTMLCanvasElement;
+  /** the old era's picture where only one era has land (coasts the two sources draw differently), faded out as it goes */
+  coast: HTMLCanvasElement | null;
   from: Layer;
   /** the shape behind each owner number on the grid, old and new (0: sea) */ ownersA: (PolityFeature | null)[];
   ownersB: (PolityFeature | null)[];
@@ -236,6 +238,8 @@ export class MapEngine {
   private steady = false;
   /** reused for the old era's picture in each sweep */
   private sweepCanvas: HTMLCanvasElement | null = null;
+  /** reused for the old era's coasts in each sweep */
+  private coastCanvas: HTMLCanvasElement | null = null;
   /** the new era's owner grid from the last sweep: the next sweep's old one, while the map hasn't moved (Play) */
   private lastGrid: (ReturnType<MapEngine["ownerGrid"]> & { layer: Layer; view: View; w: number; h: number; lakes: Lake[] }) | null =
     null;
@@ -1024,12 +1028,26 @@ export class MapEngine {
     this.lastGrid = { layer: next, view: { ...v }, w: this.w, h: this.h, lakes: this.lakes, ...B };
     const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
     const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
+    // Where one era has land and the other sea (the sources' coastlines differ, most of all where the source changes,
+    // 1783 to 1800), the old coast fades out over the sweep: shown as in the new era from the start, it jumped
+    const differs = new Path2D();
+    let coast: HTMLCanvasElement | null = null;
+    if (landDiffers(plan, cs, differs)) {
+      coast = this.coastCanvas ??= document.createElement("canvas");
+      coast.width = this.base.width;
+      coast.height = this.base.height;
+      const cctx = coast.getContext("2d")!;
+      cctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+      cctx.clip(differs);
+      cctx.drawImage(old, 0, 0, this.w, this.h);
+    }
     return {
       start: 0,
       view: { ...this.view },
       plan,
       cs,
       old,
+      coast,
       from: prev,
       ownersA: A.owners,
       ownersB: B.owners,
@@ -1108,6 +1126,11 @@ export class MapEngine {
     const [k, dx, dy] = this.sweepShift(s);
     ctx.save();
     ctx.transform(k, 0, 0, k, dx, dy);
+    if (s.coast) {
+      ctx.globalAlpha = 1 - e;
+      ctx.drawImage(s.coast, 0, 0, this.w, this.h);
+      ctx.globalAlpha = 1;
+    }
     ctx.clip(area);
     ctx.drawImage(s.old, 0, 0, this.w, this.h);
     ctx.restore();
