@@ -482,6 +482,12 @@ const isCrimea = (rings) => {
   return c[0] > 32 && c[0] < 37 && c[1] > 44 && c[1] < 46.3;
 };
 const inCaribbean = (rings) => geoCentroid({ type: "Polygon", coordinates: rings })[0] < -60;
+/** Natural Earth's Antarctica, as on the maps since 1994. */
+function antarctica() {
+  const ne = require("world-atlas/countries-50m.json");
+  const f = client.feature(ne, ne.objects.countries).features.find((x) => x.properties.name === "Antarctica");
+  return fixWinding(f.geometry);
+}
 function naturalEarthEra(year) {
   const parts = new Map(); // name -> polygons
   const extra = new Map(); // name -> properties beyond the name
@@ -2833,6 +2839,9 @@ async function main() {
       if (geometry) features.push({ type: "Feature", properties: props, geometry });
     }
     for (const r of UNNAMED) if (r.years.includes(entry.year) && !namedBack.has(r.n)) console.warn(`  ! ${eraLabel(entry.year)}: no unnamed shape found for ${r.n}`);
+    // Cliopatria has no Antarctica: it is drawn blank, as on the maps before 1800, so it doesn't vanish from 1800 to 1960
+    // (the claims floated over the sea) or pop in and out as the timeline crosses 1800 and 1994
+    if (FROM_CLIOPATRIA.has(entry.year)) features.push({ type: "Feature", properties: { n: "", b: 1 }, geometry: antarctica() });
     const grouped = groupByName(features);
     const slivers = []; // thin pieces new borders cut off our shapes, left blank for the coast fill
     if (HISTOGIS[entry.year] || OHM[entry.year]) await overlayBorders(grouped, entry.year, slivers);
