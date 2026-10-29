@@ -86,7 +86,8 @@ function SignedIn({ seed, token, choices, streak, wouldRank }: Props) {
   );
 
   // still finding out who's signed in: hold the space
-  if (!isLoaded || (isSignedIn && join.me === undefined)) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
+  // (the join card and the board under it, or the posted card: about the same height)
+  if (!isLoaded || (isSignedIn && join.me === undefined)) return <div className="mt-5 h-[330px]" aria-hidden="true" />;
   if (isSignedIn && join.me?.name && step !== 2)
     return (
       <>
@@ -213,10 +214,11 @@ export function RunBoard({ streak, rank }: { streak: number; rank: number | null
     // everyone else, ranked as if the player's earlier best weren't there (as `rank` is)
     const others = top.rows.filter((r) => !r.me).map((r) => ({ ...r, rank: r.rank - (mine && mine.score > r.score ? 1 : 0) }));
     if (!(streak > 0 && rank)) return others.slice(0, 5);
-    // after everyone tied with it: whoever got there first is listed first
+    // after everyone tied with it (whoever got there first is listed first); everyone it beats moves down one
     const run = { rank, name: t.thisRun, score: streak, me: true };
     const at = others.filter((r) => r.score >= streak).length;
-    return at < 5 ? [...others.slice(0, at), run, ...others.slice(at)].slice(0, 5) : [...others.slice(0, 5), run];
+    const below = others.slice(at).map((r) => ({ ...r, rank: r.rank + 1 }));
+    return at < 5 ? [...others.slice(0, at), run, ...below].slice(0, 5) : [...others.slice(0, 5), run];
   })();
 
   return (
