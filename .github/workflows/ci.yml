@@ -5,6 +5,11 @@ on:
   push:
     branches: [main]
 
+# a newer push to the same branch replaces a run still going
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,5 +22,23 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: npm test
       - run: npm run build
       - run: npm run check:data
+      # play the homepage, a daily round and an endless run on a phone and a computer, against this build
+      - run: npm ci --prefix scripts/qa
+      - name: Smoke test
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: |
+          npm start -- -p 3000 > server.log 2>&1 &
+          for i in $(seq 60); do curl -sf -o /dev/null http://localhost:3000 && break; sleep 1; done
+          node scripts/qa/smoke.mjs http://localhost:3000 smoke-shots
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-shots
+          path: |
+            smoke-shots
+            server.log
+          if-no-files-found: ignore

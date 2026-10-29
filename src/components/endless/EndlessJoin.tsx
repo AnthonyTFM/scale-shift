@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { DayRow, EndlessBoard, EndlessSubmitResult } from "@/lib/leaderboard-types";
 import { loadPlayer, playerId } from "@/lib/player";
+import { boardWithRun } from "@/lib/endless-board";
 import { track } from "@/lib/analytics";
 import { signInOn } from "@/lib/sign-in";
 import { endlessCopy } from "@/content/endless";
@@ -208,18 +209,7 @@ export function RunBoard({ streak, rank }: { streak: number; rank: number | null
       .catch(() => setTop(null));
   }, []);
 
-  const rows = (() => {
-    if (!top) return [];
-    const mine = top.me ?? top.rows.find((r) => r.me);
-    // everyone else, ranked as if the player's earlier best weren't there (as `rank` is)
-    const others = top.rows.filter((r) => !r.me).map((r) => ({ ...r, rank: r.rank - (mine && mine.score > r.score ? 1 : 0) }));
-    if (!(streak > 0 && rank)) return others.slice(0, 5);
-    // after everyone tied with it (whoever got there first is listed first); everyone it beats moves down one
-    const run = { rank, name: t.thisRun, score: streak, me: true };
-    const at = others.filter((r) => r.score >= streak).length;
-    const below = others.slice(at).map((r) => ({ ...r, rank: r.rank + 1 }));
-    return at < 5 ? [...others.slice(0, at), run, ...below].slice(0, 5) : [...others.slice(0, 5), run];
-  })();
+  const rows = top ? boardWithRun(top, { name: t.thisRun, score: streak, rank }) : [];
 
   return (
     <div className="mt-3 rounded-[20px] border-2 border-line bg-paper p-4">
