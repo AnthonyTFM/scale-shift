@@ -56,17 +56,21 @@ const scoreOf = (round: Round, choices: number[]) => choices.filter((c, i) => ro
 
 type Game = { round: Round; today: string; save: DailySave; choices: number[]; step: number };
 
-/** Signed-in players: take today's result from their account (played on another device) and show it here. */
-function syncAccount(setGame: React.Dispatch<React.SetStateAction<Game | null>>) {
-  fetch(`/api/leaderboard/me?today=${localDateKey()}`)
+/**
+ * Signed-in players: take today's result from their account (played on another device) and show it here. Resolves
+ * once the account has been asked, with the merged save when it had results.
+ */
+function syncAccount(setGame: React.Dispatch<React.SetStateAction<Game | null>>): Promise<DailySave | null> {
+  return fetch(`/api/leaderboard/me?today=${localDateKey()}`)
     .then((r) => (r.ok ? r.json() : null))
     .then((d: { player?: { id: string; name: string | null } | null; days?: Record<string, { c: number[]; s: number }> } | null) => {
       if (d?.player?.name) rememberPlayer({ id: d.player.id, name: d.player.name });
-      if (!d?.days || !Object.keys(d.days).length) return;
+      if (!d?.days || !Object.keys(d.days).length) return null;
       const save = mergeDays(d.days);
       setGame((g) => (g ? official(g, save) : g));
+      return save;
     })
-    .catch(() => {});
+    .catch(() => null);
 }
 
 /** Load today's round and any saved progress for it. */
@@ -134,16 +138,26 @@ export function DailyChallenge() {
   useEffect(() => {
     const c = readChallenge(location.hash);
     if (c) queueMicrotask(() => setChallenge(c));
-    prepare()
-      .then(setGame)
+    let live = true;
+    const loaded = prepare()
+      .then((g) => {
+        setGame(g);
+        return g;
+      })
       .catch(() => setFailed(true));
     // another tab answered: show its progress here too, so tabs never disagree (or let today be played twice)
     const sync = () => setGame((g) => (g ? catchUp(g) : g));
     // signed in: bring in this player's results from the leaderboard, so every device shows the same (first) score
-    if (signInOn) syncAccount(setGame);
+    const account = signInOn ? syncAccount(setGame) : Promise.resolve(null);
+    // today's round from its first question: the start sound. A round already begun or done (here, in another tab,
+    // or on another device) stays quiet, and so does a page the player has already left
+    Promise.all([loaded, account]).then(([g, save]) => {
+      if (live && g && !g.choices.length && !save?.days[g.round.date]) play("start");
+    });
     window.addEventListener("storage", sync);
     window.addEventListener("focus", sync);
     return () => {
+      live = false;
       window.removeEventListener("storage", sync);
       window.removeEventListener("focus", sync);
     };
