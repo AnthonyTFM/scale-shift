@@ -155,6 +155,7 @@ export function EndlessGame() {
     setFailed(false);
     // the loading card replaces the results (or the error), so nothing can be tapped twice while the run loads
     setRun(null);
+    setFlare(0);
     prepare(fresh)
       .then(begin)
       .catch(() => setFailed(true));
@@ -307,8 +308,8 @@ function ScoreBar({ ref, streak, best, level, newBest, flare }: { ref: React.Ref
     >
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-ink">
-          {/* a hotter flame at 10 and 25 in a row pops in; a milestone makes it flare */}
-          <span key={`${tier}:${flare}`} className={flare === streak && streak > 0 ? "flare" : tier ? "pop-in" : undefined}>
+          {/* a milestone makes the flame flare; a hotter flame reached without one (a run resumed at 10+) pops in */}
+          <span key={`${tier}:${flare}`} className={flare === streak && streak > 0 ? "flare" : tier && !flare ? "pop-in" : undefined}>
             <FlameIcon className="size-7" tier={tier} />
           </span>
           <span className="font-display text-4xl leading-none tabular-nums">{streak}</span>

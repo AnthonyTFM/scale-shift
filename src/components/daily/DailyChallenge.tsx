@@ -166,7 +166,10 @@ export function DailyChallenge() {
   const retry = () => {
     setFailed(false);
     prepare()
-      .then(setGame)
+      .then((g) => {
+        setGame(g);
+        if (!g.choices.length) play("start");
+      })
       .catch(() => setFailed(true));
   };
 
