@@ -167,6 +167,13 @@ export function EndlessGame() {
       .catch(() => setFailed(true));
   }, []);
 
+  // a run under way (answered, not on its results) folds the banner away on phones (see .endless-playing in globals.css)
+  const playing = !!run && !run.done && run.choices.length > 0;
+  useEffect(() => {
+    document.documentElement.classList.toggle("endless-playing", playing);
+    return () => document.documentElement.classList.remove("endless-playing");
+  }, [playing]);
+
   // the matchup on screen counts as seen, so the next runs steer clear of its two shapes
   const shown = run && !run.done ? run.questions[run.step] : undefined;
   useEffect(() => {
