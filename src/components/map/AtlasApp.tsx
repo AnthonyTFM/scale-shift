@@ -419,14 +419,20 @@ export default function AtlasApp() {
     // as this era's sweep ends; with none running, at once when play starts, else after a moment (for readers who prefer
     // less motion, or when a sweep was skipped because the map was being moved)
     const left = engine?.sweepLeft() ?? 0;
-    const t = setTimeout(
-      () => {
-        if (last) return setPlaying(0);
-        engine?.setSteady(true);
-        changeEra(eras[next].key);
-      },
-      left > 0 ? left : started ? 0 : 1400,
-    );
+    let t = 0;
+    const go = () => {
+      // the sweep's clock starts at its first frame, which can come a moment after this: an era that came while it still
+      // ran would show without one, so wait out the rest
+      const more = engine?.sweepLeft() ?? 0;
+      if (more > 0) {
+        t = window.setTimeout(go, more);
+        return;
+      }
+      if (last) return setPlaying(0);
+      engine?.setSteady(true);
+      changeEra(eras[next].key);
+    };
+    t = window.setTimeout(go, left > 0 ? left : started ? 0 : 1400);
     return () => clearTimeout(t);
   }, [playing, loadingEra, era, changeEra]);
 
