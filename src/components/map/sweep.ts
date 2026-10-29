@@ -418,11 +418,10 @@ export function planSweep(a: Int32Array, b: Int32Array, ownA: Owner[], ownB: Own
   return { gw, gh, a, b, carriedBy, carries, when, changing, front, style, box };
 }
 
-/** Where a sweep frame's outline goes: a canvas Path2D. */
+/** Where a sweep frame's outline goes: a canvas Path2D, only ever filled or clipped. */
 export type PathSink = {
   moveTo(x: number, y: number): void;
   lineTo(x: number, y: number): void;
-  closePath(): void;
   rect(x: number, y: number, w: number, h: number): void;
 };
 
@@ -496,9 +495,10 @@ export function sweepFrame(p: SweepPlan, t: number, cs: number, area: PathSink):
       if (in2 !== in3) cross(L + ((t - v3) / (v2 - v3)) * cs, B, ((Y + 1) * W + X) * 2);
       if (in3) corner(L, B);
       if (in3 !== in0) cross(L, T + ((t - v0) / (v3 - v0)) * cs, (Y * W + X) * 2 + 1);
+      // left open: a fill or clip closes each piece itself, and in Chrome each closePath takes longer the more the path
+      // already holds, which made frames with a long moving border take 60–150 ms to draw
       area.moveTo(px[0], py[0]);
       for (let q = 1; q < k; q++) area.lineTo(px[q], py[q]);
-      area.closePath();
       // the moving border runs between two crossings in a row, where all four cells belong to the same gaining country
       const o = front[c0];
       if (!o || front[c1] !== o || front[c2] !== o || front[c3] !== o) continue;

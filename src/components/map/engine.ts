@@ -77,6 +77,8 @@ const CUT_CENTER = 11.5;
 
 /** Overlap between neighbouring tiles, in pixels, so no hairline seams show where they meet. */
 const TILE_PAD = 2;
+/** How much of a sweep (eased, 0–1) the moving border takes to fade in at the start and out at the end. */
+const FRONT_FADE = 0.08;
 
 /** Everything needed to draw the world at one zoom level: shape boxes, outlines made on demand and bitmap tiles. */
 type BaseCache = {
@@ -101,6 +103,7 @@ type LabelItem = { text: string; p: [number, number]; size: number; weight: numb
 
 /** An era change in progress (see sweep.ts), worked out for one view and moved with the map if it moves meanwhile. */
 type Sweep = {
+  /** when its first frame was on screen (0 until then): the clock starts there, so a slow first frame skips nothing */
   start: number;
   /** the view it was worked out for: its grid, old picture and names are in that view's pixels */ view: View;
   plan: SweepPlan;
@@ -233,6 +236,9 @@ export class MapEngine {
   private steady = false;
   /** reused for the old era's picture in each sweep */
   private sweepCanvas: HTMLCanvasElement | null = null;
+  /** the new era's owner grid from the last sweep: the next sweep's old one, while the map hasn't moved (Play) */
+  private lastGrid: (ReturnType<MapEngine["ownerGrid"]> & { layer: Layer; view: View; w: number; h: number; lakes: Lake[] }) | null =
+    null;
   private tilePool: HTMLCanvasElement[] = [];
   private prefetchTimer = 0;
   private lastViewChange = 0;
@@ -328,7 +334,8 @@ export class MapEngine {
 
   /** How long the border sweep now running has left, in ms (0 when none). */
   sweepLeft() {
-    return this.sweep ? Math.max(0, SWEEP_MS - (performance.now() - this.sweep.start)) : 0;
+    if (!this.sweep) return 0;
+    return this.sweep.start ? Math.max(0, SWEEP_MS - (performance.now() - this.sweep.start)) : SWEEP_MS;
   }
   /** Whether the next sweep runs at a steady pace instead of easing in and out: while the timeline plays on, so the
    * borders never slow to a stop between eras. A sweep already running keeps its pace. */
@@ -1009,12 +1016,16 @@ export class MapEngine {
     const cs = Math.max(2, Math.sqrt((this.w * this.h) / SWEEP_CELLS));
     const gw = Math.ceil(this.w / cs);
     const gh = Math.ceil(this.h / cs);
-    const A = this.ownerGrid(prev, cs, gw, gh);
+    const v = this.view;
+    const g = this.lastGrid;
+    const same = g?.layer === prev && g.w === this.w && g.h === this.h && g.lakes === this.lakes;
+    const A = same && g.view.lon === v.lon && g.view.y === v.y && g.view.k === v.k ? g : this.ownerGrid(prev, cs, gw, gh);
     const B = this.ownerGrid(next, cs, gw, gh);
+    this.lastGrid = { layer: next, view: { ...v }, w: this.w, h: this.h, lakes: this.lakes, ...B };
     const plan = planSweep(A.grid, B.grid, A.owners.map(ownerOf), B.owners.map(ownerOf), gw, gh);
     const fromHighlight = (this.highlight && prev.byName.get(this.highlight)) || null;
     return {
-      start: performance.now(),
+      start: 0,
       view: { ...this.view },
       plan,
       cs,
@@ -1087,7 +1098,7 @@ export class MapEngine {
   /** One frame of a sweep: the new era, the old one wherever the moving border hasn't reached yet, and the border itself. */
   private drawSweep(s: Sweep, cache: BaseCache, projs: ReturnType<typeof projectionFor>[]) {
     const ctx = this.bctx;
-    const t = Math.min(1, (performance.now() - s.start) / SWEEP_MS);
+    const t = s.start ? Math.min(1, (performance.now() - s.start) / SWEEP_MS) : 0;
     const e = s.steady ? t : t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
     this.drawTiles(cache);
     const area = new Path2D();
@@ -1100,7 +1111,9 @@ export class MapEngine {
     ctx.clip(area);
     ctx.drawImage(s.old, 0, 0, this.w, this.h);
     ctx.restore();
-    // the moving border, drawn like the borders on the tiles
+    // the moving border, drawn like the borders on the tiles. It fades in as it sets off and out as it arrives: there it
+    // runs beside a border the map already draws, up to a grid cell off, which doubled every changing border into a blur
+    ctx.globalAlpha = Math.max(0, Math.min(1, e / FRONT_FADE, (1 - e) / FRONT_FADE));
     ctx.lineWidth = 0.7;
     ctx.lineJoin = "round";
     for (const style of [1, 2, 3]) {
@@ -1116,6 +1129,7 @@ export class MapEngine {
       ctx.stroke();
     }
     ctx.setLineDash([]);
+    ctx.globalAlpha = 1;
     if (e < 0.5) this.strokeHighlight(s.fromHighlight, projs);
     else this.drawHighlight(cache);
     this.drawLines();
@@ -1124,6 +1138,7 @@ export class MapEngine {
       for (const proj of projs) this.drawClaimLabels(ctx, proj);
     }
     // on to the next frame; after the last one the map draws normally again, and looks the same
+    if (!s.start) s.start = performance.now();
     if (t >= 1) this.sweep = null;
     this.markBase();
   }
