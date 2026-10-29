@@ -96,21 +96,21 @@ export default function HomePage() {
             {home.hub.welcomeBack}
           </p>
           {/* phones: the two games side by side, then the Best streaks board (competition first), yesterday's matchup
-              and the map. Wide screens: two columns, each game with its own extra under it: the daily with yesterday's
-              matchup, endless with its Best streaks board; the map across the bottom. Each part is rendered once and
-              placed by the grid; the page order (and screen readers) follow the phone order */}
-          <div className="mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
+              and the map. Computers: the two games as short banners on the left with the Best streaks board beside
+              them, then the map, then yesterday's matchup (placed in globals.css, .hero-grid). Each part is rendered
+              once; the page order (and screen readers) follow the phone order */}
+          <div className="hero-grid mt-4 grid grid-cols-2 gap-3 md:mt-6 md:gap-4">
             <HeroPlay />
             <HeroEndless />
-            <div className="hero-board col-span-2 lg:col-span-1 lg:col-start-2 lg:row-start-2 lg:self-start">
+            <div className="hero-board col-span-2">
               <HeroLeaderboard />
             </div>
-            <div className="hero-yday col-span-2 lg:col-span-1 lg:col-start-1 lg:row-start-2 lg:self-start">
+            <div className="hero-yday col-span-2">
               <YesterdayMatchup />
             </div>
-          </div>
-          <div className="mt-4">
-            <MapCard />
+            <div className="hero-map col-span-2">
+              <MapCard />
+            </div>
           </div>
         </div>
       </section>

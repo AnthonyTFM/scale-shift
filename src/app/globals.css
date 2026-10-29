@@ -543,10 +543,41 @@ html:not(.daily-done) body:has(.hero-next:empty) .hero-endless > div:last-child 
     padding: 0;
   }
 }
+/* computers: the two games as short banners on the left, the Best streaks board beside them, then the map and
+   yesterday's matchup across the page (html body … outranks the first-visit rules above) */
 @media (min-width: 1024px) {
-  .hero-board,
-  .hero-yday {
-    grid-row-start: 3;
+  html body .hero-grid {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  }
+  html body .hero-grid .hero-daily,
+  html body .hero-grid .hero-endless {
+    grid-column: 1;
+    padding: 1.25rem 1.75rem;
+  }
+  html body .hero-grid .hero-daily {
+    grid-row: 1;
+  }
+  html body .hero-grid .hero-endless {
+    grid-row: 2;
+  }
+  html body .hero-grid .hero-daily h2,
+  html body .hero-grid .hero-endless h2 {
+    font-size: 1.75rem;
+  }
+  html:not(.returning) body .hero-grid .hero-daily h2 {
+    font-size: 2.25rem;
+  }
+  html body .hero-grid .hero-board {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+  html body .hero-grid .hero-map {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  html body .hero-grid .hero-yday {
+    grid-column: 1 / -1;
+    grid-row: 4;
   }
 }
 
