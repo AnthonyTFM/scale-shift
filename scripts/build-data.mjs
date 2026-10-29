@@ -20,6 +20,7 @@ import polygonClipping from "polygon-clipping";
 import { recolorEraFiles, settleEraFiles } from "./lib/colors.mjs";
 import { separateEraFiles } from "./lib/overlaps.mjs";
 import { fillGapEraFiles } from "./lib/gaps.mjs";
+import { foldSpeckEraFiles, keepSmallOutlines } from "./lib/specks.mjs";
 import { histogisStates } from "./lib/histogis.mjs";
 import { ohmRelations } from "./lib/ohm.mjs";
 import { cliopatriaPolities } from "./lib/cliopatria.mjs";
@@ -119,6 +120,7 @@ function groupByName(features) {
 function toTopology(features, minWeight) {
   let topo = server.topology({ p: { type: "FeatureCollection", features } }, QUANTIZE);
   topo = simplifyLib.presimplify(topo);
+  keepSmallOutlines(topo, minWeight); // small territories keep their outline instead of turning into triangles
   topo = simplifyLib.simplify(topo, minWeight);
   // Drop specks smaller than ~40 km², measured on the sphere with d3 (a planar test deletes rings around a pole,
   // e.g. Antarctica). Rings that simplification turned inside-out (area > half the globe) are dropped too.
@@ -2028,7 +2030,7 @@ const BEFORE_1800 = {
     { to: "Tây Sơn dynasty", poly: [[102, 8], [110, 8], [110, 15.5], [102, 15.5], [102, 8]], from: ["Đại Việt (Trịnh lords)"] },
     // Tibet, a Qing protectorate from 1720 with its own government
     ...SPLIT("Qing Empire", [["Tibet", "Tibet", { s: "Qing Empire" }]]),
-    EZO("Japan"),
+    EZO("Tokugawa shogunate"),
     // the source draws Assam inside Burma, which only invaded it in 1817
     { ...AHOM, blank: undefined, from: ["Burma"] },
     // Rupert's Land, the Hudson's Bay Company's charter lands (the Hudson Bay basin), from OpenHistoricalMap. The source
@@ -3029,9 +3031,11 @@ async function main() {
   const leftover = (year, props) => props.n === "Australian aboriginal hunter-gatherers" && year >= 1600 && year <= 1815;
   const gaps = fillGapEraFiles(ROOT, inAustralia, leftover);
   const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
+  // specks and hairline strips the steps above leave (no source draws them) go whole to the neighbour beside them
+  const specks = foldSpeckEraFiles(ROOT).reduce((n, r) => n + r.folded, 0);
   const recoloured = settleEraFiles(ROOT, () => true);
   console.log(
-    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
+    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${specks} specks folded into their neighbours, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
   );
   // read from the finished era files, so the era pages' figures match what the map draws (see lib/era-stats.mjs)
   console.log("6/6 Era statistics");

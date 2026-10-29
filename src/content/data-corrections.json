@@ -2783,6 +2783,118 @@
       "why": "One spelling for the Māori on every map."
     },
     {
+      "name": "Maoris",
+      "years": [
+        1530,
+        1600
+      ],
+      "n": "Māori",
+      "why": "One spelling for the Māori on every map."
+    },
+    {
+      "name": "Ainus",
+      "years": [
+        1279,
+        1300,
+        1400,
+        1492,
+        1500
+      ],
+      "n": "Ainu",
+      "why": "One name for the Ainu on every map."
+    },
+    {
+      "name": "Samis",
+      "years": [
+        1000,
+        1300
+      ],
+      "n": "Sámi",
+      "why": "One spelling for the Sámi on every map."
+    },
+    {
+      "name": "Papuan",
+      "years": [
+        -200
+      ],
+      "n": "Papuans",
+      "why": "One name for the Papuans on every map."
+    },
+    {
+      "name": "Malay",
+      "years": [
+        800,
+        900
+      ],
+      "n": "Malays",
+      "why": "One name for the Malays on every map."
+    },
+    {
+      "name": "Mon state",
+      "years": [
+        800
+      ],
+      "n": "Mon States",
+      "why": "One name for the Mon states in 800 and 900."
+    },
+    {
+      "name": "Mayas",
+      "years": [
+        1530,
+        1600
+      ],
+      "n": "Maya",
+      "why": "One name for the Maya on every map."
+    },
+    {
+      "name": "Kwakwaka’wakw",
+      "years": [
+        1492
+      ],
+      "n": "Kwakwaka'wakw",
+      "why": "One spelling for the Kwakwaka'wakw on every map."
+    },
+    {
+      "name": "Tobosos",
+      "years": [
+        1492
+      ],
+      "n": "Toboso",
+      "why": "One name for the Toboso on every map."
+    },
+    {
+      "name": "Apalachees",
+      "years": [
+        1492
+      ],
+      "n": "Apalachee",
+      "why": "One name for the Apalachee on every map."
+    },
+    {
+      "name": "Cahita",
+      "years": [
+        1492
+      ],
+      "n": "Cahitas",
+      "why": "One name for the Cahitas on every map."
+    },
+    {
+      "name": "Chiso",
+      "years": [
+        1492
+      ],
+      "n": "Chisos",
+      "why": "One name for the Chisos on every map."
+    },
+    {
+      "name": "Japan",
+      "years": [
+        1783
+      ],
+      "n": "Tokugawa shogunate",
+      "why": "Japan was under the Tokugawa shogunate from 1603 to 1868: one name for it from 1650 to 1815."
+    },
+    {
       "name": "Golconda",
       "years": [
         1783
