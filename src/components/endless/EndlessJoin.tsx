@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import type { EndlessBoard, EndlessSubmitResult } from "@/lib/leaderboard-types";
-import { loadPlayer } from "@/lib/player";
+import type { DayRow, EndlessBoard, EndlessSubmitResult } from "@/lib/leaderboard-types";
+import { loadPlayer, playerId } from "@/lib/player";
 import { track } from "@/lib/analytics";
 import { signInOn } from "@/lib/sign-in";
 import { endlessCopy } from "@/content/endless";
@@ -15,7 +15,7 @@ import { useJoinTo } from "@/components/daily/useJoin";
 const t = endlessCopy.board;
 
 /** A finished run the server handed out, ready to post. */
-type Props = { seed: string; token: string; choices: number[]; streak: number; /** where this run would land, once the board is in */ wouldRank?: number | null };
+type Props = { seed: string; token: string; choices: number[]; streak: number; /** where this run would land: undefined while it loads, null if it couldn't be read */ wouldRank?: number | null };
 
 // the all-time Best streaks board's top five, with this player marked
 const boardUrl = (id: string) => `/api/endless?scope=all&limit=5&player=${id}`;
@@ -86,7 +86,8 @@ function SignedIn({ seed, token, choices, streak, wouldRank }: Props) {
   );
 
   // still finding out who's signed in: hold the space
-  if (!isLoaded || (isSignedIn && join.me === undefined)) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
+  // (the join card and the board under it, or the posted card: about the same height)
+  if (!isLoaded || (isSignedIn && join.me === undefined)) return <div className="mt-5 h-[330px]" aria-hidden="true" />;
   if (isSignedIn && join.me?.name && step !== 2)
     return (
       <>
@@ -134,13 +135,14 @@ function SignedIn({ seed, token, choices, streak, wouldRank }: Props) {
           {awaiting && opening ? t.opening : wouldRank ? t.joinPost : t.join}
         </button>
       </div>
+      <RunBoard streak={streak} rank={wouldRank} />
       {dialog}
     </>
   );
 }
 
 /** Sign-in off (local development): a browser that joined the daily's leaderboard posts its runs with that player. */
-function SavedPlayer({ seed, token, choices, streak }: Props) {
+function SavedPlayer({ seed, token, choices, streak, wouldRank }: Props) {
   const [state, setState] = useState<{ status: "idle" | "sending" | "done" | "error"; error: string; result: Extract<EndlessSubmitResult, { ok: true }> | null; top: EndlessBoard | null }>({
     status: "idle",
     error: "",
@@ -179,8 +181,92 @@ function SavedPlayer({ seed, token, choices, streak }: Props) {
   }, []);
 
   if (joined === undefined) return <div className="mt-5 h-[86px]" aria-hidden="true" />;
-  if (!joined) return <p className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4 text-sm text-ink-soft">{t.joinFromDaily}</p>;
+  if (!joined)
+    return (
+      <>
+        <p className="mt-5 rounded-[20px] border-2 border-line bg-paper p-4 text-sm text-ink-soft">{t.joinFromDaily}</p>
+        <RunBoard streak={streak} rank={wouldRank} />
+      </>
+    );
   return <Posted streak={streak} status={state.status} error={state.error} result={state.result} top={state.top} onRetry={post} />;
+}
+
+/**
+ * The Best streaks top five for a run that isn't on the board (yet), so everyone sees the competition: this run is
+ * slotted in where it would land (`rank`), or added under the five when it lands further down. `rank` is undefined
+ * while it loads and null when it couldn't be read (or the run scored 0): the board shows without the run then.
+ */
+export function RunBoard({ streak, rank }: { streak: number; rank: number | null | undefined }) {
+  const [top, setTop] = useState<EndlessBoard | null | undefined>(undefined);
+
+  useEffect(() => {
+    // one extra row, in case the player's own earlier best is in the five: it's left out, as this run would replace it
+    const id = playerId();
+    fetch(`/api/endless?scope=all&limit=6${id ? `&player=${encodeURIComponent(id)}` : ""}`)
+      .then((r) => (r.ok ? (r.json() as Promise<EndlessBoard>) : null))
+      .then((b) => setTop(b && Array.isArray(b.rows) ? b : null))
+      .catch(() => setTop(null));
+  }, []);
+
+  const rows = (() => {
+    if (!top) return [];
+    const mine = top.me ?? top.rows.find((r) => r.me);
+    // everyone else, ranked as if the player's earlier best weren't there (as `rank` is)
+    const others = top.rows.filter((r) => !r.me).map((r) => ({ ...r, rank: r.rank - (mine && mine.score > r.score ? 1 : 0) }));
+    if (!(streak > 0 && rank)) return others.slice(0, 5);
+    // after everyone tied with it (whoever got there first is listed first); everyone it beats moves down one
+    const run = { rank, name: t.thisRun, score: streak, me: true };
+    const at = others.filter((r) => r.score >= streak).length;
+    const below = others.slice(at).map((r) => ({ ...r, rank: r.rank + 1 }));
+    return at < 5 ? [...others.slice(0, at), run, ...below].slice(0, 5) : [...others.slice(0, 5), run];
+  })();
+
+  return (
+    <div className="mt-3 rounded-[20px] border-2 border-line bg-paper p-4">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+        <h3 className="flex items-center gap-1.5 whitespace-nowrap font-display text-[15px] text-ink min-[400px]:text-lg sm:gap-2 sm:text-xl">
+          <TrophyIcon className="size-5 min-[400px]:size-6 sm:size-7" /> {t.title}
+        </h3>
+        <Link href="/leaderboard#endless" className="whitespace-nowrap text-sm font-semibold text-primary hover:underline">
+          {t.seeAll} →
+        </Link>
+      </div>
+      {top === undefined || (streak > 0 && rank === undefined) ? (
+        <ul aria-hidden="true" className="mt-3 space-y-1">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <li key={i} className="h-7 animate-pulse rounded-md bg-beige" />
+          ))}
+        </ul>
+      ) : top === null ? (
+        <p className="mt-2 text-sm text-muted">{t.boardFailed}</p>
+      ) : rows.length ? (
+        <BoardRows rows={rows} gapBeforeLast={rows.length > 5} />
+      ) : (
+        <p className="mt-2 text-sm text-muted">{t.boardEmpty}</p>
+      )}
+    </div>
+  );
+}
+
+/** The board's rows; the highlighted one is you (or this run). A gap marks the jump when your row is further down. */
+function BoardRows({ rows, gapBeforeLast = false, you = "" }: { rows: DayRow[]; gapBeforeLast?: boolean; you?: string }) {
+  return (
+    <ol className="mt-3 space-y-1 text-sm">
+      {rows.map((r, i) => (
+        <li
+          key={i}
+          className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-gold-soft font-bold" : ""} ${gapBeforeLast && i === rows.length - 1 ? "mt-2 border-t border-dashed border-line pt-2" : ""}`}
+        >
+          <span className="w-6 text-right text-muted">{r.rank}</span>
+          <span className="min-w-0 flex-1 truncate">
+            {r.name}
+            {r.me && you ? <span className="font-normal text-muted"> {you}</span> : null}
+          </span>
+          <span className="font-display tabular-nums">{r.score}</span>
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 /** Where the streak landed: the player's best of all time, its rank, and the all-time top five. */
@@ -236,19 +322,8 @@ function Posted({
         ) : null}
       </div>
       {top?.rows.length ? (
-        <ol className="mt-3 space-y-1 text-sm">
-          {/* the top five, plus your own row if you're further down */}
-          {[...top.rows, ...(top.me && !top.rows.some((r) => r.me) ? [top.me] : [])].map((r, i) => (
-            <li key={i} className={`flex items-center gap-2 rounded-md px-2 py-1 ${r.me ? "bg-gold-soft font-bold" : ""}`}>
-              <span className="w-6 text-right text-muted">{r.rank}</span>
-              <span className="min-w-0 flex-1 truncate">
-                {r.name}
-                {r.me ? <span className="font-normal text-muted"> (you)</span> : null}
-              </span>
-              <span className="font-display tabular-nums">{r.score}</span>
-            </li>
-          ))}
-        </ol>
+        // the top five, plus your own row if you're further down
+        <BoardRows rows={[...top.rows, ...(top.me && !top.rows.some((r) => r.me) ? [top.me] : [])]} gapBeforeLast={!!top.me && !top.rows.some((r) => r.me)} you={t.you} />
       ) : null}
       {footer}
     </div>

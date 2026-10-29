@@ -78,6 +78,11 @@ export const endlessCopy = {
     rank: (rank: number, total: number) => `#${rank} of all time, out of ${total} ${total === 1 ? "player" : "players"}`,
     yourBest: (best: number) => `Your best: ${best} in a row`,
     better: (run: number, best: number) => `This run: ${run} in a row. Your best (${best} in a row) stays on the board.`,
+    // the top five on the results screen before a run is posted, with this run slotted in where it would land
+    thisRun: "Your run",
+    you: "(you)",
+    boardFailed: "Couldn't load the board.",
+    boardEmpty: "No streaks posted yet. Yours could be the first.",
     signedIn: "Signed in.",
     signOut: "Sign out",
     // sign-in is off (running locally without Clerk) and this browser has no player from before
