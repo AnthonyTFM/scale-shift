@@ -126,6 +126,8 @@ export function EndlessGame() {
   const [failed, setFailed] = useState(false);
   // the next round's drawings are still on their way
   const [busy, setBusy] = useState(false);
+  // the streak at the last milestone, so the flame flares once for it
+  const [flare, setFlare] = useState(0);
   // set when the player moves on, so the next question (or the results) takes focus; not on first load
   const advanced = useRef(false);
   const top = useRef<HTMLDivElement>(null);
@@ -134,18 +136,34 @@ export function EndlessGame() {
   // the next round's drawings, fetched while the current one is played
   const nextShapes = useRef<{ key: string; shapes: Promise<Record<string, ShapeFile>> } | null>(null);
 
+  // the page has been left: a run that finishes loading then stays silent
+  const live = useRef(true);
+  useEffect(() => {
+    live.current = true;
+    return () => {
+      live.current = false;
+    };
+  }, []);
+
+  // a run from its first question gets the start sound; one picked up part-way doesn't
+  const begin = (r: Run) => {
+    setRun(r);
+    if (live.current && !r.choices.length && !r.over && !r.done) play("start");
+  };
+
   const start = (fresh: boolean) => {
     setFailed(false);
     // the loading card replaces the results (or the error), so nothing can be tapped twice while the run loads
     setRun(null);
+    setFlare(0);
     prepare(fresh)
-      .then(setRun)
+      .then(begin)
       .catch(() => setFailed(true));
   };
 
   useEffect(() => {
     prepare(false)
-      .then(setRun)
+      .then(begin)
       .catch(() => setFailed(true));
   }, []);
 
@@ -206,12 +224,13 @@ export function EndlessGame() {
     }
     const choices = [...run.choices, choice];
     const right = q.answer === choice;
-    play(right ? "right" : "wrong");
-    buzz(right ? 12 : [30, 50, 30]);
     track("endless_answer", { n: run.step + 1, correct: right });
     const n = streakOf(run.questions, choices);
-    // passing the old best, or reaching a hotter flame: a longer buzz
-    if (right && ((run.bestBefore > 0 && n === run.bestBefore + 1) || n === 10 || n === 25)) buzz([20, 40, 60]);
+    // a milestone (5, 10 or 25 in a row, or passing the old best): its own chime, a longer buzz and a flare on the flame
+    const milestone = right && ((run.bestBefore > 0 && n === run.bestBefore + 1) || n === 5 || n === 10 || n === 25);
+    play(!right ? "wrong" : milestone ? "milestone" : "right");
+    buzz(!right ? [30, 50, 30] : milestone ? [20, 40, 60] : 12);
+    if (milestone) setFlare(n);
     // a played run makes this a returning player: the homepage shows both games side by side from now on
     document.documentElement.classList.add("returning");
     const updated: EndlessSave = { ...save, best: Math.max(save.best, n), run: { seed: run.seed, b: run.bestBefore, c: choices, ...(run.token ? { t: run.token } : {}), ...(right ? {} : { over: true, e: Date.now() }) } };
@@ -245,7 +264,7 @@ export function EndlessGame() {
       {/* a run under way, or its results (a reload there would replay the celebration or start a new run): no update
           reload; the new version arrives with the next page */}
       <PlayingMark on={run.choices.length > 0} />
-      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} />}
+      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} flare={flare} />}
       {run.done ? (
         <Results
           run={run}
@@ -279,7 +298,7 @@ export function EndlessGame() {
  * The run at a glance, pinned under the site header while playing, so anyone who looks (or tunes in to a stream) sees
  * the streak, the best and the level straight away: a big streak, the best, five level bars and the rules in one line.
  */
-function ScoreBar({ ref, streak, best, level, newBest }: { ref: React.Ref<HTMLDivElement>; streak: number; best: number; level: number; newBest: boolean }) {
+function ScoreBar({ ref, streak, best, level, newBest, flare }: { ref: React.Ref<HTMLDivElement>; streak: number; best: number; level: number; newBest: boolean; flare: number }) {
   const tier = flameTier(streak);
   return (
     <div
@@ -289,8 +308,8 @@ function ScoreBar({ ref, streak, best, level, newBest }: { ref: React.Ref<HTMLDi
     >
       <div className="flex items-center justify-between gap-3">
         <p className="flex items-center gap-1.5 text-ink">
-          {/* a hotter flame at 10 and 25 in a row: it pops in each time it changes */}
-          <span key={tier} className={tier ? "pop-in" : undefined}>
+          {/* a milestone makes the flame flare; a hotter flame reached without one (a run resumed at 10+) pops in */}
+          <span key={`${tier}:${flare}`} className={flare === streak && streak > 0 ? "flare" : tier && !flare ? "pop-in" : undefined}>
             <FlameIcon className="size-7" tier={tier} />
           </span>
           <span className="font-display text-4xl leading-none tabular-nums">{streak}</span>

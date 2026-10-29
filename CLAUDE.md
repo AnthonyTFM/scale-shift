@@ -55,6 +55,7 @@ If the user says "open it but don't merge", stop after step 7 and give them the 
 - `npm run dev`: local site at http://localhost:3000
 - `npm run lint && npm run typecheck && npm test && npm run build && npm run check:data`: must all pass before a PR
 - `npm run smoke -- http://localhost:3100 <dir>` (first `npm ci --prefix scripts/qa`; on Mac/Windows set `CHROME` to your Chrome's path): plays the homepage, a daily round and an endless run on a phone and a computer against a local `npm start` (APIs stubbed), with screenshots
+- `npm run sounds -- <dir>`: writes the game sounds (`src/lib/sound-cues.ts`) as WAV files to listen to before changing them
 - `npm run daily:snapshot`: records played daily puzzles so `npm test` can prove they never change; run it before touching the daily pool
 - `npm run data`: rebuild map data, Antarctic claims and the daily puzzle pool
 - `npm run data:stats`: rebuild only the era statistics (era pages' "Largest" and "What changed") from the era files, no downloads
