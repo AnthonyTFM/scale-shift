@@ -2730,7 +2730,57 @@
         1783
       ],
       "s": "Durrani Empire",
-      "why": "Sindh's rulers paid tribute to the Durrani shahs."
+      "why": "Sindh's rulers paid tribute to the Durrani shahs. Spelled Sindh, as on the other maps.",
+      "n": "Sindh"
+    },
+    {
+      "name": "Sind",
+      "years": [
+        1492
+      ],
+      "n": "Sindh",
+      "why": "One spelling for Sindh on every map."
+    },
+    {
+      "name": "Yemen",
+      "years": [
+        1715,
+        1783
+      ],
+      "n": "Imamate of Yemen",
+      "why": "The source's Yemen is the Zaydi imamate, which the map also fills from Cliopatria beside it: one name, so they are one state."
+    },
+    {
+      "name": "Segu",
+      "years": [
+        1715,
+        1783
+      ],
+      "n": "Bamana Empire",
+      "why": "The Bamana Empire of Ségou (about 1712–1861), named as on the 1800 and 1815 maps."
+    },
+    {
+      "name": "Sami",
+      "years": [
+        900
+      ],
+      "n": "Sámi",
+      "why": "One spelling for the Sámi on every map."
+    },
+    {
+      "name": "Maori",
+      "years": [
+        1279,
+        1300,
+        1400,
+        1492,
+        1500,
+        1650,
+        1700,
+        1715
+      ],
+      "n": "Māori",
+      "why": "One spelling for the Māori on every map."
     },
     {
       "name": "Golconda",
