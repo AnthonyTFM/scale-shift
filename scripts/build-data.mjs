@@ -3039,11 +3039,14 @@ async function main() {
   const leftover = (year, props) => props.n === "Australian aboriginal hunter-gatherers" && year >= 1600 && year <= 1815;
   const gaps = fillGapEraFiles(ROOT, inAustralia, leftover);
   const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
-  // specks and hairline strips the steps above leave (no source draws them) go whole to the neighbour beside them
-  const specks = foldSpeckEraFiles(ROOT).reduce((n, r) => n + r.folded, 0);
+  // specks and hairline strips the steps above leave (no source draws them) go whole to the neighbour beside them, and
+  // small shapes drawn on a grid lose their stair-steps
+  const tidied = foldSpeckEraFiles(ROOT);
+  const specks = tidied.reduce((n, r) => n + r.folded, 0);
+  const stairs = tidied.reduce((n, r) => n + r.rounded, 0);
   const recoloured = settleEraFiles(ROOT, () => true);
   console.log(
-    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${specks} specks folded into their neighbours, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
+    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${specks} specks folded into their neighbours, ${stairs} stair-stepped shapes rounded, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
   );
   // read from the finished era files, so the era pages' figures match what the map draws (see lib/era-stats.mjs)
   console.log("6/6 Era statistics");

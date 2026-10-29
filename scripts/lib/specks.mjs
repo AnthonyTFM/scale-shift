@@ -6,7 +6,10 @@
 //   strips that no source draws: a few km² wedged where three borders meet, a strip a kilometre wide along a border.
 //   foldSpecks gives each one whole to the neighbour it shares most border with. Real territories are not folded: only
 //   pieces smaller than the specks build-data.mjs already drops (SPECK_KM2), or strips with no coast that are narrower
-//   than the file's coordinates can draw (THIN_KM), and never a named shape's last piece or the piece its name sits on.
+//   than the file's coordinates can draw (THIN_KM), and never a named shape's last piece or the piece its name sits on;
+// - stair-steps: some sources were drawn on a grid of cells (Cliopatria's are about 7 km), so a small territory's real
+//   outline is a staircase of square corners: pixels on the map. roundStairs cuts those corners (Chaikin's method), so
+//   the shape keeps its place and size with a smooth outline. Big shapes are simplified into diagonals anyway.
 // Used by build-data.mjs.
 
 import fs from "node:fs";
@@ -20,6 +23,9 @@ const DETAIL = 50; // a small ring keeps the points that each hold at least 1/DE
 const SPECK_KM2 = 40; // pieces smaller than this are specks (as build-data.mjs drops them: 1e-6 of the sphere)
 const THIN_KM = 1; // no point of a strip lies further than this from its edge: about 2 km wide, the step of the file's coordinates
 const INLAND = 0.5; // ...if less than this share of its outline is coast (a thin spit of land is real: the Curonian Spit)
+const STAIR_KM2 = 3000; // rings up to this size are checked for stair-steps...
+const STAIR_SHARE = 0.75; // ...and rounded when this share of their edges runs exactly east-west or north-south...
+const STAIR_STEP = 3; // ...in steps of at least this many of the file's coordinate units (rounding noise is 1 or 2)
 
 const polysOf = (g) => (g.type === "Polygon" ? [g.arcs] : g.type === "MultiPolygon" ? g.arcs : []);
 const arcIndex = (a) => (a < 0 ? ~a : a);
@@ -294,7 +300,111 @@ export function foldSpecks(topo) {
   return folded;
 }
 
-/** foldSpecks on every era file on disk (public/data/eras, as listed in src/data/eras.json). */
+/**
+ * Chaikin's corner cutting, twice: every corner gives way to two points a quarter of the way along its edges. An arc's
+ * ends stay where they are (other arcs meet it there), unless it closes on itself.
+ */
+function chaikin(points, closed) {
+  const at = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+  let p = points;
+  for (let pass = 0; pass < 2; pass++) {
+    const n = p.length;
+    const out = closed ? [] : [p[0]];
+    for (let i = 0; i < n - 1; i++) {
+      if (closed || i > 0) out.push(at(p[i], p[i + 1], 0.25));
+      if (closed || i < n - 2) out.push(at(p[i], p[i + 1], 0.75));
+    }
+    out.push(closed ? out[0] : p[n - 1]);
+    p = out;
+  }
+  return p;
+}
+
+/** Whether segments ab and cd cross (touching at an end doesn't count). */
+function crosses(a, b, c, d) {
+  const side = (p, q, r) => Math.sign((q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0]));
+  return side(a, b, c) * side(a, b, d) < 0 && side(c, d, a) * side(c, d, b) < 0;
+}
+
+/**
+ * Rounds off the stair-steps of small rings drawn on a grid (in place): their arcs are smoothed in the file's own
+ * coordinate units, so neighbours sharing an arc stay joined. An arc whose smooth version would cross another edge
+ * (two outlines a cell apart) keeps its steps. Returns how many rings were rounded.
+ */
+export function roundStairs(topo) {
+  const abs = topo.arcs.map((arc) => {
+    let x = 0;
+    let y = 0;
+    return arc.map(([dx, dy]) => [(x += dx), (y += dy)]);
+  });
+  const {
+    scale: [sx, sy],
+    translate: [tx, ty],
+  } = topo.transform;
+  const lonLat = ([x, y]) => [x * sx + tx, y * sy + ty];
+  const ringPoints = (ring) => ring.flatMap((a, j) => (a < 0 ? [...abs[~a]].reverse() : abs[a]).slice(j ? 1 : 0));
+  const marked = new Set();
+  let rounded = 0;
+  for (const g of topo.objects.p.geometries)
+    for (const p of polysOf(g))
+      for (const ring of p) {
+        const pts = ringPoints(ring);
+        const steps = [];
+        let square = 0;
+        for (let i = 1; i < pts.length; i++) {
+          const dx = pts[i][0] - pts[i - 1][0];
+          const dy = pts[i][1] - pts[i - 1][1];
+          if (!dx && !dy) continue;
+          steps.push(Math.abs(dx) + Math.abs(dy));
+          if (!dx || !dy) square++;
+        }
+        if (steps.length < 4 || square < steps.length * STAIR_SHARE) continue;
+        const sorted = [...steps].sort((a, b) => a - b);
+        if (sorted[sorted.length >> 1] < STAIR_STEP) continue;
+        if (polygonKm2([pts.map(lonLat)]) > STAIR_KM2) continue;
+        for (const a of ring) marked.add(arcIndex(a));
+        rounded++;
+      }
+  const boxOf = (line) => {
+    let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+    for (const [x, y] of line) [x0, y0, x1, y1] = [Math.min(x0, x), Math.min(y0, y), Math.max(x1, x), Math.max(y1, y)];
+    return [x0, y0, x1, y1];
+  };
+  const boxes = abs.map(boxOf);
+  const meet = (a, b) => a[0] <= b[2] && b[0] <= a[2] && a[1] <= b[3] && b[1] <= a[3];
+  for (const k of marked) {
+    const arc = abs[k];
+    const closed = arc.length > 3 && arc[0][0] === arc.at(-1)[0] && arc[0][1] === arc.at(-1)[1];
+    const smooth = chaikin(arc, closed).map(([x, y]) => [Math.round(x), Math.round(y)]);
+    const out = smooth.filter((q, i) => !i || q[0] !== smooth[i - 1][0] || q[1] !== smooth[i - 1][1]);
+    if (out.length < (closed ? 4 : 2)) continue;
+    const box = boxOf(out);
+    let clash = false;
+    for (let j = 0; j < abs.length && !clash; j++) {
+      if (!meet(box, boxes[j])) continue;
+      const other = j === k ? out : abs[j];
+      for (let i = 1; i < out.length && !clash; i++)
+        for (let m = 1; m < other.length && !clash; m++) {
+          if (j === k && Math.abs(m - i) <= 1) continue;
+          if (j === k && closed && ((i === 1 && m === out.length - 1) || (m === 1 && i === out.length - 1))) continue;
+          clash = crosses(out[i - 1], out[i], other[m - 1], other[m]);
+        }
+    }
+    if (clash) continue;
+    abs[k] = out;
+    boxes[k] = box;
+    let x = 0;
+    let y = 0;
+    topo.arcs[k] = out.map(([qx, qy]) => {
+      const d = [qx - x, qy - y];
+      [x, y] = [qx, qy];
+      return d;
+    });
+  }
+  return rounded;
+}
+
+/** foldSpecks, then roundStairs, on every era file on disk (public/data/eras, as listed in src/data/eras.json). */
 export function foldSpeckEraFiles(root) {
   const eras = JSON.parse(fs.readFileSync(path.join(root, "src/data/eras.json"), "utf8"));
   const report = [];
@@ -302,8 +412,9 @@ export function foldSpeckEraFiles(root) {
     const file = path.join(root, "public/data/eras", `${e.key}.json`);
     const topo = JSON.parse(fs.readFileSync(file, "utf8"));
     const folded = foldSpecks(topo);
-    if (folded) writeFileRetrying(file, JSON.stringify(topo));
-    report.push({ era: e.key, folded });
+    const rounded = roundStairs(topo);
+    if (folded || rounded) writeFileRetrying(file, JSON.stringify(topo));
+    report.push({ era: e.key, folded, rounded });
   }
   return report;
 }
