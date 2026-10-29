@@ -606,7 +606,7 @@
   ],
   [
    2828508,
-   "Crown Colony of Newfoundland",
+   "Newfoundland",
    {
     "props": {
      "s": "United Kingdom of Great Britain and Ireland"
@@ -1307,7 +1307,12 @@
   ],
   [
    2846265,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "United Kingdom of Great Britain and Ireland"
+    }
+   }
   ],
   [
    2848182,
@@ -2566,7 +2571,12 @@
   ],
   [
    2846264,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "New Zealand"
+    }
+   }
   ],
   [
    2848182,
@@ -3804,7 +3814,12 @@
   ],
   [
    2846264,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "New Zealand"
+    }
+   }
   ],
   [
    2848182,
@@ -5087,7 +5102,12 @@
   ],
   [
    2846264,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "New Zealand"
+    }
+   }
   ],
   [
    2848182,
@@ -6311,7 +6331,12 @@
   ],
   [
    2846264,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "New Zealand"
+    }
+   }
   ],
   [
    2848182,
@@ -7511,7 +7536,12 @@
   ],
   [
    2846264,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "New Zealand"
+    }
+   }
   ],
   [
    2848182,
@@ -8447,7 +8477,12 @@
   ],
   [
    2855298,
-   "Egyptian administration of Gaza"
+   "Egyptian administration of Gaza",
+   {
+    "props": {
+     "s": "United Arab Republic"
+    }
+   }
   ],
   [
    2961708,
@@ -8522,7 +8557,12 @@
   ],
   [
    2697346,
-   "U.S. Naval Base Subic Bay"
+   "U.S. Naval Base Subic Bay",
+   {
+    "props": {
+     "s": "United States"
+    }
+   }
   ],
   [
    2832936,
@@ -8548,7 +8588,12 @@
   ],
   [
    2846264,
-   "Cook Islands"
+   "Cook Islands",
+   {
+    "props": {
+     "s": "New Zealand"
+    }
+   }
   ],
   [
    2848182,

@@ -306,6 +306,7 @@ const CLIO_PARTS = [
   { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "Territory of Papua and New Guinea", s: "Australia", years: [1960] },
   { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Tasmania (UK)", member: "(British Empire)", years: [1900] },
   { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Australia", s: "", years: [1914, 1920, 1930, 1938, 1945, 1960] },
+  { from: "British Colonial Empire", box: [135.5, -36.5, 138.5, -35], name: "Australia", s: "", years: [1914, 1920, 1930, 1938, 1945, 1960] }, // by Kangaroo Island
   // a strip of the Empty Quarter south of the Trucial coast, which no one held
   { from: "Kingdom of Great Britain", box: [50, 19, 58, 24.4], drop: true, years: [1900, 1914, 1920, 1930, 1938, 1945, 1960] },
   { from: "British Colonial Empire", box: [99.5, 4.5, 101, 6], name: "Prince of Wales Island", years: [1800, 1815] }, // Penang
@@ -379,6 +380,8 @@ const CLIO_PARTS = [
   { from: "Bourbon Kingdom of France", box: [-61.3, 14.3, -60.7, 15], name: "Martinique" },
   { from: "Bourbon Kingdom of France", box: [-63.2, 15.8, -60.9, 18.3], name: "Colony of Guadeloupe" },
   { from: "Bourbon Kingdom of France", box: [-4.5, 4.5, -2.5, 6], drop: true }, // the Ivory Coast, where France had no post until 1843
+  // a 53 km² piece in the Nafud: the Saudi emirate fell to the Rashidis of Jabal Shammar in 1891 and came back only in 1902
+  { from: "Emirate of Nejd", box: [39.5, 28, 41.5, 29.5], drop: true, years: [1900] },
   { from: "French Louisiana", box: [-56.6, 46.7, -56, 47.2], name: "Saint Pierre and Miquelon", member: "(British Empire)" }, // held by Britain 1793-1802
   { from: "French Louisiana", box: [-63.2, 17.8, -62.7, 18.3], name: "Colony of Guadeloupe", member: "(French Consulate)" },
   { from: "New Netherland", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Batavian Republic)" },

@@ -2948,6 +2948,89 @@
       "why": "The Funj sultanate of Sennar (1504–1821): one name with the maps before and after."
     },
     {
+      "name": "Fivizzano",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "s": "Tuscany",
+      "why": "Fivizzano belonged to Florence from the 15th century, then to the Grand Duchy of Tuscany."
+    },
+    {
+      "name": "Pontremoli",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "s": "Tuscany",
+      "why": "Spain sold Pontremoli to the Grand Duke of Tuscany in 1650."
+    },
+    {
+      "name": "Montserrat",
+      "years": [
+        1715
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "An English colony from 1632."
+    },
+    {
+      "name": "Anguilla",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "An English colony from 1650."
+    },
+    {
+      "name": "Saint Martin",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "France",
+      "why": "The source's shape is the island's French part; the Dutch held the south."
+    },
+    {
+      "name": "Saint Barthelemy",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "France",
+      "why": "French until France sold it to Sweden in 1784."
+    },
+    {
+      "name": "Danish India",
+      "years": [
+        1800
+      ],
+      "s": "Denmark-Norway",
+      "why": "Tranquebar and Serampore were Danish trading posts."
+    },
+    {
+      "name": "Curaçao",
+      "years": [
+        1815
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "note": "Taken from the Dutch by Britain in 1807; handed back to the Netherlands in 1816.",
+      "why": "Britain held Curaçao from 1807 to 1816."
+    },
+    {
+      "name": "Dutch Windward Islands",
+      "years": [
+        1815
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "note": "Sint Eustatius, Saba and Dutch Sint Maarten: taken by Britain in 1810, handed back to the Netherlands in 1816.",
+      "why": "Britain held the Dutch Windward Islands from 1810 to 1816."
+    },
+    {
       "name": "Golconda",
       "years": [
         1783
