@@ -8,7 +8,7 @@ import { loadSave, localDateKey } from "@/lib/daily";
 
 // the bar is for long reading pages (home, eras, timeline, disputes, country sizes, teachers). Hidden on the games,
 // the leaderboard (it has its own "play" banner, and the bar would cover the board), short pages, forms and the small print
-const HIDDEN = /^\/(daily|endless|leaderboard|about|how-it-works|contact|privacy|terms|unsubscribed)(\/|$)/;
+const HIDDEN = /^\/(daily|endless|leaderboard|about|team|how-it-works|contact|privacy|terms|unsubscribed)(\/|$)/;
 // pages where today's game is the better next step, until it's played
 const PLAY_FIRST = /^\/eras(\/|$)/;
 

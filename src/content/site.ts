@@ -26,6 +26,7 @@ export const footerNav = [
   { href: "/size", label: "Country sizes" },
   { href: "/teachers", label: "For teachers" },
   { href: "/about", label: "About & sources" },
+  { href: "/team", label: "Meet the makers" },
   { href: "/how-it-works", label: "How it works" },
   { href: "/contact", label: "Report a border error" },
   { href: "/privacy", label: "Privacy" },
