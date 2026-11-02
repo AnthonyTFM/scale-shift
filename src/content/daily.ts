@@ -102,6 +102,34 @@ export const dailyCopy = {
     yourPick: "Your pick",
     vs: "VS",
   },
+  // the archive: every past day's five, for fun (no streak, no leaderboard)
+  archive: {
+    eyebrow: "Archive",
+    title: "Play a past day",
+    lead: "Every day's five since launch, for fun. Archive plays don't count toward your streak or the leaderboard.",
+    metaTitle: "Archive: play a past day's five",
+    metaDescription: "Play any past day of the daily challenge: five matchups, same as the day it ran. For fun, with no effect on your streak.",
+    day: (n: number) => `Day #${n}`,
+    // on a day's chip: played on the day, replayed from the archive, or not yet
+    official: (score: number, total: number) => `${score}/${total} on the day`,
+    replayed: (score: number, total: number) => `${score}/${total} replayed`,
+    unplayed: "Not played",
+    round: (n: number, r: number, total: number) => `Day #${n} · Round ${r} of ${total}`,
+    seeScore: "See my score",
+    loading: (n: number) => `Loading day #${n}`,
+    failed: "We couldn't load that day.",
+    retry: "Try again",
+    // the little results card
+    resultTitle: (score: number, total: number) => `${score} out of ${total}`,
+    noStreak: "For fun only: archive plays don't change your streak.",
+    another: "Another day",
+    today: "Today's five",
+    answers: "The five matchups",
+    // links to the archive from the daily results and the daily page
+    link: "Play a past day",
+    todayIsLive: "Today's five are live on the daily challenge.",
+    none: "The archive opens tomorrow, once today's five are done.",
+  },
   // the results screen
   results: {
     title: (score: number, total: number) =>
