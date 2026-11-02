@@ -127,7 +127,7 @@ export const dailyCopy = {
     answers: "The five matchups",
     // links to the archive from the daily results and the daily page
     link: "Play a past day",
-    todayIsLive: "Today's five are live on the daily challenge.",
+    note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Replay scores are saved in this browser only.",
     none: "The archive opens tomorrow, once today's five are done.",
   },
   // the results screen

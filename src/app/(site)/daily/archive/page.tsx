@@ -17,10 +17,10 @@ export default function ArchivePage() {
       <PageHero center compact game eyebrow={t.archive.eyebrow} title={t.archive.title} lead={<p>{t.archive.lead}</p>} />
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-6 md:pb-10">
         <div className="mx-auto max-w-2xl">
-          <Suspense fallback={null}>
+          <Suspense fallback={<div aria-busy="true" className="min-h-48" />}>
             <Archive />
           </Suspense>
-          <p className="mt-6 text-xs leading-relaxed text-muted">{t.note}</p>
+          <p className="mt-6 text-xs leading-relaxed text-muted">{t.archive.note}</p>
         </div>
       </div>
     </>

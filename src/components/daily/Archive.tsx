@@ -42,7 +42,8 @@ export function Archive() {
   // the last day the archive holds: yesterday, in this player's time (today's five are live on /daily)
   const [last, setLast] = useState<number | null>(null);
   useEffect(() => queueMicrotask(() => setLast(dayNumber(localDateKey()) - 1)), []);
-  if (last === null) return <Skeleton label={t.title} />;
+  // the list's height, so the page doesn't jump when it arrives
+  if (last === null) return <div aria-busy="true" className="min-h-48" />;
   if (Number.isInteger(day) && day >= 1 && day <= last) return <ArchiveGame key={day} day={day} />;
   return <DayList last={last} />;
 }
