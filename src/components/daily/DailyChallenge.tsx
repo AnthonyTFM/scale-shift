@@ -567,6 +567,12 @@ function Results({
 
       <SaveStreak date={round.date} choices={choices} />
 
+      <p className="mt-3 text-center text-sm">
+        <Link href="/daily/archive" className="inline-flex min-h-11 items-center font-semibold text-primary hover:underline">
+          {dailyCopy.archive.link} <span aria-hidden="true">&nbsp;→</span>
+        </Link>
+      </p>
+
       {/* your numbers in one strip */}
       <dl className="mt-5 grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
         {[
