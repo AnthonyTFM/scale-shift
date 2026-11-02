@@ -11,6 +11,7 @@ import { HeroLeaderboard } from "@/components/home/HeroLeaderboard";
 import { LegacyMapRedirect } from "@/components/home/LegacyMapRedirect";
 import { JsonLd } from "@/components/site/PageHero";
 import { GlobeLazy } from "@/components/home/GlobeLazy";
+import { HeroProof } from "@/components/home/HeroProof";
 import { YesterdayMatchup } from "@/components/home/YesterdayMatchup";
 import { BookIcon, ColumnsIcon, DisputeIcon, MapIcon, TimelineIcon, TrophyIcon } from "@/components/site/Icons";
 import { home } from "@/content/home";
@@ -91,6 +92,8 @@ export default function HomePage() {
               <span className="sm:hidden">{home.hub.missionShort}</span>
               <span className="hidden sm:inline">{home.hub.mission}</span>
             </p>
+            {/* the proof: the map's lie in one shrinking picture (first visits only) */}
+            <HeroProof />
           </div>
           <p aria-hidden="true" className="hero-back font-display text-2xl leading-tight text-ink md:text-3xl">
             {home.hub.welcomeBack}

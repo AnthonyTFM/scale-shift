@@ -448,6 +448,9 @@ html:has(.atlas-page:not([style*="display: none"])) body {
 .returning .hero-new p {
   display: none;
 }
+.returning .hero-proof {
+  display: none;
+}
 /* the page keeps its one heading for screen readers (and the site check); only its look gives way to the greeting */
 .returning .hero-new h1 {
   position: absolute;
