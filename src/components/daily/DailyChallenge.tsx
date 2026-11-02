@@ -136,9 +136,10 @@ export function DailyChallenge() {
   useEffect(retryPendingPlay, []);
 
   // a round under way (answered, not done) folds the banner away on phones (see .daily-playing in globals.css)
-  const playing = !!game && game.choices.length > 0 && game.choices.length < game.round.questions.length;
+  // (null while loading: the mark set before paint stays, so the banner doesn't flash on a reload mid-round)
+  const playing = game ? game.choices.length > 0 && game.choices.length < game.round.questions.length : null;
   useEffect(() => {
-    document.documentElement.classList.toggle("daily-playing", playing);
+    if (playing !== null) document.documentElement.classList.toggle("daily-playing", playing);
     return () => document.documentElement.classList.remove("daily-playing");
   }, [playing]);
 

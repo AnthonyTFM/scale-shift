@@ -168,9 +168,10 @@ export function EndlessGame() {
   }, []);
 
   // a run under way (answered, not on its results) folds the banner away on phones (see .endless-playing in globals.css)
-  const playing = !!run && !run.done && run.choices.length > 0;
+  // (null while loading: the mark set before paint stays, so the banner doesn't flash on a reload mid-run)
+  const playing = run ? !run.done && run.choices.length > 0 : null;
   useEffect(() => {
-    document.documentElement.classList.toggle("endless-playing", playing);
+    if (playing !== null) document.documentElement.classList.toggle("endless-playing", playing);
     return () => document.documentElement.classList.remove("endless-playing");
   }, [playing]);
 
