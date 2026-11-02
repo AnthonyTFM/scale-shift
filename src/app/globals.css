@@ -298,6 +298,13 @@ body {
 .reveal-true {
   transition: opacity 0.35s ease 1s;
 }
+/* the homepage proof and yesterday's matchup: the shrink takes its time, so the eye can follow the size change */
+.proof-slow .reveal-map {
+  transition: transform 3s cubic-bezier(0.45, 0, 0.3, 1) 0.2s, opacity 0.6s ease 2.8s;
+}
+.proof-slow .reveal-true {
+  transition: opacity 0.6s ease 2.8s;
+}
 /* labels that land once the shapes have settled */
 .pop-in.reveal-late {
   animation-delay: 1.05s;
