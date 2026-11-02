@@ -11,6 +11,8 @@ import { loadSave, localDateKey, nameInSentence, sizeParts, type PoolEntry, type
 import { avoidOf, endlessQuestion, LEVELS, levelOf, loadEndless, loadSeen, newSeed, rememberSeen, streakOf, writeEndless, type EndlessSave } from "@/lib/endless";
 import type { ShapeFile } from "@/lib/outline";
 import { play } from "@/lib/sound";
+import { reportRun } from "@/lib/report-run";
+import type { RunStanding } from "@/lib/plays";
 import { buzz, confetti } from "@/lib/celebrate";
 import { useShareBox } from "@/components/site/ShareBox";
 import { FlameIcon, flameTier, MapIcon, MarkIcon, TrophyIcon } from "@/components/site/Icons";
@@ -236,6 +238,8 @@ export function EndlessGame() {
     const n = streakOf(run.questions, choices);
     // a milestone (5, 10 or 25 in a row, or passing the old best): its own chime, a longer buzz and a flare on the flame
     const milestone = right && ((run.bestBefore > 0 && n === run.bestBefore + 1) || n === 5 || n === 10 || n === 25);
+    // a run that just ended is counted, anonymously, so results can say how it compares
+    if (!right) reportRun(run.seed, n);
     play(!right ? "wrong" : milestone ? "milestone" : "right");
     buzz(!right ? [30, 50, 30] : milestone ? [20, 40, 60] : 12);
     if (milestone) setFlare(n);
@@ -371,9 +375,15 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
   const [dailyDone, setDailyDone] = useState(false);
   // where this run lands on the Best streaks board, and the next place up (undefined while loading, null if it failed)
   const [place, setPlace] = useState<EndlessPlace | null | undefined>(undefined);
+  // how it compares with every run that has ended (anonymous counts)
+  const [standing, setStanding] = useState<RunStanding | null>(null);
 
   useEffect(() => {
     queueMicrotask(() => setDailyDone(typeof loadSave().days[localDateKey()]?.s === "number"));
+    fetch(`/api/plays?run=${streak}`)
+      .then((r) => (r.ok ? (r.json() as Promise<RunStanding>) : null))
+      .then((s) => setStanding(s && typeof s.runs === "number" && typeof s.below === "number" ? s : null))
+      .catch(() => setStanding(null));
     // counted over the whole board, without the player's own row: this run would replace it (and, signed in, may
     // already be posted)
     if (streak > 0) {
@@ -452,6 +462,12 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
       <p aria-live="polite" className="mt-3 min-h-7 text-center font-display text-lg leading-snug text-ink">
         {goal}
       </p>
+      {/* against everyone else's ended runs (this one was counted at the miss), once there are enough to mean something */}
+      {standing && standing.runs - 1 >= 20 && streak > 0 ? (
+        <p className="mt-1 text-center text-sm font-semibold text-ink-soft">
+          {standing.below >= standing.runs - 1 ? R.beatAll : R.beat(Math.round((100 * standing.below) / (standing.runs - 1)))}
+        </p>
+      ) : null}
 
       {/* straight back in */}
       <div className="mt-3 flex gap-2">

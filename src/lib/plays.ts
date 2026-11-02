@@ -5,6 +5,7 @@
 //
 //   Redis (the leaderboard's Upstash settings)  one hash per day, "pl:day:<date>": n, s0…s5 (score), f0…f30 and fx (days
 //                                                since first play; fx is more than 30)
+//   endless runs                                one hash, "pl:endless": n, r0…r200 and rx (how long each ended run was)
 //   no Redis, local                              data/plays.json
 //   no Redis, on Vercel                          not counted: /tmp is per server and wiped, so the numbers would mislead
 import { promises as fs } from "node:fs";
@@ -71,6 +72,52 @@ export async function recordPlay(date: string, score: number, first: number) {
   });
   queue = run.catch(() => {});
   return run;
+}
+
+/** Endless runs longer than this share one bucket ("rx"). */
+export const RUN_MAX = 200;
+const runField = (n: number) => (n > RUN_MAX ? "rx" : `r${n}`);
+const ENDLESS = "endless";
+
+/** Counts one ended endless run of `streak` right answers. */
+export async function recordRun(streak: number) {
+  if (redisUrl && redisToken) {
+    await redis("multi-exec", [
+      ["HINCRBY", "pl:endless", "n", "1"],
+      ["HINCRBY", "pl:endless", runField(streak), "1"],
+    ]);
+    return;
+  }
+  const run = queue.then(async () => {
+    const data = await readFile();
+    const e = (data[ENDLESS] ??= {});
+    for (const f of ["n", runField(streak)]) e[f] = (e[f] ?? 0) + 1;
+    await fs.mkdir(path.dirname(FILE), { recursive: true });
+    await fs.writeFile(`${FILE}.tmp`, JSON.stringify(data));
+    await fs.rename(`${FILE}.tmp`, FILE);
+  });
+  queue = run.catch(() => {});
+  return run;
+}
+
+/** How a run of `streak` compares with every ended run: the total, and how many were shorter. */
+export function runStandingOf(raw: Record<string, number>, streak: number): RunStanding {
+  let below = 0;
+  for (let i = 0; i < Math.min(streak, RUN_MAX + 1); i++) below += raw[`r${i}`] ?? 0;
+  return { runs: raw.n ?? 0, below };
+}
+
+export type RunStanding = { runs: number; below: number };
+
+export async function runStanding(streak: number): Promise<RunStanding> {
+  let raw: Record<string, number>;
+  if (redisUrl && redisToken) {
+    const [flat] = await redis("pipeline", [["HGETALL", "pl:endless"]]);
+    const a = (flat as string[]) ?? [];
+    raw = {};
+    for (let i = 0; i < a.length; i += 2) raw[a[i]] = Number(a[i + 1]);
+  } else raw = (await readFile())[ENDLESS] ?? {};
+  return runStandingOf(raw, streak);
 }
 
 /** One day's player count and score spread (all zero when nobody has played it). */
