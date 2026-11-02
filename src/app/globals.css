@@ -606,6 +606,21 @@ body:has(#endless-done) .endless-intro {
   white-space: nowrap;
 }
 
+/* phones: once a round or run is under way (first answer given), the banner folds away too, so the pictures sit
+   higher and the question isn't headed twice. Set before paint by the root layout's script on a reload, kept up to
+   date by the game */
+@media (max-width: 639px) {
+  .daily-playing .daily-intro,
+  .endless-playing .endless-intro {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 /* SkyHeader (results cards): deep space behind the globe. Two layers of stars tiled at different sizes, so no grid
    shows; the brighter layer twinkles slowly (not for reduced motion). */
 .space-sky {

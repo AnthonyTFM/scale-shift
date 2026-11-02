@@ -135,6 +135,14 @@ export function DailyChallenge() {
   // a play count that failed to send last time
   useEffect(retryPendingPlay, []);
 
+  // a round under way (answered, not done) folds the banner away on phones (see .daily-playing in globals.css)
+  // (null while loading: the mark set before paint stays, so the banner doesn't flash on a reload mid-round)
+  const playing = game ? game.choices.length > 0 && game.choices.length < game.round.questions.length : null;
+  useEffect(() => {
+    if (playing !== null) document.documentElement.classList.toggle("daily-playing", playing);
+    return () => document.documentElement.classList.remove("daily-playing");
+  }, [playing]);
+
   useEffect(() => {
     const c = readChallenge(location.hash);
     if (c) queueMicrotask(() => setChallenge(c));
