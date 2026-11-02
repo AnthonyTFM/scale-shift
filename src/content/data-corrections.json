@@ -796,7 +796,7 @@
         1715,
         1783
       ],
-      "n": "Papuan peoples",
+      "n": "Papuans",
       "why": "Papua New Guinea became a country in 1975."
     },
     {
@@ -2512,7 +2512,7 @@
       "years": [
         1650
       ],
-      "n": "Maya peoples",
+      "n": "Maya",
       "why": "Belize is a later name; British logwood cutters settled the coast from the mid-17th century."
     },
     {
@@ -2730,7 +2730,305 @@
         1783
       ],
       "s": "Durrani Empire",
-      "why": "Sindh's rulers paid tribute to the Durrani shahs."
+      "why": "Sindh's rulers paid tribute to the Durrani shahs. Spelled Sindh, as on the other maps.",
+      "n": "Sindh"
+    },
+    {
+      "name": "Sind",
+      "years": [
+        1492
+      ],
+      "n": "Sindh",
+      "why": "One spelling for Sindh on every map."
+    },
+    {
+      "name": "Yemen",
+      "years": [
+        1715,
+        1783
+      ],
+      "n": "Imamate of Yemen",
+      "why": "The source's Yemen is the Zaydi imamate (in 1783 less the sultanates of Lahej and Haushabi, drawn from OpenHistoricalMap), which the map also fills from Cliopatria beside it: one name, so they are one state."
+    },
+    {
+      "name": "Segu",
+      "years": [
+        1715,
+        1783
+      ],
+      "n": "Bamana Empire",
+      "why": "The Bamana Empire of Ségou (about 1712–1861), named as on the 1800 and 1815 maps."
+    },
+    {
+      "name": "Sami",
+      "years": [
+        900
+      ],
+      "n": "Sámi",
+      "why": "One spelling for the Sámi on every map."
+    },
+    {
+      "name": "Maori",
+      "years": [
+        1279,
+        1300,
+        1400,
+        1492,
+        1500,
+        1650,
+        1700,
+        1715
+      ],
+      "n": "Māori",
+      "why": "One spelling for the Māori on every map."
+    },
+    {
+      "name": "Maoris",
+      "years": [
+        1530,
+        1600
+      ],
+      "n": "Māori",
+      "why": "One spelling for the Māori on every map."
+    },
+    {
+      "name": "Ainus",
+      "years": [
+        1279,
+        1300,
+        1400,
+        1492,
+        1500
+      ],
+      "n": "Ainu",
+      "why": "One name for the Ainu on every map."
+    },
+    {
+      "name": "Samis",
+      "years": [
+        1000,
+        1300
+      ],
+      "n": "Sámi",
+      "why": "One spelling for the Sámi on every map."
+    },
+    {
+      "name": "Papuan",
+      "years": [
+        -200
+      ],
+      "n": "Papuans",
+      "why": "One name for the Papuans on every map."
+    },
+    {
+      "name": "Malay",
+      "years": [
+        800,
+        900
+      ],
+      "n": "Malays",
+      "why": "One name for the Malays on every map."
+    },
+    {
+      "name": "Mon state",
+      "years": [
+        800
+      ],
+      "n": "Mon States",
+      "why": "One name for the Mon states in 800 and 900."
+    },
+    {
+      "name": "Mayas",
+      "years": [
+        1530,
+        1600
+      ],
+      "n": "Maya",
+      "why": "One name for the Maya on every map."
+    },
+    {
+      "name": "Kwakwaka’wakw",
+      "years": [
+        1492
+      ],
+      "n": "Kwakwaka'wakw",
+      "why": "One spelling for the Kwakwaka'wakw on every map."
+    },
+    {
+      "name": "Tobosos",
+      "years": [
+        1492
+      ],
+      "n": "Toboso",
+      "why": "One name for the Toboso on every map."
+    },
+    {
+      "name": "Apalachees",
+      "years": [
+        1492
+      ],
+      "n": "Apalachee",
+      "why": "One name for the Apalachee on every map."
+    },
+    {
+      "name": "Cahita",
+      "years": [
+        1492
+      ],
+      "n": "Cahitas",
+      "why": "One name for the Cahitas on every map."
+    },
+    {
+      "name": "Chiso",
+      "years": [
+        1492
+      ],
+      "n": "Chisos",
+      "why": "One name for the Chisos on every map."
+    },
+    {
+      "name": "Japan",
+      "years": [
+        1783
+      ],
+      "n": "Tokugawa shogunate",
+      "why": "Japan was under the Tokugawa shogunate from 1603 to 1868: one name for it from 1650 to 1815."
+    },
+    {
+      "name": "Saami",
+      "years": [
+        -1500,
+        -1000,
+        -700,
+        -500,
+        -400,
+        -323,
+        -300,
+        -200,
+        -100,
+        -1,
+        100,
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "n": "Sámi",
+      "why": "One spelling for the Sámi on every map."
+    },
+    {
+      "name": "Darfur",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "n": "Sultanate of Darfur",
+      "why": "The Keira sultanate ruled Darfur from the 17th century: one name with the maps from 1800."
+    },
+    {
+      "name": "Wadai",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "n": "Wadai Empire",
+      "why": "The Wadai sultanate was founded in 1635: one name with the maps from 1800."
+    },
+    {
+      "name": "Funj",
+      "years": [
+        1783
+      ],
+      "n": "Funj Sultanate",
+      "why": "The Funj sultanate of Sennar (1504–1821): one name with the maps before and after."
+    },
+    {
+      "name": "Fivizzano",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "s": "Tuscany",
+      "why": "Fivizzano belonged to Florence from the 15th century, then to the Grand Duchy of Tuscany."
+    },
+    {
+      "name": "Pontremoli",
+      "years": [
+        1650,
+        1700,
+        1715,
+        1783
+      ],
+      "s": "Tuscany",
+      "why": "Spain sold Pontremoli to the Grand Duke of Tuscany in 1650."
+    },
+    {
+      "name": "Montserrat",
+      "years": [
+        1715
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "An English colony from 1632."
+    },
+    {
+      "name": "Anguilla",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "Kingdom of Great Britain",
+      "why": "An English colony from 1650."
+    },
+    {
+      "name": "Saint Martin",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "France",
+      "why": "The source's shape is the island's French part; the Dutch held the south."
+    },
+    {
+      "name": "Saint Barthelemy",
+      "years": [
+        1715,
+        1783
+      ],
+      "s": "France",
+      "why": "French until France sold it to Sweden in 1784."
+    },
+    {
+      "name": "Danish India",
+      "years": [
+        1800
+      ],
+      "s": "Denmark-Norway",
+      "why": "Tranquebar and Serampore were Danish trading posts."
+    },
+    {
+      "name": "Curaçao",
+      "years": [
+        1815
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "note": "Taken from the Dutch by Britain in 1807; handed back to the Netherlands in 1816.",
+      "why": "Britain held Curaçao from 1807 to 1816."
+    },
+    {
+      "name": "Dutch Windward Islands",
+      "years": [
+        1815
+      ],
+      "s": "United Kingdom of Great Britain and Ireland",
+      "note": "Sint Eustatius, Saba and Dutch Sint Maarten: taken by Britain in 1810, handed back to the Netherlands in 1816.",
+      "why": "Britain held the Dutch Windward Islands from 1810 to 1816."
     },
     {
       "name": "Golconda",

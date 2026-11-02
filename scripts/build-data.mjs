@@ -20,6 +20,7 @@ import polygonClipping from "polygon-clipping";
 import { recolorEraFiles, settleEraFiles } from "./lib/colors.mjs";
 import { separateEraFiles } from "./lib/overlaps.mjs";
 import { fillGapEraFiles } from "./lib/gaps.mjs";
+import { foldSpeckEraFiles, keepSmallOutlines } from "./lib/specks.mjs";
 import { histogisStates } from "./lib/histogis.mjs";
 import { ohmRelations } from "./lib/ohm.mjs";
 import { cliopatriaPolities } from "./lib/cliopatria.mjs";
@@ -119,6 +120,7 @@ function groupByName(features) {
 function toTopology(features, minWeight) {
   let topo = server.topology({ p: { type: "FeatureCollection", features } }, QUANTIZE);
   topo = simplifyLib.presimplify(topo);
+  keepSmallOutlines(topo, minWeight); // small territories keep their outline instead of turning into triangles
   topo = simplifyLib.simplify(topo, minWeight);
   // Drop specks smaller than ~40 km², measured on the sphere with d3 (a planar test deletes rings around a pole,
   // e.g. Antarctica). Rings that simplification turned inside-out (area > half the globe) are dropped too.
@@ -304,6 +306,7 @@ const CLIO_PARTS = [
   { from: "British Colonial Empire", box: [149, -12, 154.6, -8], name: "Territory of Papua and New Guinea", s: "Australia", years: [1960] },
   { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Tasmania (UK)", member: "(British Empire)", years: [1900] },
   { from: "British Colonial Empire", box: [143.5, -40.5, 148.6, -39], name: "Australia", s: "", years: [1914, 1920, 1930, 1938, 1945, 1960] },
+  { from: "British Colonial Empire", box: [135.5, -36.5, 138.5, -35], name: "Australia", s: "", years: [1914, 1920, 1930, 1938, 1945, 1960] }, // by Kangaroo Island
   // a strip of the Empty Quarter south of the Trucial coast, which no one held
   { from: "Kingdom of Great Britain", box: [50, 19, 58, 24.4], drop: true, years: [1900, 1914, 1920, 1930, 1938, 1945, 1960] },
   { from: "British Colonial Empire", box: [99.5, 4.5, 101, 6], name: "Prince of Wales Island", years: [1800, 1815] }, // Penang
@@ -377,6 +380,8 @@ const CLIO_PARTS = [
   { from: "Bourbon Kingdom of France", box: [-61.3, 14.3, -60.7, 15], name: "Martinique" },
   { from: "Bourbon Kingdom of France", box: [-63.2, 15.8, -60.9, 18.3], name: "Colony of Guadeloupe" },
   { from: "Bourbon Kingdom of France", box: [-4.5, 4.5, -2.5, 6], drop: true }, // the Ivory Coast, where France had no post until 1843
+  // a 53 km² piece in the Nafud: the Saudi emirate fell to the Rashidis of Jabal Shammar in 1891 and came back only in 1902
+  { from: "Emirate of Nejd", box: [39.5, 28, 41.5, 29.5], drop: true, years: [1900] },
   { from: "French Louisiana", box: [-56.6, 46.7, -56, 47.2], name: "Saint Pierre and Miquelon", member: "(British Empire)" }, // held by Britain 1793-1802
   { from: "French Louisiana", box: [-63.2, 17.8, -62.7, 18.3], name: "Colony of Guadeloupe", member: "(French Consulate)" },
   { from: "New Netherland", box: [-63.5, 17.3, -62.7, 18.3], name: "Dutch Windward Islands", member: "(Batavian Republic)" },
@@ -1269,12 +1274,13 @@ const TRINH_NGUYEN = (year) => [
 ];
 // the island of Sicily, which Cliopatria draws as part of the Crown of Aragon
 const SICILY_ISLAND = { to: "Kingdom of Sicily", clio: ["Crown of Aragon"], pick: [12, 36.4, 15.75, 38.5], from: ["Kingdom of Naples"] };
-// Ezo (Hokkaido) and the southern Kurils, Ainu land: the Matsumae domain held only the southern tip
-const EZO = (from) => ({
+// Ezo (Hokkaido) and the southern Kurils, Ainu land: the Matsumae domain (from 1590; Japanese settlers' forts before)
+// held only the southern tip
+const EZO = (from, w = "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.") => ({
   to: "Ainu",
   poly: [[139.2, 41.9], [139.9, 42.3], [140.95, 41.95], [141.9, 42.2], [143.6, 41.6], [146.8, 43], [151.5, 45.6], [148.5, 46.6], [141.6, 46], [139.2, 43.8], [139.2, 41.9]],
   from: [from],
-  w: "Ainu land. The Matsumae domain held only the southern tip and a few trading posts; Japan took direct control of Ezo (Hokkaido) from 1799.",
+  w,
 });
 // the steppe, Burma, the Niger and the Baltic around 1500 (the 1492 and 1500 maps draw them alike)
 // Manchuria and the Amur east of the Greater Khingan: Jurchen and Tungusic land, which the source draws inside the Mongol
@@ -1335,7 +1341,7 @@ const AROUND_1500 = (year) => [
   ...SPLIT("Mali", [["Songhai", "Songhai Empire"]]),
   ...SPLIT("Teutonic Knights", [["Livonian Confederation", "Livonian Conference"]]),
   ...SPLIT("Sinhalese kingdoms", [["Jaffna Kingdom", "Jaffna kingdom"]]),
-  EZO("Japan"),
+  EZO("Japan", "Ainu land. Japanese settlers held only a few forts on the southern tip; Japan took direct control of Ezo (Hokkaido) from 1799."),
   ...FILL([["Wattasid Sultanate", "Wattasid dynasty"], ["Mali", "Mali Empire"], ["Alwa", "Alodia"], ...(year === 1500 ? [["Korea", "Joseon"]] : [])]),
 ];
 // The source draws the Shang (1500 BCE) and the Zhou (1000 BCE) with one polygon, many times the Shang's land. Each is
@@ -1934,9 +1940,9 @@ const BEFORE_1800 = {
     { to: "Jamaica (Spain)", ne0: ["Jamaica"], from: ["Cuba (Spain)"], s: "Spanish Habsburg" },
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
-      ["Zaydi Imamate", "Qasimids"],
+      ["Imamate of Yemen", "Qasimids"],
       ["Sultanate of Darfur", "Sultanate of Darfur"],
-      ["Wadai Sultanate", "Wadai Empire"],
+      ["Wadai Empire", "Wadai Empire"],
       ["Kingdom of Kongo", "Kingdom of Kongo"],
       ["Oman", "Yarubid dynasty"],
       ["Principality of Mingrelia", "Principality of Mingrelia"],
@@ -1970,9 +1976,9 @@ const BEFORE_1800 = {
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
       ["Haudenosaunee Confederacy", "Haudenosaunee"],
-      ["Wadai Sultanate", "Wadai Empire"],
+      ["Wadai Empire", "Wadai Empire"],
       ["Sultanate of Darfur", "Sultanate of Darfur"],
-      ["Zaydi Imamate", "Qasimids"],
+      ["Imamate of Yemen", "Qasimids"],
       ["Oman", "Yarubid dynasty"],
       ["Dutch Cape Colony", "Dutch Cape Colony", { s: "Netherlands" }],
       ["Kingdom of Imereti", "Kingdom of Imereti"],
@@ -1998,9 +2004,9 @@ const BEFORE_1800 = {
     ...KHIVA,
     ...FILL([
       ["Funj Sultanate", "Funj Sultanate"],
-      ["Wadai Sultanate", "Wadai Empire"],
+      ["Wadai Empire", "Wadai Empire"],
       ["Sultanate of Darfur", "Sultanate of Darfur"],
-      ["Zaydi Imamate", "Qasimids"],
+      ["Imamate of Yemen", "Qasimids"],
       ["Korea", "Joseon"],
       ["Oman", "Yarubid dynasty"],
       ["Asante", "Ashanti Empire"],
@@ -2028,7 +2034,7 @@ const BEFORE_1800 = {
     { to: "Tây Sơn dynasty", poly: [[102, 8], [110, 8], [110, 15.5], [102, 15.5], [102, 8]], from: ["Đại Việt (Trịnh lords)"] },
     // Tibet, a Qing protectorate from 1720 with its own government
     ...SPLIT("Qing Empire", [["Tibet", "Tibet", { s: "Qing Empire" }]]),
-    EZO("Japan"),
+    EZO("Tokugawa shogunate"),
     // the source draws Assam inside Burma, which only invaded it in 1817
     { ...AHOM, blank: undefined, from: ["Burma"] },
     // Rupert's Land, the Hudson's Bay Company's charter lands (the Hudson Bay basin), from OpenHistoricalMap. The source
@@ -2062,13 +2068,17 @@ const BEFORE_1800 = {
     { to: "Viceroyalty of the Río de la Plata", ohm: 2860720, from: ["Viceroyalty of Peru", "Paraguay", "Viceroyalty of Brazil"] },
     { to: "Viceroyalty of Peru", ohm: 2850566, from: ["Viceroyalty of New Granada", "Viceroyalty of the Río de la Plata"] },
     { to: "Viceroyalty of New Granada", ohm: 2964943, exact: true, from: ["Viceroyalty of New Granada"] },
+    // the sultanates of Lahej (with Aden) and Haushabi, independent of the Zaydi imams since the early 18th century, which
+    // the source draws inside Yemen: OpenHistoricalMap's outlines, as on the 1800 map
+    { to: "Sultanate of Lahej", ohm: 2921516, from: ["Imamate of Yemen"] },
+    { to: "Haushabi Sultanate", ohm: 2921509, from: ["Imamate of Yemen"] },
     // Saint-Domingue, France's richest colony, which the source leaves unnamed
     { to: "Saint-Domingue", ne0: ["Haiti"], fill: true, s: "France" },
     ...FILL([
-      ["Funj", "Funj Sultanate"],
-      ["Wadai Sultanate", "Wadai Empire"],
+      ["Funj Sultanate", "Funj Sultanate"],
+      ["Wadai Empire", "Wadai Empire"],
       ["Sultanate of Darfur", "Sultanate of Darfur"],
-      ["Zaydi Imamate", "Qasimids"],
+      ["Imamate of Yemen", "Qasimids"],
     ]),
   ],
 };
@@ -2132,7 +2142,7 @@ const TERRITORY = {
     { to: "Lado Enclave", ohm: 2961764, s: "Congo Free State", w: "Leased to King Leopold II for the Congo Free State in 1894; it went back to the Anglo-Egyptian Sudan in 1910, after his death." },
     // OpenHistoricalMap's Khiva leaves out the oasis of Khiva and Urgench itself, today's Khorezm province
     { to: "Khanate of Khiva", ne1: ["Uzbekistan/Khorezm"], s: "Russian Empire" },
-    { to: "Darfur", ne1: ["Central Darfur", "Southern Darfur", "North Darfur", "Western Darfur", "Eastern Darfur"].map((p) => `Sudan/${p}`), w: "A sultanate restored in 1898. Counted as part of Anglo-Egyptian Sudan, it ran its own affairs until Britain conquered it in 1916." },
+    { to: "Sultanate of Darfur", ne1: ["Central Darfur", "Southern Darfur", "North Darfur", "Western Darfur", "Eastern Darfur"].map((p) => `Sudan/${p}`), w: "A sultanate restored in 1898. Counted as part of Anglo-Egyptian Sudan, it ran its own affairs until Britain conquered it in 1916." },
     { to: "Ethiopia", ne0: ["Ethiopia"] },
     { to: "Eritrea", ne0: ["Eritrea"], s: "Italy" },
     { to: "French Somaliland", ne0: ["Djibouti"], s: "France" },
@@ -2148,7 +2158,7 @@ const TERRITORY = {
     { to: "Burundi", ne0: ["Burundi"], s: "Germany", w: "A kingdom under German protection, counted as part of German East Africa." },
     { to: "Congo Free State", ne0: ["Dem. Rep. Congo"], w: "The personal possession of King Leopold II of Belgium, 1885–1908." },
     { to: "French Congo", ne0: ["Gabon", "Congo", "Central African Rep.", "Chad"], s: "France" },
-    { to: "Wadai", ne1: ["Chad/Ouaddaï", "Chad/Wadi Fira"], w: "An independent sultanate until France conquered it in 1909 (shown approximately)." },
+    { to: "Wadai Empire", ne1: ["Chad/Ouaddaï", "Chad/Wadi Fira"], w: "An independent sultanate until France conquered it in 1909 (shown approximately)." },
     { to: "Kamerun", ne0: ["Cameroon"], s: "Germany" },
     { to: "Spanish Guinea", ne0: ["Eq. Guinea"], s: "Spain" },
     { to: "São Tomé and Príncipe", ne0: ["São Tomé and Principe"], s: "Portugal" },
@@ -3029,9 +3039,14 @@ async function main() {
   const leftover = (year, props) => props.n === "Australian aboriginal hunter-gatherers" && year >= 1600 && year <= 1815;
   const gaps = fillGapEraFiles(ROOT, inAustralia, leftover);
   const unfilled = gaps.filter((r) => r.inverted).map((r) => r.era);
+  // specks and hairline strips the steps above leave (no source draws them) go whole to the neighbour beside them, and
+  // small shapes drawn on a grid lose their stair-steps
+  const tidied = foldSpeckEraFiles(ROOT);
+  const specks = tidied.reduce((n, r) => n + r.folded, 0);
+  const stairs = tidied.reduce((n, r) => n + r.rounded, 0);
   const recoloured = settleEraFiles(ROOT, () => true);
   console.log(
-    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
+    `  coastal gaps: ${gaps.reduce((n, r) => n + r.filled, 0)} blank strips given to the shapes beside them, ${specks} specks folded into their neighbours, ${stairs} stair-stepped shapes rounded, ${recoloured} recoloured${unfilled.length ? ` (kept blank in ${unfilled.join(", ")})` : ""}`,
   );
   // read from the finished era files, so the era pages' figures match what the map draws (see lib/era-stats.mjs)
   console.log("6/6 Era statistics");
