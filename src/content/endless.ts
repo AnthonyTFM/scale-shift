@@ -40,6 +40,9 @@ export const endlessCopy = {
       more <= 5 ? `${more} more to reach #${place} of all time` : `Reach ${target} in a row for #${place} of all time`,
     goalNext: (n: number) => `Next goal: ${n} in a row`,
     goalTop: "That's #1 of all time!",
+    // against every run that has ended (anonymous counts), once there are enough to mean something
+    beat: (pct: number) => `Longer than ${pct}% of all runs`,
+    beatAll: "Longer than every run so far!",
     playAgain: "Play again",
     // under Play again on computers
     enterHint: "or press Enter",
