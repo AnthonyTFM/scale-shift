@@ -19,6 +19,13 @@ export const home = {
     teachers: "Everything for the classroom",
   },
 
+  // a first visit's proof under the headline: Greenland and India (src/components/home/HeroProof.tsx)
+  proof: {
+    loading: "Loading the proof",
+    // "Greenland looks 9.4× bigger than India on a normal map."
+    mapNote: (big: string, times: string, small: string) => `${big} looks ${times}× bigger than ${small} on a normal map.`,
+  },
+
   // the hero's picture: the trickiest pair from yesterday's game (src/components/home/YesterdayMatchup.tsx)
   yesterday: {
     eyebrow: "Yesterday's matchup",
