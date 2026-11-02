@@ -48,7 +48,7 @@ export function Proof({ shapes, label, mapLabel, realLabel, replay }: { shapes?:
         if (!e.isIntersecting) return;
         seen.disconnect();
         // a moment at map size first, so the eye takes in the "before"
-        timer = window.setTimeout(() => setReal(true), 700);
+        timer = window.setTimeout(() => setReal(true), 1000);
       },
       { threshold: 0.6 },
     );
@@ -84,11 +84,11 @@ export function Proof({ shapes, label, mapLabel, realLabel, replay }: { shapes?:
       )
     : 1;
   const shown = real && !rewind;
-  // the label turns to "Real size" as the shapes land (the shrink takes about a second), not when it starts
+  // the label turns to "Real size" as the shapes land (the shrink takes about 3 seconds), not when it starts
   const [landed, setLanded] = useState(false);
   useEffect(() => {
     if (!shown) return queueMicrotask(() => setLanded(false));
-    const id = window.setTimeout(() => setLanded(true), matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 1000);
+    const id = window.setTimeout(() => setLanded(true), matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 3200);
     return () => clearTimeout(id);
   }, [shown]);
   return (
@@ -105,7 +105,7 @@ export function Proof({ shapes, label, mapLabel, realLabel, replay }: { shapes?:
           <span className={landed ? "text-ink" : undefined}>{landed ? realLabel : mapLabel}</span>
           {shapes ? <span className="font-bold normal-case tracking-normal text-link">{replay}</span> : null}
         </span>
-        <svg viewBox={`0 0 ${W} ${H}`} className={`mt-1 block w-full ${rewind ? "[&_*]:!transition-none" : ""}`} aria-hidden="true">
+        <svg viewBox={`0 0 ${W} ${H}`} className={`proof-slow mt-1 block w-full ${rewind ? "[&_*]:!transition-none" : ""}`} aria-hidden="true">
           <line x1="4" x2={W - 4} y1={H - 1} y2={H - 1} className="stroke-line" />
           {parts?.map((p, i) => {
             const cx = (W / 2) * i + W / 4;
