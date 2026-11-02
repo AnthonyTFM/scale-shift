@@ -133,7 +133,13 @@ export const dailyCopy = {
         365: "365 days in a row: a full year!",
       })[n] ?? `${n} days in a row!`,
     played: "Played",
-    playedSub: (n: number) => (n === 1 ? "day" : "days"),
+    playedSub: (n: number, perfect: number) => (perfect ? `${perfect} perfect` : n === 1 ? "day" : "days"),
+    // streak shields (MAX_SHIELDS in src/lib/daily.ts): the tile, and the line when one has covered a missed day
+    shields: "Shields",
+    shieldsSub: (n: number, max: number) => (n >= max ? "full" : "cover a miss"),
+    shieldsSr: (n: number, max: number) => `${n} of ${max} streak shields`,
+    shieldSaved: (day: string) => `A shield covered ${day}, so your streak carried on.`,
+    shieldHow: "Finish two days in a row to start earning shields, one a day, up to two. A shield covers a day you miss.",
     // the one chart under the stats: everyone's scores today (anonymous counts) or your own days, with a toggle
     chartToggle: "Whose scores",
     chartEveryone: "Everyone today",
@@ -152,9 +158,9 @@ export const dailyCopy = {
     allTime: "All-time",
     allTimeSub: "correct",
     share: "Share my score",
-    // the shared text: "Border Drift Daily #6 · 4/5 🔥3", the grid, then a dare for whoever sees it
+    // the shared text: "#BorderDrift Daily #6 · 4/5 🔥3" (the hashtag makes posts findable), the grid, then a dare
     shareHead: (site: string, day: number, score: number, total: number, streak: number) =>
-      `${site} Daily #${day} · ${score}/${total}${streak >= 2 ? ` 🔥${streak}` : ""}`,
+      `#${site.replace(/\s+/g, "")} Daily #${day} · ${score}/${total}${streak >= 2 ? ` 🔥${streak}` : ""}`,
     shareDare: (misses: number) =>
       misses === 0
         ? "Perfect round. Bet the map fools you at least once."

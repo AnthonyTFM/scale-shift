@@ -51,8 +51,8 @@ export const endlessCopy = {
     // the daily challenge, before and after today's is played
     dailyPlay: "Play today's five",
     dailyDone: "See today's results",
-    // the shared text: "Border Drift Endless · 14 in a row", the grid, then a dare for whoever sees it
-    shareHead: (site: string, n: number) => `${site} Endless · ${n} in a row`,
+    // the shared text: "#BorderDrift Endless · 14 in a row", the grid, then a dare for whoever sees it
+    shareHead: (site: string, n: number) => `#${site.replace(/\s+/g, "")} Endless · ${n} in a row`,
     shareMore: (n: number) => `+${n} more`,
     shareDare: (round: number) => `The map fooled me on round ${round}. How far can you go?`,
     missTitle: "The one that got you",

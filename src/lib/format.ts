@@ -30,3 +30,13 @@ export function ratioText(a: number, b: number) {
   if (r >= 0.95 && r <= 1.05) return "about the same size as";
   return r > 1 ? `${r.toFixed(r >= 10 ? 0 : 1)}× the size of` : `${(1 / r).toFixed(1 / r >= 10 ? 0 : 1)}× smaller than`;
 }
+
+/** A finished day in words: "yesterday", or "Nov 3". For the results screen, so it never runs on the server. */
+export function dayName(key: string, today: string) {
+  const utc = (k: string) => {
+    const [y, m, d] = k.split("-").map(Number);
+    return Date.UTC(y, m - 1, d);
+  };
+  if (utc(today) - utc(key) === 86_400_000) return "yesterday";
+  return new Date(utc(key)).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
+}

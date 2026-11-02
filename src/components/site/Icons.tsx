@@ -13,6 +13,16 @@ export function TrophyIcon({ className = "size-6" }: IconProps) {
   );
 }
 
+/** Blue shield with a tick: streak shields on the daily results. */
+export function ShieldIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`shrink-0 ${className}`}>
+      <path d="M12 2.5 4.5 5.5v6c0 4.6 3.2 8.2 7.5 9.5 4.3-1.3 7.5-4.9 7.5-9.5v-6L12 2.5Z" fill="#2563EB" stroke="#1A47B0" strokeWidth="1.5" strokeLinejoin="round" />
+      <path d="m8.5 12 2.4 2.4L15.5 9.6" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /** Flame colours, hotter as an endless run goes on (see flameTier): orange, then white-gold, then blue. */
 const FLAMES = [
   { body: "#FF8A3D", edge: "#D93A2B", core: "#FFC233" },
