@@ -14,6 +14,8 @@ import {
   loadSave,
   localDateKey,
   stats,
+  daysBetween,
+  MAX_SHIELDS,
   STREAK_MILESTONES,
   writeSave,
   type DailySave,
@@ -32,7 +34,8 @@ import { resultImage } from "@/lib/result-image";
 import { challengeUrl } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { dailyCopy } from "@/content/daily";
-import { ClockIcon, FlameIcon, MapIcon, MarkIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
+import { ClockIcon, FlameIcon, MapIcon, MarkIcon, ShieldIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
+import { dayName } from "@/lib/format";
 import { SkyHeader } from "@/components/site/SkyHeader";
 import { PlayingMark } from "@/components/site/UpdateCheck";
 import { useAccount } from "./SignInProvider";
@@ -557,10 +560,19 @@ function Results({
       <SaveStreak date={round.date} choices={choices} />
 
       {/* your numbers in one strip */}
-      <dl className="mt-5 grid grid-cols-3 gap-2 text-center">
+      <dl className="mt-5 grid grid-cols-2 gap-2 text-center sm:grid-cols-4">
         {[
           [R.streak, <span key="v" className="inline-flex items-center gap-1">{s.streak}<FlameIcon className="size-5" /></span>, R.best(s.best)],
-          [R.played, String(s.played), R.playedSub(s.played)],
+          [
+            R.shields,
+            <span key="v" className="inline-flex items-center gap-1">
+              <span aria-hidden="true">{s.shields}/{MAX_SHIELDS}</span>
+              <span className="sr-only">{R.shieldsSr(s.shields, MAX_SHIELDS)}</span>
+              <ShieldIcon className="size-5" />
+            </span>,
+            R.shieldsSub(s.shields, MAX_SHIELDS),
+          ],
+          [R.played, String(s.played), R.playedSub(s.played, s.perfect)],
           [R.allTime, `${Math.round((s.average / total) * 100)}%`, R.allTimeSub],
         ].map(([k, v, sub]) => (
           <div key={String(k)} className="flex flex-col rounded-2xl bg-paper px-2 py-2 ring-1 ring-line">
@@ -570,6 +582,10 @@ function Results({
           </div>
         ))}
       </dl>
+      {/* a shield at work this week, or how to earn one */}
+      <p className="mt-2 text-center text-xs text-muted">
+        {s.saved && s.streak > 0 && daysBetween(s.saved, today) <= 7 ? R.shieldSaved(dayName(s.saved, today)) : R.shieldHow}
+      </p>
 
       {/* one chart: everyone today, or your own days; a toggle when both are there */}
       {shown ? (

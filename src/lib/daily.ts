@@ -230,27 +230,48 @@ export function mergeDays(days: Record<string, DayRecord>) {
   return merged;
 }
 
-/** `perfect`: days with every answer right. */
-export type Stats = { played: number; average: number; streak: number; best: number; perfect: number };
+/**
+ * `perfect`: days with every answer right. `shields`: streak shields in hand (see MAX_SHIELDS). `saved`: the latest
+ * missed day a shield covered inside the current streak, or null.
+ */
+export type Stats = { played: number; average: number; streak: number; best: number; perfect: number; shields: number; saved: string | null };
+
+/**
+ * Streak shields: every finished day that extends a streak (the second day in a row onwards) earns one, up to this
+ * many; a missed day spends one and the streak carries on. Worked out from the finished days alone, so every device
+ * agrees and nothing extra is stored.
+ */
+export const MAX_SHIELDS = 2;
 
 export function stats(save: DailySave, today: string): Stats {
   const finished = Object.keys(save.days)
     .filter((d) => typeof save.days[d].s === "number")
     .sort();
   const set = new Set(finished);
-  let streak = 0;
-  for (let d = set.has(today) ? today : shiftDate(today, -1); set.has(d); d = shiftDate(d, -1)) streak++;
-  let best = 0,
-    run = 0,
-    prev = "";
-  for (const d of finished) {
-    run = prev && shiftDate(prev, 1) === d ? run + 1 : 1;
-    best = Math.max(best, run);
-    prev = d;
+  // walk every day from the first finished one to the last that counts: today once finished, else yesterday
+  const last = set.has(today) ? today : shiftDate(today, -1);
+  let streak = 0,
+    best = 0,
+    shields = 0,
+    saved: string | null = null;
+  if (finished.length && finished[0] <= last) {
+    for (let d = finished[0]; d <= last; d = shiftDate(d, 1)) {
+      if (set.has(d)) {
+        if (streak > 0 && shields < MAX_SHIELDS) shields++;
+        streak++;
+      } else if (shields > 0) {
+        shields--;
+        saved = d;
+      } else {
+        streak = 0;
+        saved = null;
+      }
+      best = Math.max(best, streak);
+    }
   }
   const total = finished.reduce((sum, d) => sum + (save.days[d].s ?? 0), 0);
   const perfect = finished.filter((d) => save.days[d].s === QUESTIONS_PER_DAY).length;
-  return { played: finished.length, average: finished.length ? total / finished.length : 0, streak, best, perfect };
+  return { played: finished.length, average: finished.length ? total / finished.length : 0, streak, best, perfect, shields, saved };
 }
 
 /** Streak lengths that earn a moment on the results screen (and confetti the day they're reached). */
