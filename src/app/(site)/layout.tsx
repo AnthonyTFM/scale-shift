@@ -1,5 +1,5 @@
 import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter, StickyMapCta } from "@/components/site/SiteFooter";
+import { SiteFooter } from "@/components/site/SiteFooter";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,7 +10,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       <SiteHeader />
       <main id="main">{children}</main>
       <SiteFooter />
-      <StickyMapCta />
     </>
   );
 }

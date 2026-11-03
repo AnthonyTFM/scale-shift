@@ -3,6 +3,7 @@
 export const site = {
   name: "Border Drift",
   tagline: "See the real size of every country and empire, across 4,000 years of borders.",
+  mapDescription: "Drag any country or empire anywhere on the map and watch it take its real size. 49 snapshots of borders from 2000 BCE to today, with Antarctica's claims and today's disputes.",
   description:
     "An interactive map of 4,000 years of borders. Drag countries and empires anywhere on Earth to see their real size, step through history from 2000 BCE to today and find out who ruled any spot on the planet.",
   // Used for canonical URLs and social previews. Set NEXT_PUBLIC_SITE_URL in production.

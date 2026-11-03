@@ -11,7 +11,6 @@ import {
   capitalize,
   dayNumber,
   LAUNCH,
-  loadSave,
   localDateKey,
   nameInSentence,
   shiftDate,
@@ -47,7 +46,6 @@ const times = (r: number) => (r >= 10 ? r.toFixed(0) : r.toFixed(1));
  */
 export function YesterdayMatchup() {
   const [pick, setPick] = useState<Pick | null | undefined>(undefined);
-  const [playedToday, setPlayedToday] = useState(false);
   const t = home.yesterday;
 
   useEffect(() => {
@@ -55,7 +53,6 @@ export function YesterdayMatchup() {
     let stale = false;
     const load = () => {
       const today = localDateKey();
-      setPlayedToday(typeof loadSave().days[today]?.s === "number");
       // a tab left open past midnight: yesterday has moved on
       if (today === loadedFor) return;
       loadedFor = today;
@@ -131,8 +128,8 @@ export function YesterdayMatchup() {
             {mapNote ? `${mapNote} ` : null}
             <span className="font-semibold">{realNote}</span>
           </p>
-          <Link href="/daily" transitionTypes={["to-daily"]} className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-link hover:underline">
-            {playedToday ? t.played : t.play} <span aria-hidden="true">→</span>
+          <Link href={pick ? `/daily/archive?day=${pick.day}` : "/daily"} className="inline-flex min-h-11 items-center gap-1 text-sm font-bold text-link hover:underline">
+            {t.play} <span aria-hidden="true">→</span>
           </Link>
         </div>
       </div>

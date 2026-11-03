@@ -23,12 +23,7 @@ export default function DailyPage() {
           game
           eyebrow={t.eyebrow}
           title={t.title}
-          lead={
-            <p>
-              <span className="sm:hidden">{t.leadShort}</span>
-              <span className="hidden sm:inline">{t.lead}</span>
-            </p>
-          }
+          lead={<p>{t.leadShort}</p>}
         />
       </div>
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-3 sm:pt-6 md:pb-10">
