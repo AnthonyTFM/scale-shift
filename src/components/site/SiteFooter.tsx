@@ -48,6 +48,3 @@ export function SiteFooter() {
     </footer>
   );
 }
-
-/** Mobile-only sticky bar that keeps the main action one tap away. */
-
