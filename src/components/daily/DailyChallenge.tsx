@@ -30,7 +30,6 @@ import { PlayedElsewhere } from "./PlayedElsewhere";
 import { play } from "@/lib/sound";
 import { buzz, confetti } from "@/lib/celebrate";
 import type { ShapeFile } from "@/lib/outline";
-import { resultImage } from "@/lib/result-image";
 import { challengeUrl } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
 import { useShareName } from "./ShareNamePrompt";
@@ -461,6 +460,8 @@ function Results({
 
   const shareImage = async () => {
     track("daily_share_image", { score });
+    // the picture's drawing code loads on the first tap, not with the game
+    const { resultImage } = await import("@/lib/result-image");
     const blob = await resultImage({ day: dayNumber(round.date), score, marks, title: R.title(score, total), verdict, streak: s.streak });
     if (!blob) return setCopied(R.pictureFailed);
     const file = new File([blob], `border-drift-daily-${dayNumber(round.date)}.png`, { type: "image/png" });

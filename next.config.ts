@@ -59,7 +59,7 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Link",
-            value: `</globe-still.svg>; rel=preload; as=image; fetchpriority=high, </data/globe.json>; rel=preload; as=fetch; crossorigin=anonymous, </data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous`,
+            value: `</globe-still.svg>; rel=preload; as=image; fetchpriority=high, </data/globe.json>; rel=preload; as=fetch; crossorigin=anonymous; fetchpriority=low, </data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous`,
           },
         ],
       },

@@ -1,4 +1,6 @@
 import Link from "next/link";
+// footer links are not prefetched: on a short page (a game loading) the whole footer is in view, and prefetching every
+// section (the map alone is 50 KB of script) cost more than the odd tap saves
 import { footerNav, nav, site } from "@/content/site";
 import { Wordmark } from "./Wordmark";
 
@@ -17,7 +19,7 @@ export function SiteFooter() {
           <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm md:grid-cols-1">
             {nav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
+                <Link href={item.href} prefetch={false} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
                   {item.label}
                 </Link>
               </li>
@@ -29,7 +31,7 @@ export function SiteFooter() {
           <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm md:grid-cols-1">
             {footerNav.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
+                <Link href={item.href} prefetch={false} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
                   {item.label}
                 </Link>
               </li>

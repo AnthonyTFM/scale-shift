@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 
 // The globe's drawing code loads after the page is on screen. Until it has drawn, a still picture of its first frame
@@ -12,9 +12,21 @@ const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
 
 export function GlobeLazy({ label }: { label: string }) {
   const [ready, setReady] = useState(false);
+  // the globe's code and data wait for a quiet moment after the page is up (or a second and a half), so the first
+  // paint and the game links come first on slow phones; the still stands in meanwhile
+  const [wanted, setWanted] = useState(false);
+  useEffect(() => {
+    const go = () => setWanted(true);
+    if ("requestIdleCallback" in window) {
+      const id = requestIdleCallback(go, { timeout: 1500 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(go, 800);
+    return () => clearTimeout(id);
+  }, []);
   return (
     <div className="relative">
-      <Globe label={label} onReady={() => setReady(true)} onGone={() => setReady(false)} />
+      {wanted ? <Globe label={label} onReady={() => setReady(true)} onGone={() => setReady(false)} /> : <div aria-hidden="true" className="aspect-square w-full" />}
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${ready ? "opacity-0" : "opacity-100"}`}
