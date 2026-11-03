@@ -276,7 +276,7 @@ export function EndlessGame() {
       {/* a run under way, or its results (a reload there would replay the celebration or start a new run): no update
           reload; the new version arrives with the next page */}
       <PlayingMark on={run.choices.length > 0} />
-      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} flare={flare} />}
+      {run.done ? null : <ScoreBar ref={hud} streak={streak} best={best} level={level} newBest={run.bestBefore > 0 && streak > run.bestBefore} flare={flare} first={run.step === 0} />}
       {run.done ? (
         <Results
           run={run}
@@ -308,47 +308,67 @@ export function EndlessGame() {
 
 /**
  * The run at a glance, pinned under the site header while playing, so anyone who looks (or tunes in to a stream) sees
- * the streak, the best and the level straight away: a big streak, the best, five level bars and the rules in one line.
+ * the streak, the best and the level straight away. One short row, so the game underneath keeps the screen: the
+ * streak, the five level bars with the level's name, and the best. The rules show on the first round only.
  */
-function ScoreBar({ ref, streak, best, level, newBest, flare }: { ref: React.Ref<HTMLDivElement>; streak: number; best: number; level: number; newBest: boolean; flare: number }) {
+function ScoreBar({
+  ref,
+  streak,
+  best,
+  level,
+  newBest,
+  flare,
+  first,
+}: {
+  ref: React.Ref<HTMLDivElement>;
+  streak: number;
+  best: number;
+  level: number;
+  newBest: boolean;
+  flare: number;
+  first: boolean;
+}) {
   const tier = flameTier(streak);
   return (
     <div
       ref={ref}
       data-score-bar
-      className="sticky top-16 z-20 -mx-4 mb-3 border-b border-line bg-paper/95 px-4 pb-2.5 pt-2 backdrop-blur [@media(max-height:500px)]:top-0 sm:mx-0 sm:mb-4 sm:rounded-[22px] sm:border-2 sm:px-4"
+      className="sticky top-16 z-20 -mx-4 mb-3 border-b border-line bg-paper/95 px-4 py-2 backdrop-blur [@media(max-height:500px)]:top-0 sm:mx-0 sm:mb-4 sm:rounded-[22px] sm:border-2"
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1.5 sm:flex-nowrap">
         <p className="flex items-center gap-1.5 text-ink">
           {/* a milestone makes the flame flare; a hotter flame reached without one (a run resumed at 10+) pops in */}
           <span key={`${tier}:${flare}`} className={flare === streak && streak > 0 ? "flare" : tier && !flare ? "pop-in" : undefined}>
-            <FlameIcon className="size-7" tier={tier} />
+            <FlameIcon className="size-6" tier={tier} />
           </span>
-          <span className="font-display text-4xl leading-none tabular-nums">{streak}</span>
-          <span className="text-sm font-bold text-muted">{t.hudStreak}</span>
-          {newBest ? <span className="pop-in ml-1 rounded-full bg-gold px-2 py-0.5 text-xs font-extrabold uppercase tracking-wide text-ink">{t.hudNewBest}</span> : null}
+          <span className="font-display text-3xl leading-none tabular-nums">{streak}</span>
+          <span className="text-xs font-bold text-muted">{t.hudStreak}</span>
+          {newBest ? <span className="pop-in ml-1 rounded-full bg-gold px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-ink">{t.hudNewBest}</span> : null}
         </p>
+        {/* phones: the bars take their own row under the numbers; wider screens: between them */}
+        <div className="order-last min-w-0 basis-full sm:order-none sm:basis-auto sm:flex-1 sm:px-2">
+          <ol className="grid grid-cols-5 gap-1.5" aria-hidden="true">
+            {LEVELS.map((_, i) => (
+              <li key={i} className={`block h-2 rounded-full ${i < level ? "bg-green" : i === level ? "pop-in bg-primary" : "bg-beige"}`} />
+            ))}
+          </ol>
+          {/* the five bars in words, so a new player knows what they measure */}
+          <p key={level} className="pop-in mt-1 text-center text-[11px] font-bold leading-tight text-ink">
+            {t.level(level + 1, LEVELS.length, t.levels[level])}
+          </p>
+        </div>
         <p className="flex items-center gap-1.5 text-ink">
-          <TrophyIcon className="size-6" />
-          <span className="text-sm font-bold text-muted">{t.hudBest}</span>
-          <span className="font-display text-2xl leading-none tabular-nums">{best}</span>
+          <TrophyIcon className="size-5" />
+          <span className="text-xs font-bold text-muted">{t.hudBest}</span>
+          <span className="font-display text-xl leading-none tabular-nums">{best}</span>
         </p>
       </div>
-      <ol className="mt-2 grid grid-cols-5 gap-1.5 sm:gap-2" aria-hidden="true">
-        {LEVELS.map((_, i) => (
-          <li key={i} className={`block h-2.5 rounded-full ${i < level ? "bg-green" : i === level ? "pop-in bg-primary" : "bg-beige"}`} />
-        ))}
-      </ol>
-      {/* the five bars in words, so a new player knows what they measure */}
-      <p key={level} className="pop-in mt-1 text-center text-xs font-bold text-ink [@media(max-height:500px)]:sr-only">
-        {t.level(level + 1, LEVELS.length, t.levels[level])}
-      </p>
       {/* said once, the moment the run passes the old best */}
       <p className="sr-only" aria-live="polite">
         {newBest ? t.hudNewBestSr : ""}
       </p>
-      {/* on phones held sideways the bar keeps to one row of numbers and the level bars, so the game fits */}
-      <p className="mt-1.5 text-center text-xs font-semibold text-ink-soft [@media(max-height:500px)]:hidden">{t.rules}</p>
+      {/* the rules, on the first round only: after that the bar stays short and the game keeps the screen */}
+      {first ? <p className="mt-1.5 text-center text-xs font-semibold text-ink-soft [@media(max-height:500px)]:hidden">{t.rules}</p> : null}
     </div>
   );
 }

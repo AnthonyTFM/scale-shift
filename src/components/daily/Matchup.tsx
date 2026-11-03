@@ -19,11 +19,10 @@ const reveal = dailyCopy.reveal;
 export const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 // where a new round lines up: just under the sticky site header
 export const ROUND_TOP = 88;
-// square tiles, a little flatter on short laptop screens so both shapes fit on the first screen (the drawing stays centred
-// at its own proportions)
-// square; wider on short laptop screens; wide and short on phones held sideways, so the reveal fits the screen
+// square tiles; a little flatter on short laptop screens (a half-screen window included) so both shapes fit on the first
+// screen (the drawing stays centred at its own proportions); wide and short on phones held sideways, so the reveal fits
 const TILE =
-  "aspect-square [@media(min-width:768px)_and_(min-height:501px)_and_(max-height:820px)]:aspect-[5/4] [@media(max-height:500px)]:aspect-[2/1]";
+  "aspect-square [@media(min-width:640px)_and_(min-height:501px)_and_(max-height:820px)]:aspect-[5/4] [@media(max-height:500px)]:aspect-[2/1]";
 
 // the two shapes on the game tiles: bright fills (they are drawings, not text); a pale tint of the same colour for how a
 // web map draws them, so the two read as before and after of one shape
@@ -299,7 +298,8 @@ export function QuestionCard({
         </span>
       </div>
 
-      <WhoIsWho options={q.options} />
+      {/* who's who: under the drawings while deciding; after the answer the verdict comes first, the notes after it */}
+      {answered ? null : <WhoIsWho options={q.options} />}
 
       {/* screen readers: the verdict in short, announced as it appears (and again as the description of "Next", for
           readers that drop an announcement while focus moves) */}
@@ -329,6 +329,7 @@ export function QuestionCard({
             <StretchStrip options={q.options} title={stripTitle} />
           </div>
         ) : null}
+        {answered ? <WhoIsWho options={q.options} /> : null}
       </div>
       {answered ? (
         // a bar pinned to the bottom of the screen while the reveal is longer than the screen, so moving on is always one
