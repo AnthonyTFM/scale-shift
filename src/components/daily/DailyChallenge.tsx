@@ -446,7 +446,10 @@ function Results({
   // one Share for both: the link carries your score, so a friend who opens it sees the score to beat
   const share = () => {
     const url = challengeUrl(score, round.date);
-    const text = `${R.shareHead(site.name, dayNumber(today), score, total, s.streak)}\n${grid}\n${R.shareDare(total - score)}\n${url}`;
+    // the pair a normal map lies about most: the small one drawn biggest
+    const trickiest = [...round.questions].sort((x, y) => y.options[1 - y.answer].m / y.options[y.answer].m - x.options[1 - x.answer].m / x.options[x.answer].m)[0];
+    const hook = trickiest ? `${R.shareHook(trickiest.options[0].n, trickiest.options[1].n)}\n` : "";
+    const text = `${R.shareHead(site.name, dayNumber(today), score, total, s.streak)}\n${grid}\n${hook}${R.shareDare(total - score)}\n${url}`;
     shareBox.share({ kind: "score", url, text }, "results");
   };
 

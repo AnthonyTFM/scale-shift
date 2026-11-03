@@ -3,6 +3,8 @@
 export const endlessCopy = {
   eyebrow: "Endless mode",
   title: "How far can you go?",
+  // the social preview card: under the title, beside the two shapes
+  og: "One miss ends the run. A normal map draws Russia nine times the size of Brazil; it's twice.",
   metaTitle: "Endless mode: which is bigger?",
   metaDescription:
     "One size matchup after another, closer calls the further you go. Normal maps make some countries and empires look far bigger than they are. How long can you go without a miss?",
