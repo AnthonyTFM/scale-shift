@@ -23,18 +23,12 @@ export const nav: { href: string; label: string; from?: "lg" | "xl" }[] = [
   { href: "/disputes", label: "Disputed borders", from: "xl" },
 ];
 
-export const footerNav = [
-  { href: "/size", label: "Country sizes" },
-  { href: "/teachers", label: "For teachers" },
-  { href: "/about", label: "About & sources" },
-  { href: "/how-it-works", label: "How it works" },
-  { href: "/contact", label: "Report a border error" },
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
-];
-
-/** The phone menu: the main places first (the games lead), then history pages, then the small print. */
+/**
+ * The phone menu and the footer share these three groups, so the two never drift apart: the main places first (the
+ * games lead), then the history pages, then the small print.
+ */
 export const menu = {
+  mainTitle: "Play",
   main: [
     { href: "/daily", label: "Daily challenge", blurb: "Five new matchups every day", icon: "target" as const },
     { href: "/endless", label: "Endless mode", blurb: "Closer and closer, until your first miss", icon: "flame" as const },
@@ -46,8 +40,17 @@ export const menu = {
     { href: "/eras", label: "Eras" },
     { href: "/timeline", label: "Timeline" },
     { href: "/disputes", label: "Disputed borders" },
+    { href: "/size", label: "Country sizes" },
   ],
-  more: footerNav,
+  moreTitle: "About",
+  more: [
+    { href: "/how-it-works", label: "How it works" },
+    { href: "/teachers", label: "For teachers" },
+    { href: "/about", label: "About & sources" },
+    { href: "/contact", label: "Report a border error" },
+    { href: "/privacy", label: "Privacy" },
+    { href: "/terms", label: "Terms" },
+  ],
   backToMap: "Back to the map",
 };
 
