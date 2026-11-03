@@ -1,5 +1,5 @@
 import { dailyCopy as t } from "@/content/daily";
-import { challengeFromSegment } from "@/lib/challenge";
+import { challengeFromParam } from "@/lib/challenge";
 import { OG_SIZE, pairImage } from "@/lib/og-shapes";
 
 export const size = OG_SIZE;
@@ -11,7 +11,7 @@ export const alt = "A friend's score on the daily challenge, beside two countrie
  * would give away an answer).
  */
 export default async function Image({ params }: { params: Promise<{ c: string }> }) {
-  const c = challengeFromSegment((await params).c);
+  const c = challengeFromParam((await params).c);
   const ids: [string, string] = ["greenland-present", "india-present"];
   if (!c) return pairImage({ ids, eyebrow: t.eyebrow, title: t.title, line: t.og });
   return pairImage({ ids, eyebrow: t.challenge.ogEyebrow(c.day), title: t.challenge.ogTitle(c.name, c.score), line: t.challenge.ogLine });

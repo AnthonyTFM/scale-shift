@@ -9,9 +9,13 @@ export type ChallengeLink = { day: number; score: number; name: string };
 export const NAME_RE = /^[\p{L}\p{N}][\p{L}\p{N} _.-]*$/u;
 export const NAME_MAX = 16;
 
-/** Trims, squeezes spaces and cuts a shared name to length. Returns "" for anything that isn't a plain name. */
+/**
+ * Trims, squeezes spaces and cuts a shared name to length (by letter, never through a letter outside the basic plane).
+ * Returns "" for anything that isn't a plain name. Accents are composed first, so a name typed with a separate accent
+ * mark is still one letter.
+ */
 export function tidyName(raw: string) {
-  const name = raw.replace(/\s+/g, " ").trim().slice(0, NAME_MAX);
+  const name = Array.from(raw.normalize("NFKC").replace(/\s+/g, " ").trim()).slice(0, NAME_MAX).join("");
   return NAME_RE.test(name) ? name : "";
 }
 

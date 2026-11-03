@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   images: { formats: ["image/avif", "image/webp"], qualities: [60, 75] },
   partialPrefetching: true,
+  // the challenge preview (/d/16.3.Sam) is drawn on request, so its shapes and fonts must ship with the function
+  outputFileTracingIncludes: { "/d/\\[c\\]/*": ["./public/data/daily/shapes/greenland-present.json", "./public/data/daily/shapes/india-present.json", "./public/fonts/*"] },
   turbopack: {
     rules: {
       "*.css": {
@@ -67,6 +69,12 @@ const nextConfig: NextConfig = {
       {
         // the games can't start until the puzzle list arrives: fetch it with the page, not after the scripts
         source: "/:page(daily|endless)",
+        ...pageOnly,
+        headers: [{ key: "Link", value: `</data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous` }],
+      },
+      {
+        // a friend's challenge link is the daily game too
+        source: "/d/:c",
         ...pageOnly,
         headers: [{ key: "Link", value: `</data/daily/index.json${poolV}>; rel=preload; as=fetch; crossorigin=anonymous` }],
       },

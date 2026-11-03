@@ -370,14 +370,16 @@ function HeadToHead({ challenge, score, total }: { challenge: Challenge; score: 
         {line}
       </p>
       <dl className="mt-2 grid gap-2 sm:grid-cols-2">
-        {rows.map(([name, n, winner]) => (
-          <div key={name} className={`flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2 ring-2 ${winner ? "ring-gold" : "ring-line"}`}>
-            <dt className="min-w-0 truncate text-sm font-bold text-ink">
-              {name}
-              <span className="sr-only">: {C.scoreSr(name, n)}</span>
-            </dt>
-            <dd aria-hidden="true" className="flex shrink-0 items-center gap-1 font-display text-xl leading-none text-ink">
-              {winner ? <TrophyIcon className="size-4 text-gold" /> : null}
+        {rows.map(([name, n, winner], i) => (
+          <div key={i} className={`flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2 ring-2 ${winner ? "ring-gold" : "ring-line"}`}>
+            <dt className="min-w-0 truncate text-sm font-bold text-ink">{name}</dt>
+            <dd className="flex shrink-0 items-center gap-1 font-display text-xl leading-none text-ink">
+              {winner ? (
+                <>
+                  <TrophyIcon className="size-4 text-gold" />
+                  <span className="sr-only">{C.winnerSr} </span>
+                </>
+              ) : null}
               {n}
               <span className="text-sm text-muted">/{total}</span>
             </dd>

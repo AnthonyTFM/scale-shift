@@ -5,7 +5,7 @@ import { DailyChallenge } from "@/components/daily/DailyChallenge";
 import { SignInProvider } from "@/components/daily/SignInProvider";
 import { PageHero } from "@/components/site/PageHero";
 import { dailyCopy as t } from "@/content/daily";
-import { challengeFromSegment } from "@/lib/challenge";
+import { challengeFromParam } from "@/lib/challenge";
 
 type Props = { params: Promise<{ c: string }> };
 
@@ -19,7 +19,7 @@ export const instant = false;
  * with the score to beat. Never indexed: the game lives at /daily.
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const c = challengeFromSegment((await params).c);
+  const c = challengeFromParam((await params).c);
   if (!c) return { title: t.challenge.eyebrow, robots: { index: false, follow: false } };
   return {
     title: t.challenge.metaTitle(c.name, c.score, c.day),
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ChallengePage({ params }: Props) {
-  const c = challengeFromSegment((await params).c);
+  const c = challengeFromParam((await params).c);
   if (!c) notFound();
   return (
     <>

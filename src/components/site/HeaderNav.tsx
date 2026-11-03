@@ -10,7 +10,8 @@ export function HeaderNav() {
   return (
     <ul className="flex gap-1">
       {nav.slice(1).map((item) => {
-        const here = path === item.href || path.startsWith(`${item.href}/`);
+        // a friend's challenge link (/d/…) is the daily game
+        const here = path === item.href || path.startsWith(`${item.href}/`) || (item.href === "/daily" && path.startsWith("/d/"));
         return (
           <li key={item.href} className={item.from === "xl" ? "hidden xl:block" : item.from === "lg" ? "hidden lg:block" : undefined}>
             <Link

@@ -39,5 +39,7 @@ test("names are tidied: spaces squeezed, 16 characters at most, plain characters
   assert.equal(tidyName("Abcdefghijklmnopqrstuvwxyz"), "Abcdefghijklmnop");
   assert.equal(tidyName("-dash"), "");
   assert.equal(tidyName("Émilie"), "Émilie");
+  assert.equal(tidyName("E\u0301milie"), "Émilie", "a separate accent mark is composed");
+  assert.equal(tidyName("\u{10400}".repeat(17)), "\u{10400}".repeat(16), "cut by letter, not by code unit");
   assert.equal(tidyName(""), "");
 });

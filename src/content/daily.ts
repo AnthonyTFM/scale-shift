@@ -11,12 +11,12 @@ export const dailyCopy = {
   challenge: {
     eyebrow: "Daily challenge",
     // the hero's line under the title
-    lead: (name: string, score: number, day: number) => `${name} got ${score}/5 on Daily #${day}. Beat it, then send it back.`,
+    lead: (name: string, score: number, day: number) => `${name} got ${score}/5 on Daily #${day}. Play today's five and send yours back.`,
     // the banner above the questions while playing
     today: (name: string, score: number) => `${name} scored ${score}/5 on today's challenge. Can you beat it?`,
     old: (name: string, day: number) => `${name} sent you Daily #${day}. That one's gone, but today's is ready: play it and send your score back.`,
     // the browser tab and the text under a shared link
-    metaTitle: (name: string, score: number, day: number) => `${name} got ${score}/5 on Daily #${day}. Beat it?`,
+    metaTitle: (name: string, score: number, day: number) => `${name} got ${score}/5 on Daily #${day}. Your turn.`,
     metaDescription: "Five size matchups, the same for everyone. Normal maps make some countries look far bigger than they are. Can you see through them?",
     // the preview picture: eyebrow, title and the line under it
     ogEyebrow: (day: number) => `Daily #${day} · Challenge`,
@@ -27,7 +27,8 @@ export const dailyCopy = {
     tie: (name: string) => `Tied with ${name}.`,
     lose: (name: string) => `${name} wins this one.`,
     you: "You",
-    scoreSr: (name: string, score: number) => `${name}: ${score} out of 5`,
+    // before the winner's score, for screen readers
+    winnerSr: "winner,",
     // the Share button when there's a score to send back
     sendBack: "Send it back",
     sendBackSr: "Share your score with the friend who sent this",
@@ -35,7 +36,7 @@ export const dailyCopy = {
     shareBeat: (name: string, score: number) => `Beat ${name}'s ${score}/5.`,
     // asked once, the first time a player without an account shares; "" means they'd rather not say
     askTitle: "Who's sending this?",
-    askLead: "Your first name goes on the link, so your friend knows whose score to beat. Only this browser remembers it.",
+    askLead: "Your first name goes in the link you send, so your friend knows whose score to beat. This browser keeps it for next time.",
     askLabel: "Your first name",
     askPlaceholder: "e.g. Sam",
     askShare: "Share",
