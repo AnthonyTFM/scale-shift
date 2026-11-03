@@ -18,7 +18,8 @@ export function SiteHeader() {
         <nav aria-label="Main" className="hidden flex-1 md:block">
           <HeaderNav />
         </nav>
-        <Link href="/map" className="btn btn-primary ml-auto mb-0 hidden h-11 text-sm lg:inline-flex">
+        {/* not prefetched: the map is its own app (50 KB of script) and loads on the tap */}
+        <Link href="/map" prefetch={false} className="btn btn-primary ml-auto mb-0 hidden h-11 text-sm lg:inline-flex">
           Open the map
         </Link>
         <SiteMenu variant="header" />
