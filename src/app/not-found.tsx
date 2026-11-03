@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
-export const metadata: Metadata = { title: "Page not found", robots: { index: false } };
+export const metadata: Metadata = { title: "Page not found", description: "That page isn't here. The map, the daily challenge and endless mode are.", robots: { index: false } };
 
 export default function NotFound() {
   return (

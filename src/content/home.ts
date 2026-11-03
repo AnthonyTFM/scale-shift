@@ -16,6 +16,7 @@ export const home = {
     eras: (n: number) => `${n} snapshots, 2000 BCE to today`,
     timeline: (n: number) => `${n} times land changed hands`,
     disputes: (n: number) => `${n} places, from Crimea to Antarctica`,
+    archive: "Replay any day's five, just for fun",
     teachers: "Everything for the classroom",
   },
 
@@ -37,13 +38,10 @@ export const home = {
     replay: "Replay",
     // the picture, for screen readers (the line under it says the sizes in words)
     proofSr: (a: string, b: string) => `${a} and ${b}, drawn as a normal map shows them, then shrinking or growing to their real sizes`,
-    play: "Play today's five",
-    played: "See today's results",
+    // under the picture: replay that day in the archive (today's five have their own card above)
+    play: "Play yesterday's five",
   },
 
-  stickyCta: "Explore the real-size map",
-  // the phone bar on era pages, before today's game is played
-  stickyPlay: "Play today's five",
 
   // the game-first hero: the two game tiles, yesterday's matchup, the Best streaks board and the map card over a floating globe
   hub: {

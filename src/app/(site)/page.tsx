@@ -13,7 +13,7 @@ import { JsonLd } from "@/components/site/PageHero";
 import { GlobeLazy } from "@/components/home/GlobeLazy";
 import { HeroProof } from "@/components/home/HeroProof";
 import { YesterdayMatchup } from "@/components/home/YesterdayMatchup";
-import { BookIcon, ColumnsIcon, DisputeIcon, MapIcon, TimelineIcon, TrophyIcon } from "@/components/site/Icons";
+import { BookIcon, ColumnsIcon, DisputeIcon, MapIcon, TimelineIcon, TrophyIcon, ClockIcon } from "@/components/site/Icons";
 import { home } from "@/content/home";
 
 export const metadata: Metadata = {
@@ -29,6 +29,7 @@ const places = [
   { href: "/timeline", Icon: TimelineIcon, title: "Timeline", line: x.timeline(events.length) },
   { href: "/disputes", Icon: DisputeIcon, title: "Disputed borders", line: x.disputes(disputes.length) },
   { href: "/teachers", Icon: BookIcon, title: "For teachers", line: x.teachers },
+  { href: "/daily/archive", Icon: ClockIcon, title: "Past days", line: x.archive },
 ];
 
 function MapCard() {

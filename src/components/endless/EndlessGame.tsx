@@ -371,6 +371,8 @@ function grid(streak: number) {
 function Results({ run, streak, best, onAgain }: { run: Run; streak: number; best: number; onAgain: () => void }) {
   const shareBox = useShareBox();
   const newBest = streak > run.bestBefore && streak > 0;
+  // the party (banner, chime, confetti) waits for a best worth celebrating
+  const fanfare = newBest && streak >= 3;
   const miss = run.questions[streak];
   const [dailyDone, setDailyDone] = useState(false);
   // where this run lands on the Best streaks board, and the next place up (undefined while loading, null if it failed)
@@ -393,13 +395,13 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
         .then((p) => setPlace(p && typeof p.rank === "number" ? p : null))
         .catch(() => setPlace(null));
     }
-    if (!newBest) return;
+    if (!fanfare) return;
     play("perfect");
     buzz([20, 40, 20, 40, 80]);
     const id = setTimeout(confetti, reducedMotion() ? 0 : 300);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newBest]);
+  }, [fanfare]);
 
   // a plain Enter plays again, unless something else has focus or a pop-up (or the sign-in window) is open
   useEffect(() => {
@@ -435,7 +437,7 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
   return (
     <section aria-labelledby="endless-done" className="rounded-[28px] border-2 border-line bg-white p-5 shadow-[0_8px_0_0_var(--color-line)] sm:p-7">
       <SkyHeader>
-        {newBest ? (
+        {fanfare ? (
           <p className="flex justify-center">
             <span className="pop-in inline-flex items-center gap-1.5 rounded-full bg-gold px-3 py-1 text-sm font-extrabold uppercase tracking-wider text-ink shadow-[0_3px_0_0_var(--color-gold-shadow)] [text-shadow:none]">
               <TrophyIcon className="size-5" />
@@ -444,14 +446,14 @@ function Results({ run, streak, best, onAgain }: { run: Run; streak: number; bes
           </p>
         ) : null}
         {/* the streak beside its title */}
-        <div className={`${newBest ? "mt-3" : ""} flex items-center justify-center gap-4`}>
+        <div className={`${fanfare ? "mt-3" : ""} flex items-center justify-center gap-4`}>
           <p aria-hidden="true" className="pop-in flex items-center gap-1 font-display text-7xl leading-none">
             {streak > 0 ? <FlameIcon className="size-12" tier={flameTier(streak)} /> : null}
             {streak}
           </p>
           <div className="min-w-0">
             <h2 id="endless-done" tabIndex={-1} className="font-display text-2xl leading-tight outline-none sm:text-3xl">
-              <span className="sr-only">{R.scoreSr(streak, newBest)} </span>
+              <span className="sr-only">{R.scoreSr(streak, fanfare)} </span>
               {R.title(streak)}
             </h2>
             <p className="text-sm">{R.inARow(streak)}</p>
