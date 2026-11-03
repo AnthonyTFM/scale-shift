@@ -142,7 +142,7 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
                 ))}
               </ul>
               <p className="mt-7 px-1 text-xs font-bold uppercase tracking-wide text-muted">{menu.historyTitle}</p>
-              <ul className="mt-2 grid grid-cols-3 gap-2">
+              <ul className="mt-2 grid grid-cols-2 gap-2">
                 {menu.history.map((item) => (
                   <li key={item.href}>
                     <Link

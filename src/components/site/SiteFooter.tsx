@@ -1,43 +1,40 @@
 import Link from "next/link";
-// footer links are not prefetched: on a short page (a game loading) the whole footer is in view, and prefetching every
-// section (the map alone is 50 KB of script) cost more than the odd tap saves
-import { footerNav, nav, site } from "@/content/site";
+import { menu, site } from "@/content/site";
 import { Wordmark } from "./Wordmark";
+
+// the same three groups as the phone menu (src/content/site.ts), so nothing is listed twice and nothing is missing
+const groups = [
+  { title: menu.mainTitle, items: menu.main },
+  { title: menu.historyTitle, items: menu.history },
+  { title: menu.moreTitle, items: menu.more },
+];
 
 export function SiteFooter() {
   return (
     <footer className="mt-20 border-t border-line bg-white pb-24 text-ink md:pb-0">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
-        <div>
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:grid-cols-3 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div className="sm:col-span-3 md:col-span-1">
           <Link href="/" aria-label={`${site.name} home`} className="inline-flex min-h-11 items-center rounded-lg">
             <Wordmark />
           </Link>
           <p className="mt-3 max-w-xs text-sm text-muted">{site.tagline}</p>
         </div>
-        <nav aria-label="Explore">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">Explore</p>
-          <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm md:grid-cols-1">
-            {nav.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} prefetch={false} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-        <nav aria-label="About">
-          <p className="text-xs font-bold uppercase tracking-wide text-muted">About</p>
-          <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm md:grid-cols-1">
-            {footerNav.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} prefetch={false} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
+        {groups.map((g) => (
+          <nav key={g.title} aria-label={g.title}>
+            <p className="text-xs font-bold uppercase tracking-wide text-muted">{g.title}</p>
+            <ul className="mt-2 grid grid-cols-2 gap-x-4 text-sm sm:grid-cols-1">
+              {g.items.map((item) => (
+                <li key={item.href}>
+                  {/* not prefetched: on a short page (a game loading) the whole footer is in view, and prefetching every
+                      page (the map alone is 50 KB of script) cost more than the odd tap saves */}
+                  <Link href={item.href} prefetch={false} className="inline-flex min-h-11 items-center font-medium text-ink-soft hover:text-primary hover:underline">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
       </div>
       <div className="border-t border-line">
         <p className="mx-auto max-w-6xl px-4 py-5 text-xs text-muted">
