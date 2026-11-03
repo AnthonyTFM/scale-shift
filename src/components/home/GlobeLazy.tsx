@@ -5,28 +5,31 @@ import dynamic from "next/dynamic";
 
 // The globe's drawing code loads after the page is on screen. Until it has drawn, a still picture of its first frame
 // (public/globe-still.svg, made by scripts/build-globe.mjs) sits in its place, so the globe never shows up empty.
-const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), {
-  ssr: false,
-  loading: () => <div aria-hidden="true" className="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_38%_32%,#f1f8ff,#a9d3f0_78%)] p-2" />,
-});
+// the sea disc, shown while the globe's code is still to come (under the still, and in its place if the still is slow)
+const Sea = () => <div aria-hidden="true" className="aspect-square w-full rounded-full bg-[radial-gradient(circle_at_38%_32%,#f1f8ff,#a9d3f0_78%)] p-2" />;
+
+const Globe = dynamic(() => import("./Globe").then((m) => m.Globe), { ssr: false, loading: Sea });
+
+// how long the globe waits for a quiet moment at most, idle callback or not
+const WAIT = 1500;
 
 export function GlobeLazy({ label }: { label: string }) {
   const [ready, setReady] = useState(false);
-  // the globe's code and data wait for a quiet moment after the page is up (or a second and a half), so the first
-  // paint and the game links come first on slow phones; the still stands in meanwhile
+  // the globe's code and data wait for a quiet moment after the page is up (WAIT at most), so the first paint and the
+  // game links come first on slow phones; the still stands in meanwhile
   const [wanted, setWanted] = useState(false);
   useEffect(() => {
     const go = () => setWanted(true);
     if ("requestIdleCallback" in window) {
-      const id = requestIdleCallback(go, { timeout: 1500 });
+      const id = requestIdleCallback(go, { timeout: WAIT });
       return () => cancelIdleCallback(id);
     }
-    const id = setTimeout(go, 800);
+    const id = setTimeout(go, WAIT);
     return () => clearTimeout(id);
   }, []);
   return (
     <div className="relative">
-      {wanted ? <Globe label={label} onReady={() => setReady(true)} onGone={() => setReady(false)} /> : <div aria-hidden="true" className="aspect-square w-full" />}
+      {wanted ? <Globe label={label} onReady={() => setReady(true)} onGone={() => setReady(false)} /> : <Sea />}
       <div
         aria-hidden="true"
         className={`pointer-events-none absolute inset-0 transition-opacity duration-300 ${ready ? "opacity-0" : "opacity-100"}`}
