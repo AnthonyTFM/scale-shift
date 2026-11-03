@@ -63,7 +63,7 @@ export function SiteMenu({ variant }: { variant: "map" | "header" }) {
   const close = () => setOpen(false);
   // read when the menu opens (the cookie isn't there on the server)
   const signedIn = open && maybeSignedIn();
-  const here = (href: string) => (pathname === href ? "page" : undefined);
+  const here = (href: string) => (pathname === href || (href === "/daily" && pathname.startsWith("/d/")) ? "page" : undefined);
 
   return (
     // in the header until every link fits beside the logo (Timeline and Disputed borders hide below xl)
