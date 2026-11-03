@@ -33,6 +33,7 @@ import type { ShapeFile } from "@/lib/outline";
 import { resultImage } from "@/lib/result-image";
 import { challengeUrl } from "@/lib/challenge-friend";
 import { useShareBox } from "@/components/site/ShareBox";
+import { useShareName } from "./ShareNamePrompt";
 import { dailyCopy } from "@/content/daily";
 import { ClockIcon, FlameIcon, MapIcon, MarkIcon, ShieldIcon, TargetIcon, TickIcon, TrophyIcon } from "@/components/site/Icons";
 import { dayName } from "@/lib/format";
@@ -42,6 +43,7 @@ import { useAccount } from "./SignInProvider";
 
 const reveal = dailyCopy.reveal;
 const R = dailyCopy.results;
+const C = dailyCopy.challenge;
 
 type Round = {
   /** the puzzle's date key */
@@ -147,7 +149,7 @@ export function DailyChallenge() {
   }, [playing]);
 
   useEffect(() => {
-    const c = readChallenge(location.hash);
+    const c = readChallenge(location.pathname, location.hash);
     if (c) queueMicrotask(() => setChallenge(c));
     let live = true;
     const loaded = prepare()
@@ -236,9 +238,7 @@ export function DailyChallenge() {
       {challenge && !finished ? (
         <p className="mb-3 flex items-start gap-2 rounded-2xl border-2 border-gold bg-gold-soft p-3 text-sm font-semibold text-ink">
           <TargetIcon className="size-5" />
-          {challenge.day === todayNo
-            ? dailyCopy.challengeToday(challenge.name, challenge.score)
-            : dailyCopy.challengeOld(challenge.name, challenge.day)}
+          {challenge.day === todayNo ? dailyCopy.challenge.today(challenge.name, challenge.score) : dailyCopy.challenge.old(challenge.name, challenge.day)}
         </p>
       ) : null}
       <DoneMark finished={finished} />
@@ -354,6 +354,40 @@ function StreakPill({ save, today }: { save: DailySave; today: string }) {
   );
 }
 
+/** The friend's score and yours, side by side, with the winner's trophy. */
+function HeadToHead({ challenge, score, total }: { challenge: Challenge; score: number; total: number }) {
+  const won = score > challenge.score;
+  const tied = score === challenge.score;
+  const line = won ? C.win(challenge.name) : tied ? C.tie(challenge.name) : C.lose(challenge.name);
+  const rows: [string, number, boolean][] = [
+    [challenge.name, challenge.score, !won && !tied],
+    [C.you, score, won],
+  ];
+  return (
+    <div className="pop-in mt-3 rounded-2xl border-2 border-gold bg-gold-soft p-3">
+      <p className="flex items-center justify-center gap-2 text-center text-sm font-bold text-ink">
+        {won ? <TrophyIcon className="size-5" /> : <TargetIcon className="size-5" />}
+        {line}
+      </p>
+      <dl className="mt-2 grid gap-2 sm:grid-cols-2">
+        {rows.map(([name, n, winner]) => (
+          <div key={name} className={`flex items-center justify-between gap-2 rounded-xl bg-white px-3 py-2 ring-2 ${winner ? "ring-gold" : "ring-line"}`}>
+            <dt className="min-w-0 truncate text-sm font-bold text-ink">
+              {name}
+              <span className="sr-only">: {C.scoreSr(name, n)}</span>
+            </dt>
+            <dd aria-hidden="true" className="flex shrink-0 items-center gap-1 font-display text-xl leading-none text-ink">
+              {winner ? <TrophyIcon className="size-4 text-gold" /> : null}
+              {n}
+              <span className="text-sm text-muted">/{total}</span>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  );
+}
+
 function Results({
   round,
   choices,
@@ -374,6 +408,7 @@ function Results({
   const grid = marks.map((m) => (m ? "🟩" : "🟥")).join("");
   const [copied, setCopied] = useState("");
   const shareBox = useShareBox();
+  const shareName = useShareName();
   const verdict = R.verdict(score, total);
   // everyone's scores today (anonymous counts), for "Better than 62% of players today"
   const [crowd, setCrowd] = useState<{ n: number; scores: number[] } | null>(null);
@@ -443,15 +478,18 @@ function Results({
     setCopied(R.pictureSaved);
   };
 
-  // one Share for both: the link carries your score, so a friend who opens it sees the score to beat
-  const share = () => {
-    const url = challengeUrl(score, round.date);
-    // the pair a normal map lies about most: the small one drawn biggest
-    const trickiest = [...round.questions].sort((x, y) => y.options[1 - y.answer].m / y.options[y.answer].m - x.options[1 - x.answer].m / x.options[x.answer].m)[0];
-    const hook = trickiest ? `${R.shareHook(trickiest.options[0].n, trickiest.options[1].n)}\n` : "";
-    const text = `${R.shareHead(site.name, dayNumber(today), score, total, s.streak)}\n${grid}\n${hook}${R.shareDare(total - score)}\n${url}`;
-    shareBox.share({ kind: "score", url, text }, "results");
-  };
+  // one Share for both: the link carries your score (and your name, asked once), so a friend who opens it sees the
+  // score to beat
+  const share = () =>
+    shareName.withName(() => {
+      const url = challengeUrl(score, round.date);
+      // the pair a normal map lies about most: the small one drawn biggest
+      const trickiest = [...round.questions].sort((x, y) => y.options[1 - y.answer].m / y.options[y.answer].m - x.options[1 - x.answer].m / x.options[x.answer].m)[0];
+      const hook = trickiest ? `${R.shareHook(trickiest.options[0].n, trickiest.options[1].n)}\n` : "";
+      const beat = challenge && score > challenge.score ? `${C.shareBeat(challenge.name, challenge.score)}\n` : "";
+      const text = `${R.shareHead(site.name, dayNumber(today), score, total, s.streak)}\n${grid}\n${hook}${beat}${R.shareDare(total - score)}\n${url}`;
+      shareBox.share({ kind: "score", url, text }, challenge ? "challenge" : "results");
+    });
 
   // one bar chart, used for both views: rows from 5 down to 0, your score's row in blue
   const bars = (values: number[], label: (n: number, v: number) => string, sr: (n: number, v: number) => string, you: boolean) => {
@@ -537,20 +575,12 @@ function Results({
           <FlameIcon className="size-6" /> {R.milestone(s.streak)}
         </p>
       ) : null}
-      {challenge ? (
-        <p className="mt-3 flex items-center justify-center gap-2 rounded-2xl border-2 border-gold bg-gold-soft px-3 py-2 text-center text-sm font-bold text-ink">
-          {score > challenge.score ? <TrophyIcon className="size-5" /> : <TargetIcon className="size-5" />}
-          {score > challenge.score
-            ? `You beat ${challenge.name} (${challenge.score}/5)! Send them a rematch.`
-            : score === challenge.score
-              ? `Tied with ${challenge.name} at ${score}/5.`
-              : `${challenge.name} wins this one with ${challenge.score}/5. Get them back tomorrow.`}
-        </p>
-      ) : null}
+      {challenge ? <HeadToHead challenge={challenge} score={score} total={total} /> : null}
       {/* the two things to do next: share (the main one: it's how friends find the game) and endless mode */}
       <div className="mt-5 flex gap-2">
         <button type="button" onClick={share} className="btn btn-primary h-12 min-w-0 flex-1 px-2">
-          {R.share}
+          {challenge ? C.sendBack : R.share}
+          {challenge ? <span className="sr-only">. {C.sendBackSr}</span> : null}
         </button>
         <Link href="/endless" onClick={() => track("daily_endless_start")} className="btn btn-gold h-12 shrink-0 px-4">
           {R.endlessShort}
@@ -567,6 +597,7 @@ function Results({
         {copied}
       </p>
       {shareBox.box}
+      {shareName.prompt}
 
       <SaveStreak date={round.date} choices={choices} />
 

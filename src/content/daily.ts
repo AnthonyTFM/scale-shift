@@ -7,9 +7,41 @@ export const dailyCopy = {
   og: "Five matchups a day. A normal map draws Greenland bigger than India; India is bigger.",
   // under the game
   note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your scores and streak are saved in this browser, and in your account if you sign in.",
-  // a friend's challenge link: for today's game, or for an older one
-  challengeToday: (name: string, score: number) => `${name} scored ${score}/5 on today's challenge. Can you beat it?`,
-  challengeOld: (name: string, day: number) => `${name} sent you Daily #${day}. That one's gone, but today's is ready: play it and send your score back.`,
+  // a friend's "beat my score" link (/d/<day>/<score>/<name>): the page it opens, its preview, and the results side by side
+  challenge: {
+    eyebrow: "Daily challenge",
+    // the hero's line under the title
+    lead: (name: string, score: number, day: number) => `${name} got ${score}/5 on Daily #${day}. Beat it, then send it back.`,
+    // the banner above the questions while playing
+    today: (name: string, score: number) => `${name} scored ${score}/5 on today's challenge. Can you beat it?`,
+    old: (name: string, day: number) => `${name} sent you Daily #${day}. That one's gone, but today's is ready: play it and send your score back.`,
+    // the browser tab and the text under a shared link
+    metaTitle: (name: string, score: number, day: number) => `${name} got ${score}/5 on Daily #${day}. Beat it?`,
+    metaDescription: "Five size matchups, the same for everyone. Normal maps make some countries look far bigger than they are. Can you see through them?",
+    // the preview picture: eyebrow, title and the line under it
+    ogEyebrow: (day: number) => `Daily #${day} · Challenge`,
+    ogTitle: (name: string, score: number) => `${name} got ${score}/5`,
+    ogLine: "Beat it? Five size matchups, the same five for everyone.",
+    // the results screen, side by side: the friend's score and yours
+    win: (name: string) => `You beat ${name}!`,
+    tie: (name: string) => `Tied with ${name}.`,
+    lose: (name: string) => `${name} wins this one.`,
+    you: "You",
+    scoreSr: (name: string, score: number) => `${name}: ${score} out of 5`,
+    // the Share button when there's a score to send back
+    sendBack: "Send it back",
+    sendBackSr: "Share your score with the friend who sent this",
+    // a line in the shared text when you beat the friend who sent the link
+    shareBeat: (name: string, score: number) => `Beat ${name}'s ${score}/5.`,
+    // asked once, the first time a player without an account shares; "" means they'd rather not say
+    askTitle: "Who's sending this?",
+    askLead: "Your first name goes on the link, so your friend knows whose score to beat. Only this browser remembers it.",
+    askLabel: "Your first name",
+    askPlaceholder: "e.g. Sam",
+    askShare: "Share",
+    askSkip: "Skip",
+    askBad: "Letters and numbers only, please.",
+  },
   // the countdown under the results, to the next daily
   nextIn: "Next five in",
   nextTime: (h: number, m: number) => (h ? `${h}h ${m}m` : m ? `${m}m` : "under a minute"),
