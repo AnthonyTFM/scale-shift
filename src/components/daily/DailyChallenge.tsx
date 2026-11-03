@@ -104,8 +104,8 @@ function catchUp(g: Game): Game {
 }
 
 // results: "Better than N%" needs this many plays today, and the chart of how everyone scored this many
-const CROWD_MIN = 30;
-const SPREAD_MIN = 10;
+const CROWD_MIN = 10;
+const SPREAD_MIN = 3;
 const BETTER_MIN = 30;
 const TOP_MAX = 50;
 
@@ -245,9 +245,9 @@ export function DailyChallenge() {
       {/* answered at least one, not finished: no update reload mid-round */}
       <PlayingMark on={!finished && choices.length > 0} />
       {signInOn ? <OnSignIn run={() => syncAccount(setGame)} /> : null}
-      {/* on phones above the game, where it still fits; on wider screens below it, so both tiles stay on a laptop's first screen */}
+      {/* below the game on every screen, so the first thing on the page is the first question */}
       {signInOn && !finished ? (
-        <div className="md:order-last md:mt-4">
+        <div className="order-last mt-4">
           <PlayedElsewhere />
         </div>
       ) : null}

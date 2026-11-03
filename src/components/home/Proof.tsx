@@ -98,7 +98,7 @@ export function Proof({ shapes, label, mapLabel, realLabel, replay }: { shapes?:
         type="button"
         onClick={again}
         disabled={!shapes}
-        aria-label={shapes ? `${label}. ${replay}` : label}
+        aria-label={shapes ? `${replay}: ${label}` : label}
         className="block w-full cursor-pointer rounded-xl bg-white p-2 text-left ring-1 ring-line disabled:cursor-default"
       >
         <span className="flex items-center justify-between gap-1 text-[10px] font-semibold uppercase leading-tight tracking-wide text-muted">

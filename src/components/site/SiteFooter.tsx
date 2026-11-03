@@ -11,9 +11,6 @@ export function SiteFooter() {
             <Wordmark />
           </Link>
           <p className="mt-3 max-w-xs text-sm text-muted">{site.tagline}</p>
-          <Link href="/map" className="btn btn-primary mt-5 h-11 text-sm">
-            Open the map
-          </Link>
         </div>
         <nav aria-label="Explore">
           <p className="text-xs font-bold uppercase tracking-wide text-muted">Explore</p>
@@ -51,7 +48,3 @@ export function SiteFooter() {
     </footer>
   );
 }
-
-/** Mobile-only sticky bar that keeps the main action one tap away. */
-
-export { StickyMapCta } from "./StickyMapCta";

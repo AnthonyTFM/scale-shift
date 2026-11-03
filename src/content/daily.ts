@@ -5,7 +5,6 @@ export const dailyCopy = {
   title: "Which is bigger?",
   // the social preview card: under the title, beside the two shapes
   og: "Five matchups a day. A normal map draws Greenland bigger than India; India is bigger.",
-  lead: "Five matchups a day, the same for everyone. Normal maps puff up land near the poles, so the one that looks bigger often isn't. Go 5 for 5 and keep your streak alive. New matchups at midnight your time.",
   // under the game
   note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your scores and streak are saved in this browser, and in your account if you sign in.",
   // a friend's challenge link: for today's game, or for an older one

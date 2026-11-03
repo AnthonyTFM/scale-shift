@@ -5,7 +5,7 @@ import { site } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "The map: drag countries and empires to see their real size",
-  description: site.description,
+  description: site.mapDescription,
   alternates: { canonical: "/map" },
 };
 

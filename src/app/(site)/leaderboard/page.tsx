@@ -37,7 +37,7 @@ export default function LeaderboardPage() {
         }
       />
       <div className="mx-auto max-w-6xl px-4 pb-8 pt-4 md:py-10">
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-2xl">
           <SignInProvider>
             <LeaderboardView />
             {/* below the board, so on phones the board starts on the first screen */}
