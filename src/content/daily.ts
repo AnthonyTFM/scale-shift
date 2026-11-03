@@ -3,6 +3,8 @@
 export const dailyCopy = {
   eyebrow: "Daily challenge",
   title: "Which is bigger?",
+  // the social preview card: under the title, beside the two shapes
+  og: "Five matchups a day. A normal map draws Greenland bigger than India; India is bigger.",
   lead: "Five matchups a day, the same for everyone. Normal maps puff up land near the poles, so the one that looks bigger often isn't. Go 5 for 5 and keep your streak alive. New matchups at midnight your time.",
   // under the game
   note: "Areas come from our map outlines (for an empire, its borders in the year shown), so they can be a few percent off official figures. Your scores and streak are saved in this browser, and in your account if you sign in.",
@@ -189,6 +191,8 @@ export const dailyCopy = {
     // the shared text: "#BorderDrift Daily #6 · 4/5 🔥3" (the hashtag makes posts findable), the grid, then a dare
     shareHead: (site: string, day: number, score: number, total: number, streak: number) =>
       `#${site.replace(/\s+/g, "")} Daily #${day} · ${score}/${total}${streak >= 2 ? ` 🔥${streak}` : ""}`,
+    // the pair the map lies about most, named without the answer, so the post says what the game is
+    shareHook: (a: string, b: string) => `Trickiest pair: ${a} vs ${b}`,
     shareDare: (misses: number) =>
       misses === 0
         ? "Perfect round. Bet the map fools you at least once."

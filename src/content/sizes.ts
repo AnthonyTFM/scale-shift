@@ -24,6 +24,10 @@ export const sizes = {
   metaDescription: (Name: string, area: string, like: string, stretchLine: string) => `${Name} covers ${area}, ${like}. ${stretchLine}`,
   metaStretch: (x: string) => `A normal web map draws it ${x}× too big.`,
   metaRight: "A normal web map shows it about the right size.",
+  // the social preview card for a country page
+  ogTitle: (name: string) => `How big is ${name}, really?`,
+  ogStretch: (x: string, partner: string) => `A normal map draws it ${x}× too big. At real size, next to ${partner}.`,
+  ogRight: (partner: string) => `A normal map gets it about right. At real size, next to ${partner}.`,
   eyebrow: "Real size",
   size,
   // phrase is "largest", "12th largest", "smallest" or "5th smallest" (whichever end is nearer)
